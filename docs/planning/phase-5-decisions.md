@@ -276,7 +276,10 @@ is captured from the start, and reporting stays barebones (D18).
 
 ### D27: Decoys that test error types (settled: Arthur's OK, 2026-11-21)
 
-Each set's decoy tests one error type (R8), and the types rotate evenly.
+Each set's decoy tests one error type (R8). Each set uses the type shown
+least so far among those it can supply. Small ゃゅょ decoys exist for only
+9% of N5 words, so exact even rotation is impossible, and reports divide
+misses by exposure (slice 0 spike, finding 4).
 The decoy then does three jobs: it stops free last matches, it makes
 players read carefully, and it measures which kinds of mistakes learners
 make, at equal exposure.

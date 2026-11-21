@@ -39,8 +39,10 @@ word's difficulty tag is added to the set's multiplier (L7).
 - the review engine records 学校 as a miss (R2), and 学校 comes back within
   the next 2 sets (R3).
 
-Only the first card tapped counts as the miss. じかん belongs to another
-word, which did nothing wrong.
+The miss counts against the **word card** in the wrong pair, whichever
+card was tapped first. Tapping じかん then 学校 also says "学校 reads
+じかん". じかん's own word did nothing wrong. (Clarified while building
+slice 1.)
 
 **L5. Levels (Must, D2).** Levels run from 1 to 5. The level goes up by 1
 each time the combo reaches a multiple of 10 (10, 20, 30, 40), up to 5. A
@@ -50,7 +52,8 @@ level 1.
 **L6. The set timer (Must, D3, D4).** The time per set is 40, 30, 22, 17
 and 12 seconds at levels 1 to 5. That's about 8 seconds per card at
 level 1 and 2.5 at level 5. When time runs out:
-- the unmatched pairs are shown briefly, then cleared;
+- each unmatched word card shows its reading for 3 seconds, long enough
+  to read all five, then the cards clear;
 - the combo goes to 0 and the level drops, as for a miss;
 - the unmatched words are **not** recorded as forgotten. A timeout
   measures reading speed more than memory;
@@ -70,7 +73,9 @@ is our own (D22).
 
 **L8. Difficulty tags (Must, D6).** Each word card shows a small tag,
 from +0.1× to +0.5× in steps of 0.1:
-- it starts from a guess based on the data (R5);
+- it starts from a guess based on the data (R5). The tag comes from the
+  word's rank within its level, in fifths, because the N5 guess is too
+  narrow (0.15 to 0.37) to spread tags (slice 0 spike);
 - it then moves with the player's own misses on that word;
 - a word you keep missing is worth more, so the score rewards beating
   your weak words.
@@ -186,7 +191,9 @@ from the word and the reading that was picked:
 - dakuten or handakuten (はし / ばし);
 - a small ゃ, ゅ or ょ;
 - the same kanji with another reading (生: せい / しょう);
-- a look-alike kanji (待 / 持: a shared part, from KANJIDIC2);
+- ~~a look-alike kanji~~: **dropped** by slice 0's spike. OpenJLPT has
+  radicals but not kanji components, and 待 and 持 share 寺, not a
+  radical. EDRDG's KRADFILE could add it later;
 - a mix-up with another word in the set;
 - other.
 
