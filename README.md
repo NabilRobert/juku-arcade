@@ -9,12 +9,11 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 4. The game is playable and remembers your progress, in
-a karuta table look: washi-paper cards with a vermilion stamp for each
-card's difficulty, a side panel with a counting-up score, and animation
-that follows your reduce-motion setting. It suggests a break after 15
-minutes, and schools can set a daily cap. The check-up and export come in
-slice 5.
+**Status:** slice 5a. The game is playable and remembers your progress, in
+a karuta table look, with a break nudge and an optional daily cap. An
+optional one-minute daily check-up measures whether play improves recall
+(with a held-back control group), and Settings can export your anonymous
+data for your teacher. The report script comes in slice 5b.
 
 ## Run it
 

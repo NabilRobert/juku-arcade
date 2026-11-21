@@ -8,8 +8,13 @@
 import { domAnimation, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
 import type { Deck, JlptLevel } from './deck/types.ts';
-import type { GameEvent } from './game/events.ts';
+import { localDay, type GameEvent } from './game/events.ts';
+import { pickQuestions } from './memory/check-up-questions.ts';
+import type { Question } from './memory/check-up.ts';
+import { buildExport, downloadExport } from './memory/export.ts';
+import { deriveMemory } from './memory/word-memory.ts';
 import {
+  appendEvents,
   deleteAllData,
   loadEvents,
   loadSettings,
@@ -17,11 +22,12 @@ import {
   type Settings,
 } from './memory/storage.ts';
 import AboutData from './components/AboutData.vue';
+import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/GameScreen.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import SetupScreen from './components/SetupScreen.vue';
 
-type Page = 'game' | 'about' | 'settings';
+type Page = 'game' | 'about' | 'settings' | 'checkUp';
 
 const settings = shallowRef<Settings | null>(null);
 const deck = shallowRef<Deck | null>(null);
@@ -32,6 +38,12 @@ const page = ref<Page>('game');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
 const isAway = computed(() => page.value !== 'game');
+const checkUpQuestions = shallowRef<readonly Question[]>([]);
+const checkUpIdentity = computed(() => ({
+  playerId: settings.value?.playerId ?? '',
+  sessionId: `check-up-${runKey.value}`,
+  classCode: settings.value?.classCode ?? null,
+}));
 
 /** Storage can be blocked (a private window); the game then runs without saving. */
 async function orFallback<T>(load: () => Promise<T>, fallback: T): Promise<T> {
@@ -59,10 +71,45 @@ async function startGame(current: Settings): Promise<void> {
     pastEvents.value = await orFallback(loadEvents, []);
     deck.value = await loadDeck(current.level);
     settings.value = current;
+    offerCheckUp(current, deck.value);
     runKey.value += 1;
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : String(error);
   }
+}
+
+/** C1: offers the check-up once a day, when there's something to ask. */
+function offerCheckUp(current: Settings, levelDeck: Deck): void {
+  const today = localDay(new Date());
+  if (current.checkUpOfferedDay === today) return;
+  const questions = pickQuestions(
+    levelDeck.words,
+    deriveMemory(pastEvents.value),
+    today,
+    Math.random,
+  );
+  if (questions.length === 0) return;
+  checkUpQuestions.value = questions;
+  page.value = 'checkUp';
+}
+
+/** After the check-up (or skipping it): saves its answers, then starts the game with them. */
+async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
+  if (settings.value === null) return;
+  const updated = { ...settings.value, checkUpOfferedDay: localDay(new Date()) };
+  await orFallback(() => saveSettings(updated), undefined);
+  await orFallback(() => appendEvents(answers), undefined);
+  pastEvents.value = [...pastEvents.value, ...answers];
+  settings.value = updated;
+  page.value = 'game';
+  runKey.value += 1;
+}
+
+/** A1: downloads this browser's events as an anonymous file. */
+async function exportData(): Promise<void> {
+  if (settings.value === null) return;
+  const events = await orFallback(loadEvents, pastEvents.value);
+  downloadExport(buildExport(events, settings.value, new Date()));
 }
 
 async function useSettings(updated: Settings): Promise<void> {
@@ -80,6 +127,7 @@ function finishSetup(level: JlptLevel, classCode: string | null): Promise<void> 
     bestSetScore: 0,
     playDay: null,
     playMsToday: 0,
+    checkUpOfferedDay: null,
   };
   return useSettings(fresh);
 }
@@ -120,9 +168,18 @@ onMounted(async () => {
             :settings="settings"
             @change-level="changeLevel"
             @delete-data="deleteData"
+            @export-data="exportData"
             @close="page = 'game'"
           />
+          <CheckUpScreen
+            v-if="page === 'checkUp'"
+            :questions="checkUpQuestions"
+            :identity="checkUpIdentity"
+            @done="finishCheckUp"
+            @skip="finishCheckUp([])"
+          />
           <GameScreen
+            v-else
             v-show="!isAway"
             :key="runKey"
             :deck="deck"
