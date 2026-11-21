@@ -245,6 +245,11 @@ before it ships.
 CC0 sounds only, muted until the first tap. Sound is first on the cut
 list.
 
+### D24: System fonts for Japanese (settled: Arthur's OK, 2026-11-21)
+
+- **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before
+  subsetting, which works against N1).
+
 ## Data for decisions (added 2026-11-21, after Arthur's review)
 
 ### D25: The score motivates, and the data measures (settled)
@@ -290,7 +295,26 @@ report are written as static HTML or Markdown, plus a CSV of events.
   (leaves the school to do the analysis, and they asked for insight, not
   data).
 
-### D24: System fonts for Japanese (settled: Arthur's OK, 2026-11-21)
+## Kanji readings (added 2026-11-21)
 
-- **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before
-  subsetting, which works against N1).
+### D29: One reading on each word card, and every kanji's readings on the back (settled)
+
+Arthur asked whether cards should show all of a kanji's readings. A
+single kanji can have 8 or more (生: せい, しょう, い(きる), う(まれる),
+なま…), which won't fit on a card and turns matching into guessing. The
+cards are **words**, and a word has one reading in context (学校 is
+always がっこう).
+
+So the board stays one word with one reading. Flipping a card while
+paused (L9) shows each of the word's kanji with its full reading list,
+the reading used in this word highlighted, and 2–3 other words that use
+the same kanji. The "same kanji, other reading" error type (R8) tests
+this knowledge.
+
+- **Beat:**
+  - all readings on the card (doesn't fit, and isn't recall);
+  - a kanji mode matching single kanji to their 2 most common readings
+    at that level (a busy card, and "the key 2" is a judgement call).
+- **Decided after the playtest:** a separate kanji mode that matches
+  single kanji to their **meaning** (生 → life). Meanings are short, and
+  readings stay in word mode, where they're unambiguous.

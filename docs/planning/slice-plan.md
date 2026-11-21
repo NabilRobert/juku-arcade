@@ -43,7 +43,10 @@ The heart of the game. No memory between runs yet.
 ## Slice 2: Pause, flip and peek (`feat/pause-flip`)
 
 - The pause button freezes the timer and animations, with no menu (L9).
-- Flipping a card shows its reading, meaning, example and level.
+- Flipping a card shows its reading, meaning, example and level, plus
+  each kanji's full reading list with this word's reading highlighted,
+  and 2–3 other words that use it (D29). The deck script adds the kanji
+  readings from KANJIDIC2, through OpenJLPT.
 - The peek rule, the eye mark, and the missed tray of the last 8.
 - Comebacks within 2 sets (R3).
 - Hidden card faces while paused (D8).
@@ -141,6 +144,6 @@ wellbeing nudge and minors cap (D19), and attribution (D2).
 
 ## After the playtest (not planned)
 
-Grammar mode (D11), a tiny backend with an admin page (D18), pooling the
+Grammar mode (D11), a kanji-to-meaning mode (D29), a tiny backend with an admin page (D18), pooling the
 class's misses for difficulty (D6), importing the school's lists (D3), and
 moving to Juku's API.

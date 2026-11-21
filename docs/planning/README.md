@@ -25,8 +25,9 @@ Japanese school. These documents are planning only: there's no code yet.
   faces while paused (D8), the Juku engine port (D13), storage (D14), the
   deck script (D15), hosting (D20), sound (D23), fonts (D24), and an MIT
   code licence once the school confirms ownership (D21).
-- **Open with Arthur:** how to show kanji with many readings (see the
-  session report of 2026-11-21).
+- **Kanji readings (D29):** one reading on each word card, and every
+  kanji's readings on the card's back. A kanji-to-meaning mode is decided
+  after the playtest.
 - **Waiting on the school:** the open questions in phase 1. Answers
   could change the deck levels, the minors cap, the UI language and slice
   6's timing.

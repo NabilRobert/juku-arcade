@@ -78,7 +78,10 @@ from +0.1× to +0.5× in steps of 0.1:
 **L9. Pause and flip (Must, D8).** A pause button freezes the timer and
 the animations. No menu opens, and the board stays in place.
 - Tap any card to flip it. Its back shows the reading, the English
-  meaning, an example sentence with furigana, and the JLPT level.
+  meaning, an example sentence with furigana, and the JLPT level. Below
+  that, each kanji in the word appears with **all** its readings, the one
+  used in this word highlighted, and 2–3 other words that use the same
+  kanji (D29). The back scrolls if it's long.
 - **Peeking:** flipping a card that isn't matched yet marks that word with
   an eye. Matching a peeked word gives no chips, tag or combo point, but
   doesn't break the combo either. The review engine records it as a miss,
