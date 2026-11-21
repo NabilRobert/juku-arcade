@@ -16,7 +16,11 @@ Japanese school. These documents are planning only: there's no code yet.
 - **Settled with Arthur:** the core loop (D1–D10), grammar deferred
   (D11), the framework (D12), the measurement approach (D16, D17), the
   barebones admin (D18), and wellbeing (D19).
-- **Waiting on Arthur:** hiding card faces while paused (D8), the Juku
+- **Added after Arthur's review:** score versus ability (D25), detailed
+  anonymous events (R6, D26), words known (R7), error types and the
+  decoys that test them (R8, D27), class codes (R9), and the decision
+  report (phase 3, D28).
+- **Waiting on Arthur:** decoys that test error types (D27), hiding card faces while paused (D8), the Juku
   engine port (D13), storage (D14), the deck script (D15), hosting (D20),
   and the code licence (D21).
 - **Waiting on the school:** the open questions in phase 1. Answers

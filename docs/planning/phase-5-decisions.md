@@ -245,6 +245,51 @@ before it ships.
 CC0 sounds only, muted until the first tap. Sound is first on the cut
 list.
 
+## Data for decisions (added 2026-11-21, after Arthur's review)
+
+### D25: The score motivates, and the data measures (settled)
+
+Arthur noticed that per-player tags make scores meaningless as a measure
+of ability. That's by design: the score is a personal motivator, never
+compared between players. Ability comes from the event log, "words known"
+(R7) and the check-up.
+
+- **Beat:** fixed tags, so scores could be compared (that drops the
+  learning tags, and invites leaderboards, which D19 rules out); hiding
+  the score (that drops the arcade payoff).
+
+### D26: Detailed, anonymous events from slice 1 (settled)
+
+Every event carries the full field list in R6. Events that weren't logged
+can never be recovered, but reports can be built at any time. So detail
+is captured from the start, and reporting stays barebones (D18).
+
+- **Beat:** logging only outcomes (no confusions, speed or context, so
+  the struggle insight is impossible); logging names to make follow-up
+  easier (a privacy risk, especially for minors; the school can map IDs
+  itself, N5).
+
+### D27: Decoys that test error types (recommended)
+
+Each set's decoy tests one error type (R8), and the types rotate evenly.
+The decoy then does three jobs: it stops free last matches, it makes
+players read carefully, and it measures which kinds of mistakes learners
+make, at equal exposure.
+
+- **Beat:**
+  - random decoys from the same level, as in Juku's quiz (error types
+    would only show up by chance, and couldn't be compared);
+  - **classifying errors by hand:** it doesn't scale.
+
+### D28: Reports as static files from a script, and a CSV (settled in substance: barebones)
+
+The class report, the ability reports per learner and the measurement
+report are written as static HTML or Markdown, plus a CSV of events.
+
+- **Beat:** a live dashboard (needs the deferred backend); a CSV only
+  (leaves the school to do the analysis, and they asked for insight, not
+  data).
+
 ### D24: System fonts for Japanese (recommended)
 
 - **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before

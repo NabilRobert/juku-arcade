@@ -17,6 +17,9 @@ ambiguous:
 - no two cards in a set share a spelling or a reading (橋 and 箸 are both
   はし, so they never share a set);
 - the decoy's reading is not the reading of any word in the set;
+- the decoy is built to test one error type (R8), such as がこう for
+  がっこう, a dropped small っ. The types rotate evenly across sets, so the
+  error rates of different types can be compared fairly;
 - kana-only words (これ, ソース) are left out, because their reading *is*
   their spelling;
 - each word shows one reading: OpenJLPT's main one.
@@ -139,6 +142,55 @@ reading flag (今日 きょう, 大人 おとな). Then it's updated with that
 player's own record: `(misses + k × guess) / (attempts + k)`, with `k = 5`
 to start. That chance maps to the tag (L8).
 
+## Score versus ability (D25)
+
+The score is for motivation, not measurement. Difficulty tags differ for
+each player, so two players' scores can't be compared, and they never
+are: there are no leaderboards. A learner's ability is measured only from
+the event log (R6), the "words known" count (R7) and the check-up (C).
+
+**R6. Detailed events (Must, D26).** Every event records the fields below.
+They're cheap to capture, and impossible to recover later. Events live in
+memory from slice 1, and in storage from slice 3.
+
+| Field | Why |
+|---|---|
+| `event_id` (random UUID), `schema_version` | Merging exports without double counting, and reading old exports after the format changes |
+| `player_id` (random, anonymous), `class_code` (optional, R9), `session_id` | Linking events up, with no names |
+| `at` (local time, with timezone) | Days, sessions, time of day, and gaps between visits |
+| `kind`: match, miss, peek, timeout, check-up answer, pause, session start or end | What happened |
+| `word_id`, `first_card`, `second_card` | Which word, and what it was confused with |
+| `wrong_card_role`: the decoy, or another word in the set | A confusion with the decoy tests an error type. A confusion with another word is a real mix-up between two words |
+| `error_type` (R8) | Why the miss happened |
+| `ms_since_set_shown`, `ms_since_last_action` | How fast the word was recalled |
+| `level`, `seconds_left`, `set_index`, `cards_left_in_set` | Context, so speed under pressure isn't mistaken for ability |
+| `outcome`: clean, after a miss, peeked | Accuracy, kept apart from guessing |
+| `times_seen_before`, `days_since_last_seen`, `box_before`, `tag_shown` | The forgetting curve, and checking the difficulty model |
+| `check_up_role`: before, after or held back (check-up answers only) | The headline measure |
+
+**R7. Words known (Must).** The home screen shows an honest ability number,
+for example "Words known: 312 / 700 (N5)", per level. A word counts as
+known after clean matches on 2 separate local days (Juku's LE1 rule).
+Peeks and matches after a miss don't count.
+
+**R8. Error types (Must, D27).** Each miss gets an error type, worked out
+from the word and the reading that was picked:
+- a long vowel (がっこう / がこう);
+- a small っ;
+- dakuten or handakuten (はし / ばし);
+- a small ゃ, ゅ or ょ;
+- the same kanji with another reading (生: せい / しょう);
+- a look-alike kanji (待 / 持: a shared part, from KANJIDIC2);
+- a mix-up with another word in the set;
+- other.
+
+Slice 0's spike checks that this can be computed. If a type can't be,
+it's dropped and not guessed.
+
+**R9. Class code (Should).** On first launch, the player can type an
+optional class code given by the teacher, such as "N5-SAT". It goes into
+every event, so reports can be split by class. No names.
+
 ## The check-up (C)
 
 **C1. Optional and daily (Must, D17).** Offered once a day, and easy to
@@ -198,8 +250,22 @@ energy systems, or leaderboards with names.
 event log as an anonymous JSON file, with a random player ID and no
 names.
 
-**A2. Summary (Should, D18).** A script in the repo reads a folder of
-exports and prints the measurement report (phase 3).
+**A2. Reports (Should, D18, D28).** A script in the repo reads a folder of
+exports and writes three reports as static files, laid out in phase 3's
+"Decision report":
+- a **class report**: what to re-teach, and who may need help;
+- an **ability report per learner**, by anonymous ID: words known per
+  level, weak words and their usual confusions, error types, recall speed
+  over time, and how well words are held after 1, 4 and 8 days;
+- the **measurement report**: the headline, S1–S6, and the guardrails.
+
+It also writes a CSV of the events, so the school can explore the data in
+a spreadsheet.
+
+**A4. Data quality (Must, with A2).** Merged exports are deduplicated by
+`event_id`. Old `schema_version`s are still read. Gaps and clock jumps are
+flagged. Every figure shows how many learners and answers it rests on,
+and a figure that rests on too few is held back (phase 3).
 
 **A3. A backend (Won't now).** A tiny backend for live class stats is
 deferred until after the playtest, and not planned yet.
@@ -218,6 +284,13 @@ deferred until after the playtest, and not planned yet.
   Keyboard play on laptops is Could.
 - **N5. Private:** no accounts, no names, no third-party analytics. Data
   stays in the browser until the player exports it.
+  - The player's anonymous ID is shown in the settings. If the school
+    wants follow-up with named learners, the learner tells the teacher
+    their ID, and that mapping stays with the school, never in our data.
+  - The export screen says in plain words what the file contains.
+  - A "Delete my data" button clears this browser's data.
+  - If minors play, the school handles consent from parents or
+    guardians before collecting exports.
 - **N6. Works offline mid-run:** once a deck has loaded, a dropped
   connection doesn't stop play. Installing it as an app (PWA) is Could.
 - **N7. Browsers:** the last 2 versions of Chrome, Safari on iOS, and

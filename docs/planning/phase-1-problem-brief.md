@@ -60,6 +60,11 @@ Juku's, so after a playtest the game can switch to Juku's API.
   kanji frequency, irregular readings) and moves with the player's own
   misses. We measure whether the learned tag predicts misses better than
   the starting guess.
+- **It turns play into decisions.** The score is only for motivation.
+  The detailed log behind it shows where learners struggle: which words,
+  which confusions, which kinds of error (long vowels, small っ, look-alike
+  kanji). Reports start from the school's decisions, such as what to
+  re-teach this week and who may need help.
 - **It reuses Arthur's work:** the same open word data as Juku
   (OpenJLPT), and Juku's review scheduling, ported to the browser.
 
@@ -68,8 +73,9 @@ Juku's, so after a playtest the game can switch to Juku's API.
 - Kanji-to-reading matching for JLPT words, N5 first.
 - The loop, scoring, pause and peek, daily deck, review engine and
   check-up, all in the browser with no server.
-- A barebones way for the school to get anonymous stats out: an export
-  file and a summary script.
+- A barebones way for the school to get anonymous data out: an export
+  file, and a script that writes a class report, ability reports per
+  learner and the measurement report.
 
 ## Not in scope now
 
@@ -102,5 +108,7 @@ Juku's, so after a playtest the game can switch to Juku's API.
 | Use | In class, homework or free time? Phone or laptop? | Session length, layout priority |
 | Language | Which language for menus and meanings: English or Indonesian? | OpenJLPT meanings are English |
 | Success | What would make them call it a success? | Adds to the measurement plan |
+| Decisions | What would teachers and managers decide with this data, and how often? Weekly? Per term? | The decision report (phase 3) is built around their answers |
+| Learner privacy | Is class-level data enough, or do teachers need to know which learner is which? Who collects consent for minors? | Whether learners share their anonymous ID with the teacher (N5) |
 | Measurement | Will they ask learners to do the check-up and export their stats? Would they compare with a class that doesn't play? | The headline measure needs check-up data |
 | Deal | Free or paid? Can Arthur show it in his portfolio? Their branding? Deadline? | Public repo or private; slice order |

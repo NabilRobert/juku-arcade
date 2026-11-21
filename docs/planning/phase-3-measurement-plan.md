@@ -80,6 +80,36 @@ From the same export (A1) and summary script (A2).
 | S5 | **Peeks:** peeks per set, and peeked words' later recall | Shows whether pause and flip helps learning or is avoided |
 | S6 | **Check-up uptake:** share of play days with a check-up | Below 30% means the headline will be thin; tell the school early |
 
+## Decision report: data for the people who decide
+
+Arthur (2026-11-21): the data is there to help decision makers decide,
+and to show where learners struggle. So every report section starts from
+a decision, not from a chart. The meeting with the school confirms this
+list (phase 1, open questions).
+
+| Who | Decision | Evidence in the report | When it flags |
+|---|---|---|---|
+| Teacher | What to re-teach this week | The class's 10 most-missed words; its most common confusions (学校 ↔ 学生); error types as a share of misses | A word missed by at least 40% of the learners who met it, with at least 5 learners |
+| Teacher | Who might need help | By anonymous ID: words known per week, accuracy trend, days since last play | Accuracy falling 2 weeks running, or no play for 7 days |
+| Teacher | Which skill to drill | Error types per class, for example "long vowels: 32% of misses" | A type with twice the miss rate of the others, at the same number of decoy tests |
+| Curriculum lead | Which words are harder than their level suggests | Class difficulty (R5, pooled) next to the JLPT level | A word in the hardest 10% of a level that sits a level easier |
+| Curriculum lead | Is the class ready for the next level? | Words known as a share of the level's deck, as the median and spread across the class | — (shown, not flagged) |
+| School leadership | Keep using the game? | The headline (play effect), S1 coming back, and the wellbeing guardrails | The headline's success or failure rule, above |
+| Learner | What to study next | In the game: words known (R7), and their own weak words when paused | — |
+
+**Reporting rules:**
+- Every figure shows how many learners and answers it rests on.
+- Figures about a word or a class need at least 5 learners. Below that,
+  the report says "too few learners" instead of a number, so nobody acts
+  on noise and no single learner can be picked out.
+- Reports rank words and skills, never learners against each other.
+- Confusions with a decoy and mix-ups between two real words are reported
+  separately (R6 `wrong_card_role`). Decoy confusions show which error
+  types learners fall for. Real mix-ups show which pairs of words get
+  confused.
+- Each flag says what it suggests ("consider re-teaching 学校, 学生 and
+  先生: the 学 readings"), and the evidence sits next to it.
+
 ## Wellbeing guardrails
 
 These are watched as closely as success:

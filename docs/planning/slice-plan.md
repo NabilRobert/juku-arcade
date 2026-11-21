@@ -17,7 +17,8 @@ Sizes are rough estimates of lines of code, not counting tests and docs.
 - **Spike, in the script:** how many words per level pass L2's rules, and
   the difficulty guess's inputs (R5). Is the irregular-reading flag
   computable from KANJIDIC2 readings, or does it need a short hand-made
-  list?
+  list? Which error types (R8) can be computed, and how many decoys of
+  each type can every level supply (D27)?
 - **Done when:** CI is green, and `npm run dev` shows one static N5 board
   dealt from the real deck. The spike's counts are in the PR.
 - About 250 lines.
@@ -31,6 +32,8 @@ The heart of the game. No memory between runs yet.
   timeouts, and the set score with tags from the data's guess (L1–L8).
 - Vue board: tap in either order, a simple shake on a miss, the right
   answer flashing, and the combo, level, timer and set score on screen.
+- Decoys that test error types (D27). Every action emits an R6 event,
+  kept in memory, with a test that each event has every field.
 - Bests kept for the current visit only.
 - **Done when:** Arthur plays a 5-minute run on his phone over the local
   network, and each rule in L1–L8 has a test named after it
@@ -56,7 +59,10 @@ The heart of the game. No memory between runs yet.
   rebuilding from the log matches (R4).
 - The daily deck and its progress bar, endless mixing, and promotion at
   most once a day (L10, L11).
-- Learned difficulty tags (R5). The level picker on first launch (L15).
+- Learned difficulty tags (R5). The level picker and optional class code
+  on first launch (L15, R9).
+- "Words known" on the home screen (R7). The player ID in the settings,
+  and "Delete my data" (N5).
 - Bests and the calendar, kept across visits (L12).
 - **Done when:** closing and reopening the browser keeps progress, and a
   word missed today is due tomorrow (a test with a fixed clock).
@@ -73,17 +79,28 @@ The heart of the game. No memory between runs yet.
   DevTools performance trace), and Arthur says it feels good to play.
 - About 300 lines.
 
-## Slice 5: Check-up and export (`feat/check-up`)
+## Slice 5a: Check-up and export (`feat/check-up`)
 
 - The optional daily check-up: 5 questions, 4 options, 8 seconds, with
   before, after and held-back words assigned at random (C1–C5).
-- The export button (A1), and the summary script (A2) that prints phase
-  3's report.
-- The simulated-player test: a planted effect is recovered, and zero
-  gives "not enough data" or a CI that includes 0.
-- **Done when:** the simulated-player test passes, and an export from
-  Arthur's own play goes through the script.
-- About 400 lines (the script is about half).
+- The export button (A1), with the plain-words explanation (N5).
+- **Done when:** a check-up's answers appear in an export with their
+  roles, and the random assignment test passes (about 1 in 3 held back,
+  with a fixed seed).
+- About 250 lines.
+
+## Slice 5b: Reports (`feat/reports`)
+
+- The report script (A2): the class report, ability reports per learner,
+  the measurement report, and the CSV, with data quality checks (A4) and
+  the reporting rules (phase 3).
+- **Simulated players:** a planted play effect is recovered, and zero
+  gives "not enough data" or a CI that includes 0. Planted weak words and
+  error types appear in the class report's flags.
+- **Done when:** the simulated-player tests pass, and Arthur reads the
+  class report built from his own play plus simulated classmates and
+  finds it useful.
+- About 400 lines.
 
 ## Slice 6: Playtest (`chore/playtest`)
 
@@ -98,7 +115,8 @@ The heart of the game. No memory between runs yet.
 
 ## Merge order
 
-0 → 1 → 2 → 3 → 4 → 5 → 6. Slices 2 and 3 both build on 1 and touch
+0 → 1 → 2 → 3 → 4 → 5a → 5b → 6. Slice 5b only needs exports, so it
+can start once 5a is merged, alongside 4 if 4 runs late. Slices 2 and 3 both build on 1 and touch
 different files, so they can run side by side in separate worktrees. Slice
 4 goes after both.
 
@@ -114,8 +132,10 @@ If time runs short, cut from the top down:
 6. Score count-up polish. Show the number instantly.
 7. Learned difficulty. Keep the data's guess for the tags, and leave S3
    unmeasured.
+8. The ability reports per learner. Keep the class report and the CSV.
 
-**Never cut:** the decoy (D1), the peek rule (D8), timeouts not counting
+**Never cut:** the detailed events (R6: they can't be recovered later),
+the decoy (D1), the peek rule (D8), timeouts not counting
 as forgotten (D4), the check-up with its held-back control (D16), the
 wellbeing nudge and minors cap (D19), and attribution (D2).
 
