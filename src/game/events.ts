@@ -10,8 +10,13 @@ import type { DecoyType } from '../deck/types.ts';
 
 export const EVENT_SCHEMA_VERSION = 1;
 
-/** Check-up answers are 'check_up_right' or 'check_up_wrong', with check_up_role set (C1). */
+/**
+ * Check-up answers are 'check_up_right' or 'check_up_wrong', with
+ * check_up_role set (C1). A 'deal' event's error_type is the error type its
+ * decoy tests, so reports know how often each type was shown.
+ */
 export type EventKind =
+  | 'deal'
   | 'match'
   | 'miss'
   | 'peek'

@@ -193,3 +193,12 @@ describe('decoy rotation', () => {
     expect(set.readings.find((card) => card.wordId === null)?.decoyType).toBe('dakuten');
   });
 });
+
+describe('deal events', () => {
+  it("logs each set's decoy error type, so reports know how often each type was shown", () => {
+    const { state } = start();
+    const deal = state.events.find((event) => event.kind === 'deal');
+    const decoy = state.set.readings.find((card) => card.wordId === null);
+    expect(deal).toMatchObject({ kind: 'deal', error_type: decoy?.decoyType, set_index: 0 });
+  });
+});
