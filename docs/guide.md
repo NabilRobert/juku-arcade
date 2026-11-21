@@ -155,8 +155,17 @@ flowchart LR
    learners who may need help.
 5. **`report/learner-report.ts`** writes an ability report per anonymous
    player, reusing the app's `deriveMemory` for "words known".
-6. **`report/render.ts`** writes `measurement-report.md`, `class-report.md`,
-   `ability-reports.md` and `events.csv`.
+6. **`report/play-measures.ts`** works out the game measures from events
+   alone: S1 coming back, S4 loop balance (timeouts and misses per level,
+   and quitting after a 5→1 drop), S5 peeks, S6 check-up uptake.
+7. **`report/deck-measures.ts`** works out the two that need the decks in
+   `public/decks`: S2 replays each player's events day by day through the
+   app's own `dailyProgress`, and S3 scores the starting guess against the
+   learned miss chance on each later answer, predicted only from earlier
+   ones. Each player's deck is the level in their latest export.
+8. **`report/render.ts`** writes `measurement-report.md`, `class-report.md`,
+   `ability-reports.md` and `events.csv`; **`report/render-play.ts`**
+   writes `play-report.md`, with phase 3's reading of each measure.
 
 **`report/simulate.ts`** makes simulated players with a planted truth. The
 specs use them to check the reports find what's there and don't invent what
@@ -271,6 +280,10 @@ fields. They stay in memory until slice 3 stores them.
 - **Change a report's rules (thresholds, minimum learners):** the constants
   are at the top of `scripts/report/class-report.ts` and `measurement.ts`.
   Specs: `tests/report.test.ts`, run on simulated players.
+- **Change a play report threshold (S3's 5%, S4's 40% and 30%, S6's
+  30%):** the constants at the top of `scripts/report/render-play.ts`.
+  Specs: `tests/play-report.test.ts`, on hand-built events.
+- **Deploy or tune for the playtest:** `docs/playtest.md`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
