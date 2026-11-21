@@ -35,6 +35,34 @@ export interface DeckWord {
   missChanceGuess: number;
   /** One wrong reading per decoy type, where the data allows one. */
   decoys: Partial<Record<DecoyType, string>>;
+  /** English meanings, for the card's back (L9). */
+  meanings: string[];
+  example: Example | null;
+  /**
+   * For each kanji in the word, the KANJIDIC2 readings this word uses
+   * (学校: 学 → ガク, 校 → コウ), highlighted on the card's back (D29).
+   */
+  kanjiReadingsUsed: Record<string, string[]>;
+}
+
+/** An example sentence from Tatoeba (CC BY 2.0 FR). */
+export interface Example {
+  /**
+   * The sentence, with readings marked where Tatoeba has them:
+   * この{学校|がっこう}は… Plain text otherwise. src/deck/furigana.ts parses it.
+   */
+  text: string;
+  english: string;
+  tatoebaId: number;
+}
+
+/** One kanji's entry for the card's back: all its readings, and other words using it (D29). */
+export interface KanjiNote {
+  onyomi: string[];
+  kunyomi: string[];
+  meanings: string[];
+  /** Up to a few other JLPT words that use this kanji, with their readings. */
+  words: { word: string; reading: string }[];
 }
 
 export interface Deck {
@@ -42,4 +70,6 @@ export interface Deck {
   /** The OpenJLPT commit the deck was built from. */
   sourceCommit: string;
   words: DeckWord[];
+  /** Every kanji used by this deck's words. */
+  kanji: Record<string, KanjiNote>;
 }

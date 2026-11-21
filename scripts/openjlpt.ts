@@ -24,11 +24,24 @@ export interface VocabRow {
   reading: string;
   otherReadings: string[];
   level: JlptLevel;
+  meanings: string[];
+  examples: RawExample[];
+}
+
+/** An example as OpenJLPT stores it; furigana is missing for some sentences. */
+export interface RawExample {
+  ja: string;
+  furigana?: string;
+  en: string;
+  tatoeba_id: number;
 }
 
 export interface KanjiRow extends KanjiReadings {
   /** KANJIDIC2's frequency rank (1 is the most common); null when unranked. */
   frequencyRank: number | null;
+  meanings: string[];
+  /** JLPT words that use this kanji, as OpenJLPT lists them. */
+  words: string[];
 }
 
 async function download(): Promise<void> {
@@ -53,13 +66,15 @@ export async function openPinnedDatabase(): Promise<DatabaseSync> {
   return new DatabaseSync(SQLITE_PATH, { readOnly: true });
 }
 
-function parseList(json: unknown): string[] {
-  return typeof json === 'string' ? (JSON.parse(json) as string[]) : [];
+function parseList<T = string>(json: unknown): T[] {
+  return typeof json === 'string' ? (JSON.parse(json) as T[]) : [];
 }
 
 export function readVocab(database: DatabaseSync): VocabRow[] {
   const rows = database
-    .prepare('SELECT id, word, reading, other_readings, level FROM vocab ORDER BY level DESC, id')
+    .prepare(
+      'SELECT id, word, reading, other_readings, level, meanings, examples FROM vocab ORDER BY level DESC, id',
+    )
     .all();
   return rows.map((row) => ({
     id: String(row.id),
@@ -67,17 +82,23 @@ export function readVocab(database: DatabaseSync): VocabRow[] {
     reading: String(row.reading),
     otherReadings: parseList(row.other_readings),
     level: String(row.level) as JlptLevel,
+    meanings: parseList(row.meanings),
+    examples: parseList<RawExample>(row.examples),
   }));
 }
 
 export function readKanji(database: DatabaseSync): Map<string, KanjiRow> {
-  const rows = database.prepare('SELECT character, onyomi, kunyomi, freq FROM kanji').all();
+  const rows = database
+    .prepare('SELECT character, onyomi, kunyomi, freq, meanings, words FROM kanji')
+    .all();
   const table = new Map<string, KanjiRow>();
   for (const row of rows) {
     table.set(String(row.character), {
       onyomi: parseList(row.onyomi),
       kunyomi: parseList(row.kunyomi),
       frequencyRank: typeof row.freq === 'number' ? row.freq : null,
+      meanings: parseList(row.meanings),
+      words: parseList(row.words),
     });
   }
   return table;
