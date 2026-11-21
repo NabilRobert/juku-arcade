@@ -18,6 +18,9 @@ export interface Settings {
   classCode: string | null;
   bestCombo: number;
   bestSetScore: number;
+  /** W2: the local day the play time is for, and today's play so far. */
+  playDay: string | null;
+  playMsToday: number;
 }
 
 interface SettingsRow {
@@ -51,7 +54,10 @@ export async function appendEvents(events: readonly GameEvent[]): Promise<void> 
 }
 
 export async function loadSettings(): Promise<Settings | null> {
-  return (await database.settings.get('settings'))?.value ?? null;
+  const saved = (await database.settings.get('settings'))?.value;
+  if (saved === undefined) return null;
+  // Settings saved before slice 4 have no play time yet.
+  return { ...saved, playDay: saved.playDay ?? null, playMsToday: saved.playMsToday ?? 0 };
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {

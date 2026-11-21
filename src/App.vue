@@ -5,6 +5,7 @@
  * and starts a run. The game stays mounted (v-show) under the About and
  * Settings pages, and pauses while they cover it.
  */
+import { domAnimation, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
 import type { Deck, JlptLevel } from './deck/types.ts';
 import type { GameEvent } from './game/events.ts';
@@ -71,7 +72,15 @@ async function useSettings(updated: Settings): Promise<void> {
 }
 
 function finishSetup(level: JlptLevel, classCode: string | null): Promise<void> {
-  const fresh = { playerId: crypto.randomUUID(), level, classCode, bestCombo: 0, bestSetScore: 0 };
+  const fresh: Settings = {
+    playerId: crypto.randomUUID(),
+    level,
+    classCode,
+    bestCombo: 0,
+    bestSetScore: 0,
+    playDay: null,
+    playMsToday: 0,
+  };
   return useSettings(fresh);
 }
 
@@ -95,35 +104,42 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-4 py-6">
-    <h1 class="text-center text-2xl font-bold tracking-wide">juku-arcade</h1>
-    <p v-if="loadError" role="alert" class="text-center text-rose-300">{{ loadError }}</p>
-    <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
-    <template v-else-if="settings && deck">
-      <AboutData v-if="page === 'about'" @close="page = 'game'" />
-      <SettingsPanel
-        v-if="page === 'settings'"
-        :settings="settings"
-        @change-level="changeLevel"
-        @delete-data="deleteData"
-        @close="page = 'game'"
-      />
-      <GameScreen
-        v-show="!isAway"
-        :key="runKey"
-        :deck="deck"
-        :settings="settings"
-        :past-events="pastEvents"
-        :is-away="isAway"
-      />
-    </template>
-    <p v-else class="text-center text-slate-400">Loading…</p>
-    <footer
-      v-if="settings && page === 'game'"
-      class="mt-auto flex justify-center gap-6 text-sm text-slate-400"
-    >
-      <button type="button" class="underline" @click="page = 'settings'">Settings</button>
-      <button type="button" class="underline" @click="page = 'about'">About the data</button>
-    </footer>
-  </main>
+  <!-- Motion's small animation bundle; "user" follows the system's reduce-motion setting. -->
+  <LazyMotion :features="domAnimation">
+    <MotionConfig reduced-motion="user">
+      <main class="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-4 py-6">
+        <h1 class="text-center font-card text-3xl font-bold tracking-wide text-gold">
+          juku-arcade
+        </h1>
+        <p v-if="loadError" role="alert" class="text-center text-vermilion">{{ loadError }}</p>
+        <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
+        <template v-else-if="settings && deck">
+          <AboutData v-if="page === 'about'" @close="page = 'game'" />
+          <SettingsPanel
+            v-if="page === 'settings'"
+            :settings="settings"
+            @change-level="changeLevel"
+            @delete-data="deleteData"
+            @close="page = 'game'"
+          />
+          <GameScreen
+            v-show="!isAway"
+            :key="runKey"
+            :deck="deck"
+            :settings="settings"
+            :past-events="pastEvents"
+            :is-away="isAway"
+          />
+        </template>
+        <p v-else class="text-center text-washi/60">Loading…</p>
+        <footer
+          v-if="settings && page === 'game'"
+          class="mt-auto flex justify-center gap-6 text-sm text-washi/60"
+        >
+          <button type="button" class="underline" @click="page = 'settings'">Settings</button>
+          <button type="button" class="underline" @click="page = 'about'">About the data</button>
+        </footer>
+      </main>
+    </MotionConfig>
+  </LazyMotion>
 </template>

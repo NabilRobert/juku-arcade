@@ -23,10 +23,11 @@ function onWordTap(word: DeckWord): void {
   <section class="flex flex-col gap-6" aria-label="Board">
     <div class="grid grid-cols-3 gap-3 sm:grid-cols-5" data-testid="word-row">
       <PlayCard
-        v-for="word in state.set.words"
+        v-for="(word, index) in state.set.words"
         :key="word.id"
         :text="word.word"
         kind="word"
+        :index="index"
         :status="wordCardStatus(state, word.id, nowMs)"
         :tag="tags.get(word.id)"
         :hint="state.phase === 'timedOut' ? word.reading : undefined"
@@ -40,6 +41,7 @@ function onWordTap(word: DeckWord): void {
         :key="card.text"
         :text="card.text"
         kind="reading"
+        :index="state.set.words.length + index"
         :status="readingCardStatus(state, index, nowMs)"
         @tap="$emit('tap', { kind: 'reading', index })"
       />

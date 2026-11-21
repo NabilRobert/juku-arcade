@@ -1,14 +1,70 @@
 @import 'tailwindcss';
 
-/* System fonts with Japanese coverage, so no webfont is downloaded (D24). */
+/*
+ * The karuta table look (decision D30): washi-paper cards with a vermilion
+ * hanko stamp, on a dark lacquer table. Every colour is a token here, so the
+ * look changes in one place. Textures are CSS gradients, not image files.
+ */
 @theme {
   --font-sans:
     system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI',
     'Yu Gothic', sans-serif;
+  /* Mincho (serif) faces for the cards, as on printed karuta; system fonts only (D24). */
+  --font-card: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP', serif;
+
+  --color-lacquer: #1a0f0b;
+  --color-lacquer-light: #2b1912;
+  --color-wood: #3a2418;
+  --color-washi: #f6efdf;
+  --color-washi-shade: #e8dcc2;
+  --color-sumi: #1f1a17;
+  --color-vermilion: #c3361f;
+  --color-gold: #c9a24a;
+  --color-pine: #1f3b2c;
+  --color-pine-light: #2e5641;
+
   --animate-shake: shake 0.35s ease-in-out;
 }
 
-/* A wrong tap shakes both cards (L4). Motion's richer effects come in slice 4. */
+body {
+  background-color: var(--color-lacquer);
+  /* Lacquer with a faint glow from the centre of the table. */
+  background-image: radial-gradient(
+    ellipse at 50% 35%,
+    var(--color-lacquer-light),
+    transparent 70%
+  );
+  background-attachment: fixed;
+  color: var(--color-washi);
+}
+
+/* Washi: soft fibres from two layered gradients. */
+.washi {
+  background-color: var(--color-washi);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 80%, rgb(160 130 90 / 0.12) 0 1px, transparent 2px),
+    linear-gradient(160deg, var(--color-washi), var(--color-washi-shade));
+  background-size:
+    9px 9px,
+    13px 13px,
+    100% 100%;
+}
+
+/* The back of a card: pine green with a thin gold frame, as karuta backs are. */
+.card-back {
+  background-color: var(--color-pine);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-pine) 0 6px,
+    var(--color-pine-light) 6px 7px
+  );
+  box-shadow:
+    inset 0 0 0 3px var(--color-pine),
+    inset 0 0 0 4px var(--color-gold);
+}
+
+/* A wrong tap shakes both cards (L4). */
 @keyframes shake {
   0%,
   100% {

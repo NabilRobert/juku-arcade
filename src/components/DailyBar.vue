@@ -14,19 +14,17 @@ const share = computed(() =>
 </script>
 
 <template>
-  <section class="space-y-1 text-sm text-slate-300" aria-label="Today">
+  <section class="space-y-1 rounded-xl bg-wood/80 p-3 text-sm text-washi/80" aria-label="Today">
     <p class="flex justify-between">
-      <span v-if="progress.daily.isCleared" class="font-semibold text-emerald-300"
+      <span v-if="progress.daily.isCleared" class="font-semibold text-gold"
         >Today's deck cleared ✓</span
       >
       <span v-else>Today {{ progress.daily.done }} / {{ progress.daily.total }}</span>
       <span>Words known {{ progress.wordsKnown }} / {{ progress.deckSize }} ({{ level }})</span>
     </p>
-    <div class="h-1.5 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
-      <div class="h-full rounded-full bg-amber-400" :style="{ width: `${share * 100}%` }" />
+    <div class="h-1.5 overflow-hidden rounded-full bg-lacquer" aria-hidden="true">
+      <div class="h-full rounded-full bg-gold" :style="{ width: `${share * 100}%` }" />
     </div>
-    <p class="text-xs text-slate-400">
-      Played {{ progress.daysPlayedThisWeek }} of the last 7 days
-    </p>
+    <p class="text-xs text-washi/60">Played {{ progress.daysPlayedThisWeek }} of the last 7 days</p>
   </section>
 </template>

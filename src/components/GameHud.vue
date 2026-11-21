@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
- * The heads-up display: level, combo, the set timer, bests, and the set
- * score when a set clears (L5–L7, L12).
+ * The run's numbers: level, combo (it pops when it rises), the set timer,
+ * the pause button, and what's happening (L5, L6, L9, L12).
  */
+import { m } from 'motion-v';
 import { computed } from 'vue';
 import { secondsLeft, type RunState } from '../game/run.ts';
 import { MAX_LEVEL } from '../game/tuning.ts';
@@ -11,7 +12,6 @@ const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
 
 const isPaused = computed(() => props.state.pausedAtMs !== null);
-
 const timeShare = computed(
   () => secondsLeft(props.state, props.nowMs) / (props.state.setDurationMs / 1000),
 );
@@ -19,57 +19,64 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
 </script>
 
 <template>
-  <section class="flex flex-col gap-3" aria-label="Score">
-    <div class="flex items-end justify-between">
-      <p>
-        <span class="text-sm text-slate-400">Level</span>
-        <span class="ml-1 text-2xl font-bold" data-testid="level">{{ state.level }}</span>
-        <span class="text-sm text-slate-500"> / {{ MAX_LEVEL }}</span>
+  <section class="flex flex-col gap-3" aria-label="Run">
+    <div class="grid grid-cols-2 gap-3">
+      <p class="rounded-xl bg-wood/80 p-3 text-center">
+        <span class="block text-xs tracking-widest text-gold/80 uppercase">Level</span>
+        <m.span
+          :key="state.level"
+          class="inline-block text-3xl font-bold"
+          data-testid="level"
+          :initial="{ scale: 1.8, color: '#c9a24a' }"
+          :animate="{ scale: 1, color: '#f6efdf' }"
+          :transition="{ type: 'spring', stiffness: 400, damping: 15 }"
+          >{{ state.level }}</m.span
+        >
+        <span class="text-sm text-washi/60"> / {{ MAX_LEVEL }}</span>
       </p>
-      <button
-        type="button"
-        class="min-h-11 rounded-lg bg-slate-700 px-4 text-sm font-semibold"
-        :disabled="state.phase !== 'playing'"
-        :aria-pressed="isPaused"
-        @click="isPaused ? $emit('resume') : $emit('pause')"
-      >
-        {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      </button>
-      <p class="text-right">
-        <span class="text-sm text-slate-400">Combo</span>
-        <span class="ml-1 text-3xl font-bold text-amber-300" data-testid="combo">{{
-          state.combo
-        }}</span>
+      <p class="rounded-xl bg-wood/80 p-3 text-center">
+        <span class="block text-xs tracking-widest text-gold/80 uppercase">Combo</span>
+        <m.span
+          :key="state.combo"
+          class="inline-block text-3xl font-bold text-gold"
+          data-testid="combo"
+          :initial="{ scale: state.combo > 0 ? 1.5 : 1 }"
+          :animate="{ scale: 1 }"
+          :transition="{ type: 'spring', stiffness: 500, damping: 18 }"
+          >{{ state.combo }}</m.span
+        >
       </p>
     </div>
     <div
-      class="h-2 overflow-hidden rounded-full bg-slate-800"
+      class="h-2.5 overflow-hidden rounded-full bg-lacquer"
       role="progressbar"
       aria-label="Time left in this set"
       :aria-valuenow="Math.round(timeShare * 100)"
     >
       <div
         class="h-full rounded-full transition-[width] duration-100"
-        :class="isTimeLow ? 'bg-rose-500' : 'bg-emerald-400'"
+        :class="isTimeLow ? 'bg-vermilion' : 'bg-gold'"
         :style="{ width: `${timeShare * 100}%` }"
       />
     </div>
-    <p class="flex justify-between text-xs text-slate-400">
-      <span>Best combo {{ state.bestCombo }}</span>
-      <span>Best set {{ state.bestSetScore }}</span>
-    </p>
-    <p
-      v-if="state.phase === 'cleared' && state.lastSetScore"
-      class="text-center text-xl font-semibold text-amber-200"
-      role="status"
+    <button
+      type="button"
+      class="min-h-11 rounded-lg bg-pine px-4 text-sm font-semibold text-washi disabled:opacity-50"
+      :disabled="state.phase !== 'playing'"
+      :aria-pressed="isPaused"
+      @click="isPaused ? $emit('resume') : $emit('pause')"
     >
-      {{ state.lastSetScore.chips }} × {{ state.lastSetScore.multiplier }} =
-      {{ state.lastSetScore.total }}
-    </p>
-    <p v-else-if="isPaused" class="text-center text-sky-300" role="status">
+      {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
+    </button>
+    <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
+    <p v-if="isPaused" class="text-center text-sm text-gold" role="status">
       Paused. Tap a word card to flip it. A card you peek at won't score.
     </p>
-    <p v-else-if="state.phase === 'timedOut'" class="text-center text-rose-300" role="status">
+    <p
+      v-else-if="state.phase === 'timedOut'"
+      class="text-center text-sm text-vermilion"
+      role="status"
+    >
       Time's up: here are the answers
     </p>
   </section>

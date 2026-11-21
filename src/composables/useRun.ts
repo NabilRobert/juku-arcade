@@ -19,11 +19,16 @@ import {
 import type { TagTable } from '../game/tags.ts';
 import { tapCard } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
+import { withPlayTime } from '../game/wellbeing.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
 import { appendEvents, saveSettings, type Settings } from '../memory/storage.ts';
 
 /** Often enough for a smooth timer bar, rarely enough to stay cheap on phones. */
 const TICK_MS = 100;
+/** The longest gap between ticks still counted as play. */
+const MAX_TICK_GAP_MS = 1000;
+/** How often today's play time is saved. */
+const PLAY_SAVE_EVERY_MS = 15_000;
 
 export interface RunSetup {
   words: readonly DeckWord[];
@@ -77,6 +82,8 @@ interface Driver {
   context: RunContext;
   syncedCount: number;
   setEndedAtMs: number | null;
+  lastTickMs: number;
+  lastPlaySaveMs: number;
 }
 
 /** The Vue state a run shows. */
@@ -85,6 +92,10 @@ interface RunView {
   nowMs: Ref<number>;
   tags: ShallowRef<TagTable>;
   progress: ShallowRef<Progress>;
+  /** W1: play in this sitting, not counting pauses. */
+  sessionPlayMs: Ref<number>;
+  /** W2: play today, across sittings. */
+  playMsToday: Ref<number>;
 }
 
 function createDriver(setup: RunSetup): Driver {
@@ -101,7 +112,15 @@ function createDriver(setup: RunSetup): Driver {
     },
     historyOf: (wordId) => engine.history(wordId, today()),
   };
-  return { engine, settings, context: refreshed(base, engine), syncedCount: 0, setEndedAtMs: null };
+  return {
+    engine,
+    settings,
+    context: refreshed(base, engine),
+    syncedCount: 0,
+    setEndedAtMs: null,
+    lastTickMs: Date.now(),
+    lastPlaySaveMs: Date.now(),
+  };
 }
 
 function afterChange(driver: Driver, view: RunView): void {
@@ -122,8 +141,29 @@ function dealNextSetAfterPause(driver: Driver, view: RunView): void {
   view.state.value = nextSet(view.state.value, driver.context, nowMs);
 }
 
+/**
+ * Counts play time while the game isn't paused (W1, W2), and saves today's
+ * total now and then, so a closed tab loses at most a few seconds of it.
+ */
+function countPlayTime(driver: Driver, view: RunView): void {
+  const nowMs = view.nowMs.value;
+  // A sleeping laptop or a throttled tab can stall the timer; never count a stall as play.
+  const playedMs = Math.min(nowMs - driver.lastTickMs, MAX_TICK_GAP_MS);
+  driver.lastTickMs = nowMs;
+  if (view.state.value.pausedAtMs !== null) return;
+  view.sessionPlayMs.value += playedMs;
+  driver.settings = withPlayTime(driver.settings, today(), playedMs);
+  view.playMsToday.value = driver.settings.playMsToday;
+  if (nowMs - driver.lastPlaySaveMs < PLAY_SAVE_EVERY_MS) return;
+  driver.lastPlaySaveMs = nowMs;
+  saveSettings(driver.settings).catch((error: unknown) =>
+    console.warn('Could not save play time:', error),
+  );
+}
+
 function tick(driver: Driver, view: RunView): void {
   view.nowMs.value = Date.now();
+  countPlayTime(driver, view);
   view.state.value = timeUp(view.state.value, driver.context, view.nowMs.value);
   if (view.state.value.phase !== 'playing') dealNextSetAfterPause(driver, view);
   afterChange(driver, view);
@@ -136,6 +176,8 @@ export function useRun(setup: RunSetup) {
     nowMs: ref(Date.now()),
     tags: shallowRef(driver.context.tags),
     progress: shallowRef(driver.engine.getProgress(today())),
+    sessionPlayMs: ref(0),
+    playMsToday: ref(withPlayTime(driver.settings, today(), 0).playMsToday),
   };
   const act = (change: (current: RunState, context: RunContext) => RunState): void => {
     view.state.value = change(view.state.value, driver.context);

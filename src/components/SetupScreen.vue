@@ -16,21 +16,21 @@ const classCode = ref('');
         v-for="level in JLPT_LEVELS"
         :key="level"
         type="button"
-        class="min-h-12 rounded-lg bg-amber-50 text-lg font-semibold text-slate-900"
+        class="min-h-12 washi rounded-lg font-card text-lg font-semibold text-sumi"
         @click="$emit('start', level, classCode.trim() || null)"
       >
         {{ level }}
       </button>
     </div>
-    <label class="block space-y-1 text-left text-sm text-slate-300">
+    <label class="block space-y-1 text-left text-sm text-washi/80">
       <span>Class code (optional, from your teacher)</span>
       <input
         v-model="classCode"
-        class="w-full rounded-lg bg-slate-800 px-3 py-2 text-slate-100"
+        class="w-full rounded-lg bg-lacquer-light px-3 py-2 text-washi"
         maxlength="32"
         autocomplete="off"
       />
     </label>
-    <p class="text-xs text-slate-400">Your progress stays in this browser. No account, no name.</p>
+    <p class="text-xs text-washi/60">Your progress stays in this browser. No account, no name.</p>
   </section>
 </template>

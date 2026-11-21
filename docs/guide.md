@@ -117,6 +117,26 @@ flowchart LR
    IndexedDB (**`appendEvents`**), saves new bests, and refreshes
    **`DailyBar.vue`**: today's deck, words known, and days played.
 
+## The look and wellbeing
+
+- **The karuta table (D30)** lives in `src/style.css`: colour tokens
+  (`washi`, `sumi`, `vermilion`, `lacquer`, `pine`, `gold`), the Mincho card
+  font, and two textures made of CSS gradients (`.washi` paper, `.card-back`).
+  No image files.
+- **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
+  `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
+  system's reduce-motion setting. `PlayCard.vue` deals cards in, lifts the
+  selected one and flies matches off; `GameHud.vue` pops the combo and level.
+  The score total counts up with a short `requestAnimationFrame` loop in
+  `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
+- **Layout:** `GameScreen.vue` puts a side panel (`DailyBar`, `GameHud`,
+  `ScoreBreakdown`) beside the table on screens 768 px and wider, and stacks
+  it above the table on phones.
+- **Wellbeing:** `useRun` counts play time while the game isn't paused.
+  `game/wellbeing.ts` decides when to show `WellbeingNudge.vue` (15 and 30
+  minutes in one sitting), and whether today's play has reached the cap set
+  by `VITE_DAILY_CAP_MINUTES` (see `.env.example`; unset means no cap).
+
 Every action appends a **`GameEvent`** (`events.ts`) with all of R6's
 fields. They stay in memory until slice 3 stores them.
 
@@ -152,6 +172,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
+| **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
+| **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -182,6 +204,13 @@ fields. They stay in memory until slice 3 stores them.
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
   Dexie version if the stores change.
+- **Change colours, fonts or textures:** edit the tokens and classes in
+  `src/style.css`.
+- **Change an animation:** card motion is in `PlayCard.vue` (`pose`, the
+  `initial` deal-in and its `transition`); the combo and level pops are in
+  `GameHud.vue`.
+- **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
+  before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
