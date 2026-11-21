@@ -110,14 +110,37 @@ function comebackWords(state: RunState, context: RunContext): DeckWord[] {
   return context.pool.filter((word) => due.includes(word.id));
 }
 
+/**
+ * Logs which error type the set's decoy tests, so reports can divide misses
+ * by how often each type was shown (D27).
+ */
+function dealEvent(
+  context: RunContext,
+  set: DealtSet,
+  setIndex: number,
+  level: number,
+  nowMs: number,
+) {
+  const decoyType = set.readings.find((card) => card.wordId === null)?.decoyType ?? null;
+  return makeEvent(context.identity, new Date(nowMs), {
+    kind: 'deal',
+    level,
+    set_index: setIndex,
+    error_type: decoyType,
+    cards_left_in_set: set.words.length,
+  });
+}
+
 function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunState {
   const comebacks = comebackWords(state, context);
   const set = dealSet(context.pool, context.random, state.decoyExposure, comebacks);
   const dealtIds = set.words.map((word) => word.id);
+  const setIndex = state.setIndex + 1;
   return {
     ...state,
     set,
-    setIndex: state.setIndex + 1,
+    events: [...state.events, dealEvent(context, set, setIndex, state.level, nowMs)],
+    setIndex,
     setShownAtMs: nowMs,
     setDurationMs: setDurationMs(state.level),
     lastActionAtMs: nowMs,

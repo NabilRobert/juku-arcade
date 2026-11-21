@@ -15,7 +15,9 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "report": "node scripts/build-reports.ts",
+    "power": "node scripts/simulate-power.ts"
   },
   "dependencies": {
     "dexie": "^4.4.7",

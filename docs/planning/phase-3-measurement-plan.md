@@ -160,3 +160,34 @@ That's a test helper, so plain code is fine.
 | The decoy and options teach elimination | Check-up options are chosen separately from the game's decoys (C5) |
 | A and H have different delays | Both are at least 1 day. The summary reports the median delay of each |
 | Small numbers | The minimum data rule, plus CIs, plus "not enough data" with no number |
+
+## Changes after building the report script (slice 5b, 2026-11-21)
+
+The text above stays as fixed. These notes add to it.
+
+1. **"About 7 players" was slightly short.** 7 players × 14 days × 2
+   after-answers is 196, under the 200 minimum. It takes **8 players** on 14
+   days (or 7 on 15).
+2. **How often a real effect is detected** (`npm run power`: simulated
+   classes with a planted +20-point effect, 40 classes per size, 14 days):
+
+   | Players | "Play works" | Not enough data |
+   |---|---|---|
+   | 7 | 0 of 40 | 40 of 40 |
+   | 8 | 36 of 40 | 0 of 40 |
+   | 12 | 34 of 40 | 0 of 40 |
+   | 20 | 36 of 40 | 0 of 40 |
+   | 30 | 38 of 40 | 0 of 40 |
+
+   Once the minimum data exists, a real +20 effect is called "play works"
+   about 85–95% of the time. The rest come out "too early to tell", never as
+   "doesn't help". The success rule is unchanged.
+3. **Re-teach flags use the share of answers missed**, not the share of
+   learners who missed a word at least once. Over two weeks nearly every
+   learner misses nearly every word once, so the learner-based rule flagged
+   words missed only 1 time in 10. The threshold stays 40%, with at least 5
+   learners.
+4. **Error-type exposure is now logged.** Dividing misses by how often each
+   type was shown needed a record of what was shown. Each set now logs a
+   `deal` event with its decoy type. Exports from before this change report
+   "exposure unknown" instead of a rate.

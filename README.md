@@ -9,11 +9,12 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 5a. The game is playable and remembers your progress, in
-a karuta table look, with a break nudge and an optional daily cap. An
-optional one-minute daily check-up measures whether play improves recall
-(with a held-back control group), and Settings can export your anonymous
-data for your teacher. The report script comes in slice 5b.
+**Status:** slice 5b. The game is playable and remembers your progress, in
+a karuta table look, with a break nudge, an optional daily cap, and an
+optional daily check-up that measures whether play improves recall.
+Players can export their anonymous data, and a report script turns a
+folder of exports into a class report, ability reports and the
+measurement report. Next: the playtest (slice 6).
 
 ## Run it
 
@@ -27,6 +28,15 @@ the pinned OpenJLPT file (about 6 MB) into `data/raw/`.
 
 For schools where minors play, copy `.env.example` to `.env` and set
 `VITE_DAILY_CAP_MINUTES` before building.
+
+To build the reports from a folder of exports:
+
+```bash
+npm run report -- path/to/exports
+```
+
+`npm run power` shows how often the measurement detects a real effect at
+each class size.
 
 Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`. `npm run decks:report` prints the deck statistics.

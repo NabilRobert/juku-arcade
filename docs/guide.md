@@ -139,6 +139,30 @@ flowchart LR
 5. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
    as an anonymous JSON file. Slice 5b's report script reads these files.
 
+## The flow, part 6: the reports (outside the app)
+
+1. **`npm run report -- <folder of exports> [output folder]`** runs
+   **`scripts/build-reports.ts`**.
+2. **`scripts/report/load.ts: readExportFolder`** merges the files, drops
+   duplicate events by `event_id`, and counts data problems (unknown format
+   versions, clock jumps).
+3. **`report/measurement.ts: measure`** works out the headline: after minus
+   held-back accuracy, a 95% bootstrap interval resampling players, and the
+   verdict from the plan's fixed rules.
+4. **`report/class-report.ts`** lists the most-missed words (by share of
+   answers missed, at least 5 learners), common confusions (decoys and
+   mix-ups apart), error types per time shown (from `deal` events), and
+   learners who may need help.
+5. **`report/learner-report.ts`** writes an ability report per anonymous
+   player, reusing the app's `deriveMemory` for "words known".
+6. **`report/render.ts`** writes `measurement-report.md`, `class-report.md`,
+   `ability-reports.md` and `events.csv`.
+
+**`report/simulate.ts`** makes simulated players with a planted truth. The
+specs use them to check the reports find what's there and don't invent what
+isn't, and `npm run power` uses them to show how often a real effect is
+detected at each class size.
+
 ## The look and wellbeing
 
 - **The karuta table (D30)** lives in `src/style.css`: colour tokens
@@ -199,6 +223,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
 | **Held back** | 1 word in 3, chosen by hash, kept out of play for 3 days after its first check: the control group | `isHeldBack`, `isOnHold` |
 | **Export** | The browser's event log as an anonymous JSON file the player chooses to share | `memory/export.ts` |
+| **Play effect** | After-accuracy minus held-back accuracy, in percentage points: the headline | `report/measurement.ts` |
+| **Bootstrap interval** | The range the play effect would likely fall in, found by resampling players 10,000 times | `bootstrapInterval` |
+| **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -241,6 +268,9 @@ fields. They stay in memory until slice 3 stores them.
   `memory/check-up-questions.ts`. Specs: `tests/check-up.test.ts`.
 - **Change the export format:** edit `memory/export.ts` and bump
   `EXPORT_FORMAT_VERSION`.
+- **Change a report's rules (thresholds, minimum learners):** the constants
+  are at the top of `scripts/report/class-report.ts` and `measurement.ts`.
+  Specs: `tests/report.test.ts`, run on simulated players.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
