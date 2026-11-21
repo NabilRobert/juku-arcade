@@ -30,6 +30,7 @@ describe('browser storage', () => {
       bestSetScore: 90,
       playDay: '2026-11-21',
       playMsToday: 60_000,
+      checkUpOfferedDay: '2026-11-21',
     };
     await saveSettings(settings);
     expect(await loadSettings()).toEqual(settings);
@@ -44,7 +45,11 @@ describe('browser storage', () => {
       bestSetScore: 0,
     };
     await saveSettings(older as Parameters<typeof saveSettings>[0]);
-    expect(await loadSettings()).toMatchObject({ playDay: null, playMsToday: 0 });
+    expect(await loadSettings()).toMatchObject({
+      playDay: null,
+      playMsToday: 0,
+      checkUpOfferedDay: null,
+    });
   });
 
   it('deletes every event and setting', async () => {

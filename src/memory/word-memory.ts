@@ -9,6 +9,7 @@
  *   measures reading speed more than memory (D4).
  */
 import type { GameEvent } from '../game/events.ts';
+import { applyCheckUp, type CheckRecord } from './check-up.ts';
 import { afterAnswer, NEW_WORD, type LeitnerState } from './leitner.ts';
 
 export interface WordMemory extends LeitnerState {
@@ -23,12 +24,14 @@ export interface WordMemory extends LeitnerState {
 
 export interface Memory {
   words: Map<string, WordMemory>;
+  /** Each word's check-up history (C2); kept apart from the review schedule (C4). */
+  checkUps: Map<string, CheckRecord>;
   /** Local days with at least one answer. */
   daysPlayed: Set<string>;
 }
 
 export function emptyMemory(): Memory {
-  return { words: new Map(), daysPlayed: new Set() };
+  return { words: new Map(), checkUps: new Map(), daysPlayed: new Set() };
 }
 
 /** The local date of an event: its `at` is local time with an offset, so the first 10 characters. */
@@ -69,6 +72,7 @@ function updatedWord(
 
 /** Applies one event to the memory, in place. Events must come in time order. */
 export function applyEvent(memory: Memory, event: GameEvent): void {
+  applyCheckUp(memory.checkUps, event);
   const isCorrect = answerOf(event);
   if (isCorrect === null || event.word_id === null) return;
   memory.words.set(event.word_id, updatedWord(memory.words.get(event.word_id), isCorrect, event));

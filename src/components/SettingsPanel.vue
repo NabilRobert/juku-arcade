@@ -7,7 +7,12 @@ import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
 
 defineProps<{ settings: Settings }>();
-const emit = defineEmits<{ changeLevel: [level: JlptLevel]; deleteData: []; close: [] }>();
+const emit = defineEmits<{
+  changeLevel: [level: JlptLevel];
+  exportData: [];
+  deleteData: [];
+  close: [];
+}>();
 
 function confirmDelete(): void {
   const isSure = window.confirm(
@@ -39,6 +44,19 @@ function confirmDelete(): void {
           {{ level }}
         </button>
       </div>
+    </div>
+    <div class="space-y-2">
+      <button
+        type="button"
+        class="rounded-lg bg-gold px-4 py-2 text-sumi"
+        @click="emit('exportData')"
+      >
+        Export my data
+      </button>
+      <p class="text-sm text-washi/70">
+        Downloads a file with your anonymous player ID, class code, and every answer with its
+        timing. No name, and nothing is sent anywhere. Give it to your teacher only if you want to.
+      </p>
     </div>
     <button type="button" class="rounded-lg bg-vermilion px-4 py-2" @click="confirmDelete">
       Delete my data

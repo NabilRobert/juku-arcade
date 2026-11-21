@@ -10,8 +10,17 @@ import type { DecoyType } from '../deck/types.ts';
 
 export const EVENT_SCHEMA_VERSION = 1;
 
+/** Check-up answers are 'check_up_right' or 'check_up_wrong', with check_up_role set (C1). */
 export type EventKind =
-  'match' | 'miss' | 'peek' | 'timeout' | 'pause' | 'resume' | 'session_start';
+  | 'match'
+  | 'miss'
+  | 'peek'
+  | 'timeout'
+  | 'pause'
+  | 'resume'
+  | 'session_start'
+  | 'check_up_right'
+  | 'check_up_wrong';
 export type ErrorType = DecoyType | 'mixUp';
 export type Outcome = 'clean' | 'after_miss' | 'peeked';
 
