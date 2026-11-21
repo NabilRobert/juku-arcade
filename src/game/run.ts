@@ -50,8 +50,6 @@ export interface RunState {
   lastSetScore: SetScore | null;
   flash: WrongFlash | null;
   decoyExposure: DecoyExposure;
-  /** How many times each word has been dealt in this run, for R6's times_seen_before. */
-  timesDealt: Readonly<Record<string, number>>;
   events: readonly GameEvent[];
   /** When the player paused, or null while playing (L9). The clock stops while paused. */
   pausedAtMs: number | null;
@@ -65,24 +63,41 @@ export interface RunState {
   missedTray: readonly DeckWord[];
 }
 
-/** What a run needs but never changes. */
+/** R6's familiarity fields for a word, from the review engine. */
+export interface WordHistory {
+  timesSeenBefore: number;
+  daysSinceLastSeen: number | null;
+  boxBefore: number | null;
+}
+
+/**
+ * What a run reads but never changes. The pool and tags are refreshed from
+ * the review engine before each deal (composables/useRun.ts).
+ */
 export interface RunContext {
   pool: readonly DeckWord[];
   tags: TagTable;
   random: RandomSource;
   identity: SessionIdentity;
+  historyOf: (wordId: string) => WordHistory;
+}
+
+/** The R6 fields about a word that every word event carries. */
+export function wordFields(context: RunContext, wordId: string) {
+  const history = context.historyOf(wordId);
+  return {
+    word_id: wordId,
+    tag_shown: context.tags.get(wordId) ?? null,
+    times_seen_before: history.timesSeenBefore,
+    days_since_last_seen: history.daysSinceLastSeen,
+    box_before: history.boxBefore,
+  };
 }
 
 /** Seconds left in the set; the clock stands still while paused. */
 export function secondsLeft(state: RunState, nowMs: number): number {
   const clockMs = state.pausedAtMs ?? nowMs;
   return Math.max(0, (state.setShownAtMs + state.setDurationMs - clockMs) / 1000);
-}
-
-function countDealt(state: RunState, set: DealtSet): Record<string, number> {
-  const timesDealt = { ...state.timesDealt };
-  for (const word of set.words) timesDealt[word.id] = (timesDealt[word.id] ?? 0) + 1;
-  return timesDealt;
 }
 
 function withExposure(exposure: DecoyExposure, set: DealtSet): DecoyExposure {
@@ -113,14 +128,22 @@ function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunS
     cleanMatchTags: [],
     flash: null,
     decoyExposure: withExposure(state.decoyExposure, set),
-    timesDealt: countDealt(state, set),
     flippedWord: null,
     peekedWordIds: [],
     comebackWordIds: state.comebackWordIds.filter((id) => !dealtIds.includes(id)),
   };
 }
 
-export function startRun(context: RunContext, nowMs: number): RunState {
+export interface Bests {
+  bestCombo: number;
+  bestSetScore: number;
+}
+
+export function startRun(
+  context: RunContext,
+  nowMs: number,
+  bests: Bests = { bestCombo: 0, bestSetScore: 0 },
+): RunState {
   const empty: RunState = {
     set: { words: [], readings: [] },
     setIndex: -1,
@@ -134,12 +157,11 @@ export function startRun(context: RunContext, nowMs: number): RunState {
     cleanMatchTags: [],
     combo: 0,
     level: FIRST_LEVEL,
-    bestCombo: 0,
-    bestSetScore: 0,
+    bestCombo: bests.bestCombo,
+    bestSetScore: bests.bestSetScore,
     lastSetScore: null,
     flash: null,
     decoyExposure: NO_EXPOSURE,
-    timesDealt: {},
     pausedAtMs: null,
     flippedWord: null,
     peekedWordIds: [],
@@ -176,11 +198,9 @@ export function timeUp(state: RunState, context: RunContext, nowMs: number): Run
       kind: 'timeout',
       level: state.level,
       set_index: state.setIndex,
-      word_id: word.id,
+      ...wordFields(context, word.id),
       seconds_left: 0,
       cards_left_in_set: unmatched.length,
-      tag_shown: context.tags.get(word.id) ?? null,
-      times_seen_before: (state.timesDealt[word.id] ?? 1) - 1,
     }),
   );
   return {

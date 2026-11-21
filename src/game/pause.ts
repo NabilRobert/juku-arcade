@@ -10,7 +10,7 @@
 import type { DeckWord } from '../deck/types.ts';
 import { withComeback } from './comebacks.ts';
 import { makeEvent } from './events.ts';
-import type { RunContext, RunState } from './run.ts';
+import { wordFields, type RunContext, type RunState } from './run.ts';
 
 function pauseEvent(state: RunState, context: RunContext, nowMs: number, kind: 'pause' | 'resume') {
   return makeEvent(context.identity, new Date(nowMs), {
@@ -56,10 +56,8 @@ function withPeek(state: RunState, context: RunContext, word: DeckWord, nowMs: n
     kind: 'peek',
     level: state.level,
     set_index: state.setIndex,
-    word_id: word.id,
-    tag_shown: context.tags.get(word.id) ?? null,
+    ...wordFields(context, word.id),
     cards_left_in_set: state.set.words.length - state.matchedWordIds.length,
-    times_seen_before: (state.timesDealt[word.id] ?? 1) - 1,
   });
   return {
     ...state,

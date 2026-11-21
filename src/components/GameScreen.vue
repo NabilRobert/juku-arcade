@@ -1,22 +1,31 @@
 <script setup lang="ts">
 /**
- * One run on screen: the HUD, then the board (or a flipped card's back
- * while paused), then the missed tray. Driven by useRun.
+ * One run on screen: today's progress, the HUD, then the board (or a
+ * flipped card's back while paused), then the missed tray. Driven by useRun.
  */
 import { watch } from 'vue';
 import type { Deck } from '../deck/types.ts';
+import type { GameEvent } from '../game/events.ts';
 import { useRun } from '../composables/useRun.ts';
+import type { Settings } from '../memory/storage.ts';
 import CardBack from './CardBack.vue';
+import DailyBar from './DailyBar.vue';
 import GameBoard from './GameBoard.vue';
 import GameHud from './GameHud.vue';
 import MissedTray from './MissedTray.vue';
 
 const props = defineProps<{
   deck: Deck;
-  /** True while another page (About the data) covers the game: it pauses. */
+  settings: Settings;
+  pastEvents: readonly GameEvent[];
+  /** True while another page covers the game: it pauses. */
   isAway: boolean;
 }>();
-const { state, nowMs, tags, tap, pause, resume, flip } = useRun(props.deck.words);
+const { state, nowMs, tags, progress, tap, pause, resume, flip } = useRun({
+  words: props.deck.words,
+  settings: props.settings,
+  pastEvents: props.pastEvents,
+});
 
 watch(
   () => props.isAway,
@@ -27,7 +36,8 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-5">
+    <DailyBar :progress="progress" :level="deck.level" />
     <GameHud :state="state" :now-ms="nowMs" @pause="pause" @resume="resume" />
     <CardBack
       v-if="state.flippedWord"
