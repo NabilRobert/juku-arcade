@@ -7,10 +7,11 @@ remember and measure.
 
 Sizes are rough estimates of lines of code, not counting tests and docs.
 
-**Progress (2026-11-21):** slices 0–4 merged (PRs #1–#4). Slice 5a is
-`feat/check-up`. Deck findings:
+**Progress (2026-11-21):** slices 0–5a merged (PRs #1–#5). Slice 5b is
+`feat/reports`. Deck findings:
 [`docs/spikes/slice-0-decks.md`](../spikes/slice-0-decks.md). The karuta
-look is D30.
+look is D30. Slice 5b's changes to the measurement plan are at the bottom
+of phase 3.
 
 ## Slice 0: Skeleton and decks (`build/skeleton`)
 
