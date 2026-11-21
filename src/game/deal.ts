@@ -3,8 +3,7 @@
  * decoy), following requirement L2 so that no match is ambiguous.
  *
  * Plain TypeScript with no Vue (decision D12), so the rules are tested on
- * their own. Slice 1 adds the even rotation of decoy types (D27); for now
- * the decoy type is picked at random.
+ * their own.
  */
 import { DECOY_TYPES, type DecoyType, type DeckWord } from '../deck/types.ts';
 
@@ -56,21 +55,63 @@ function pickWords(pool: readonly DeckWord[], random: RandomSource): DeckWord[] 
   );
 }
 
-/** A decoy that isn't a valid reading of any word in the set. */
-function pickDecoy(words: readonly DeckWord[], random: RandomSource): ReadingCard {
-  const blocked = new Set(words.flatMap(validReadings));
-  for (const word of shuffled(words, random)) {
-    for (const type of shuffled(DECOY_TYPES, random)) {
-      const text = word.decoys[type];
-      if (text !== undefined && !blocked.has(text)) return { text, wordId: null, decoyType: type };
-    }
-  }
-  throw new Error("Can't deal a set: no word in it has a decoy that differs from every reading.");
+/** How many times each error type has been shown as a decoy so far. */
+export type DecoyExposure = Readonly<Record<DecoyType, number>>;
+
+export const NO_EXPOSURE: DecoyExposure = {
+  longVowel: 0,
+  smallTsu: 0,
+  dakuten: 0,
+  smallYoon: 0,
+  otherReading: 0,
+};
+
+interface DecoyCard extends ReadingCard {
+  decoyType: DecoyType;
 }
 
-export function dealSet(pool: readonly DeckWord[], random: RandomSource = Math.random): DealtSet {
+/** Every decoy the set's words offer that isn't a valid reading of any word in the set. */
+function decoyOptions(words: readonly DeckWord[]): DecoyCard[] {
+  const blocked = new Set(words.flatMap(validReadings));
+  return words.flatMap((word) =>
+    DECOY_TYPES.flatMap((type) => {
+      const text = word.decoys[type];
+      return text === undefined || blocked.has(text)
+        ? []
+        : [{ text, wordId: null, decoyType: type }];
+    }),
+  );
+}
+
+/**
+ * The decoy of the type shown least so far, among the types this set can
+ * supply (D27). Small ゃゅょ decoys are scarce, so types can't rotate evenly
+ * within every set (slice 0 spike, finding 4). Reports divide misses by
+ * exposure instead.
+ */
+function pickDecoy(
+  words: readonly DeckWord[],
+  random: RandomSource,
+  exposure: DecoyExposure,
+): DecoyCard {
+  const options = shuffled(decoyOptions(words), random);
+  let best: DecoyCard | undefined;
+  for (const option of options) {
+    if (best === undefined || exposure[option.decoyType] < exposure[best.decoyType]) best = option;
+  }
+  if (best === undefined) {
+    throw new Error("Can't deal a set: no word in it has a decoy that differs from every reading.");
+  }
+  return best;
+}
+
+export function dealSet(
+  pool: readonly DeckWord[],
+  random: RandomSource = Math.random,
+  exposure: DecoyExposure = NO_EXPOSURE,
+): DealtSet {
   const words = pickWords(pool, random);
   const answers = words.map((word) => ({ text: word.reading, wordId: word.id, decoyType: null }));
-  const readings = shuffled([...answers, pickDecoy(words, random)], random);
+  const readings = shuffled([...answers, pickDecoy(words, random, exposure)], random);
   return { words, readings };
 }
