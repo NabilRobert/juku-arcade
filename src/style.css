@@ -5,4 +5,25 @@
   --font-sans:
     system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI',
     'Yu Gothic', sans-serif;
+  --animate-shake: shake 0.35s ease-in-out;
+}
+
+/* A wrong tap shakes both cards (L4). Motion's richer effects come in slice 4. */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shake {
+    animation: none;
+  }
 }
