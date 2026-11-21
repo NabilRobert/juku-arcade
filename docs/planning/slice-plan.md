@@ -46,7 +46,7 @@ The heart of the game. No memory between runs yet.
 - Flipping a card shows its reading, meaning, example and level.
 - The peek rule, the eye mark, and the missed tray of the last 8.
 - Comebacks within 2 sets (R3).
-- Hidden faces while paused, if Arthur OKs it (D8).
+- Hidden card faces while paused (D8).
 - **Done when:** the peek rule's tests pass, and Arthur has tried
   pausing mid-set on his phone.
 - About 250 lines.

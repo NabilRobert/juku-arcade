@@ -107,7 +107,7 @@ run's last 8 misses.
 - **Beat:** showing only the meaning for unmatched cards (you can't check
   a reading you're unsure of); flipping with no penalty (combos stop
   meaning anything).
-- **Open, recommended:** hide the card faces while paused (L9).
+- **Settled (Arthur's OK):** hide the card faces while paused (L9).
   Otherwise pausing gives unlimited thinking time.
 
 ### D9: Daily deck plus bests (settled)
@@ -117,7 +117,7 @@ calendar, and the bests are best combo and best set.
 
 - **Beat:** best combo only (nothing brings you back the next day);
   a session score (rewards long sessions).
-- **Recommended detail:** show "days played out of the last 7" rather
+- **Settled detail:** show "days played out of the last 7" rather
   than a streak that resets, so a missed day doesn't make anyone anxious.
 
 ### D10: Endless play mixes weak words with a few new ones (settled)
@@ -156,7 +156,7 @@ and combo effects.
   `src/game/`, with no Vue. They're unit-tested on their own, and Vue only
   draws them.
 
-### D13: Port Juku's Leitner engine behind a Juku-shaped interface (recommended)
+### D13: Port Juku's Leitner engine behind a Juku-shaped interface (settled: Arthur's OK, 2026-11-21)
 
 - **Beat:**
   - **ts-fsrs** (MIT): a better scheduler, but it differs from Juku, so
@@ -165,7 +165,7 @@ and combo effects.
     browser;
   - **a new scheduler:** no reason to write one.
 
-### D14: Event log in IndexedDB through Dexie (recommended)
+### D14: Event log in IndexedDB through Dexie (settled: Arthur's OK, 2026-11-21)
 
 - **Beat:**
   - **localStorage:** a 5 MB cap and blocking calls, which suits a log of
@@ -173,7 +173,7 @@ and combo effects.
   - **idb:** smaller and lower-level. A fair alternative if bundle size
     gets tight.
 
-### D15: Decks generated from pinned OpenJLPT at build time (recommended)
+### D15: Decks generated from pinned OpenJLPT at build time (settled: Arthur's OK, 2026-11-21)
 
 A TypeScript script reads OpenJLPT's SQLite file with Node's built-in
 `node:sqlite` (Node 22.13+), checks the checksum, applies L2's rules, and
@@ -218,7 +218,7 @@ The cap is a deploy setting, not an admin screen (barebones).
 - **Beat:** a nudge only (not enough for children); a hard cap for
   everyone (patronising for adults).
 
-### D20: Static hosting on Cloudflare Pages' free tier (recommended)
+### D20: Static hosting on Cloudflare Pages' free tier (settled: Arthur's OK, 2026-11-21)
 
 The same platform as Framed, with a preview build per branch, and room
 for a Worker later.
@@ -227,7 +227,7 @@ for a Worker later.
   branch); a self-managed server (a static game needs no server to
   maintain).
 
-### D21: Licences (needs Arthur)
+### D21: Licences (settled: MIT once the school confirms ownership)
 
 The data is CC BY-SA 4.0, as OpenJLPT requires, with attribution. The
 code licence is Arthur's choice. MIT is suggested, but wait for the
@@ -240,7 +240,7 @@ card design and scoring formula (D5). It has no jokers, shop, poker hands
 or card art from any existing game. Every visual is checked against this
 before it ships.
 
-### D23: Sound is a Could (recommended)
+### D23: Sound is a Could (settled: Arthur's OK, 2026-11-21)
 
 CC0 sounds only, muted until the first tap. Sound is first on the cut
 list.
@@ -269,7 +269,7 @@ is captured from the start, and reporting stays barebones (D18).
   easier (a privacy risk, especially for minors; the school can map IDs
   itself, N5).
 
-### D27: Decoys that test error types (recommended)
+### D27: Decoys that test error types (settled: Arthur's OK, 2026-11-21)
 
 Each set's decoy tests one error type (R8), and the types rotate evenly.
 The decoy then does three jobs: it stops free last matches, it makes
@@ -290,7 +290,7 @@ report are written as static HTML or Markdown, plus a CSV of events.
   (leaves the school to do the analysis, and they asked for insight, not
   data).
 
-### D24: System fonts for Japanese (recommended)
+### D24: System fonts for Japanese (settled: Arthur's OK, 2026-11-21)
 
 - **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before
   subsetting, which works against N1).

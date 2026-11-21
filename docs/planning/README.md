@@ -20,9 +20,13 @@ Japanese school. These documents are planning only: there's no code yet.
   anonymous events (R6, D26), words known (R7), error types and the
   decoys that test them (R8, D27), class codes (R9), and the decision
   report (phase 3, D28).
-- **Waiting on Arthur:** decoys that test error types (D27), hiding card faces while paused (D8), the Juku
-  engine port (D13), storage (D14), the deck script (D15), hosting (D20),
-  and the code licence (D21).
+- **Settled later the same day (Arthur's OK on all of the
+  recommendations):** decoys that test error types (D27), hiding card
+  faces while paused (D8), the Juku engine port (D13), storage (D14), the
+  deck script (D15), hosting (D20), sound (D23), fonts (D24), and an MIT
+  code licence once the school confirms ownership (D21).
+- **Open with Arthur:** how to show kanji with many readings (see the
+  session report of 2026-11-21).
 - **Waiting on the school:** the open questions in phase 1. Answers
   could change the deck levels, the minors cap, the UI language and slice
   6's timing.

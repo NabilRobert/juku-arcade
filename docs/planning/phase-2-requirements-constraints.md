@@ -22,7 +22,10 @@ ambiguous:
   error rates of different types can be compared fairly;
 - kana-only words (これ, ソース) are left out, because their reading *is*
   their spelling;
-- each word shows one reading: OpenJLPT's main one.
+- each word shows one reading: OpenJLPT's main one;
+- no card shows any **other** valid reading of a word in the set,
+  whether as a decoy or as another word's reading. 今日 is read きょう,
+  but also こんにち, so こんにち must never appear beside 今日.
 
 **L3. A correct match (Must).** The pair flies off. The combo goes up by 1.
 If the match is clean (no miss and no peek on that word this set), the
@@ -82,7 +85,7 @@ the animations. No menu opens, and the board stays in place.
   because you didn't know it.
 - **The missed tray:** a strip beside the board holds this run's last 8
   missed words. They can be flipped freely while paused.
-- **Card faces while paused (recommended, needs Arthur's OK):** the board
+- **Card faces while paused (settled):** the board
   hides its card faces while paused, until you flip one. Otherwise pausing
   stops the clock while you keep thinking, which would make the timer
   pointless.
