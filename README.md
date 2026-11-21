@@ -10,8 +10,9 @@ The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/) (on the `docs/planning` branch until it
 merges).
 
-**Status:** slice 0. The decks are built and one set is dealt on the
-board. Matching comes in slice 1.
+**Status:** slice 1. The core loop is playable: matching, combos,
+levels, the set timer, timeouts, set scores and difficulty tags. Pause and
+flip come in slice 2, and saved progress in slice 3.
 
 ## Run it
 
