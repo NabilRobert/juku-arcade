@@ -2,6 +2,8 @@
  * Reads a folder of exports (A1) and checks the data (A4): merges every
  * file's events, drops duplicates by event_id (the same export sent twice),
  * flags unknown schema versions and clock jumps, and keeps events in order.
+ * It also keeps each player's JLPT level, from their latest export, so the
+ * deck measures (S2, S3) know which deck the player was on.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -23,6 +25,13 @@ export interface DataQuality {
 export interface LoadedData {
   events: GameEvent[];
   quality: DataQuality;
+  /** Each player's JLPT level (N5 and so on), from their latest export. */
+  levelByPlayer: Map<string, string>;
+}
+
+function latestLevels(files: readonly ExportFile[]): Map<string, string> {
+  const byExportTime = [...files].sort((a, b) => a.exported_at.localeCompare(b.exported_at));
+  return new Map(byExportTime.map((file) => [file.player_id, file.level]));
 }
 
 function countClockJumps(events: readonly GameEvent[]): number {
@@ -58,7 +67,7 @@ export function mergeExports(files: readonly ExportFile[]): LoadedData {
     clockJumps: countClockJumps(events),
     players: new Set(events.map((event) => event.player_id)).size,
   };
-  return { events, quality };
+  return { events, quality, levelByPlayer: latestLevels(files) };
 }
 
 export function readExportFolder(folder: string): LoadedData {
