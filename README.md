@@ -7,8 +7,7 @@ game over.
 
 Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
-[`docs/planning/`](docs/planning/) (on the `docs/planning` branch until it
-merges).
+[`docs/planning/`](docs/planning/).
 
 **Status:** slice 1. The core loop is playable: matching, combos,
 levels, the set timer, timeouts, set scores and difficulty tags. Pause and

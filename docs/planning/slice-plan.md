@@ -7,9 +7,9 @@ remember and measure.
 
 Sizes are rough estimates of lines of code, not counting tests and docs.
 
-**Progress (2026-11-21):** slices 0 and 1 are built and committed on
-`build/skeleton` and `feat/core-loop` (stacked), and not pushed yet.
-Findings: `docs/spikes/slice-0-decks.md` on those branches.
+**Progress (2026-11-21):** slices 0 and 1 are built, with the plan, in
+one PR (`feat/first-playable`). Deck findings:
+[`docs/spikes/slice-0-decks.md`](../spikes/slice-0-decks.md).
 
 ## Slice 0: Skeleton and decks (`build/skeleton`)
 
