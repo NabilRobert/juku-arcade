@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { deckWord } from './helpers/fixtures.ts';
 import { flipCard, pause, resume } from '../src/game/pause.ts';
 import { nextSet, secondsLeft, timeUp, type RunState } from '../src/game/run.ts';
 import { tapCard } from '../src/game/taps.ts';
@@ -123,13 +124,19 @@ describe('flip and peek', () => {
 });
 
 describe('comebacks and the missed tray', () => {
-  it('deals a missed word again in the next set', () => {
-    const { state, context } = start();
-    const word = wordIdAt(state, 0);
-    const missed = tapPair(state, context, word, decoyIndex(state), START_MS);
-    const next = nextSet({ ...missed, phase: 'cleared' }, context, START_MS);
-    expect(next.set.words.map((candidate) => candidate.id)).toContain(word);
-    expect(next.comebackWordIds).not.toContain(word);
+  it('deals a missed word again in the next set, even from a large pool', () => {
+    const largePool = Array.from({ length: 40 }, (_, index) =>
+      deckWord(`p${index}`, `語${index}`, `ご${index}`),
+    );
+    for (let seed = 0; seed < 20; seed++) {
+      const { state, context } = start(seed);
+      const word = wordIdAt(state, 0);
+      const missed = tapPair(state, context, word, decoyIndex(state), START_MS);
+      const wideContext = { ...context, pool: [...largePool, ...context.pool] };
+      const next = nextSet({ ...missed, phase: 'cleared' }, wideContext, START_MS);
+      expect(next.set.words.map((candidate) => candidate.id)).toContain(word);
+      expect(next.comebackWordIds).not.toContain(word);
+    }
   });
 
   it('keeps comeback words that were not dealt queued for a later set', () => {

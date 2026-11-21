@@ -2,12 +2,8 @@
  * The detailed event every action records (requirement R6, decision D26).
  *
  * Events are cheap to capture and can't be recovered later, so every field
- * exists from slice 1. Fields that need later slices are null until then:
- * - `player_id` and `class_code` persist from slice 3 (a fresh ID per visit
- *   until then);
- * - `days_since_last_seen` and `box_before` come from the review engine
- *   (slice 3);
- * - `check_up_role` comes with the check-up (slice 5a).
+ * exists from slice 1. `check_up_role` stays null until the check-up arrives
+ * (slice 5a).
  * Field names are snake_case because they are the export format (A1).
  */
 import type { DecoyType } from '../deck/types.ts';
@@ -52,6 +48,13 @@ export interface GameEvent {
 export interface SessionIdentity {
   playerId: string;
   sessionId: string;
+  /** The optional code the teacher gave (R9). */
+  classCode: string | null;
+}
+
+/** The local date, YYYY-MM-DD, the same way event times are written. */
+export function localDay(at: Date): string {
+  return localTimeWithOffset(at).slice(0, 10);
 }
 
 function localTimeWithOffset(at: Date): string {
@@ -72,7 +75,7 @@ export function makeEvent(
     event_id: crypto.randomUUID(),
     schema_version: EVENT_SCHEMA_VERSION,
     player_id: identity.playerId,
-    class_code: null,
+    class_code: identity.classCode,
     session_id: identity.sessionId,
     at: localTimeWithOffset(at),
     word_id: null,

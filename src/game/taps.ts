@@ -9,7 +9,7 @@
 import { makeEvent, type GameEvent } from './events.ts';
 import { levelAfterMatch, levelAfterMiss } from './levels.ts';
 import type { CardRef, RunContext, RunState } from './run.ts';
-import { secondsLeft } from './run.ts';
+import { secondsLeft, wordFields } from './run.ts';
 import { withComeback, withTrayWord } from './comebacks.ts';
 import { scoreSet } from './score.ts';
 import { WRONG_FLASH_MS } from './tuning.ts';
@@ -53,15 +53,13 @@ function tapEvent(
     kind: 'match',
     level: state.level,
     set_index: state.setIndex,
-    word_id: pair.wordId,
+    ...wordFields(context, pair.wordId),
     first_card: pair.firstCard,
     second_card: pair.secondCard,
     ms_since_set_shown: nowMs - state.setShownAtMs,
     ms_since_last_action: nowMs - state.lastActionAtMs,
     seconds_left: Math.round(secondsLeft(state, nowMs) * 10) / 10,
     cards_left_in_set: state.set.words.length - state.matchedWordIds.length,
-    times_seen_before: (state.timesDealt[pair.wordId] ?? 1) - 1,
-    tag_shown: context.tags.get(pair.wordId) ?? null,
     ...fields,
   });
 }

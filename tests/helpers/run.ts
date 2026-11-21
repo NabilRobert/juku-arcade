@@ -19,7 +19,8 @@ export function makeContext(seed = 1): RunContext {
     pool,
     tags: tagsByRank(pool),
     random: seededRandom(seed),
-    identity: { playerId: 'player-1', sessionId: 'session-1' },
+    identity: { playerId: 'player-1', sessionId: 'session-1', classCode: null },
+    historyOf: () => ({ timesSeenBefore: 0, daysSinceLastSeen: null, boxBefore: null }),
   };
 }
 

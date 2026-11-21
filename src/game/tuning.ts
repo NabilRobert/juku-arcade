@@ -33,3 +33,19 @@ export const MISSED_TRAY_SIZE = 8;
 
 /** How long a wrong tap shows the right answer. */
 export const WRONG_FLASH_MS = 900;
+
+/** L10: new words in each day's deck, on top of the reviews due. */
+export const NEW_WORDS_PER_DAY = 10;
+
+/** R5: how many attempts the starting guess is worth against the player's own record. */
+export const GUESS_WEIGHT = 5;
+
+/**
+ * L11: endless play deals from the player's weakest seen words plus one new
+ * word, so about 5 sets in 7 bring something new.
+ */
+export const ENDLESS_WEAK_WORDS = 6;
+export const ENDLESS_NEW_WORDS = 1;
+
+/** A pool smaller than this can't always deal a valid set (L2), so it's topped up. */
+export const MIN_POOL_SIZE = 8;
