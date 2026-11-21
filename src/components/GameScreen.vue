@@ -33,7 +33,7 @@ const run = useRun({
   settings: props.settings,
   pastEvents: props.pastEvents,
 });
-const { state, nowMs, tags, progress, tap, pause, resume, flip } = run;
+const { state, nowMs, tags, progress, tap, throwReading, pause, resume, flip } = run;
 
 const CAP_MINUTES = parseCapMinutes(import.meta.env.VITE_DAILY_CAP_MINUTES);
 const shownNudges = ref<number[]>([]);
@@ -80,7 +80,15 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
         :kanji="deck.kanji"
         @close="flip(state.flippedWord)"
       />
-      <GameBoard v-else :state="state" :now-ms="nowMs" :tags="tags" @tap="tap" @flip="flip" />
+      <GameBoard
+        v-else
+        :state="state"
+        :now-ms="nowMs"
+        :tags="tags"
+        @tap="tap"
+        @throw="throwReading"
+        @flip="flip"
+      />
       <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
     </div>
   </div>

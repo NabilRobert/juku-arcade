@@ -1,12 +1,14 @@
 /**
  * How a card moves (PlayCard passes these to Motion). A matched pair plays
  * one throw: the reading card spins through the air to its word card, hits
- * it, and both fall over. Selecting lifts a card off the table, and a new
- * set deals in one card after another. Motion skips the movement and keeps
+ * it, and both fall over. Whether the player dragged and flung the card or
+ * tapped the pair, the flight starts from wherever the card is. Selecting
+ * lifts a card off the table, a word card a dragged card is over rises to
+ * meet it, and a new set deals in one card after another. Motion skips the movement and keeps
  * the fades when the system asks for reduced motion (App.vue).
  */
 import type { CardStatus } from '../game/card-status.ts';
-import type { Offset } from '../composables/useThrows.ts';
+import type { Offset } from './throw-geometry.ts';
 
 /** How long the thrown card flies before it hits, and how long both then take to fall. */
 export const THROW_S = 0.36;
@@ -66,13 +68,18 @@ function knockedDown(index: number): Pose {
   };
 }
 
-export function cardPose(
-  status: CardStatus,
-  kind: 'word' | 'reading',
-  index: number,
-  throwTo?: Offset,
-): Pose {
-  if (status === 'selected') return LIFTED;
+export interface CardMotionInput {
+  status: CardStatus;
+  kind: 'word' | 'reading';
+  index: number;
+  /** For a matched reading card: how far away its word card's slot is. */
+  throwTo?: Offset;
+  /** For a word card: a dragged reading card is over it. */
+  isTargeted?: boolean;
+}
+
+export function cardPose({ status, kind, index, throwTo, isTargeted }: CardMotionInput): Pose {
+  if (status === 'selected' || (isTargeted === true && status === 'idle')) return LIFTED;
   if (status !== 'matched') return RESTING;
   if (kind === 'word') return knockedDown(index);
   return throwTo === undefined ? FLOWN_OFF : thrown(throwTo);

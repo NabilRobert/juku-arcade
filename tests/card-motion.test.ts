@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import GameBoard from '../src/components/GameBoard.vue';
 import PlayCard from '../src/components/PlayCard.vue';
 import { cardPose } from '../src/components/card-motion.ts';
-import { centreOffset } from '../src/composables/useThrows.ts';
+import { centreOffset } from '../src/components/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';
 import { tapCard } from '../src/game/taps.ts';
 import { readingIndexOf, start, START_MS, wordIdAt } from './helpers/run.ts';
@@ -20,7 +20,12 @@ describe('the throw', () => {
   });
 
   it('flies the reading card onto its word card, spinning whole turns', () => {
-    const pose = cardPose('matched', 'reading', 0, { x: 60, y: -190 });
+    const pose = cardPose({
+      status: 'matched',
+      kind: 'reading',
+      index: 0,
+      throwTo: { x: 60, y: -190 },
+    });
     expect((pose.x as number[])[HIT]).toBe(60);
     expect((pose.y as number[])[HIT]).toBe(-190);
     expect(((pose.rotate as number[])[HIT] ?? 1) % 360).toBe(0);
@@ -28,7 +33,7 @@ describe('the throw', () => {
   });
 
   it('keeps the word card standing until the hit, then knocks it over', () => {
-    const pose = cardPose('matched', 'word', 0);
+    const pose = cardPose({ status: 'matched', kind: 'word', index: 0 });
     expect((pose.rotateX as number[])[HIT]).toBe(0);
     expect((pose.opacity as number[])[HIT]).toBe(1);
     expect((pose.rotateX as number[])[LAST]).toBeGreaterThan(45);
@@ -37,8 +42,10 @@ describe('the throw', () => {
   it('names x in every pose, so no card slides back to where it was dealt from', () => {
     const statuses: CardStatus[] = ['idle', 'selected', 'matched', 'wrong', 'hidden'];
     for (const status of statuses) {
-      expect(cardPose(status, 'word', 0)).toHaveProperty('x');
-      expect(cardPose(status, 'reading', 0, { x: 1, y: 1 })).toHaveProperty('x');
+      expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('x');
+      expect(
+        cardPose({ status, kind: 'reading', index: 0, throwTo: { x: 1, y: 1 } }),
+      ).toHaveProperty('x');
     }
   });
 

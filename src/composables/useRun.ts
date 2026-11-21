@@ -17,7 +17,7 @@ import {
   type RunState,
 } from '../game/run.ts';
 import type { TagTable } from '../game/tags.ts';
-import { tapCard } from '../game/taps.ts';
+import { tapCard, throwReading } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
 import { withPlayTime } from '../game/wellbeing.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
@@ -189,6 +189,8 @@ export function useRun(setup: RunSetup) {
   return {
     ...view,
     tap: (card: CardRef) => act((current, context) => tapCard(current, context, card, Date.now())),
+    throwReading: (readingIndex: number, wordId: string) =>
+      act((current, context) => throwReading(current, context, readingIndex, wordId, Date.now())),
     pause: () => act((current, context) => pause(current, context, Date.now())),
     resume: () => act((current, context) => resume(current, context, Date.now())),
     flip: (word: DeckWord) =>

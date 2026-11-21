@@ -4,18 +4,22 @@
  * drawn as a card from a deck (D30): upright, with an inner frame and a
  * suit mark in two opposite corners. Word cards have a vermilion frame,
  * the suit 言 and a hanko stamp for their tag; reading cards have a pine
- * frame and the suit 音. How the card moves lives in card-motion.ts: a
- * matched reading card is thrown at its word card and knocks it down.
+ * frame and the suit 音. How the card moves lives in card-motion.ts.
+ *
+ * Reading cards can be picked up and thrown (Motion's drag): the card
+ * reports where it is while dragged and where and how fast it was let go,
+ * and the board decides which word card it was aimed at. It springs back
+ * to its place unless a match sends it flying on to its word card.
  *
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
  * shows ✗, a right one shows ✓. While paused, cards are face down (D8):
  * word cards can be tapped to flip them, reading cards can't.
  */
-import { m } from 'motion-v';
+import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
-import type { Offset } from '../composables/useThrows.ts';
 import { cardPose, cardTransition, DEAL_FROM } from './card-motion.ts';
+import type { Offset, Point } from './throw-geometry.ts';
 
 const props = defineProps<{
   text: string;
@@ -31,12 +35,23 @@ const props = defineProps<{
   isPeeked?: boolean;
   /** For a matched reading card: how far away its word card is. */
   throwTo?: Offset;
+  /** For a word card: a dragged reading card is over it. */
+  isTargeted?: boolean;
 }>();
 
-defineEmits<{ tap: [] }>();
+const emit = defineEmits<{
+  tap: [];
+  /** While a reading card is dragged: the pointer, in page coordinates. */
+  drag: [point: Point];
+  /** When it's let go: the pointer, and its speed in pixels per second. */
+  release: [point: Point, velocity: Point];
+}>();
+
+/** A held card grows and tilts, as a card does when picked up off the table. */
+const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 
 /** Largest text size (rem): short words are bold and big, as on a printed card. */
-const MAX_TEXT_REM = { word: 2.5, reading: 1.6 } as const;
+const MAX_TEXT_REM = { word: 3.5, reading: 2.2 } as const;
 /** Share of the card's width (cqw) the text may fill, inside the frame. */
 const TEXT_WIDTH_CQW = 78;
 /**
@@ -61,6 +76,11 @@ const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correc
 
 /** Becomes true once the first deal lands, so later moves aren't staggered. */
 const isDealt = ref(false);
+/**
+ * True from picking the card up until the click that follows letting go.
+ * Reset on the next press too, as no click follows a release off the card.
+ */
+const wasDragged = ref(false);
 
 const isFaceDown = computed(() => props.status === 'hidden');
 
@@ -93,15 +113,34 @@ const isDisabled = computed(
   () => props.status === 'matched' || (isFaceDown.value && props.kind === 'reading'),
 );
 
-const pose = computed(() => cardPose(props.status, props.kind, props.index, props.throwTo));
+const isThrowable = computed(
+  () => props.kind === 'reading' && (props.status === 'idle' || props.status === 'selected'),
+);
+
+const pose = computed(() => cardPose(props));
 const transition = computed(() => cardTransition(props.status, props.index, isDealt.value));
+
+function onRelease(info: PanInfo): void {
+  emit('release', info.point, info.velocity);
+}
+
+/** Letting go of a dragged card also fires a click; it isn't a tap. */
+function onClick(): void {
+  if (wasDragged.value) wasDragged.value = false;
+  else emit('tap');
+}
 </script>
 
 <template>
   <m.button
     type="button"
-    class="@container relative flex aspect-[3/4] w-full flex-col items-center justify-center rounded-xl px-2 font-card whitespace-nowrap shadow-[0_1px_0_#d8cbb0,0_2px_0_#b3a27c,0_3px_0_#8f7f5c,0_10px_18px_rgb(0_0_0/0.5)]"
-    :class="[faceClass, STATUS_CLASSES[status]]"
+    class="@container relative mx-auto flex aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] flex-col items-center justify-center rounded-xl px-2 font-card whitespace-nowrap shadow-[0_1px_0_#d8cbb0,0_2px_0_#b3a27c,0_3px_0_#8f7f5c,0_10px_18px_rgb(0_0_0/0.5)]"
+    :class="[
+      faceClass,
+      STATUS_CLASSES[status],
+      isThrowable ? 'cursor-grab active:cursor-grabbing' : '',
+      isTargeted ? 'ring-4 ring-gold' : '',
+    ]"
     :initial="DEAL_FROM"
     :animate="pose"
     :transition="transition"
@@ -109,7 +148,14 @@ const transition = computed(() => cardTransition(props.status, props.index, isDe
     :aria-pressed="status === 'selected'"
     :aria-label="isFaceDown ? 'Face-down card: tap to flip it' : undefined"
     lang="ja"
-    @click="$emit('tap')"
+    :drag="isThrowable"
+    drag-snap-to-origin
+    :while-drag="HELD_POSE"
+    @pointerdown="wasDragged = false"
+    @drag-start="wasDragged = true"
+    @drag="(_event: PointerEvent, info: PanInfo) => emit('drag', info.point)"
+    @drag-end="(_event: PointerEvent, info: PanInfo) => onRelease(info)"
+    @click="onClick"
     @animation-complete="isDealt = true"
   >
     <span v-if="isFaceDown" aria-hidden="true" class="text-3xl">{{

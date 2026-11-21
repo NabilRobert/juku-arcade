@@ -47,10 +47,14 @@ flowchart TD
    **`GameBoard.vue`** shows the cards, each one a **`PlayCard.vue`**,
    styled by **`card-status.ts`**.
 
-## The flow, part 2: one tap
+## The flow, part 2: one throw (or two taps)
 
 ```mermaid
 flowchart LR
+    T["PlayCard drag ends"] --> U["useThrows: release →<br/>throw-geometry.ts: aimedWord"]
+    U -->|"aimed at a word card"| V["GameBoard emits throw"]
+    V --> W["useRun: throwReading → taps.ts: throwReading"]
+    W --> D
     A["PlayCard click"] --> B["GameBoard emits tap"]
     B --> C["useRun: tap"]
     C --> D["taps.ts: tapCard"]
@@ -62,8 +66,15 @@ flowchart LR
     I --> J
 ```
 
-1. A tap selects a card. A tap on a card of the other kind pairs the two
-   (**`taps.ts: tapCard`**).
+1. The main way to play is to **throw**: drag a reading card and let go
+   of it on a word card, or fling it at one. While it's dragged, the word
+   card under it lights up (**`useThrows: trackDrag`**). On release,
+   **`throw-geometry.ts: aimedWord`** picks the word card it was dropped
+   on, or else the one it was heading for 0.15 s ahead at its release
+   speed. **`taps.ts: throwReading`** pairs the two, whatever was selected
+   before. A card let go away from every word card springs back.
+   Tapping still works, for the keyboard: a tap selects a card, and a tap
+   on a card of the other kind pairs the two (**`taps.ts: tapCard`**).
 2. A right pair is a **match**. The combo goes up, and every 10 combo the
    level goes up (**`levels.ts: levelAfterMatch`**). If the word wasn't
    missed in this set, its tag joins the set's multiplier.
@@ -181,10 +192,12 @@ detected at each class size.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
   system's reduce-motion setting. `components/card-motion.ts` says how
-  each card moves: cards deal in one after another, a selected card lifts,
-  and a matched reading card is **thrown**: it spins up to its word card,
-  hits it, and both fall over. `composables/useThrows.ts: useThrows`
-  measures how far the thrown card flies, before the board redraws.
+  each card moves: cards deal in one after another, a selected or held
+  card lifts, and a matched reading card flies on, spinning, to its word
+  card, hits it, and both fall over. Dragging uses Motion's drag, so
+  `App.vue` loads the `domMax` bundle. `composables/useThrows.ts`
+  measures how far the thrown card flies from the slot each card sits in,
+  before the board redraws.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
@@ -196,7 +209,10 @@ detected at each class size.
 - **Layout (desktop only):** the school plays on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
   `ScoreBreakdown`) beside the table: 5 word cards above 6 smaller reading
-  cards.
+  cards. The game fills the window: the root font size grows with the
+  window's width (`html` in `style.css`), and each card row in
+  `GameBoard.vue` sets its cards' height as a share of the window's
+  height (`--card-height`), so a set fits without scrolling.
 - **Wellbeing:** `useRun` counts play time while the game isn't paused.
   `game/wellbeing.ts` decides when to show `WellbeingNudge.vue` (15 and 30
   minutes in one sitting), and whether today's play has reached the cap set
@@ -237,7 +253,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
-| **Throw** | A matched reading card spinning up to its word card and knocking it down | `card-motion.ts`, `useThrows.ts` |
+| **Throw** | Dragging a reading card and letting go on, or flinging it at, a word card; a right pair spins on and knocks the word card down | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
 | **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
@@ -280,7 +296,12 @@ fields. They stay in memory until slice 3 stores them.
   `src/style.css`.
 - **Change an animation:** card motion is in `components/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
-  `DEAL_FROM` the deal-in); the combo and level pops are in `GameHud.vue`.
+  `DEAL_FROM` the deal-in, `HELD_POSE` in `PlayCard.vue` a held card);
+  the combo and level pops are in `GameHud.vue`.
+- **Change how forgiving a fling is:** `AIM_AHEAD_S` in
+  `components/throw-geometry.ts`.
+- **Change how big the game is:** the `html` font size in `style.css`, and
+  `--card-height` on each row in `GameBoard.vue`.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Change the check-up (questions, options, timer, hold):** the numbers are

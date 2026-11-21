@@ -5,7 +5,7 @@
  * and starts a run. The game stays mounted (v-show) under the About and
  * Settings pages, and pauses while they cover it.
  */
-import { domAnimation, LazyMotion, MotionConfig } from 'motion-v';
+import { domMax, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
 import type { Deck, JlptLevel } from './deck/types.ts';
 import { localDay, type GameEvent } from './game/events.ts';
@@ -152,11 +152,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Motion's small animation bundle; "user" follows the system's reduce-motion setting. -->
-  <LazyMotion :features="domAnimation">
+  <!-- Motion's bundle with drag, for throwing cards; "user" follows the system's reduce-motion setting. -->
+  <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
-      <main class="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6">
-        <h1 class="text-center font-card text-3xl font-bold tracking-wide text-gold">
+      <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
+        <h1 class="text-center font-card text-2xl font-bold tracking-wide text-gold">
           juku-arcade
         </h1>
         <p v-if="loadError" role="alert" class="text-center text-vermilion">{{ loadError }}</p>
@@ -182,6 +182,7 @@ onMounted(async () => {
             v-else
             v-show="!isAway"
             :key="runKey"
+            class="my-auto"
             :deck="deck"
             :settings="settings"
             :past-events="pastEvents"
