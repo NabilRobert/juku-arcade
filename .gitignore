@@ -28,3 +28,7 @@ coverage/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Pinned OpenJLPT download and generated decks (rebuilt by npm run decks)
+data/raw/
+public/decks/

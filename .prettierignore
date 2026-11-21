@@ -1,0 +1,6 @@
+dist/
+coverage/
+public/decks/
+data/
+package-lock.json
+docs/
