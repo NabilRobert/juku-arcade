@@ -9,9 +9,10 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 1. The core loop is playable: matching, combos,
-levels, the set timer, timeouts, set scores and difficulty tags. Pause and
-flip come in slice 2, and saved progress in slice 3.
+**Status:** slice 2. The core loop is playable (matching, combos, levels,
+the set timer, set scores, difficulty tags), with pause and flip: card
+backs with meanings, examples and kanji readings, the peek rule, comebacks
+and the missed tray. Saved progress comes in slice 3.
 
 ## Run it
 

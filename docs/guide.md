@@ -79,6 +79,25 @@ flowchart LR
 6. After a short pause, **`run.ts: nextSet`** deals the next set at the
    current level's time.
 
+## The flow, part 3: pause and flip
+
+1. **⏸ Pause** in **`GameHud.vue`** (or hiding the tab, or opening the
+   About page) calls **`pause.ts: pause`**. The clock stops, and
+   **`card-status.ts`** turns every card face down.
+2. Tapping a face-down word card calls **`pause.ts: flipCard`**.
+   **`CardBack.vue`** shows the word's reading, meanings, an example with
+   furigana (**`FuriganaText.vue`**, parsing `{学校|がっこう}` markup), and
+   each kanji's readings from the deck's kanji table, with the readings
+   this word uses highlighted.
+3. Flipping an unmatched card on the board is a **peek**. The word gets a 👁,
+   scores nothing when matched (**`taps.ts: peekedMatch`**), and joins the
+   comeback queue. Cards in **`MissedTray.vue`** are past misses, so flipping
+   them is free.
+4. **▶ Resume** calls **`pause.ts: resume`**, which moves the set's clock
+   on by the time spent paused.
+5. Missed and peeked words come back in the next set, up to 3 per set
+   (**`run.ts: comebackWords`**, **`deal.ts: pickWords`**).
+
 Every action appends a **`GameEvent`** (`events.ts`) with all of R6's
 fields. They stay in memory until slice 3 stores them.
 
@@ -103,6 +122,11 @@ fields. They stay in memory until slice 3 stores them.
 | **Tag** | A card's difficulty bonus (+0.1× to +0.5×), from its rank within the deck | `tags.ts` |
 | **Chips × multiplier** | The set score: chips for clean matches and seconds left, times level × (1 + the tags added up) | `score.ts` |
 | **Event** | One logged action with every R6 field, the raw material for the reports | `events.ts` |
+| **Pause / flip** | Pausing stops the clock and turns cards face down; flipping shows a card's back | `pause.ts`, `CardBack.vue` |
+| **Peek** | Flipping an unmatched card on the board: the word then scores nothing and comes back soon | `pause.ts: withPeek` |
+| **Comeback** | A missed or peeked word dealt again in the next set | `comebacks.ts`, `run.ts: comebackWords` |
+| **Missed tray** | This run's last 8 missed words, flippable while paused | `MissedTray.vue` |
+| **Kanji note** | A kanji's readings, meanings and other words, carried in each deck for the card's back | `KanjiNote` in `types.ts`, `scripts/deck-kanji.ts` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -123,6 +147,10 @@ fields. They stay in memory until slice 3 stores them.
   `src/game/tuning.ts`. Every number the playtest may change is there.
 - **Change what happens on a tap:** edit `src/game/taps.ts`; timeouts and
   dealing are in `src/game/run.ts`. Specs: `tests/run.test.ts`.
+- **Change what a card's back shows:** edit `src/components/CardBack.vue`;
+  the data comes from `scripts/deck-words.ts` and `scripts/deck-kanji.ts`.
+- **Change pause or peek rules:** edit `src/game/pause.ts`. Specs:
+  `tests/pause.test.ts`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
