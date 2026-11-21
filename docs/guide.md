@@ -117,6 +117,28 @@ flowchart LR
    IndexedDB (**`appendEvents`**), saves new bests, and refreshes
    **`DailyBar.vue`**: today's deck, words known, and days played.
 
+## The flow, part 5: the daily check-up and the export
+
+1. When the game starts, **`App.vue: offerCheckUp`** asks
+   **`memory/check-up-questions.ts: pickQuestions`** for today's questions,
+   once a day (`checkUpOfferedDay` in settings):
+   - **before:** the next new words, not yet played;
+   - **after:** words checked before, first played at least a day ago;
+   - **held back:** words checked before and kept out of play since.
+2. **`CheckUpScreen.vue`** asks each question: 4 readings
+   (**`check-up.ts: optionsFor`**: similar readings from other words, not the
+   game's decoys) and 8 seconds. **`checkUpEvent`** logs each answer as
+   `check_up_right` or `check_up_wrong`, with its role. A timeout is wrong.
+3. Answering a before question decides whether the word is held back:
+   **`check-up.ts: isHeldBack`** hashes the player and word IDs, so 1 word in
+   3 is held back, the same way every time. A held word stays out of the
+   daily deck for 3 days (**`isOnHold`**, used by **`daily-deck.ts`**).
+4. Check-up answers update only the check-up history
+   (**`applyCheckUp`**, kept in `Memory.checkUps`), never the review schedule
+   or difficulty.
+5. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
+   as an anonymous JSON file. Slice 5b's report script reads these files.
+
 ## The look and wellbeing
 
 - **The karuta table (D30)** lives in `src/style.css`: colour tokens
@@ -174,6 +196,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
+| **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
+| **Held back** | 1 word in 3, chosen by hash, kept out of play for 3 days after its first check: the control group | `isHeldBack`, `isOnHold` |
+| **Export** | The browser's event log as an anonymous JSON file the player chooses to share | `memory/export.ts` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -211,6 +236,11 @@ fields. They stay in memory until slice 3 stores them.
   `GameHud.vue`.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
+- **Change the check-up (questions, options, timer, hold):** the numbers are
+  at the top of `memory/check-up.ts`; question picking is in
+  `memory/check-up-questions.ts`. Specs: `tests/check-up.test.ts`.
+- **Change the export format:** edit `memory/export.ts` and bump
+  `EXPORT_FORMAT_VERSION`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card

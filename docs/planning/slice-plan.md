@@ -7,10 +7,10 @@ remember and measure.
 
 Sizes are rough estimates of lines of code, not counting tests and docs.
 
-**Progress (2026-11-21):** slices 0 and 1 merged (PR #1). Slice 2 is
-PR #2 (`feat/pause-flip`), and slice 3 is `feat/review-engine`, stacked on
-it. Deck findings: [`docs/spikes/slice-0-decks.md`](../spikes/slice-0-decks.md).
-Slice 4 uses the karuta table look (D30).
+**Progress (2026-11-21):** slices 0–4 merged (PRs #1–#4). Slice 5a is
+`feat/check-up`. Deck findings:
+[`docs/spikes/slice-0-decks.md`](../spikes/slice-0-decks.md). The karuta
+look is D30.
 
 ## Slice 0: Skeleton and decks (`build/skeleton`)
 
