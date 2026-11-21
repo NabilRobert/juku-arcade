@@ -6,6 +6,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { JLPT_LEVELS, type Deck, type DeckWord } from '../src/deck/types.ts';
+import { kanjiNotesFor } from './deck-kanji.ts';
 import { deckReport } from './deck-report.ts';
 import { toDeckWord } from './deck-words.ts';
 import { OPENJLPT_COMMIT, openPinnedDatabase, readKanji, readVocab } from './openjlpt.ts';
@@ -26,10 +27,12 @@ for (const row of rows) {
 mkdirSync(DECK_DIRECTORY, { recursive: true });
 for (const level of JLPT_LEVELS) {
   const levelIds = new Set(rows.filter((row) => row.level === level).map((row) => row.id));
+  const levelWords = words.filter((word) => levelIds.has(word.id));
   const deck: Deck = {
     level,
     sourceCommit: OPENJLPT_COMMIT,
-    words: words.filter((word) => levelIds.has(word.id)),
+    words: levelWords,
+    kanji: kanjiNotesFor(levelWords, kanjiTable, rows),
   };
   writeFileSync(`${DECK_DIRECTORY}/${level.toLowerCase()}.json`, JSON.stringify(deck));
 }

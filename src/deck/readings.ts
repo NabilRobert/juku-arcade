@@ -9,7 +9,9 @@
  *   reading" decoy (R8).
  */
 import { distance } from 'fastest-levenshtein';
-import { isPronounceable, SEMI_VOICED, toHiragana, VOICED } from './kana.ts';
+import { isKanji, isPronounceable, REPEAT_MARK, SEMI_VOICED, toHiragana, VOICED } from './kana.ts';
+
+export { isKanji } from './kana.ts';
 
 export interface KanjiReadings {
   onyomi: string[];
@@ -19,15 +21,8 @@ export interface KanjiReadings {
 /** Combinations beyond this are skipped, so long words don't explode. */
 export const MAX_CANDIDATES = 5000;
 
-const REPEAT_MARK = '々';
-const CJK_START = 0x4e00;
-const CJK_END = 0x9fff;
+/** Endings that turn into a small っ before the next sound: がく → がっ (学校). */
 const SOKUON_ENDINGS = 'きくちつ';
-
-export function isKanji(char: string): boolean {
-  const code = char.codePointAt(0) ?? 0;
-  return char === REPEAT_MARK || (code >= CJK_START && code <= CJK_END);
-}
 
 /** A verb ending's stem form, used inside compounds: 入る → 入り (いりぐち). */
 const STEM_FORM: Readonly<Record<string, string>> = {
@@ -143,4 +138,49 @@ export function otherReadingDecoy(
   const byCloseness = (a: string, b: string): number =>
     distance(a, reading) - distance(b, reading) || a.localeCompare(b);
   return wrong.sort(byCloseness)[0];
+}
+
+/** A KANJIDIC2 reading's spoken forms, with sound changes: ガク → がく, がっ. */
+function spokenForms(rawReading: string, isOnyomi: boolean): string[] {
+  const bases = isOnyomi ? [toHiragana(rawReading)] : kunyomiForms(rawReading, true);
+  return bases
+    .flatMap((base) => withSoundChanges(base, false, false))
+    .filter((form) => form !== '');
+}
+
+/**
+ * For each kanji in the word, the KANJIDIC2 readings that appear in the
+ * word's reading: 学校 がっこう → { 学: [ガク], 校: [コウ] }. Irregular
+ * words such as 今日 match none. Used to highlight readings on the card's
+ * back (D29); it's an approximation, so it never feeds scoring.
+ */
+export function readingsUsedIn(
+  word: string,
+  reading: string,
+  kanjiTable: ReadonlyMap<string, KanjiReadings>,
+): Record<string, string[]> {
+  const used: Record<string, string[]> = {};
+  for (const char of new Set([...word].filter((char) => char !== REPEAT_MARK && isKanji(char)))) {
+    const kanji = kanjiTable.get(char);
+    if (kanji === undefined) continue;
+    const matches = [
+      ...kanji.onyomi.map((raw) => ({ raw, form: longestFormIn(raw, true, reading) })),
+      ...kanji.kunyomi.map((raw) => ({ raw, form: longestFormIn(raw, false, reading) })),
+    ].filter((match) => match.form !== '');
+    // ク inside くち (口 in いりぐち) is a coincidence: keep only matches no longer one contains.
+    const kept = matches.filter(
+      (match) =>
+        !matches.some(
+          (other) => other.form.length > match.form.length && other.form.includes(match.form),
+        ),
+    );
+    if (kept.length > 0) used[char] = kept.map((match) => match.raw);
+  }
+  return used;
+}
+
+/** The longest spoken form of a reading found in the word's reading, or '' if none. */
+function longestFormIn(rawReading: string, isOnyomi: boolean, reading: string): string {
+  const found = spokenForms(rawReading, isOnyomi).filter((form) => reading.includes(form));
+  return found.sort((a, b) => b.length - a.length)[0] ?? '';
 }

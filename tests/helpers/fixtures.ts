@@ -14,7 +14,7 @@ export function seededRandom(seed: number): () => number {
 }
 
 function kanji(onyomi: string[], kunyomi: string[], frequencyRank: number | null): KanjiRow {
-  return { onyomi, kunyomi, frequencyRank };
+  return { onyomi, kunyomi, frequencyRank, meanings: [], words: [] };
 }
 
 /** Readings as KANJIDIC2 gives them (on-yomi in katakana, kun-yomi with okurigana dots). */
@@ -41,5 +41,8 @@ export function deckWord(
     otherReadings,
     missChanceGuess: 0.2,
     decoys: { longVowel: `${reading}う`, dakuten: `が${reading}` },
+    meanings: [`meaning of ${word}`],
+    example: null,
+    kanjiReadingsUsed: {},
   };
 }

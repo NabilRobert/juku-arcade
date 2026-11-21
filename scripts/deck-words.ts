@@ -10,9 +10,17 @@ import {
   smallYoonDecoys,
 } from '../src/deck/decoys.ts';
 import { isPronounceable } from '../src/deck/kana.ts';
-import { isIrregularReading, isKanji, otherReadingDecoy } from '../src/deck/readings.ts';
-import { JLPT_LEVELS, type DecoyType, type DeckWord } from '../src/deck/types.ts';
+import {
+  isIrregularReading,
+  isKanji,
+  otherReadingDecoy,
+  readingsUsedIn,
+} from '../src/deck/readings.ts';
+import { JLPT_LEVELS, type DecoyType, type DeckWord, type Example } from '../src/deck/types.ts';
 import type { KanjiRow, VocabRow } from './openjlpt.ts';
+
+/** The card's back has room for a few meanings, not JMdict's full list. */
+const MAX_MEANINGS = 3;
 
 /**
  * Starting values for the miss-chance guess (R5). They are judgement, not
@@ -77,6 +85,17 @@ export function decoysFor(
   return decoys;
 }
 
+/** The first example with furigana, so learners can read it; otherwise the first one. */
+export function pickExample(row: VocabRow): Example | null {
+  const example = row.examples.find((candidate) => candidate.furigana) ?? row.examples[0];
+  if (example === undefined) return null;
+  return {
+    text: example.furigana ?? example.ja,
+    english: example.en,
+    tatoebaId: example.tatoeba_id,
+  };
+}
+
 /** A deck word, or null for a kana-only word (its reading *is* its spelling, L2). */
 export function toDeckWord(
   row: VocabRow,
@@ -91,5 +110,8 @@ export function toDeckWord(
     otherReadings: row.otherReadings,
     missChanceGuess: missChanceGuess(row, kanjiTable, isIrregular),
     decoys: decoysFor(row, kanjiTable),
+    meanings: row.meanings.slice(0, MAX_MEANINGS),
+    example: pickExample(row),
+    kanjiReadingsUsed: readingsUsedIn(row.word, row.reading, kanjiTable),
   };
 }

@@ -4,7 +4,18 @@ import type { VocabRow } from '../scripts/openjlpt.ts';
 import { KANJI_TABLE } from './helpers/fixtures.ts';
 
 function row(word: string, reading: string, otherReadings: string[] = []): VocabRow {
-  return { id: `id-${word}`, word, reading, otherReadings, level: 'N5' };
+  return {
+    id: `id-${word}`,
+    word,
+    reading,
+    otherReadings,
+    level: 'N5',
+    meanings: ['school', 'a', 'b', 'c'],
+    examples: [
+      { ja: '学校へ行く。', en: 'I go to school.', tatoeba_id: 1 },
+      { ja: '学校だ。', furigana: '{学校|がっこう}だ。', en: "It's a school.", tatoeba_id: 2 },
+    ],
+  };
 }
 
 describe('deck words', () => {
@@ -31,6 +42,22 @@ describe('deck words', () => {
     const decoys = Object.values(decoysFor(row('今日', 'きょう', ['こんにち']), KANJI_TABLE));
     expect(decoys).not.toContain('きょう');
     expect(decoys).not.toContain('こんにち');
+  });
+
+  it('keeps at most 3 meanings for the card back', () => {
+    expect(toDeckWord(row('学校', 'がっこう'), KANJI_TABLE)?.meanings).toEqual([
+      'school',
+      'a',
+      'b',
+    ]);
+  });
+
+  it('prefers an example with furigana', () => {
+    expect(toDeckWord(row('学校', 'がっこう'), KANJI_TABLE)?.example).toEqual({
+      text: '{学校|がっこう}だ。',
+      english: "It's a school.",
+      tatoebaId: 2,
+    });
   });
 
   it('gives 学校 a decoy of every type it can', () => {

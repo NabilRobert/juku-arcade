@@ -2,14 +2,21 @@
 /**
  * The board for one set: the word cards on top, the reading cards below
  * (L1). When a set times out, each word card shows its reading (L6).
+ * While paused, tapping a word card flips it instead of selecting it (L9).
  */
 import { readingCardStatus, wordCardStatus } from '../game/card-status.ts';
 import type { CardRef, RunState } from '../game/run.ts';
+import type { DeckWord } from '../deck/types.ts';
 import type { TagTable } from '../game/tags.ts';
 import PlayCard from './PlayCard.vue';
 
-defineProps<{ state: RunState; nowMs: number; tags: TagTable }>();
-defineEmits<{ tap: [card: CardRef] }>();
+const props = defineProps<{ state: RunState; nowMs: number; tags: TagTable }>();
+const emit = defineEmits<{ tap: [card: CardRef]; flip: [word: DeckWord] }>();
+
+function onWordTap(word: DeckWord): void {
+  if (props.state.pausedAtMs !== null) emit('flip', word);
+  else emit('tap', { kind: 'word', wordId: word.id });
+}
 </script>
 
 <template>
@@ -23,7 +30,8 @@ defineEmits<{ tap: [card: CardRef] }>();
         :status="wordCardStatus(state, word.id, nowMs)"
         :tag="tags.get(word.id)"
         :hint="state.phase === 'timedOut' ? word.reading : undefined"
-        @tap="$emit('tap', { kind: 'word', wordId: word.id })"
+        :is-peeked="state.peekedWordIds.includes(word.id)"
+        @tap="onWordTap(word)"
       />
     </div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="reading-row">

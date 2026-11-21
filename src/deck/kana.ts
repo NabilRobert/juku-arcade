@@ -79,3 +79,13 @@ export function isPronounceable(reading: string): boolean {
     return hasValidPrevious && next !== undefined && SOKUON_FOLLOWERS.includes(next);
   });
 }
+
+/** 々 repeats the kanji before it (人々 ひとびと). */
+export const REPEAT_MARK = '々';
+const CJK_START = 0x4e00;
+const CJK_END = 0x9fff;
+
+export function isKanji(char: string): boolean {
+  const code = char.codePointAt(0) ?? 0;
+  return char === REPEAT_MARK || (code >= CJK_START && code <= CJK_END);
+}

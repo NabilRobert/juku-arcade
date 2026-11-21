@@ -14,9 +14,10 @@ import type { DecoyType } from '../deck/types.ts';
 
 export const EVENT_SCHEMA_VERSION = 1;
 
-export type EventKind = 'match' | 'miss' | 'timeout' | 'session_start';
+export type EventKind =
+  'match' | 'miss' | 'peek' | 'timeout' | 'pause' | 'resume' | 'session_start';
 export type ErrorType = DecoyType | 'mixUp';
-export type Outcome = 'clean' | 'after_miss';
+export type Outcome = 'clean' | 'after_miss' | 'peeked';
 
 export interface GameEvent {
   event_id: string;

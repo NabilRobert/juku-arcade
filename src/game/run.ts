@@ -14,6 +14,7 @@ import {
 } from './deal.ts';
 import { makeEvent, type GameEvent, type SessionIdentity } from './events.ts';
 import { FIRST_LEVEL, levelAfterMiss, setDurationMs } from './levels.ts';
+import { MAX_COMEBACKS_PER_SET } from './tuning.ts';
 import type { SetScore } from './score.ts';
 import type { TagTable } from './tags.ts';
 
@@ -52,6 +53,16 @@ export interface RunState {
   /** How many times each word has been dealt in this run, for R6's times_seen_before. */
   timesDealt: Readonly<Record<string, number>>;
   events: readonly GameEvent[];
+  /** When the player paused, or null while playing (L9). The clock stops while paused. */
+  pausedAtMs: number | null;
+  /** The word whose card back is showing while paused. */
+  flippedWord: DeckWord | null;
+  /** Words peeked at in this set: matching them scores nothing (L9). */
+  peekedWordIds: readonly string[];
+  /** Missed or peeked words waiting to be dealt again (R3). */
+  comebackWordIds: readonly string[];
+  /** This run's latest missed words, newest first, flippable while paused (L9). */
+  missedTray: readonly DeckWord[];
 }
 
 /** What a run needs but never changes. */
@@ -62,15 +73,32 @@ export interface RunContext {
   identity: SessionIdentity;
 }
 
+/** Seconds left in the set; the clock stands still while paused. */
 export function secondsLeft(state: RunState, nowMs: number): number {
-  return Math.max(0, (state.setShownAtMs + state.setDurationMs - nowMs) / 1000);
+  const clockMs = state.pausedAtMs ?? nowMs;
+  return Math.max(0, (state.setShownAtMs + state.setDurationMs - clockMs) / 1000);
+}
+
+function countDealt(state: RunState, set: DealtSet): Record<string, number> {
+  const timesDealt = { ...state.timesDealt };
+  for (const word of set.words) timesDealt[word.id] = (timesDealt[word.id] ?? 0) + 1;
+  return timesDealt;
+}
+
+function withExposure(exposure: DecoyExposure, set: DealtSet): DecoyExposure {
+  const decoyType = set.readings.find((card) => card.wordId === null)?.decoyType;
+  return decoyType ? { ...exposure, [decoyType]: exposure[decoyType] + 1 } : exposure;
+}
+
+function comebackWords(state: RunState, context: RunContext): DeckWord[] {
+  const due = state.comebackWordIds.slice(0, MAX_COMEBACKS_PER_SET);
+  return context.pool.filter((word) => due.includes(word.id));
 }
 
 function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunState {
-  const set = dealSet(context.pool, context.random, state.decoyExposure);
-  const decoyType = set.readings.find((card) => card.wordId === null)?.decoyType;
-  const timesDealt = { ...state.timesDealt };
-  for (const word of set.words) timesDealt[word.id] = (timesDealt[word.id] ?? 0) + 1;
+  const comebacks = comebackWords(state, context);
+  const set = dealSet(context.pool, context.random, state.decoyExposure, comebacks);
+  const dealtIds = set.words.map((word) => word.id);
   return {
     ...state,
     set,
@@ -84,10 +112,11 @@ function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunS
     missedWordIds: [],
     cleanMatchTags: [],
     flash: null,
-    decoyExposure: decoyType
-      ? { ...state.decoyExposure, [decoyType]: state.decoyExposure[decoyType] + 1 }
-      : state.decoyExposure,
-    timesDealt,
+    decoyExposure: withExposure(state.decoyExposure, set),
+    timesDealt: countDealt(state, set),
+    flippedWord: null,
+    peekedWordIds: [],
+    comebackWordIds: state.comebackWordIds.filter((id) => !dealtIds.includes(id)),
   };
 }
 
@@ -111,6 +140,11 @@ export function startRun(context: RunContext, nowMs: number): RunState {
     flash: null,
     decoyExposure: NO_EXPOSURE,
     timesDealt: {},
+    pausedAtMs: null,
+    flippedWord: null,
+    peekedWordIds: [],
+    comebackWordIds: [],
+    missedTray: [],
     events: [
       makeEvent(context.identity, new Date(nowMs), {
         kind: 'session_start',
@@ -134,7 +168,8 @@ export function nextSet(state: RunState, context: RunContext, nowMs: number): Ru
  * so the review engine won't treat them as forgotten.
  */
 export function timeUp(state: RunState, context: RunContext, nowMs: number): RunState {
-  if (state.phase !== 'playing' || secondsLeft(state, nowMs) > 0) return state;
+  if (state.phase !== 'playing' || state.pausedAtMs !== null) return state;
+  if (secondsLeft(state, nowMs) > 0) return state;
   const unmatched = state.set.words.filter((word) => !state.matchedWordIds.includes(word.id));
   const timeouts = unmatched.map((word) =>
     makeEvent(context.identity, new Date(nowMs), {

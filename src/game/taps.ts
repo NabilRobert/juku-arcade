@@ -10,6 +10,7 @@ import { makeEvent, type GameEvent } from './events.ts';
 import { levelAfterMatch, levelAfterMiss } from './levels.ts';
 import type { CardRef, RunContext, RunState } from './run.ts';
 import { secondsLeft } from './run.ts';
+import { withComeback, withTrayWord } from './comebacks.ts';
 import { scoreSet } from './score.ts';
 import { WRONG_FLASH_MS } from './tuning.ts';
 
@@ -33,6 +34,11 @@ function isMatched(state: RunState, card: CardRef): boolean {
 function isSameCard(a: CardRef, b: CardRef): boolean {
   if (a.kind === 'word' && b.kind === 'word') return a.wordId === b.wordId;
   return a.kind === 'reading' && b.kind === 'reading' && a.index === b.index;
+}
+
+/** Cards respond only while a set is in play and the game isn't paused. */
+function acceptsTaps(state: RunState): boolean {
+  return state.phase === 'playing' && state.pausedAtMs === null;
 }
 
 /** The R6 fields every tap event shares. */
@@ -71,7 +77,24 @@ function withSetEnd(state: RunState, nowMs: number): RunState {
   };
 }
 
+/**
+ * Matching a word you peeked at (L9): it leaves the board, but scores no
+ * chips, tag or combo point, and doesn't break the combo either.
+ */
+function peekedMatch(state: RunState, context: RunContext, nowMs: number, pair: Pair): RunState {
+  const event = tapEvent(state, context, nowMs, pair, { outcome: 'peeked' });
+  return withSetEnd(
+    {
+      ...state,
+      matchedWordIds: [...state.matchedWordIds, pair.wordId],
+      events: [...state.events, event],
+    },
+    nowMs,
+  );
+}
+
 function match(state: RunState, context: RunContext, nowMs: number, pair: Pair): RunState {
+  if (state.peekedWordIds.includes(pair.wordId)) return peekedMatch(state, context, nowMs, pair);
   const isClean = !state.missedWordIds.includes(pair.wordId);
   const tag = context.tags.get(pair.wordId) ?? 0;
   const combo = state.combo + 1;
@@ -101,8 +124,11 @@ function miss(state: RunState, context: RunContext, nowMs: number, pair: Pair): 
     error_type: isDecoy ? (wrongReading?.decoyType ?? null) : 'mixUp',
   });
   const correctIndex = state.set.readings.findIndex((card) => card.wordId === pair.wordId);
+  const word = state.set.words.find((candidate) => candidate.id === pair.wordId);
   return {
     ...state,
+    comebackWordIds: withComeback(state.comebackWordIds, pair.wordId),
+    missedTray: word ? withTrayWord(state.missedTray, word) : state.missedTray,
     combo: 0,
     level: levelAfterMiss(state.level),
     missedWordIds: state.missedWordIds.includes(pair.wordId)
@@ -136,7 +162,7 @@ export function tapCard(
   card: CardRef,
   nowMs: number,
 ): RunState {
-  if (state.phase !== 'playing' || isMatched(state, card)) return state;
+  if (!acceptsTaps(state) || isMatched(state, card)) return state;
   const selected = state.selected;
   if (selected === null || selected.kind === card.kind) {
     const isUnselect = selected !== null && isSameCard(selected, card);
