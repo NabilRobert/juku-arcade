@@ -9,12 +9,13 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 5b. The game is playable and remembers your progress, in
+**Status:** slice 6, the playtest. The game is playable and remembers your progress, in
 a karuta table look, with a break nudge, an optional daily cap, and an
 optional daily check-up that measures whether play improves recall.
 Players can export their anonymous data, and a report script turns a
-folder of exports into a class report, ability reports and the
-measurement report. Next: the playtest (slice 6).
+folder of exports into a class report, ability reports, the
+measurement report and a play report (S1–S6). The playtest guide, with
+the deploy steps, is [`docs/playtest.md`](docs/playtest.md).
 
 ## Run it
 
@@ -43,15 +44,20 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 
 ## Layout
 
-| Folder            | What it holds                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- |
-| `scripts/`        | The deck build: reads pinned OpenJLPT and writes `public/decks/<level>.json`                               |
-| `src/deck/`       | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game |
-| `src/game/`       | Game rules in plain TypeScript with no Vue (dealing a set for now)                                         |
-| `src/components/` | Vue components: the board, the card, the "About the data" page                                             |
-| `tests/`          | Vitest specs, one behaviour each                                                                           |
-| `docs/guide.md`   | How a request flows through the code, a glossary, and where to change things                               |
-| `docs/spikes/`    | Spike reports                                                                                              |
+| Folder             | What it holds                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `scripts/`         | The deck build (reads pinned OpenJLPT, writes `public/decks/<level>.json`), the report script and the power check |
+| `scripts/report/`  | The reports: loading exports, the measurement, the class, ability and play reports                                |
+| `src/deck/`        | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game        |
+| `src/game/`        | Game rules in plain TypeScript with no Vue: dealing, taps, levels, score, tags, events, tuning                    |
+| `src/memory/`      | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
+| `src/composables/` | `useRun`: connects the game rules to the clock, storage and the screen                                            |
+| `src/components/`  | Vue components: the board, the cards, the side panel, the check-up, settings                                      |
+| `public/_headers`  | Cloudflare Pages headers: the content security policy and caching                                                 |
+| `tests/`           | Vitest specs, one behaviour each                                                                                  |
+| `docs/guide.md`    | How a request flows through the code, a glossary, and where to change things                                      |
+| `docs/playtest.md` | Deploying, watching learners play, tuning, and reading the reports                                                |
+| `docs/spikes/`     | Spike reports                                                                                                     |
 
 ## Data and licences
 

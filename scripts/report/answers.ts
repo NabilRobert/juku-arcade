@@ -43,12 +43,21 @@ export function wordSpellings(events: readonly GameEvent[]): Map<string, string>
 /** A short form of the anonymous player ID for reports. */
 export const shortId = (playerId: string): string => playerId.slice(0, 8);
 
-export function eventsByPlayer(events: readonly GameEvent[]): Map<string, GameEvent[]> {
-  const byPlayer = new Map<string, GameEvent[]>();
+/** Groups events by a key, keeping each group in time order. */
+export function groupEvents(
+  events: readonly GameEvent[],
+  keyOf: (event: GameEvent) => string,
+): Map<string, GameEvent[]> {
+  const groups = new Map<string, GameEvent[]>();
   for (const event of events) {
-    const list = byPlayer.get(event.player_id) ?? [];
-    list.push(event);
-    byPlayer.set(event.player_id, list);
+    const key = keyOf(event);
+    const group = groups.get(key) ?? [];
+    group.push(event);
+    groups.set(key, group);
   }
-  return byPlayer;
+  return groups;
+}
+
+export function eventsByPlayer(events: readonly GameEvent[]): Map<string, GameEvent[]> {
+  return groupEvents(events, (event) => event.player_id);
 }
