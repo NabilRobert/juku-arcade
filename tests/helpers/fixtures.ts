@@ -1,17 +1,8 @@
-// Shared test data: a seeded random source and a small kanji table.
+// Shared test data: a small kanji table and deck words (and the seeded random source).
 import type { KanjiRow } from '../../scripts/openjlpt.ts';
 import type { DeckWord } from '../../src/deck/types.ts';
 
-/** Mulberry32: a tiny seeded generator, so shuffles repeat exactly in tests. */
-export function seededRandom(seed: number): () => number {
-  let state = seed;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let mixed = Math.imul(state ^ (state >>> 15), 1 | state);
-    mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed;
-    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
-  };
-}
+export { seededRandom } from '../../src/game/random.ts';
 
 function kanji(onyomi: string[], kunyomi: string[], frequencyRank: number | null): KanjiRow {
   return { onyomi, kunyomi, frequencyRank, meanings: [], words: [] };

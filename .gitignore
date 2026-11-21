@@ -32,3 +32,6 @@ coverage/
 # Pinned OpenJLPT download and generated decks (rebuilt by npm run decks)
 data/raw/
 public/decks/
+
+# Reports written by npm run report
+report-output/
