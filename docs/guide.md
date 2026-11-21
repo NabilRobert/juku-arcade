@@ -98,6 +98,25 @@ flowchart LR
 5. Missed and peeked words come back in the next set, up to 3 per set
    (**`run.ts: comebackWords`**, **`deal.ts: pickWords`**).
 
+## The flow, part 4: memory across visits
+
+1. **`App.vue`** loads the settings (**`memory/storage.ts: loadSettings`**).
+   With none, **`SetupScreen.vue`** asks for a level and an optional class
+   code. Then it loads the event log (**`loadEvents`**) and the level's deck.
+2. **`useRun`** builds the review engine,
+   **`memory/review-engine.ts: createLocalEngine`**. It rebuilds each
+   word's memory from the log (**`word-memory.ts: deriveMemory`**):
+   misses and peeks are wrong answers, clean matches are right ones, and
+   **`leitner.ts: afterAnswer`** moves the word between boxes (ported from
+   Juku).
+3. Before each deal, the engine picks the pool
+   (**`daily-deck.ts: poolForNextSet`**): today's due reviews and new words
+   until the daily deck is cleared, then weak words plus one new word. It
+   also gives fresh learned tags (**`difficulty.ts: learnedTags`**).
+4. After every change, **`useRun`** hands new events to the engine and to
+   IndexedDB (**`appendEvents`**), saves new bests, and refreshes
+   **`DailyBar.vue`**: today's deck, words known, and days played.
+
 Every action appends a **`GameEvent`** (`events.ts`) with all of R6's
 fields. They stay in memory until slice 3 stores them.
 
@@ -127,6 +146,12 @@ fields. They stay in memory until slice 3 stores them.
 | **Comeback** | A missed or peeked word dealt again in the next set | `comebacks.ts`, `run.ts: comebackWords` |
 | **Missed tray** | This run's last 8 missed words, flippable while paused | `MissedTray.vue` |
 | **Kanji note** | A kanji's readings, meanings and other words, carried in each deck for the card's back | `KanjiNote` in `types.ts`, `scripts/deck-kanji.ts` |
+| **Leitner box** | Boxes 1–5; a word waits 1, 2, 4, 8 or 16 days before it's due again. Wrong goes to box 1 | `memory/leitner.ts` |
+| **Daily deck** | Today's reviews due plus 10 new words; clearing it ticks the day | `memory/daily-deck.ts` |
+| **Endless play** | After the daily deck: weak words plus one new word per set | `poolForNextSet` |
+| **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
+| **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
+| **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -151,6 +176,12 @@ fields. They stay in memory until slice 3 stores them.
   the data comes from `scripts/deck-words.ts` and `scripts/deck-kanji.ts`.
 - **Change pause or peek rules:** edit `src/game/pause.ts`. Specs:
   `tests/pause.test.ts`.
+- **Change the review schedule:** edit `memory/leitner.ts`. Specs:
+  `tests/memory.test.ts`.
+- **Change the daily deck or endless mix:** edit `memory/daily-deck.ts`; its
+  numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
+- **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
+  Dexie version if the stores change.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card

@@ -9,10 +9,11 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 2. The core loop is playable (matching, combos, levels,
-the set timer, set scores, difficulty tags), with pause and flip: card
-backs with meanings, examples and kanji readings, the peek rule, comebacks
-and the missed tray. Saved progress comes in slice 3.
+**Status:** slice 3. The core loop is playable, with pause and flip, and
+it remembers: a review engine (Leitner boxes, ported from Juku) builds a
+daily deck of reviews due plus 10 new words, learns which words are hard
+for you, and keeps your progress in this browser. Visual design comes in
+slice 4.
 
 ## Run it
 

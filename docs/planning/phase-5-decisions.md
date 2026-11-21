@@ -321,3 +321,21 @@ this knowledge.
 - **Decided after the playtest:** a separate kanji mode that matches
   single kanji to their **meaning** (生 → life). Meanings are short, and
   readings stay in word mode, where they're unambiguous.
+
+## Look and feel (added 2026-11-21)
+
+### D30: A karuta table look, with a card-game layout (settled)
+
+Arthur picked the karuta table: karuta is a traditional Japanese game of
+matching what's read aloud to the right card, which fits the learning goal.
+Cards look like washi paper with a vermilion hanko stamp for the difficulty
+tag, on a dark lacquer or tatami table. On laptops, a side panel holds the
+level, combo, timer and a score breakdown that counts up; on phones the
+same blocks sit in a bar above the board. Built in slice 4.
+
+The layout follows common card-game conventions, the genre Arthur named as
+inspiration. The look is our own: no other game's card art, table texture,
+score boxes, font or naming (D22).
+
+- **Beat:** a night-market arcade (flashier, less tied to learning
+  Japanese); clean stationery (easy to read, least like an arcade).
