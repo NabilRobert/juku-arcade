@@ -9,11 +9,12 @@ Built for a friend's Japanese school, as a static web app with no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
-**Status:** slice 3. The core loop is playable, with pause and flip, and
-it remembers: a review engine (Leitner boxes, ported from Juku) builds a
-daily deck of reviews due plus 10 new words, learns which words are hard
-for you, and keeps your progress in this browser. Visual design comes in
-slice 4.
+**Status:** slice 4. The game is playable and remembers your progress, in
+a karuta table look: washi-paper cards with a vermilion stamp for each
+card's difficulty, a side panel with a counting-up score, and animation
+that follows your reduce-motion setting. It suggests a break after 15
+minutes, and schools can set a daily cap. The check-up and export come in
+slice 5.
 
 ## Run it
 
@@ -24,6 +25,9 @@ npm run dev
 
 `npm run dev` first builds the word decks. On the first run it downloads
 the pinned OpenJLPT file (about 6 MB) into `data/raw/`.
+
+For schools where minors play, copy `.env.example` to `.env` and set
+`VITE_DAILY_CAP_MINUTES` before building.
 
 Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`. `npm run decks:report` prints the deck statistics.
