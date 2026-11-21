@@ -41,8 +41,8 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
 </script>
 
 <template>
-  <section class="flex flex-col gap-[4dvh]" aria-label="Board">
-    <div class="grid grid-cols-5 gap-4 [--card-height:36dvh]" data-testid="word-row">
+  <section class="flex flex-col gap-[7dvh]" aria-label="Board">
+    <div class="grid grid-cols-5 gap-x-10 [--card-height:33dvh]" data-testid="word-row">
       <div v-for="(word, index) in state.set.words" :key="word.id" :ref="registerWord(word.id)">
         <PlayCard
           :text="word.word"
@@ -57,7 +57,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         />
       </div>
     </div>
-    <div class="grid grid-cols-6 gap-3 [--card-height:27dvh]" data-testid="reading-row">
+    <div class="grid grid-cols-6 gap-x-8 [--card-height:25dvh]" data-testid="reading-row">
       <div
         v-for="(card, index) in state.set.readings"
         :key="card.text"
