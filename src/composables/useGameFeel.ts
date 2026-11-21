@@ -1,8 +1,8 @@
 /**
  * How the game answers what the player does, beyond the cards moving:
  * sounds, the combo building on the table, and the table shaking on a hit.
- * It watches the run's state for what changed (a match, a miss, a level,
- * a cleared or timed-out set) and plays the reaction.
+ * It watches the run's state for what changed (a new deal, a match, a
+ * miss, a level, a cleared or timed-out set) and plays the reaction.
  *
  * A match lands when the thrown card hits its word card, not when it's let
  * go, so the slap, the chime and the shake wait for the throw (THROW_S).
@@ -55,6 +55,7 @@ export function useGameFeel(state: () => RunState) {
   }
 
   watch(state, (now, before) => {
+    if (now.setIndex > before.setIndex) playSound('deal');
     if (now.matchedWordIds.length > before.matchedWordIds.length) {
       const isLevelUp = now.level > before.level;
       later(() => landHit(now.combo, isLevelUp), THROW_MS);

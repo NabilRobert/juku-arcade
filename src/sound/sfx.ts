@@ -1,7 +1,10 @@
 /**
- * The game's sound effects, made in code by ZzFX (no audio files to host
- * or license). Each sound is a list of ZzFX's synth settings; they were
- * shaped by ear and are the place to change how the game sounds.
+ * The game's sound effects. Most are made in code by ZzFX: each is a list
+ * of ZzFX's synth settings, shaped by ear. The card sounds (a shuffle when
+ * a set is dealt, a slide when a card is picked up, a slap when it lands)
+ * are recordings from Kenney's Casino Audio pack (CC0, public/sounds/),
+ * because paper is hard to fake; if a recording can't load or play, its
+ * synth sound plays instead.
  *
  * ZzFX opens an AudioContext as soon as it loads, and browsers only allow
  * sound after the player has touched the page, so it's loaded on the first
@@ -20,13 +23,15 @@ type SoundSettings = (number | undefined)[];
 
 /* eslint-disable no-sparse-arrays -- ZzFX's own format leaves settings it doesn't need empty. */
 const SOUNDS = {
-  /** Picking a card up: a short papery tick. */
+  /** A new set dealt (recorded; this is the fallback): a swish. */
+  deal: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
+  /** Picking a card up (recorded; this is the fallback): a short papery tick. */
   pickUp: [0.5, 0.05, 1400, , 0.005, 0.03, 4, 2],
   /** A held card over a word card: a soft click. */
   aim: [0.25, 0, 1800, , , 0.02, 1],
   /** Letting a thrown card fly: a swish of air. */
   whoosh: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
-  /** The thrown card hitting its word card: a slap. */
+  /** The thrown card hitting its word card (recorded; this is the fallback): a slap. */
   slap: [1, 0.05, 160, , 0.01, 0.09, 4, 2, , , , , , 2],
   /** The chime on each match; its pitch climbs with the combo. */
   chime: [0.55, 0, 660, , 0.02, 0.3, 1, 2, , , , , , , , , , 0.5, 0.06],
@@ -40,6 +45,18 @@ const SOUNDS = {
 /* eslint-enable no-sparse-arrays */
 
 export type SoundName = keyof typeof SOUNDS;
+
+/** Recorded sounds, by the sound they replace; one variant is picked at random each time. */
+const RECORDINGS: Partial<Record<SoundName, string[]>> = {
+  deal: ['card-shuffle.ogg'],
+  pickUp: ['card-slide-1.ogg', 'card-slide-2.ogg', 'card-slide-3.ogg'],
+  slap: ['card-place-1.ogg', 'card-place-2.ogg'],
+};
+/** Recordings are louder than the synth sounds; this evens them out. */
+const RECORDING_VOLUME = 0.5;
+/** The shuffle recording runs 3 s; a deal plays its first riffle, fading out over the end. */
+const RECORDING_MAX_S = 1.2;
+const FADE_OUT_S = 0.25;
 
 /**
  * Steps of the major pentatonic scale, in semitones: each match in a combo
@@ -75,19 +92,59 @@ export function setMuted(muted: boolean): void {
   }
 }
 
-type Player = (name: SoundName, pitch: number) => void;
+type Player = (name: SoundName, pitch: number) => Promise<void>;
 let player: Promise<Player> | null = null;
 
+/** Fetches and decodes each recording once; a failed one stays failed, so its synth sound plays. */
+function recordingLoader(context: AudioContext): (file: string) => Promise<AudioBuffer> {
+  const buffers = new Map<string, Promise<AudioBuffer>>();
+  return (file) => {
+    let buffer = buffers.get(file);
+    if (buffer === undefined) {
+      buffer = fetch(`${import.meta.env.BASE_URL}sounds/${file}`)
+        .then((response) => response.arrayBuffer())
+        .then((data) => context.decodeAudioData(data));
+      buffers.set(file, buffer);
+    }
+    return buffer;
+  };
+}
+
+function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number): void {
+  const source = context.createBufferSource();
+  const gain = context.createGain();
+  source.buffer = buffer;
+  source.playbackRate.value = pitch;
+  const length = Math.min(buffer.duration, RECORDING_MAX_S);
+  const now = context.currentTime;
+  gain.gain.setValueAtTime(RECORDING_VOLUME, now);
+  gain.gain.setValueAtTime(RECORDING_VOLUME, now + length - FADE_OUT_S);
+  gain.gain.linearRampToValueAtTime(0, now + length);
+  source.connect(gain).connect(context.destination);
+  source.start(now, 0, length);
+}
+
 async function loadPlayer(): Promise<Player> {
-  const { ZZFXSound } = await import('zzfx');
+  const { ZZFX, ZZFXSound } = await import('zzfx');
   const built = new Map<SoundName, InstanceType<typeof ZZFXSound>>();
-  return (name, pitch) => {
+  const loadRecording = recordingLoader(ZZFX.audioContext);
+  const playSynth = (name: SoundName, pitch: number): void => {
     let sound = built.get(name);
     if (sound === undefined) {
       sound = new ZZFXSound([...SOUNDS[name]]);
       built.set(name, sound);
     }
     sound.play(1, pitch);
+  };
+  return async (name, pitch) => {
+    const files = RECORDINGS[name];
+    const file = files?.[Math.floor(Math.random() * files.length)];
+    if (file === undefined) return playSynth(name, pitch);
+    try {
+      playBuffer(ZZFX.audioContext, await loadRecording(file), pitch);
+    } catch {
+      playSynth(name, pitch);
+    }
   };
 }
 

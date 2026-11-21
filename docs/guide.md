@@ -207,9 +207,12 @@ detected at each class size.
   card's width with container units, and a reading longer than 6 kana goes
   on two lines.
 - **Sound and the combo (feeling involved):** every move gets an answer.
-  `sound/sfx.ts` makes the sounds in code with ZzFX (a tiny MIT synth, no
-  audio files): a tick when a card is picked up, a click when it's over a
-  word card, a swish when it's thrown, a slap and a chime when it hits,
+  `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
+  Casino Audio pack (CC0, in `public/sounds/` with its licence): a
+  shuffle when a set is dealt, a slide when a card is picked up, and a
+  slap when it lands. The rest are made in code with ZzFX (a tiny MIT
+  synth): a click when a held card is over a word card, a swish when
+  it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
@@ -316,7 +319,9 @@ fields. They stay in memory until slice 3 stores them.
   `DEAL_FROM` the deal-in, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
 - **Change a sound:** edit its numbers in `SOUNDS` in `sound/sfx.ts`
-  (the comment there names each one). The combo's tune is `COMBO_STEPS`.
+  (the comment there names each one), or point it at a different file in
+  `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
+  `COMBO_STEPS`.
 - **Change how the combo builds:** the steps, praise and colours are
   `TIERS` in `ComboMeter.vue`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.

@@ -53,6 +53,7 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 | `src/memory/`      | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
 | `src/composables/` | `useRun`: connects the game rules to the clock, storage and the screen                                            |
 | `src/components/`  | Vue components: the board, the cards, the side panel, the check-up, settings                                      |
+| `public/sounds/`   | Card sounds from Kenney's Casino Audio pack (CC0, licence included)                                               |
 | `public/_headers`  | Cloudflare Pages headers: the content security policy and caching                                                 |
 | `tests/`           | Vitest specs, one behaviour each                                                                                  |
 | `docs/guide.md`    | How a request flows through the code, a glossary, and where to change things                                      |

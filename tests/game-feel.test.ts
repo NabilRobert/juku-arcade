@@ -72,6 +72,13 @@ describe('the game answering a match', () => {
     expect(playSound).toHaveBeenCalledWith('chime', comboPitch(1));
   });
 
+  it('shuffles when a new set is dealt', async () => {
+    const { state } = feelFor(start().state);
+    state.value = { ...state.value, setIndex: state.value.setIndex + 1 };
+    await nextTick();
+    expect(playSound).toHaveBeenCalledWith('deal');
+  });
+
   it('plays the level-up sound when a match raises the level', async () => {
     const { state } = feelFor(start().state);
     state.value = withMatch(state.value, 10, state.value.level + 1);
