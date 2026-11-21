@@ -180,13 +180,23 @@ detected at each class size.
   No image files.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
-  system's reduce-motion setting. `PlayCard.vue` deals cards in, lifts the
-  selected one and flies matches off; `GameHud.vue` pops the combo and level.
+  system's reduce-motion setting. `components/card-motion.ts` says how
+  each card moves: cards deal in one after another, a selected card lifts,
+  and a matched reading card is **thrown**: it spins up to its word card,
+  hits it, and both fall over. `composables/useThrows.ts: useThrows`
+  measures how far the thrown card flies, before the board redraws.
+  `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
-- **Layout:** `GameScreen.vue` puts a side panel (`DailyBar`, `GameHud`,
-  `ScoreBreakdown`) beside the table on screens 768 px and wider, and stacks
-  it above the table on phones.
+- **Cards** are drawn like cards from a deck (`PlayCard.vue`): upright
+  (3:4), with an inner frame, a suit mark in two corners (言 on word cards,
+  音 on reading cards) and a stacked edge. The text sizes itself to the
+  card's width with container units, and a reading longer than 6 kana goes
+  on two lines.
+- **Layout (desktop only):** the school plays on laptops and desktops, so
+  `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
+  `ScoreBreakdown`) beside the table: 5 word cards above 6 smaller reading
+  cards.
 - **Wellbeing:** `useRun` counts play time while the game isn't paused.
   `game/wellbeing.ts` decides when to show `WellbeingNudge.vue` (15 and 30
   minutes in one sitting), and whether today's play has reached the cap set
@@ -227,6 +237,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
+| **Throw** | A matched reading card spinning up to its word card and knocking it down | `card-motion.ts`, `useThrows.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
 | **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
@@ -267,9 +278,9 @@ fields. They stay in memory until slice 3 stores them.
   Dexie version if the stores change.
 - **Change colours, fonts or textures:** edit the tokens and classes in
   `src/style.css`.
-- **Change an animation:** card motion is in `PlayCard.vue` (`pose`, the
-  `initial` deal-in and its `transition`); the combo and level pops are in
-  `GameHud.vue`.
+- **Change an animation:** card motion is in `components/card-motion.ts`
+  (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
+  `DEAL_FROM` the deal-in); the combo and level pops are in `GameHud.vue`.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Change the check-up (questions, options, timer, hold):** the numbers are
