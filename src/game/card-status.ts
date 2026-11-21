@@ -5,7 +5,8 @@
  */
 import type { RunState } from './run.ts';
 
-export type CardStatus = 'idle' | 'selected' | 'matched' | 'wrong' | 'correct';
+/** 'hidden': the card shows its back while the game is paused (D8). */
+export type CardStatus = 'idle' | 'selected' | 'matched' | 'wrong' | 'correct' | 'hidden';
 
 function isFlashing(state: RunState, nowMs: number): boolean {
   return state.flash !== null && nowMs < state.flash.untilMs;
@@ -13,6 +14,7 @@ function isFlashing(state: RunState, nowMs: number): boolean {
 
 export function wordCardStatus(state: RunState, wordId: string, nowMs: number): CardStatus {
   if (state.matchedWordIds.includes(wordId)) return 'matched';
+  if (state.pausedAtMs !== null) return 'hidden';
   if (isFlashing(state, nowMs) && state.flash?.wordId === wordId) return 'wrong';
   const selected = state.selected;
   return selected?.kind === 'word' && selected.wordId === wordId ? 'selected' : 'idle';
@@ -33,6 +35,7 @@ function isReadingMatched(state: RunState, index: number): boolean {
 
 export function readingCardStatus(state: RunState, index: number, nowMs: number): CardStatus {
   if (isReadingMatched(state, index)) return 'matched';
+  if (state.pausedAtMs !== null) return 'hidden';
   const flashStatus = readingFlashStatus(state, index, nowMs);
   if (flashStatus !== null) return flashStatus;
   const selected = state.selected;

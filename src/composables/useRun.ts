@@ -5,6 +5,7 @@
  */
 import { onUnmounted, ref, shallowRef } from 'vue';
 import type { DeckWord } from '../deck/types.ts';
+import { flipCard, pause, resume } from '../game/pause.ts';
 import { nextSet, startRun, timeUp, type CardRef, type RunContext } from '../game/run.ts';
 import { tagsByRank } from '../game/tags.ts';
 import { tapCard } from '../game/taps.ts';
@@ -12,6 +13,15 @@ import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
 
 /** Often enough for a smooth timer bar, rarely enough to stay cheap on phones. */
 const TICK_MS = 100;
+
+/** Leaving the tab pauses the game, so the clock never runs while nobody is looking. */
+function usePauseWhenHidden(pauseRun: () => void): void {
+  const pauseWhenHidden = (): void => {
+    if (document.visibilityState === 'hidden') pauseRun();
+  };
+  document.addEventListener('visibilitychange', pauseWhenHidden);
+  onUnmounted(() => document.removeEventListener('visibilitychange', pauseWhenHidden));
+}
 
 export function useRun(words: readonly DeckWord[]) {
   const context: RunContext = {
@@ -39,8 +49,21 @@ export function useRun(words: readonly DeckWord[]) {
     state.value = tapCard(state.value, context, card, Date.now());
   }
 
+  function pauseRun(): void {
+    state.value = pause(state.value, context, Date.now());
+  }
+
+  function resumeRun(): void {
+    state.value = resume(state.value, context, Date.now());
+  }
+
+  function flip(word: DeckWord): void {
+    state.value = flipCard(state.value, context, word, Date.now());
+  }
+
   const timer = setInterval(tick, TICK_MS);
   onUnmounted(() => clearInterval(timer));
+  usePauseWhenHidden(pauseRun);
 
-  return { state, nowMs, tags: context.tags, tap };
+  return { state, nowMs, tags: context.tags, tap, pause: pauseRun, resume: resumeRun, flip };
 }

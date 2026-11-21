@@ -2,17 +2,17 @@
 /**
  * The app shell: loads the N5 deck, starts a run, and switches between the
  * game and the "About the data" page. Level choice arrives in slice 3.
- * The game stays mounted (v-show) under the About page, so the run survives;
- * slice 2's pause will stop its clock there.
+ * The game stays mounted (v-show) under the About page, so the run survives,
+ * and it pauses while the About page covers it.
  */
 import { onMounted, ref } from 'vue';
-import type { Deck, DeckWord } from './deck/types.ts';
+import type { Deck } from './deck/types.ts';
 import AboutData from './components/AboutData.vue';
 import GameScreen from './components/GameScreen.vue';
 
 const DECK_URL = `${import.meta.env.BASE_URL}decks/n5.json`;
 
-const deckWords = ref<readonly DeckWord[] | null>(null);
+const deck = ref<Deck | null>(null);
 const loadError = ref<string | null>(null);
 const isShowingAbout = ref(false);
 
@@ -26,7 +26,7 @@ async function loadDeck(): Promise<Deck> {
 
 onMounted(async () => {
   try {
-    deckWords.value = (await loadDeck()).words;
+    deck.value = await loadDeck();
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : String(error);
   }
@@ -38,7 +38,7 @@ onMounted(async () => {
     <h1 class="text-center text-2xl font-bold tracking-wide">juku-arcade</h1>
     <AboutData v-if="isShowingAbout" @close="isShowingAbout = false" />
     <p v-if="loadError" role="alert" class="text-center text-rose-300">{{ loadError }}</p>
-    <GameScreen v-else-if="deckWords" v-show="!isShowingAbout" :words="deckWords" />
+    <GameScreen v-else-if="deck" v-show="!isShowingAbout" :deck="deck" :is-away="isShowingAbout" />
     <p v-else class="text-center text-slate-400">Loading the deck…</p>
     <footer class="mt-auto text-center text-sm text-slate-400">
       <button v-if="!isShowingAbout" type="button" class="underline" @click="isShowingAbout = true">
