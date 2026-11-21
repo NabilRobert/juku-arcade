@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /**
  * The run's numbers: level, combo (it pops when it rises), the set timer,
- * the pause button, and what's happening (L5, L6, L9, L12).
+ * the pause button, the sound switch, and what's happening (L5, L6, L9,
+ * L12).
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import { secondsLeft, type RunState } from '../game/run.ts';
 import { MAX_LEVEL } from '../game/tuning.ts';
+import { isMuted, playSound, setMuted } from '../sound/sfx.ts';
 
 const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
@@ -16,6 +18,11 @@ const timeShare = computed(
   () => secondsLeft(props.state, props.nowMs) / (props.state.setDurationMs / 1000),
 );
 const isTimeLow = computed(() => timeShare.value < 0.25);
+
+function toggleSound(): void {
+  setMuted(!isMuted.value);
+  playSound('pickUp');
+}
 </script>
 
 <template>
@@ -67,6 +74,14 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
       @click="isPaused ? $emit('resume') : $emit('pause')"
     >
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
+    </button>
+    <button
+      type="button"
+      class="min-h-9 rounded-lg border border-washi/20 px-4 text-xs text-washi/80"
+      :aria-pressed="!isMuted"
+      @click="toggleSound"
+    >
+      {{ isMuted ? '🔇 Sound off' : '🔊 Sound on' }}
     </button>
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
     <p v-if="isPaused" class="text-center text-sm text-gold" role="status">

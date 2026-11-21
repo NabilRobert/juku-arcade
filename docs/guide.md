@@ -206,6 +206,21 @@ detected at each class size.
   音 on reading cards) and a stacked edge. The text sizes itself to the
   card's width with container units, and a reading longer than 6 kana goes
   on two lines.
+- **Sound and the combo (feeling involved):** every move gets an answer.
+  `sound/sfx.ts` makes the sounds in code with ZzFX (a tiny MIT synth, no
+  audio files): a tick when a card is picked up, a click when it's over a
+  word card, a swish when it's thrown, a slap and a chime when it hits,
+  a buzz on a miss, an arpeggio on a level up. Each match in a combo
+  chimes the next note of a pentatonic scale (`comboPitch`), so a streak
+  climbs a tune. `composables/useGameFeel.ts` watches the run and plays
+  these when the thrown card lands, and drives `ComboMeter.vue`: the
+  combo between the two rows, growing and warming (gold from 5, vermilion
+  from 10, with いいね！, すごい！, さいこう！). A glow behind the cards
+  (`.table-glow`) brightens with the combo and the table jolts on each
+  hit. A lost streak of 3 or more drops away in vermilion. The 🔊 button
+  in the side panel mutes it all, remembered in this browser. ZzFX is
+  loaded on the first sound, because browsers only allow sound after the
+  player has touched the page.
 - **Layout (desktop only):** the school plays on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
   `ScoreBreakdown`) beside the table: 5 word cards above 6 smaller reading
@@ -253,6 +268,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
+| **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
+| **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Throw** | Dragging a reading card and letting go on, or flinging it at, a word card; a right pair spins on and knocks the word card down | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
@@ -298,6 +315,11 @@ fields. They stay in memory until slice 3 stores them.
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
   `DEAL_FROM` the deal-in, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
+- **Change a sound:** edit its numbers in `SOUNDS` in `sound/sfx.ts`
+  (the comment there names each one). The combo's tune is `COMBO_STEPS`.
+- **Change how the combo builds:** the steps, praise and colours are
+  `TIERS` in `ComboMeter.vue`; the glow's brightest combo is
+  `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
   `components/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and

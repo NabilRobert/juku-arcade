@@ -24,6 +24,7 @@
   --color-pine-light: #2e5641;
 
   --animate-shake: shake 0.35s ease-in-out;
+  --animate-glow: glow 1.6s ease-in-out infinite;
 }
 
 /*
@@ -74,6 +75,28 @@ body {
     inset 0 0 0 4px var(--color-gold);
 }
 
+/* Behind the cards: a gold glow that warms as the combo builds (GameBoard.vue). */
+.table-glow {
+  background-image: radial-gradient(
+    ellipse at 50% 50%,
+    rgb(201 162 74 / 0.32),
+    rgb(195 54 31 / 0.12) 45%,
+    transparent 72%
+  );
+  transition: opacity 0.5s ease-out;
+}
+
+/* At full heat the glow breathes. */
+@keyframes glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
 /* A wrong tap shakes both cards (L4). */
 @keyframes shake {
   0%,
@@ -89,7 +112,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-shake {
+  .animate-shake,
+  .animate-glow {
     animation: none;
   }
 }

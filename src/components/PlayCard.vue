@@ -41,6 +41,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   tap: [];
+  /** A reading card was picked up. */
+  pickUp: [];
   /** While a reading card is dragged: the pointer, in page coordinates. */
   drag: [point: Point];
   /** When it's let go: the pointer, and its speed in pixels per second. */
@@ -124,6 +126,11 @@ function onRelease(info: PanInfo): void {
   emit('release', info.point, info.velocity);
 }
 
+function onPickUp(): void {
+  wasDragged.value = true;
+  emit('pickUp');
+}
+
 /** Letting go of a dragged card also fires a click; it isn't a tap. */
 function onClick(): void {
   if (wasDragged.value) wasDragged.value = false;
@@ -152,7 +159,7 @@ function onClick(): void {
     drag-snap-to-origin
     :while-drag="HELD_POSE"
     @pointerdown="wasDragged = false"
-    @drag-start="wasDragged = true"
+    @drag-start="onPickUp"
     @drag="(_event: PointerEvent, info: PanInfo) => emit('drag', info.point)"
     @drag-end="(_event: PointerEvent, info: PanInfo) => onRelease(info)"
     @click="onClick"
