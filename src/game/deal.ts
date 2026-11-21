@@ -44,9 +44,15 @@ function canJoin(word: DeckWord, picked: readonly DeckWord[]): boolean {
   return !sharesSpelling && validReadings(word).every((reading) => !takenReadings.has(reading));
 }
 
-function pickWords(pool: readonly DeckWord[], random: RandomSource): DeckWord[] {
+/** Words that must come back (R3) go in first, if they fit; the rest is random. */
+function pickWords(
+  pool: readonly DeckWord[],
+  random: RandomSource,
+  comebacks: readonly DeckWord[],
+): DeckWord[] {
   const picked: DeckWord[] = [];
-  for (const word of shuffled(pool, random)) {
+  for (const word of [...comebacks, ...shuffled(pool, random)]) {
+    if (picked.some((other) => other.id === word.id)) continue;
     if (canJoin(word, picked)) picked.push(word);
     if (picked.length === WORDS_PER_SET) return picked;
   }
@@ -109,8 +115,9 @@ export function dealSet(
   pool: readonly DeckWord[],
   random: RandomSource = Math.random,
   exposure: DecoyExposure = NO_EXPOSURE,
+  comebacks: readonly DeckWord[] = [],
 ): DealtSet {
-  const words = pickWords(pool, random);
+  const words = shuffled(pickWords(pool, random, comebacks), random);
   const answers = words.map((word) => ({ text: word.reading, wordId: word.id, decoyType: null }));
   const readings = shuffled([...answers, pickDecoy(words, random, exposure)], random);
   return { words, readings };

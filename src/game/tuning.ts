@@ -25,5 +25,11 @@ export const CLEARED_PAUSE_MS = 1200;
 /** How long a timed-out set shows its answers: long enough to read all five (L6). */
 export const TIMED_OUT_PAUSE_MS = 3000;
 
+/** R3: at most this many missed or peeked words come back in the next set, so new words still flow. */
+export const MAX_COMEBACKS_PER_SET = 3;
+
+/** L9: the missed tray holds this run's latest missed words. */
+export const MISSED_TRAY_SIZE = 8;
+
 /** How long a wrong tap shows the right answer. */
 export const WRONG_FLASH_MS = 900;
