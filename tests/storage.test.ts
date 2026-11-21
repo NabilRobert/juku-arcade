@@ -28,9 +28,23 @@ describe('browser storage', () => {
       classCode: 'N5-SAT',
       bestCombo: 3,
       bestSetScore: 90,
+      playDay: '2026-11-21',
+      playMsToday: 60_000,
     };
     await saveSettings(settings);
     expect(await loadSettings()).toEqual(settings);
+  });
+
+  it('fills in play time for settings saved before it existed', async () => {
+    const older = {
+      playerId: 'p',
+      level: 'N5' as const,
+      classCode: null,
+      bestCombo: 0,
+      bestSetScore: 0,
+    };
+    await saveSettings(older as Parameters<typeof saveSettings>[0]);
+    expect(await loadSettings()).toMatchObject({ playDay: null, playMsToday: 0 });
   });
 
   it('deletes every event and setting', async () => {

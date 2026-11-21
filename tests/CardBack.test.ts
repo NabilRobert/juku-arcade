@@ -49,7 +49,7 @@ describe('CardBack', () => {
     ]);
     expect(
       readings
-        .filter((reading) => reading.classes('bg-amber-300'))
+        .filter((reading) => reading.classes('bg-vermilion'))
         .map((reading) => reading.text()),
     ).toEqual(['ガク', 'コウ']);
   });

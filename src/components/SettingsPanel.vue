@@ -18,11 +18,11 @@ function confirmDelete(): void {
 </script>
 
 <template>
-  <section class="mx-auto max-w-prose space-y-5 text-slate-200">
+  <section class="mx-auto max-w-prose space-y-5 text-washi/90">
     <h2 class="text-xl font-semibold">Settings</h2>
     <p class="text-sm">
       Your anonymous player ID:
-      <code class="rounded bg-slate-800 px-1 break-all">{{ settings.playerId }}</code>
+      <code class="rounded bg-lacquer-light px-1 break-all">{{ settings.playerId }}</code>
       <span v-if="settings.classCode"> · class {{ settings.classCode }}</span>
     </p>
     <div class="space-y-2">
@@ -33,17 +33,17 @@ function confirmDelete(): void {
           :key="level"
           type="button"
           class="min-h-11 rounded-lg px-3 font-semibold"
-          :class="level === settings.level ? 'bg-amber-400 text-slate-900' : 'bg-slate-700'"
+          :class="level === settings.level ? 'bg-gold text-sumi' : 'bg-pine'"
           @click="emit('changeLevel', level)"
         >
           {{ level }}
         </button>
       </div>
     </div>
-    <button type="button" class="rounded-lg bg-rose-800 px-4 py-2" @click="confirmDelete">
+    <button type="button" class="rounded-lg bg-vermilion px-4 py-2" @click="confirmDelete">
       Delete my data
     </button>
-    <button type="button" class="block rounded-lg bg-slate-700 px-4 py-2" @click="emit('close')">
+    <button type="button" class="block rounded-lg bg-pine px-4 py-2" @click="emit('close')">
       Back to the game
     </button>
   </section>
