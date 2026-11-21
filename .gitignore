@@ -1,0 +1,30 @@
+# Secrets: commit .env.example with placeholders only
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Private notes
+HANDOVER*.md
+backups/
+_private/
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.vite/
+
+# Logs, dumps and caches
+*.log
+*.dump
+*.sql.gz
+.cache/
+.eslintcache
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
