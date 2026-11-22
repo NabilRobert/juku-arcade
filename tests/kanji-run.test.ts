@@ -5,6 +5,7 @@ import { defineComponent, h } from 'vue';
 import { THROW_S } from '../src/components/card-motion.ts';
 import { PLAY_STEP_MS } from '../src/composables/useHand.ts';
 import type { Deck, KanjiNote } from '../src/deck/types.ts';
+import { CURSE_POINTS } from '../src/kanji/kanji-crests.ts';
 import { POINTS_PER_HIT } from '../src/kanji/kanji-round.ts';
 import { useKanjiRun } from '../src/kanji/useKanjiRun.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
@@ -46,12 +47,12 @@ const DECK: Deck = {
 
 const THROW_MS = THROW_S * 1000;
 
-function runFor() {
+function runFor(seed = 2) {
   let run!: ReturnType<typeof useKanjiRun>;
   mount(
     defineComponent({
       setup() {
-        run = useKanjiRun(DECK, seededRandom(2));
+        run = useKanjiRun(DECK, seededRandom(seed));
         return () => h('div');
       },
     }),
@@ -117,5 +118,50 @@ describe('a kanji round', () => {
     expect(run.roundNumber.value).toBe(2);
     expect(run.round.value.kanji).not.toBe(first);
     expect(run.phase.value).toBe('picking');
+  });
+});
+
+/** A seed whose first round hides a curse (found by trying seeds). */
+const CURSED_FIRST_ROUND_SEED = 5;
+
+describe('scouting in a kanji round', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('turns the hand face down while scouting, and holds Play until it is turned back', () => {
+    const run = runFor();
+    run.toggle(0);
+    run.toggleScout();
+    expect(run.statusOf(1)).toBe('hidden');
+    expect(run.canPlay.value).toBe(false);
+    run.toggleScout();
+    expect(run.statusOf(0)).toBe('selected');
+    expect(run.canPlay.value).toBe(true);
+  });
+
+  it('earns a scout back for a perfect round', () => {
+    const run = runFor();
+    run.toggleScout();
+    run.toggleScout();
+    const before = run.scoutsLeft.value;
+    for (const index of rightIndexes(run)) run.toggle(index);
+    run.play();
+    vi.advanceTimersByTime(10_000);
+    expect(run.scoutsLeft.value).toBe(before + 1);
+  });
+
+  it('never lets a curse take the score below nothing', () => {
+    const run = runFor(CURSED_FIRST_ROUND_SEED);
+    run.toggleScout();
+    const cursed = [...run.crestMarks.value].find(([, mark]) => mark.symbol === '黒')?.[0];
+    run.toggleScout();
+    for (let index = 0; index < run.round.value.cards.length; index += 1) {
+      if (!(run.round.value.cards[index]?.isRight ?? false)) run.toggle(index);
+    }
+    run.play();
+    vi.advanceTimersByTime(10_000);
+    expect(run.score.value).toBe(0);
+    expect(cursed).toBeDefined();
+    expect(run.lastResult.value?.crestPoints).toBe(-CURSE_POINTS);
   });
 });

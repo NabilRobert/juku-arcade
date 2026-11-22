@@ -114,7 +114,9 @@ flowchart LR
     B --> C["kanji-round.ts: kanjiPool → dealKanjiRound"]
     C --> D["readings.ts: readingsUsedByKanji<br/>(right) and allReadingsOf (never a decoy)"]
     B -->|"Play"| E["throw each picked card in turn"]
-    E --> F["reveal: scoreRound → next kanji"]
+    B --> H["useKanjiCrests.ts: deal crests,<br/>Scout flips the hand"]
+    E -->|"crested card"| H
+    E --> F["reveal: scoreRound + crest points → next kanji"]
     A --> G["usePlayClock + useWellbeing<br/>(counts toward the nudges and cap)"]
 ```
 
@@ -126,13 +128,24 @@ flowchart LR
    of other kanji that the dictionary doesn't list for it.
 3. **`KanjiBoard.vue`** shows the kanji and its meanings over an overlapping row of the 8
    readings. Clicking one picks it (it lifts) or puts it back.
-4. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
+4. **Crests** (D42): each round may hide a gold koban or purple omikuji
+   on one right reading and a black curse on one wrong reading
+   (**`kanji-crests.ts: dealKanjiCrests`**). **Scout**
+   (**`KanjiScoutPanel.vue`**, **`useKanjiCrests: toggleScout`**) flips
+   the hand over to show them. After that, a crested card's back and
+   front frame stay in the crest's colour until the round ends
+   (**`CardFrame.vue`**, `tint`). A run starts with 2 scouts and earns 1
+   per perfect round, up to 3.
+5. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
    in turn. A right one hits and dissolves, the kanji jolts, and the combo
-   builds; a wrong one shakes and its frame goes dark.
-5. Then the right readings left in the hand light up aqua (✓),
-   **`scoreRound`** adds the points (a bonus for a perfect round), and a
-   new kanji is dealt off the deck.
-6. **`usePlayClock`** counts the play toward the nudges and the school's
+   builds; a wrong one shakes and its frame goes dark. A crested card
+   pays as it lands (**`crestBonus`**): a koban doubles that card's
+   points, an omikuji adds 5 to 15, a curse takes 10.
+6. Then the right readings left in the hand light up aqua (✓),
+   **`scoreRound`** adds the points (a bonus for a perfect round) and the
+   crests' points (the score never drops below 0), and a new kanji is
+   dealt off the deck.
+7. **`usePlayClock`** counts the play toward the nudges and the school's
    daily cap with the same tick as word mode (**`wellbeing.ts:
    tickPlayClock`**), and **`WellbeingGate.vue`** shows the same screens.
 
@@ -370,6 +383,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
+| **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `roguelike/specials.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
 | **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
@@ -408,7 +422,10 @@ fields. They stay in memory until slice 3 stores them.
   `kanji/kanji-round.ts` (`CARDS_PER_ROUND`, `POINTS_PER_HIT`,
   `PERFECT_ROUND_BONUS`, `MAX_PICK_WEIGHT`); how long the answers show is
   `REVEAL_MS` in `kanji/useKanjiRun.ts`. Specs: `tests/kanji-round.test.ts`
-  and `tests/kanji-run.test.ts`.
+  and `tests/kanji-run.test.ts`. Crests' chances, points and scouts are
+  at the top of `kanji/kanji-crests.ts` (specs:
+  `tests/kanji-crests.test.ts`); their colours are `tint` in
+  `roguelike/specials.ts`.
 - **Change how a hand is laid out or played:** the rules (which slot a
   click fills, when Play is ready, the play order) are in
   `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between

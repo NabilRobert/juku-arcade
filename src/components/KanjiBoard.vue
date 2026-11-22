@@ -12,6 +12,7 @@ import { reactive, watch } from 'vue';
 import type { JlptLevel } from '../deck/types.ts';
 import type { CardStatus } from '../game/card-status.ts';
 import type { KanjiRound } from '../kanji/kanji-round.ts';
+import type { CrestMark } from './crest-mark.ts';
 import { boxOf, useTableSlots } from '../composables/useTableSlots.ts';
 import { useDeal } from '../composables/useDeal.ts';
 import CardDeck from './CardDeck.vue';
@@ -33,6 +34,8 @@ const props = defineProps<{
   combo: number;
   impacts: number;
   canPlay: boolean;
+  /** Scouted crests (D42), by reading card index. */
+  crestMarks: ReadonlyMap<number, CrestMark>;
 }>();
 defineEmits<{ toggle: [index: number]; play: [] }>();
 
@@ -127,6 +130,7 @@ watch(
               :level="level"
               :throw-to="throws.get(index)"
               :deal-from="dealFrom.readings[index]"
+              :crest-mark="crestMarks.get(index)"
               @tap="$emit('toggle', index)"
             />
           </div>

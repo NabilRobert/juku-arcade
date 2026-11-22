@@ -1,8 +1,11 @@
 <script setup lang="ts">
-/** The last kanji round's result in the side panel: how many readings were found, missed and wrong. */
-import type { RoundResult } from '../kanji/kanji-round.ts';
+/**
+ * The last kanji round's result in the side panel: how many readings were
+ * found, missed and wrong, and what its crests added or took (D42).
+ */
+import type { PlayedRound } from '../kanji/useKanjiRun.ts';
 
-defineProps<{ result: RoundResult | null }>();
+defineProps<{ result: PlayedRound | null }>();
 </script>
 
 <template>
@@ -18,6 +21,13 @@ defineProps<{ result: RoundResult | null }>();
           {{ result.wrongPicks }} wrong {{ result.wrongPicks === 1 ? 'pick' : 'picks' }}
         </p>
       </template>
+      <p
+        v-if="result.crestPoints !== 0"
+        :class="result.crestPoints > 0 ? 'text-[#e9c46a]' : 'text-crimson'"
+        data-testid="crest-points"
+      >
+        Crests {{ result.crestPoints > 0 ? '+' : '−' }}{{ Math.abs(result.crestPoints) }}
+      </p>
     </template>
     <p v-else class="text-washi/60">Pick the readings, then Play.</p>
   </section>

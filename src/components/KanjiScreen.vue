@@ -6,6 +6,9 @@
  * counts toward the nudges and the school's daily cap (usePlayClock), and
  * the same wellbeing screens stand in front of the board (WellbeingGate);
  * "Stop for today" goes back to the start screen.
+ *
+ * Crests (D42) hide on some cards: the scout panel flips the hand over to
+ * show them (KanjiScoutPanel.vue).
  */
 import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
@@ -15,6 +18,7 @@ import { useWellbeing } from '../composables/useWellbeing.ts';
 import type { Settings } from '../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
+import KanjiScoutPanel from './KanjiScoutPanel.vue';
 import SoundToggle from './SoundToggle.vue';
 import WellbeingGate from './WellbeingGate.vue';
 
@@ -28,6 +32,7 @@ const emit = defineEmits<{ leave: [] }>();
 
 const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
+const { crestMarks, news, scoutsLeft, isScouting, phase } = run;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -75,6 +80,13 @@ function dismiss(isStopping: boolean): void {
         </p>
       </div>
       <KanjiResult :result="lastResult" />
+      <KanjiScoutPanel
+        :scouts-left="scoutsLeft"
+        :is-scouting="isScouting"
+        :can-scout="phase === 'picking'"
+        :news="news"
+        @scout="run.toggleScout"
+      />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
@@ -93,6 +105,7 @@ function dismiss(isStopping: boolean): void {
           :combo="combo"
           :impacts="impacts"
           :can-play="canPlay"
+          :crest-marks="crestMarks"
           @toggle="run.toggle"
           @play="run.play"
         />

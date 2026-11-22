@@ -15,8 +15,10 @@ export interface Crest {
   kind: CrestKind;
   symbol: string;
   name: string;
-  /** Tailwind classes for the crest on a card back. */
-  colour: string;
+  /** The colour of the crest's seal on a card back: its ring and symbol, on a light disc. */
+  ink: string;
+  /** The crest's colour on a scouted card's frames and back (crest-mark.ts). */
+  tint: string;
   effect: string;
 }
 
@@ -25,21 +27,24 @@ export const CRESTS: Record<CrestKind, Crest> = {
     kind: 'koban',
     symbol: '金',
     name: 'Koban',
-    colour: 'bg-[#e9c46a] text-sumi',
+    ink: '#a87a12',
+    tint: '#d4a73a',
     effect: 'Matched right: double coins for that match.',
   },
   omikuji: {
     kind: 'omikuji',
     symbol: '紫',
     name: 'Omikuji',
-    colour: 'bg-[#9d6bd6] text-washi',
+    ink: '#6a3aa6',
+    tint: '#7d4cb8',
     effect: 'Matched right: a random gift of coins.',
   },
   cursed: {
     kind: 'cursed',
     symbol: '黒',
     name: 'Cursed',
-    colour: 'bg-sumi text-[#ff1f3a]',
+    ink: '#2a0d14',
+    tint: '#2a0d14',
     effect: 'Missed: lose the pot and 5 coins from your wallet.',
   },
 };

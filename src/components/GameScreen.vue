@@ -44,8 +44,8 @@ const run = useRun({
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
 const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause });
 const { run: bank, notice, bestRound, shownCrests } = bankRun;
-/** SPIKE: the crests to draw on the word cards' backs while scouting. */
-const backMarks = computed(
+/** SPIKE: the scouted crests, marked on the word cards until the set ends. */
+const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
 );
 
@@ -96,7 +96,7 @@ usePauseKey({
           :now-ms="nowMs"
           :tags="tags"
           :level="deck.level"
-          :back-marks="backMarks"
+          :crest-marks="crestMarks"
           @throw="throwReading"
           @flip="flip"
         />
