@@ -41,6 +41,10 @@
   --color-gold: #c9a24a;
   --color-pine: #1f3b2c;
   --color-pine-light: #2e5641;
+  /* The pixel cards (D32): karuta's green frame, a brighter green for a right answer, white paper. */
+  --color-karuta: #23633a;
+  --color-karuta-bright: #5bbf5f;
+  --color-paper: #fbf8f0;
 
   --animate-shake: shake 0.35s ease-in-out;
   --animate-glow: glow 1.6s ease-in-out infinite;
@@ -150,4 +154,58 @@ body {
   .animate-float {
     animation: none;
   }
+}
+
+/*
+ * Pixel-art cards (D32, CardFrame.vue). Every layer has stepped corners two
+ * "pixels" deep; a pixel is a share of the card's width, so the art grows
+ * with the card. The shadow is hard and offset, as in 8-bit card sprites.
+ */
+.pixel-shadow,
+.pixel-frame,
+.pixel-face {
+  --pixel: max(3px, 2.2cqw);
+  position: absolute;
+  clip-path: polygon(
+    calc(var(--pixel) * 2) 0,
+    calc(100% - var(--pixel) * 2) 0,
+    calc(100% - var(--pixel) * 2) var(--pixel),
+    calc(100% - var(--pixel)) var(--pixel),
+    calc(100% - var(--pixel)) calc(var(--pixel) * 2),
+    100% calc(var(--pixel) * 2),
+    100% calc(100% - var(--pixel) * 2),
+    calc(100% - var(--pixel)) calc(100% - var(--pixel) * 2),
+    calc(100% - var(--pixel)) calc(100% - var(--pixel)),
+    calc(100% - var(--pixel) * 2) calc(100% - var(--pixel)),
+    calc(100% - var(--pixel) * 2) 100%,
+    calc(var(--pixel) * 2) 100%,
+    calc(var(--pixel) * 2) calc(100% - var(--pixel)),
+    var(--pixel) calc(100% - var(--pixel)),
+    var(--pixel) calc(100% - var(--pixel) * 2),
+    0 calc(100% - var(--pixel) * 2),
+    0 calc(var(--pixel) * 2),
+    var(--pixel) calc(var(--pixel) * 2),
+    var(--pixel) var(--pixel),
+    calc(var(--pixel) * 2) var(--pixel)
+  );
+  pointer-events: none;
+}
+
+.pixel-shadow {
+  inset: 0;
+  translate: 0 calc(var(--pixel) * 2);
+  background: rgb(0 0 0 / 0.5);
+}
+
+/* A lit top edge and a dark bottom edge, so the frame reads as raised. */
+.pixel-frame {
+  inset: 0;
+  box-shadow:
+    inset 0 var(--pixel) 0 rgb(255 255 255 / 0.3),
+    inset 0 calc(var(--pixel) * -1) 0 rgb(0 0 0 / 0.3);
+}
+
+.pixel-face {
+  inset: calc(var(--pixel) * 3);
+  box-shadow: inset 0 0 0 var(--pixel) rgb(0 0 0 / 0.08);
 }

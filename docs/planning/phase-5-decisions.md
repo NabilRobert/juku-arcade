@@ -360,3 +360,20 @@ weight, so faked bold is turned off to keep the pixels sharp.
 - **Beat:** system fonts (D24: no download, but no game feel); Noto Sans
   JP (larger, and not a pixel face); m6x11 or other pixel fonts for
   English (Arthur asked for this one).
+
+### D32: Pixel-art karuta cards (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the cards to look like an 8-bit card sprite sheet,
+modelled on real karuta: a pixelated karuta card. Each card is a white
+paper face in a thick karuta-green frame, with stepped pixel corners, a
+lit top edge and a hard offset shadow, all drawn in CSS (no image files),
+so it scales with the card. Reading cards are written top to bottom, as
+karuta's grab cards are. The card's state shows in the frame's colour,
+backed by the shake and the ✓ and ✗ marks (N4). The suit marks and hanko
+tag from D30 stay; the washi texture and soft shadow go.
+
+- **Beat:** image sprites drawn per card (sharper pixels, but an asset
+  pipeline and fixed sizes); buying or reusing a pixel card pack (its
+  playing-card faces don't fit karuta, and it would be someone else's
+  art, D22).
+

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 /**
  * One card on the board: a word card (学校) or a reading card (がっこう),
- * drawn as a card from a deck (D30): upright, with an inner frame and a
- * suit mark in two opposite corners. Word cards have a vermilion frame,
- * the suit 言 and a hanko stamp for their tag; reading cards have a pine
- * frame and the suit 音. How the card moves lives in card-motion.ts.
+ * drawn as a pixel-art karuta card (D32, CardFrame.vue): a green frame
+ * around white paper, with a suit mark in two opposite corners, 言 on word
+ * cards and 音 on reading cards. Reading cards are written top to bottom,
+ * as karuta's grab cards are; word cards carry a hanko stamp for their
+ * tag. How the card moves lives in card-motion.ts.
  *
  * Reading cards can be picked up and dropped under a word card (Motion's
  * drag): the card reports where it is while dragged and where and how fast
@@ -12,6 +13,8 @@
  * A laid card shifts up with a tag naming its word card (1 to 5) until
  * the hand is played; a match then sends it flying on to its word card.
  *
+ * The frame's colour shows the card's state: gold when picked up or aimed
+ * at, vermilion when wrong, bright green when it's the right answer.
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
  * shows ✗, a right one shows ✓. While paused, cards are face down (D8):
  * word cards can be tapped to flip them, reading cards can't.
@@ -20,6 +23,7 @@ import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import { cardPose, cardTransition, dealtFrom } from './card-motion.ts';
+import CardFrame, { type FrameColour } from './CardFrame.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
 const props = defineProps<{
@@ -57,10 +61,14 @@ const emit = defineEmits<{
 /** A held card grows and tilts, as a card does when picked up off the table. */
 const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 
-/** Largest text size (rem): short words are bold and big, as on a printed card. */
-const MAX_TEXT_REM = { word: 3.5, reading: 2.2 } as const;
-/** Share of the card's width (cqw) the text may fill, inside the frame. */
-const TEXT_WIDTH_CQW = 78;
+/** Largest text size (rem): short words are big, as on a printed card. */
+const MAX_TEXT_REM = { word: 3.5, reading: 2.6 } as const;
+/**
+ * Share of the card's width (cqw) a line of text may fill inside the frame:
+ * across the card for a word, down it for a reading (the card is 4/3 as
+ * tall as it is wide).
+ */
+const TEXT_LENGTH_CQW = { word: 74, reading: 96 } as const;
 /**
  * Text longer than this goes on two lines rather than shrinking past
  * reading. The longest N5–N4 entries are 6-character words and 9-kana
@@ -70,13 +78,15 @@ const ONE_LINE_MAX = 6;
 
 const SUITS = { word: '言', reading: '音' } as const;
 
-const STATUS_CLASSES: Record<CardStatus, string> = {
-  idle: '',
-  selected: 'ring-4 ring-gold',
+const STATUS_CLASSES: Partial<Record<CardStatus, string>> = {
   matched: 'pointer-events-none z-10',
-  wrong: 'animate-shake ring-4 ring-vermilion',
-  correct: 'ring-4 ring-pine-light',
-  hidden: '',
+  wrong: 'animate-shake',
+};
+
+const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
+  selected: 'gold',
+  wrong: 'vermilion',
+  correct: 'bright',
 };
 
 const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correct: '✓' };
@@ -91,7 +101,7 @@ const wasDragged = ref(false);
 
 const isFaceDown = computed(() => props.status === 'hidden');
 
-/** The text, split in two halves when it's too long for one line. */
+/** The text, split in two halves when it's too long for one line (or column). */
 const lines = computed(() => {
   const chars = [...props.text];
   if (chars.length <= ONE_LINE_MAX) return [props.text];
@@ -99,17 +109,17 @@ const lines = computed(() => {
   return [chars.slice(0, half).join(''), chars.slice(half).join('')];
 });
 
-/** As big as the card allows: the longest line fills the card's width, up to the maximum. */
+/** As big as the card allows: the longest line fills the card, up to the maximum. */
 const textStyle = computed(() => {
   const longest = Math.max(...lines.value.map((line) => [...line].length));
-  return { fontSize: `min(${MAX_TEXT_REM[props.kind]}rem, ${TEXT_WIDTH_CQW / longest}cqw)` };
+  const fitted = TEXT_LENGTH_CQW[props.kind] / longest;
+  return { fontSize: `min(${MAX_TEXT_REM[props.kind]}rem, ${fitted}cqw)` };
 });
 
-const faceClass = computed(() => (isFaceDown.value ? 'card-back text-gold' : 'washi text-sumi'));
-const frameClass = computed(() =>
-  props.kind === 'word' ? 'border-vermilion/60' : 'border-pine/60',
+const frame = computed<FrameColour>(() =>
+  props.isTargeted === true ? 'gold' : (STATUS_FRAMES[props.status] ?? 'karuta'),
 );
-const suitClass = computed(() => (props.kind === 'word' ? 'text-vermilion' : 'text-pine'));
+const suitClass = computed(() => (props.kind === 'word' ? 'text-vermilion' : 'text-karuta'));
 
 /** The top corner shows ✓, ✗ or 👁 when there is one, else the suit. */
 const cornerMark = computed(
@@ -151,13 +161,8 @@ function onClick(): void {
 <template>
   <m.button
     type="button"
-    class="@container relative mx-auto flex aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] flex-col items-center justify-center rounded-xl px-2 font-card whitespace-nowrap shadow-[0_1px_0_#d8cbb0,0_2px_0_#b3a27c,0_3px_0_#8f7f5c,0_10px_18px_rgb(0_0_0/0.5)]"
-    :class="[
-      faceClass,
-      STATUS_CLASSES[status],
-      isThrowable ? 'cursor-grab active:cursor-grabbing' : '',
-      isTargeted ? 'ring-4 ring-gold' : '',
-    ]"
+    class="@container relative mx-auto flex aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] flex-col items-center justify-center px-2 font-card whitespace-nowrap text-sumi"
+    :class="[STATUS_CLASSES[status], isThrowable ? 'cursor-grab active:cursor-grabbing' : '']"
     :initial="dealtPose"
     :animate="pose"
     :transition="transition"
@@ -175,40 +180,40 @@ function onClick(): void {
     @click="onClick"
     @animation-complete="isDealt = true"
   >
-    <span v-if="isFaceDown" aria-hidden="true" class="text-3xl">{{
+    <CardFrame :frame="frame" :is-face-down="isFaceDown" />
+    <span v-if="isFaceDown" aria-hidden="true" class="relative text-3xl text-gold">{{
       kind === 'word' ? '札' : ''
     }}</span>
     <template v-else>
       <span
-        class="pointer-events-none absolute inset-1.5 rounded-lg border"
-        :class="frameClass"
-        aria-hidden="true"
-      />
-      <span
-        class="absolute top-2 left-2.5 text-xs leading-none"
+        class="absolute top-[9cqw] left-[9cqw] text-[7cqw] leading-none"
         :class="suitClass"
         aria-hidden="true"
         >{{ cornerMark }}</span
       >
       <span
-        class="absolute right-2.5 bottom-2 rotate-180 text-xs leading-none"
+        class="absolute right-[9cqw] bottom-[9cqw] rotate-180 text-[7cqw] leading-none"
         :class="suitClass"
         aria-hidden="true"
         >{{ SUITS[kind] }}</span
       >
-      <span class="flex flex-col items-center leading-tight font-semibold" :style="textStyle">
+      <span
+        class="relative flex flex-col items-center leading-tight"
+        :class="kind === 'reading' ? '[writing-mode:vertical-rl]' : ''"
+        :style="textStyle"
+      >
         <span v-for="line in lines" :key="line">{{ line }}</span>
       </span>
-      <span v-if="hint" class="font-sans text-xs text-sumi/70">{{ hint }}</span>
+      <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
       <span
         v-if="tag !== undefined"
-        class="absolute -top-2 -right-2 rounded-md bg-vermilion px-1 py-0.5 font-sans text-[0.65rem] font-bold text-washi shadow"
+        class="absolute -top-2 -right-2 bg-vermilion px-1 py-0.5 font-sans text-[0.65rem] text-washi shadow-[0_2px_0_rgb(0_0_0/0.5)]"
         lang="en"
         >+{{ tag.toFixed(1) }}×</span
       >
       <span
         v-if="order !== undefined"
-        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center rounded-full bg-gold font-sans text-base font-bold text-sumi shadow-md"
+        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-gold font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
         lang="en"
         data-testid="order-tag"
         >{{ order }}</span

@@ -2,8 +2,10 @@
 /**
  * The deck each set is dealt from: a stack of face-down cards at the end
  * of the player's hand. The board measures it (useDeal.ts), so every card
- * starts on top of it and flies to its place.
+ * starts on top of it and flies to its place. Each card in the stack is
+ * a face-down pixel card (CardFrame.vue).
  */
+import CardFrame from './CardFrame.vue';
 
 /** Cards drawn in the stack, each a little higher than the one under it. */
 const LAYERS = 3;
@@ -18,9 +20,11 @@ const LAYERS = 3;
     <span
       v-for="layer in LAYERS"
       :key="layer"
-      class="card-back absolute inset-0 flex items-center justify-center rounded-xl font-card text-3xl text-gold shadow-[0_6px_14px_rgb(0_0_0/0.5)]"
+      class="@container absolute inset-0 flex items-center justify-center font-card text-3xl text-gold"
       :style="{ transform: `translate(${-layer * 2}px, ${-layer * 3}px)` }"
-      >{{ layer === LAYERS ? '札' : '' }}</span
     >
+      <CardFrame frame="karuta" :is-face-down="true" />
+      <span v-if="layer === LAYERS" class="relative">札</span>
+    </span>
   </div>
 </template>

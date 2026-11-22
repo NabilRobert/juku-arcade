@@ -220,11 +220,17 @@ detected at each class size.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
-- **Cards** are drawn like cards from a deck (`PlayCard.vue`): upright
-  (3:4), with an inner frame, a suit mark in two corners (言 on word cards,
-  音 on reading cards) and a stacked edge. The text sizes itself to the
-  card's width with container units, and a reading longer than 6 kana goes
-  on two lines.
+- **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
+  body every card shares (a hard shadow, a thick karuta-green frame with
+  stepped pixel corners, and white paper, or the patterned back when face
+  down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
+  of the card's width (`--pixel` in `style.css`), so the art scales with
+  the card. Reading cards are written top to bottom, like karuta's grab
+  cards; word cards keep their kanji across. The frame turns gold when a
+  dragged card aims at it, vermilion when wrong and bright green for the
+  right answer. A suit mark sits in two corners (言 on word cards, 音 on
+  reading cards). The text sizes itself to the card with container
+  units, and a reading longer than 6 kana goes in two columns.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
