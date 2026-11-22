@@ -66,14 +66,8 @@ html {
 }
 
 body {
+  /* The moving table is drawn behind the page by TableBackground.vue. */
   background-color: var(--color-lacquer);
-  /* Lacquer with a faint glow from the centre of the table. */
-  background-image: radial-gradient(
-    ellipse at 50% 35%,
-    var(--color-lacquer-light),
-    transparent 70%
-  );
-  background-attachment: fixed;
   color: var(--color-washi);
 }
 
@@ -150,10 +144,33 @@ body {
   }
 }
 
+/* The drifting table (TableBackground.vue): one tile of overhang, one tile of travel per loop. */
+.table-swirl {
+  --tile: 600px;
+  position: absolute;
+  inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
+  background-size: var(--tile) var(--tile);
+  animation: table-drift 80s linear infinite;
+  will-change: transform;
+}
+
+@keyframes table-drift {
+  to {
+    transform: translate(var(--tile), var(--tile));
+  }
+}
+
+.table-light {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.35), transparent 70%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-shake,
   .animate-glow,
-  .animate-float {
+  .animate-float,
+  .table-swirl {
     animation: none;
   }
 }

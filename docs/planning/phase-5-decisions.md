@@ -391,3 +391,21 @@ pine colours.
 
 - **Beat:** keeping D30's colours (Arthur: boring with the pixel cards).
 
+### D34: A drifting marbled table (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for a background like a liquid marble pattern, in our
+colours, blurred, and moving gently in a loop. The table is soft navy
+bands on navy. The tile is drawn by SVG filters (smooth noise cut into
+bands, coloured, then blurred) rather than as a picture, so it's a 2 KB
+file. It's repeated 3 by 3 inside the SVG before blurring, so the tile
+has no seam. A layer one tile larger than the window drifts by exactly
+one tile every 80 seconds, so the loop has no jump. That's a transform,
+which the graphics card moves without redrawing; a CSS blur every frame
+would cost far more on school laptops. It stands still under reduced
+motion.
+
+- **Beat:** a looping GIF or video (megabytes, and blurry when scaled);
+  tracing noise into vector shapes with d3-contour (crisp, but the blur
+  makes crispness pointless, and it adds two dev dependencies); a
+  canvas redrawn every frame (real flowing motion, but constant CPU).
+

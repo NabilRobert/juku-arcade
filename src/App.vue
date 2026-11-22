@@ -26,6 +26,7 @@ import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/GameScreen.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import SetupScreen from './components/SetupScreen.vue';
+import TableBackground from './components/TableBackground.vue';
 
 type Page = 'game' | 'about' | 'settings' | 'checkUp';
 
@@ -155,6 +156,7 @@ onMounted(async () => {
   <!-- Motion's bundle with drag, for throwing cards; "user" follows the system's reduce-motion setting. -->
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
+      <TableBackground />
       <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
         <h1 class="text-center font-card text-2xl font-bold tracking-wide text-aqua">
           juku-arcade
