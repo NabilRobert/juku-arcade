@@ -3,9 +3,10 @@
  * The combo as a style rank (D39), on the table between the word cards and
  * the hand, where the player is looking. A big letter grade (combo-ranks.ts)
  * slams in at each new rank with a sound, beside its word of praise, the
- * combo count and a bar filling toward the next rank; the colours heat up
- * from off-white to aqua to crimson. The meter floats gently while it
- * waits, like the cards. A lost streak drops away in crimson.
+ * combo count and a bar filling toward the next rank. The letter, the word
+ * and the combo count all warm rank by rank, to a bright red at SSS. The
+ * meter floats gently while it waits, like the cards. A lost streak drops
+ * away in crimson.
  */
 import { m } from 'motion-v';
 import { computed, watch } from 'vue';
@@ -58,7 +59,8 @@ watch(
         >
         <m.span
           :key="combo"
-          class="text-[2dvh] leading-none tracking-widest text-washi/80 uppercase"
+          class="text-[2dvh] leading-none tracking-widest uppercase"
+          :class="rank.colour"
           lang="en"
           :initial="{ scale: 1.4 }"
           :animate="{ scale: 1 }"
