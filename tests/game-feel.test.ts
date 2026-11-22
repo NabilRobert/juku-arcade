@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import ComboMeter from '../src/components/ComboMeter.vue';
+import { rankFor } from '../src/components/combo-ranks.ts';
 import { THROW_S } from '../src/components/card-motion.ts';
 import { useGameFeel } from '../src/composables/useGameFeel.ts';
 import type { RunState } from '../src/game/run.ts';
@@ -117,13 +118,22 @@ describe('the combo meter', () => {
     expect(meter.text()).toBe('');
   });
 
-  it('cheers in Japanese once the combo reaches 5, and louder at 10', () => {
-    expect(mount(ComboMeter, { props: { combo: 5, brokenCombo: null } }).text()).toContain(
+  it('shows a style rank that climbs with the combo, with a word of praise', () => {
+    const rankAt = (combo: number) =>
+      mount(ComboMeter, { props: { combo, brokenCombo: null } }).find('[data-testid="combo-rank"]');
+    expect(rankAt(2).text()).toBe('F');
+    expect(rankAt(10).text()).toBe('C');
+    expect(rankAt(40).text()).toBe('SSS');
+    expect(mount(ComboMeter, { props: { combo: 6, brokenCombo: null } }).text()).toContain(
       'いいね',
     );
-    expect(mount(ComboMeter, { props: { combo: 12, brokenCombo: null } }).text()).toContain(
-      'すごい',
-    );
+  });
+
+  it('fills the bar toward the next rank', () => {
+    expect(rankFor(9).towardNext).toBe(0);
+    expect(rankFor(10).towardNext).toBeCloseTo(1 / 3);
+    expect(rankFor(50).towardNext).toBe(1);
+    expect(rankFor(1).rank).toBeNull();
   });
 
   it('shows the streak that was just lost', () => {

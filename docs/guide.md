@@ -236,7 +236,8 @@ detected at each class size.
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
   Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
-  two textures made of CSS gradients (`.washi` paper, `.card-back`).
+  two pixel-art textures, tiny SVG tiles drawn on the card's own pixel grid
+  (`.washi` paper with pixel specks, `.card-back` with a diamond lattice).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
   warp and spiral in a 19-second loop (D35). A WebGL shader draws them
   (`background/swirl-shader.ts`) on a canvas a sixth of the window's
@@ -296,8 +297,11 @@ detected at each class size.
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
-  combo between the two rows, growing and warming (aqua from 5, crimson
-  from 10, with いいね！, すごい！, さいこう！). A glow behind the cards
+  combo between the two rows as a style rank (D39), a letter grade from F
+  up to SSS (`components/combo-ranks.ts`) with a word of praise (がんばれ, よし,
+  いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), the combo count and a bar
+  toward the next rank. Each rank-up slams the letter in with a sound, and
+  the meter floats gently while it waits. A glow behind the cards
   (`.table-glow`) brightens with the combo and the table jolts on each
   hit. A lost streak of 3 or more drops away in crimson. The 🔊 button
   in the side panel mutes it all, remembered in this browser. ZzFX is
@@ -351,7 +355,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
-| **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
+| **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
@@ -422,8 +426,8 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
-- **Change how the combo builds:** the steps, praise and colours are
-  `TIERS` in `ComboMeter.vue`; the glow's brightest combo is
+- **Change how the combo builds:** the ranks, their thresholds, praise and
+  colours are `COMBO_RANKS` in `components/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
   `components/throw-geometry.ts`.
