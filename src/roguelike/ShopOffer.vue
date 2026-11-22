@@ -7,6 +7,7 @@
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import PixelButton from '../components/PixelButton.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 import { MAX_ITEMS, type BankRun } from './bank-run.ts';
 import { itemById, type ItemId } from './items.ts';
 
@@ -25,7 +26,8 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
   >
     <p class="font-card text-3xl font-bold text-aqua">Round {{ run.round }} cleared!</p>
     <p class="text-lg">
-      Wallet 🪙 {{ run.wallet }}<span v-if="isFull" class="text-washi/60"> · item slots full</span>
+      Wallet <PixelIcon name="coin" /> {{ run.wallet
+      }}<span v-if="isFull" class="text-washi/60"> · item slots full</span>
     </p>
     <div class="flex gap-6">
       <m.div
@@ -45,7 +47,7 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
           :disabled="run.wallet < item.price || isFull"
           @click="$emit('buy', item.id)"
         >
-          Buy 🪙 {{ item.price }}
+          Buy <PixelIcon name="coin" /> {{ item.price }}
         </PixelButton>
       </m.div>
       <p v-if="offered.length === 0" class="text-washi/70">Sold out.</p>

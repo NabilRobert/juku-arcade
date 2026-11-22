@@ -294,7 +294,8 @@ detected at each class size.
   `pixel-seal.ts`. It sits beside the title, on every card back and on the
   deck.
 - **Icons** (D43) are pixel art drawn for the game: a magnifying glass on
-  Scout and a speaker on the sound switch (with sound, or crossed out).
+  Scout, a speaker on the sound switch (with sound, or crossed out), and
+  a gold coin for the bank run's pot, wallet and prices.
   Each is a grid of letters in `pixel-icons.ts`, one letter per pixel,
   drawn by `PixelIcon.vue`. To change one, edit its grid; a new colour
   needs a letter in `PALETTE`.
