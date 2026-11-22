@@ -249,8 +249,8 @@ detected at each class size.
   a wave (each card draws a front and a back, `PlayCard.vue`); a held
   card lifts, a laid card shifts up out of the fan, and a matched
   reading card flies on, spinning, to its word card and hits it, and
-  both then vanish block by block in a circle spreading from the
-  top-left corner, like dust blowing away (the pixel snap,
+  both then vanish block by block in a curved front sweeping from the
+  top-left corner to the bottom-right, like dust blowing away (the pixel snap,
   `components/pixel-snap.ts`, played by `composables/usePixelSnap.ts`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
   bundle. Every card sits in a slot the size of the card that never moves
   (`composables/useTableSlots.ts`), so the slots can be measured before
