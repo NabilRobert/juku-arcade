@@ -12,21 +12,24 @@ vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
   playSound: vi.fn(),
 }));
 
-function bankFor(initial: RunState) {
+function bankFor(initial: RunState, random: () => number = Math.random) {
   const state = ref(initial);
   const endCombo = vi.fn(() => {
     state.value = { ...state.value, combo: 0 };
+  });
+  const pause = vi.fn(() => {
+    state.value = { ...state.value, pausedAtMs: 1 };
   });
   let bank!: ReturnType<typeof useBankRun>;
   mount(
     defineComponent({
       setup() {
-        bank = useBankRun(() => state.value, endCombo);
+        bank = useBankRun(() => state.value, { endCombo, pause }, random);
         return () => h('div');
       },
     }),
   );
-  return { state, bank, endCombo };
+  return { state, bank, endCombo, pause };
 }
 
 async function match(state: { value: RunState }): Promise<void> {
@@ -43,7 +46,7 @@ describe('the bank run alongside a word run', () => {
     state.value = { ...state.value, combo: 0 };
     await nextTick();
     expect(bank.run.value.pot).toBe(0);
-    expect(bank.lastLoss.value?.amount).toBe(3);
+    expect(bank.notice.value?.text).toBe('−3 lost!');
   });
 
   it('banks the pot and ends the combo without counting it as a miss', async () => {
@@ -56,7 +59,7 @@ describe('the bank run alongside a word run', () => {
     await nextTick();
     expect(endCombo).toHaveBeenCalled();
     expect(bank.run.value).toMatchObject({ pot: 0, wallet: 3 });
-    expect(bank.lastLoss.value).toBeNull();
+    expect(bank.notice.value).toBeNull();
     expect(bank.run.value.isCraneUsed).toBe(false);
   });
 
@@ -72,5 +75,37 @@ describe('the bank run alongside a word run', () => {
     expect(endCombo).toHaveBeenCalled();
     expect(bank.run.value.offer).not.toBeNull();
     expect(bank.run.value.bankedThisRound).toBeGreaterThanOrEqual(FIRST_TARGET);
+  });
+
+  it('scouts twice a round, pausing the game each time, and no more', async () => {
+    const { state, bank, pause } = bankFor(start().state);
+    bank.scout();
+    expect(pause).toHaveBeenCalledOnce();
+    state.value = { ...state.value, pausedAtMs: null };
+    await nextTick();
+    bank.scout();
+    state.value = { ...state.value, pausedAtMs: null };
+    await nextTick();
+    bank.scout();
+    expect(pause).toHaveBeenCalledTimes(2);
+    expect(bank.run.value.scoutsLeft).toBe(0);
+  });
+
+  it('doubles a koban match and charges a cursed miss to the wallet', async () => {
+    // Crest rolls, word by word: the first word gets a curse, the second a koban.
+    const rolls = [0, 0.9, 0, 0];
+    const initial = start().state;
+    const { state, bank } = bankFor(initial, () => rolls.shift() ?? 0.99);
+    const [cursed, koban] = initial.set.words;
+    if (cursed === undefined || koban === undefined) throw new Error('the set has too few words');
+    bank.run.value = { ...bank.run.value, wallet: 10 };
+    state.value = { ...state.value, combo: 1, matchedWordIds: [koban.id] };
+    await nextTick();
+    expect(bank.run.value.pot).toBe(2);
+    const flash = { wordId: cursed.id, correctIndex: 0, wrongIndex: 1, untilMs: 0 };
+    state.value = { ...state.value, combo: 0, flash };
+    await nextTick();
+    expect(bank.run.value.wallet).toBe(5);
+    expect(bank.notice.value?.text).toContain('Cursed');
   });
 });

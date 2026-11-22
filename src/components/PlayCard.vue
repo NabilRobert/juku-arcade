@@ -31,6 +31,7 @@ import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../deck/types.ts';
 import { useCardTilt } from '../composables/useCardTilt.ts';
 import { usePixelSnap } from '../composables/usePixelSnap.ts';
+import type { BackMark } from './back-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
@@ -54,6 +55,8 @@ const props = defineProps<{
   level: JlptLevel;
   /** Where the deck is, so the card is dealt off it. */
   dealFrom?: Placement;
+  /** SPIKE: a mark on the card's back (a bank run crest), shown while face down. */
+  backMark?: BackMark;
   /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
   order?: number;
 }>();
@@ -248,7 +251,14 @@ function onClick(): void {
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
         <CardFrame frame="crimson" :is-face-down="true" />
-        <span class="relative">{{ kind === 'word' ? '札' : '' }}</span>
+        <span
+          v-if="backMark"
+          class="relative flex size-[42cqw] items-center justify-center text-[24cqw] shadow-[0_3px_0_rgb(0_0_0/0.5)]"
+          :class="backMark.colour"
+          data-testid="back-mark"
+          >{{ backMark.symbol }}</span
+        >
+        <span v-else class="relative">{{ kind === 'word' ? '札' : '' }}</span>
       </span>
     </span>
   </m.button>

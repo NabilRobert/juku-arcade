@@ -44,6 +44,7 @@ import PlayCard from './PlayCard.vue';
 import { floatStyle, handStyle, SLOT_SIZE } from './hand-layout.ts';
 import PixelButton from './PixelButton.vue';
 import type { Point } from './throw-geometry.ts';
+import type { BackMark } from './back-mark.ts';
 
 const props = defineProps<{
   state: RunState;
@@ -51,6 +52,8 @@ const props = defineProps<{
   tags: TagTable;
   /** The deck's JLPT level, marked on every card. */
   level: JlptLevel;
+  /** SPIKE: marks on word cards' backs, by word id (the bank run's crests while scouting). */
+  backMarks?: ReadonlyMap<string, BackMark>;
 }>();
 const emit = defineEmits<{
   throw: [readingIndex: number, wordId: string];
@@ -148,6 +151,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               :is-peeked="state.peekedWordIds.includes(word.id)"
               :is-targeted="targetWordId === word.id"
               :deal-from="dealFrom.words[position]"
+              :back-mark="backMarks?.get(word.id)"
               @tap="onWordTap(word)"
             />
           </div>
