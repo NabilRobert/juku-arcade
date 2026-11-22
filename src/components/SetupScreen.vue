@@ -2,7 +2,7 @@
 /** First launch (L15, R9): pick a JLPT level, and type a class code if the teacher gave one. */
 import { ref } from 'vue';
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 
 defineEmits<{ start: [level: JlptLevel, classCode: string | null] }>();
 

@@ -18,7 +18,7 @@ import {
   type Box,
   type Offset,
   type Point,
-} from '../components/throw-geometry.ts';
+} from '../components/cards/throw-geometry.ts';
 import { boxOf, type Slots } from './useTableSlots.ts';
 
 /** A drag reports page coordinates; boxes are in window coordinates. */

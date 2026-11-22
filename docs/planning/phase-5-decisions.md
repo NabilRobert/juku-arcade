@@ -496,3 +496,127 @@ is interrupted, so none is ever left part-way.
 - **Beat:** the top-down row wipe (Arthur: not this); particles flying
   off (that's the ash he didn't want, and costs more to draw).
 
+### D39: The combo as a style rank (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for combo tiers like an action game's style meter. The
+combo shows as a letter grade from F to SSS, as Arthur asked: F from 2,
+E from 4, D from 6, C from 9, B from 12, A from 15, S from 20, SS from 25
+and SSS from 30. Each has a word of praise in easy Japanese (がんばれ, よし,
+いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), so even the
+cheering is reading practice, and a bar fills toward the next rank. A
+rank-up slams the letter in with a sound pitched above the level-up's. The letter, the word and
+the combo count warm rank by rank, from off-white through aqua and pinks
+to a bright red at SSS (brighter than the palette's crimson, which is too
+dark to read on the navy table). The
+meter floats gently while it waits, like the cards. Letter grades are a
+common way to score style; the words and thresholds are our own.
+
+- **Beat:** another game's rank names (D22); a gauge that drains when idle
+  (it would change the game's rules, not just how the combo looks).
+
+**D32 update (2026-11-22):** Arthur found the card backs and faces didn't
+look pixelated. Both textures are now tiny SVG tiles of hard-edged pixels
+on the card's own pixel grid: specks on the washi faces (and on paper
+panels and buttons), and a diamond lattice on the crimson backs.
+
+### D40: A pixel seal logo, and 塾 on every card back (settled: Arthur's choice, 2026-11-22)
+
+Arthur pointed out the card backs should carry 塾 (juku, a cram school,
+the game's name) rather than 札 (fuda, "card"), and asked for a logo like
+a hanko seal in our pixel style. The logo is red 塾 inside a red ring on
+a white disc, with the circle worked out on a 24-pixel grid so its edge
+steps like pixel art (`pixel-seal.ts`, drawn by `PixelSeal.vue`). It sits
+beside the title, on every card back (both kinds) and on the deck.
+
+### D41: Kuronuri for Japanese (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for Kuronuri (黒塗り, by lihbr, SIL OFL 1.1) as the Japanese
+font. It's drawn in Redaction's photocopied style and comes in seven
+pixel levels; Arthur chose 70, clearly pixelated but easy to read, which
+matters for learners. It covers JIS levels 1 to 4, so it replaces
+DotGothic16 (D31) and that package is removed.
+
+The npm package (@lihbr/kuronuri) splits the font into character slices,
+so a browser downloads only the slices a page shows. Its stylesheet also
+carries italic and bold, three times the size (89 KB against 29 KB
+gzipped), so `npm run fonts` keeps only the regular rules, generated like
+the decks and never committed, and `main.ts` loads them after the page
+draws.
+
+- **Watch:** the package is new (0.0.3, one author). If it breaks, switch
+  the font stacks in `style.css` back to DotGothic16.
+- **Beat:** DotGothic16 (D31; Arthur preferred Kuronuri's look); level 100
+  (complex kanji like 塾 blur at card size); the package's full stylesheet
+  (89 KB gzipped for weights the game never uses).
+
+### D42: Crests in kanji mode, and crest colours on the cards (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the bank run's crests (koban, omikuji, curse) in kanji
+mode too. Kanji mode has no pause and no coins, so the crests pay in
+points and come with their own Scout button:
+
+- Each round may hide one good crest on a right reading and one curse
+  on a wrong reading (`kanji/kanji-crests.ts`). The good crests only sit
+  on right answers so they reward knowing the reading, and the curse is
+  always a decoy, so it punishes a guess.
+- A koban doubles that card's points, an omikuji adds 5 to 15, and a
+  curse takes 10. The score never drops below 0.
+- Scout flips the hand over and uses one of the run's scouts (2 to start,
+  1 more per perfect round, up to 3). Turning the hand back is free.
+  Play waits until the hand is turned back.
+
+Arthur then asked for crests to colour the cards, not just a small tile:
+a scouted card's whole back (frame and lattice) and its front frame take
+the crest's colour (`tint` in `crests.ts`, drawn by `CardFrame.vue`),
+in both modes. The crest's symbol sits on the back in the same round
+pixel seal as 塾 (a light disc in a ring), in the crest's colour, so
+every back reads as one family. The marks stay until the set or round ends, so the player
+remembers which face-up card was gold. They appear only after a scout;
+an always-coloured front would make scouting pointless. A status colour
+(picked, wrong, right) still wins on the front.
+
+- **Beat:** reusing the pause (kanji mode has none); coins in kanji mode
+  (it has no wallet or shop); colouring fronts without a scout (gives
+  the crests away).
+
+### D43: Pixel-art icons for Scout, sound and coins (settled: Arthur's choice, 2026-11-22)
+
+Arthur sent two stock pictures to model the icons on: a pixel magnifying
+glass for Scout, and a pixel speaker for the sound switch (only "on" and
+"off"). Both are stock art with licence terms (one watermarked and paid),
+so the game doesn't use the files. It draws its own icons in the same
+style: a grey glass with an aqua lens and a white glint, and an orange and
+yellow speaker with sound waves or a cross, outlined in near-black.
+
+He then sent a pixel coin (a Freepik asset) for the pot and prices; the
+game draws its own in that style too: an octagonal gold coin with a lit
+rim, an orange inner ring and a $.
+
+Each icon is a grid of letters, one per pixel, in `pixel-icons.ts`, drawn
+as one SVG path per colour by `PixelIcon.vue`. The grid reads like the
+sprite, so changing a pixel is a one-letter edit, and a letter missing
+from the palette throws rather than leaving a hole.
+
+- **Beat:** downloading the stock images (licence); emoji (they don't
+  match the pixel style, and look different on every system); an icon
+  font (a dependency for three icons).
+
+### D44: Word mode plays as a bank run (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked what makes a roguelike fun, then picked his own idea: the
+combo is money. Every match adds coins to a pot, more the longer the
+combo; banking keeps the coins but ends the combo, and a miss loses the
+pot. Coins buy items between rounds, and a round of 3 sets must bank a
+target that grows, or the run ends. It was built as a spike
+(`spike/roguelike-bank`), playtested on his localhost and merged (PR #10),
+so it now ships as word mode's run (`src/bank-run/`). Crests and scouting
+(D42) grew out of it.
+
+- **Why it fits:** the risk sits on the thing the game teaches. Riding a
+  combo means knowing more readings in a row, so the push-your-luck
+  choice rewards learning, not luck.
+- **Kept separate:** the bank run's coins never touch the review engine
+  or the logs; the words played still count as reviews as before.
+- **Beat:** a charm run with rounds, targets and upgrades (a second spike,
+  `spike/roguelike-charms`, kept as a local branch); no run at all (less
+  reason to keep a combo going).

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import ScoreBreakdown from '../src/components/ScoreBreakdown.vue';
+import ScoreBreakdown from '../src/components/words/ScoreBreakdown.vue';
 import { dueNudge } from '../src/game/wellbeing.ts';
 import WellbeingNudge from '../src/components/WellbeingNudge.vue';
 

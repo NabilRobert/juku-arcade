@@ -3,7 +3,7 @@
  * "About the data" (requirement D2): the attribution OpenJLPT's NOTICE asks
  * for, worded as in Juku's about_the_data.md.
  */
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 
 defineEmits<{ close: [] }>();
 </script>

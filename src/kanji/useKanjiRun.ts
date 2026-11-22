@@ -6,14 +6,19 @@
  * wrong one breaks it. Then the right readings left in the hand light up,
  * the round is scored (kanji-round.ts), and a new kanji is dealt.
  *
+ * Crests (D42, useKanjiCrests.ts) may hide on the cards: scouting flips the
+ * hand over to show them, and a crested card adds or takes points when
+ * it's thrown.
+ *
  * Kanji mode is practice (D37): nothing here is logged or reviewed.
  */
-import { computed, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import type { RandomSource } from '../game/deal.ts';
 import type { Deck } from '../deck/types.ts';
-import { THROW_S } from '../components/card-motion.ts';
+import { THROW_S } from '../components/cards/card-motion.ts';
 import { PLAY_STEP_MS } from '../composables/useHand.ts';
+import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import {
   dealKanjiRound,
@@ -22,11 +27,17 @@ import {
   type KanjiRound,
   type RoundResult,
 } from './kanji-round.ts';
+import { useKanjiCrests } from './useKanjiCrests.ts';
 
 export type KanjiPhase = 'picking' | 'playing' | 'revealed';
 
 /** A thrown card reaches the kanji this long after it leaves the hand. */
 const THROW_MS = THROW_S * 1000;
+/** A scored round, with what its crests added or took. */
+export interface PlayedRound extends RoundResult {
+  crestPoints: number;
+}
+
 /** How long the answers show before the next kanji is dealt. */
 const REVEAL_MS = 2200;
 /** A kanji isn't dealt again until this many others have been. */
@@ -63,8 +74,9 @@ function useTally() {
     playSound('slap');
     playSound('chime', comboPitch(combo.value));
   }
-  function finish(result: RoundResult): void {
-    score.value += result.points;
+  function finish(result: PlayedRound): void {
+    // A curse can take points, but never below nothing.
+    score.value = Math.max(0, score.value + result.points + result.crestPoints);
     if (result.misses > 0) combo.value = 0;
     if (result.isPerfect) playSound('cleared');
   }
@@ -72,7 +84,7 @@ function useTally() {
 }
 
 /** The cards on the table: the round, which cards are picked and which have been thrown. */
-function useTable(firstRound: KanjiRound) {
+function useTable(firstRound: KanjiRound, isScouting: () => boolean) {
   const round = shallowRef(firstRound);
   const roundNumber = ref(1);
   const picked = ref<number[]>([]);
@@ -97,6 +109,7 @@ function useTable(firstRound: KanjiRound) {
   function statusOf(index: number): CardStatus {
     const card = round.value.cards[index];
     if (thrown.value.includes(index)) return card?.isRight === true ? 'matched' : 'wrong';
+    if (isScouting()) return 'hidden';
     if (phase.value === 'revealed' && card?.isRight === true) return 'correct';
     return picked.value.includes(index) ? 'selected' : 'idle';
   }
@@ -106,55 +119,79 @@ function useTable(firstRound: KanjiRound) {
 
 type Table = ReturnType<typeof useTable>;
 type Tally = ReturnType<typeof useTally>;
+type Crests = ReturnType<typeof useKanjiCrests>;
 
 /** Playing the picked cards: throws them in turn, then reveals and scores the round. */
-function usePlayback(table: Table, tally: Tally, deal: () => KanjiRound) {
-  const lastResult = shallowRef<RoundResult | null>(null);
-  let timers: ReturnType<typeof setTimeout>[] = [];
-  const later = (run: () => void, ms: number): void => {
-    timers.push(setTimeout(run, ms));
-  };
+function usePlayback(table: Table, tally: Tally, crests: Crests, deal: () => KanjiRound) {
+  const lastResult = shallowRef<PlayedRound | null>(null);
+  /** What this round's thrown crests have added or taken so far. */
+  let crestPoints = 0;
+  const later = useLater();
 
   function throwCard(index: number): void {
     table.thrown.value = [...table.thrown.value, index];
     playSound('whoosh');
-    later(() => tally.land(table.round.value.cards[index]?.isRight === true), THROW_MS);
+    later(() => {
+      const isRight = table.round.value.cards[index]?.isRight === true;
+      crestPoints += crests.pointsFor(index, isRight);
+      tally.land(isRight);
+    }, THROW_MS);
+  }
+
+  function dealNext(): void {
+    const next = deal();
+    table.newRound(next);
+    crests.deal(next);
   }
 
   function reveal(): void {
-    const result = scoreRound(table.round.value, table.picked.value);
+    const result = { ...scoreRound(table.round.value, table.picked.value), crestPoints };
     lastResult.value = result;
     tally.finish(result);
+    if (result.isPerfect) crests.earnScout();
     table.phase.value = 'revealed';
-    later(() => table.newRound(deal()), REVEAL_MS);
+    later(dealNext, REVEAL_MS);
   }
 
   function play(): void {
     if (table.phase.value !== 'picking' || table.picked.value.length === 0) return;
+    crests.isScouting.value = false;
     table.phase.value = 'playing';
-    timers = [];
+    crestPoints = 0;
     const order = [...table.picked.value].sort((a, b) => a - b);
     order.forEach((index, step) => later(() => throwCard(index), step * PLAY_STEP_MS));
     later(reveal, (order.length - 1) * PLAY_STEP_MS + THROW_MS);
   }
 
-  onUnmounted(() => timers.forEach(clearTimeout));
   return { lastResult, play };
 }
 
 export function useKanjiRun(deck: Deck, random: RandomSource = Math.random) {
   const { deal } = useRounds(deck, random);
   const tally = useTally();
-  const table = useTable(deal());
-  const { lastResult, play } = usePlayback(table, tally, deal);
+  const firstRound = deal();
+  const crests = useKanjiCrests(firstRound, random);
+  const table = useTable(firstRound, () => crests.isScouting.value);
+  const { lastResult, play } = usePlayback(table, tally, crests, deal);
   return {
     ...table,
     lastResult,
     play,
+    crestMarks: crests.crestMarks,
+    notice: crests.notice,
+    scoutsLeft: crests.scoutsLeft,
+    isScouting: crests.isScouting,
+    /** Scouting is for picking time: once the hand is played, the crests are spent. */
+    toggleScout: () => crests.toggleScout(table.phase.value === 'picking'),
     score: tally.score,
     combo: tally.combo,
     bestCombo: tally.bestCombo,
     impacts: tally.impacts,
-    canPlay: computed(() => table.phase.value === 'picking' && table.picked.value.length > 0),
+    canPlay: computed(
+      () =>
+        table.phase.value === 'picking' &&
+        table.picked.value.length > 0 &&
+        !crests.isScouting.value,
+    ),
   };
 }

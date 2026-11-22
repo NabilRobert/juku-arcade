@@ -5,7 +5,7 @@
  */
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 
 defineProps<{ settings: Settings }>();
 const emit = defineEmits<{

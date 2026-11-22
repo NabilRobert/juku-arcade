@@ -5,7 +5,7 @@
  * pairs words with their readings and feeds the reviews, or kanji mode,
  * which is practice at finding every reading of one kanji.
  */
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 
 export type GameMode = 'words' | 'kanji';
 

@@ -7,7 +7,7 @@
  */
 import { useReducedMotion } from 'motion-v';
 import { computed, ref } from 'vue';
-import { NO_TILT, tiltToward, type Tilt } from '../components/card-tilt.ts';
+import { NO_TILT, tiltToward, type Tilt } from '../components/cards/card-tilt.ts';
 
 /** Depth for the tilt; smaller looks more dramatic. */
 const TILT_PERSPECTIVE_PX = 600;

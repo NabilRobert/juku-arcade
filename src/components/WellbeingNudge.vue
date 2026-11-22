@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** W1: a friendly suggestion to stop, after 15 and 30 minutes of play. Easy to dismiss. */
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 defineProps<{ minutes: number }>();
 defineEmits<{ stop: []; keepGoing: [] }>();
 </script>

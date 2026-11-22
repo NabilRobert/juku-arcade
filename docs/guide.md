@@ -69,10 +69,10 @@ flowchart LR
 ```
 
 1. The player **lays out a hand**: a reading card for each word card. The
-   reading cards are held in a fan under the word cards, which are
+   reading cards are laid out in an overlapping row under the word cards, which are
    numbered 1 to 5. Clicking a reading card (or pressing Enter on it)
    lays it for the first word card still open, from the left
-   (**`hand.ts: layReading`**): it shifts up out of the fan with an aqua
+   (**`hand.ts: layReading`**): it shifts up out of the row with an aqua
    tag showing that word's number. Dragging it onto a word card, or
    flinging it at one, lays it for that word instead: while it's dragged
    the word card under it lights up (**`useThrows: trackDrag`**), and on
@@ -114,7 +114,9 @@ flowchart LR
     B --> C["kanji-round.ts: kanjiPool → dealKanjiRound"]
     C --> D["readings.ts: readingsUsedByKanji<br/>(right) and allReadingsOf (never a decoy)"]
     B -->|"Play"| E["throw each picked card in turn"]
-    E --> F["reveal: scoreRound → next kanji"]
+    B --> H["useKanjiCrests.ts: deal crests,<br/>Scout flips the hand"]
+    E -->|"crested card"| H
+    E --> F["reveal: scoreRound + crest points → next kanji"]
     A --> G["usePlayClock + useWellbeing<br/>(counts toward the nudges and cap)"]
 ```
 
@@ -124,21 +126,74 @@ flowchart LR
 2. **`dealKanjiRound`** picks a kanji not shown recently, more often if it
    has several readings, and deals 8 cards: all its readings, plus readings
    of other kanji that the dictionary doesn't list for it.
-3. **`KanjiBoard.vue`** shows the kanji and its meanings over a fan of the 8
+3. **`KanjiBoard.vue`** shows the kanji and its meanings over an overlapping row of the 8
    readings. Clicking one picks it (it lifts) or puts it back.
-4. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
+4. **Crests** (D42): each round may hide a gold koban or purple omikuji
+   on one right reading and a black curse on one wrong reading
+   (**`kanji-crests.ts: dealKanjiCrests`**). **Scout**
+   (**`KanjiScoutPanel.vue`**, **`useKanjiCrests: toggleScout`**) flips
+   the hand over to show them. After that, a crested card's back and
+   front frame stay in the crest's colour until the round ends
+   (**`CardFrame.vue`**, `tint`). A run starts with 2 scouts and earns 1
+   per perfect round, up to 3.
+5. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
    in turn. A right one hits and dissolves, the kanji jolts, and the combo
-   builds; a wrong one shakes and its frame goes dark.
-5. Then the right readings left in the hand light up aqua (✓),
-   **`scoreRound`** adds the points (a bonus for a perfect round), and a
-   new kanji is dealt off the deck.
-6. **`usePlayClock`** counts the play toward the nudges and the school's
+   builds; a wrong one shakes and its frame goes dark. A crested card
+   pays as it lands (**`crestBonus`**): a koban doubles that card's
+   points, an omikuji adds 5 to 15, a curse takes 10.
+6. Then the right readings left in the hand light up aqua (✓),
+   **`scoreRound`** adds the points (a bonus for a perfect round) and the
+   crests' points (the score never drops below 0), and a new kanji is
+   dealt off the deck.
+7. **`usePlayClock`** counts the play toward the nudges and the school's
    daily cap with the same tick as word mode (**`wellbeing.ts:
    tickPlayClock`**), and **`WellbeingGate.vue`** shows the same screens.
 
+## The flow, part 2c: the bank run (word mode)
+
+Word mode plays as a push-your-luck run (D44). Every match adds coins to
+an unbanked **pot**; banking it moves the coins to the **wallet** and ends
+the combo, and a miss or a timeout loses it.
+
+```mermaid
+flowchart LR
+    A["words/GameScreen.vue"] --> B["bank-run/useBankRun.ts<br/>(watches the run)"]
+    B -->|"match"| C["bank-run.ts: addMatch<br/>(pot grows with the combo)"]
+    B -->|"miss / timeout"| D["losePot"]
+    A -->|"Bank"| E["bankPot → wallet"]
+    B -->|"set ends"| F["endSet: next set, the shop, or run over"]
+    F --> G["ShopOffer.vue: buyItem"]
+    B --> H["useCrests.ts: crests and scouting"]
+```
+
+1. **`words/GameScreen.vue`** starts **`useBankRun`** beside the word run
+   (`useRun`). It watches the run's state: a new match calls
+   **`bank-run.ts: addMatch`**, which adds the combo's length in coins to
+   the pot (**`coinsForMatch`**; items can add more), and a broken combo
+   calls **`losePot`**.
+2. **Bank** (**`components/bank-run/BankPanel.vue`**) calls **`bankPot`**:
+   the pot goes to the wallet and counts toward this round's target, and
+   `useRun: endCombo` ends the combo.
+3. A round is 3 sets (**`SETS_PER_ROUND`**). After each set,
+   **`endSet`** moves on, or after the third opens the shop if the round's
+   target was banked, else ends the run (**`RunOver.vue`**). If the pot
+   alone would reach the target on the last set, it's banked at the bell
+   (**`shouldBankAtBell`**).
+4. In the shop (**`ShopOffer.vue`**), the wallet buys items
+   (**`items.ts`**, **`buyItem`**) that bend the risk: more coins per
+   match, half the pot kept on a miss, a bonus for banking, interest on
+   savings. `useRun` holds the next set while the shop or end screen is
+   open (`useBankRun: isHolding`, passed as `isHoldingNextDeal`).
+5. **Crests** (**`useCrests.ts`**, **`crests.ts: dealCrests`**) hide on a
+   few word cards each set; **Scout** pauses the game to show them. A
+   koban doubles a match's coins, an omikuji gives a gift, and a curse
+   costs wallet coins when missed.
+6. The best round reached is kept in this browser (`useBankRun:
+   useBestRound`).
+
 ## The flow, part 3: pause and flip
 
-1. **⏸ Pause** in **`GameHud.vue`** (or hiding the tab, or opening the
+1. **⏸ Pause** in **`GameHud.vue`**, or the Esc key (**`usePauseKey.ts`**) (or hiding the tab, or opening the
    About page) calls **`pause.ts: pause`**. The clock stops, and
    **`card-status.ts`** turns every card face down.
 2. Tapping a face-down word card calls **`pause.ts: flipCard`**.
@@ -193,7 +248,12 @@ flowchart LR
 4. Check-up answers update only the check-up history
    (**`applyCheckUp`**, kept in `Memory.checkUps`), never the review schedule
    or difficulty.
-5. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
+5. **Stats** (the footer link, **`StatsPage.vue`**) shows the player's own
+   numbers from this browser's event log (**`memory/stats.ts:
+   playerStats`**): words known, right answers today and overall, best
+   combo and set, play today, the words missed most and the kinds of
+   mistake made most. Kanji mode logs nothing, so it isn't counted.
+6. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
    as an anonymous JSON file. Slice 5b's report script reads these files.
 
 ## The flow, part 6: the reports (outside the app)
@@ -234,39 +294,53 @@ detected at each class size.
 - **The karuta table (D30)** lives in `src/style.css`: colour tokens for
   the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
-  pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
-  Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
-  two textures made of CSS gradients (`.washi` paper, `.card-back`).
+  pixel font for English, `public/fonts/balatro/`, and Kuronuri for
+  Japanese at pixel level 70, from the `@lihbr/kuronuri` package; decisions
+  D31, D41: `npm run fonts` (`scripts/build-font-css.ts`) keeps its regular
+  weight in `src/fonts/kuronuri.css`, which `main.ts` loads after the page
+  draws), and
+  two pixel-art textures, tiny SVG tiles drawn on the card's own pixel grid
+  (`.washi` paper with pixel specks, `.card-back` with a diamond lattice).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
   warp and spiral in a 19-second loop (D35). A WebGL shader draws them
   (`background/swirl-shader.ts`) on a canvas a sixth of the window's
   size, stretched to fill it, about 30 times a second.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
-  system's reduce-motion setting. `components/card-motion.ts` says how
+  system's reduce-motion setting. `components/cards/card-motion.ts` says how
   each card moves: a new set comes off the deck face down, one card after
   another, turning face up as it flies; pausing turns every card over in
   a wave (each card draws a front and a back, `PlayCard.vue`); a held
-  card lifts, a laid card shifts up out of the fan, and a matched
+  card lifts, a laid card shifts up out of the row, and a matched
   reading card flies on, spinning, to its word card and hits it, and
   both then vanish block by block in a curved front sweeping from the
   top-left corner to the bottom-right, like dust blowing away (the pixel snap,
-  `components/pixel-snap.ts`, played by `composables/usePixelSnap.ts`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
+  `components/cards/pixel-snap.ts`, played by `composables/usePixelSnap.ts`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
   bundle. Every card sits in a slot the size of the card that never moves
   (`composables/useTableSlots.ts`), so the slots can be measured before
   any card is drawn: `useDeal.ts` measures where the deck is from each
   slot, and `useThrows.ts` how far a thrown card flies (before the board
-  redraws). A card moves by being drawn away from its own slot. The fan
-  is a fixed turn and drop on each reading card's slot (`fanStyle` in
-  `GameBoard.vue`). Inside its slot every card floats: a CSS animation
+  redraws). A card moves by being drawn away from its own slot. Each reading
+  card's slot has a small fixed turn and raise (`handStyle` in
+  `hand-layout.ts`). Inside its slot every card floats: a CSS animation
   (`float` in `style.css`) bobs and sways it, each card out of step with
   the next (`floatStyle`).
   Every card also tilts in 3D toward the mouse while it's over the card
-  (`composables/useCardTilt.ts`, maths in `components/card-tilt.ts`), on
+  (`composables/useCardTilt.ts`, maths in `components/cards/card-tilt.ts`), on
   a layer inside the card so it adds to whatever Motion is doing.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
+- **The logo** (D40) is red 塾 in a red pixel ring on white, like a hanko
+  seal: `PixelSeal.vue`, its circle worked out on a pixel grid in
+  `pixel-seal.ts`. It sits beside the title, on every card back and on the
+  deck.
+- **Icons** (D43) are pixel art drawn for the game: a magnifying glass on
+  Scout, a speaker on the sound switch (with sound, or crossed out), and
+  a gold coin for the bank run's pot, wallet and prices.
+  Each is a grid of letters in `pixel-icons.ts`, one letter per pixel,
+  drawn by `PixelIcon.vue`. To change one, edit its grid; a new colour
+  needs a letter in `PALETTE`.
 - **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
   `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
   top edge and a shaded bottom edge. Every button outside the cards is a
@@ -296,8 +370,11 @@ detected at each class size.
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
-  combo between the two rows, growing and warming (aqua from 5, crimson
-  from 10, with いいね！, すごい！, さいこう！). A glow behind the cards
+  combo between the two rows as a style rank (D39), a letter grade from F
+  up to SSS (`components/ui/combo-ranks.ts`) with a word of praise (がんばれ, よし,
+  いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), the combo count and a bar
+  toward the next rank. Each rank-up slams the letter in with a sound, and
+  the meter floats gently while it waits. A glow behind the cards
   (`.table-glow`) brightens with the combo and the table jolts on each
   hit. A lost streak of 3 or more drops away in crimson. The 🔊 button
   in the side panel mutes it all, remembered in this browser. ZzFX is
@@ -306,7 +383,7 @@ detected at each class size.
 - **Layout (desktop only):** the school plays on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
   `ScoreBreakdown`) beside the table: 5 numbered word cards, the combo
-  and the Play button, then the hand of 6 reading cards held in a fan,
+  and the Play button, then the hand of 6 reading cards in an overlapping row,
   next to the deck. The game fills the window: the root font size grows with the
   window's width (`html` in `style.css`), and each card row in
   `GameBoard.vue` sets its cards' height as a share of the window's
@@ -351,11 +428,15 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
-| **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
+| **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
+| **Pot / bank / wallet** | The bank run's coins: the pot grows with each match and is lost on a miss; banking moves it to the wallet, which buys items (D44) | `bank-run/bank-run.ts` |
+| **Round target** | Coins to bank in a round's 3 sets to reach the shop; it grows each round | `bank-run.ts: targetFor` |
+| **Item** | A charm bought in the shop that changes the bank run's odds (lucky cat, koi, omamori, crane, fan, bamboo) | `bank-run/items.ts` |
+| **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `bank-run/crests.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
-| **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
+| **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
 | **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both snap away block by block. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
@@ -392,7 +473,15 @@ fields. They stay in memory until slice 3 stores them.
   `kanji/kanji-round.ts` (`CARDS_PER_ROUND`, `POINTS_PER_HIT`,
   `PERFECT_ROUND_BONUS`, `MAX_PICK_WEIGHT`); how long the answers show is
   `REVEAL_MS` in `kanji/useKanjiRun.ts`. Specs: `tests/kanji-round.test.ts`
-  and `tests/kanji-run.test.ts`.
+  and `tests/kanji-run.test.ts`. Crests' chances, points and scouts are
+  at the top of `kanji/kanji-crests.ts` (specs:
+  `tests/kanji-crests.test.ts`); their colours are `tint` in
+  `bank-run/crests.ts`.
+- **Change the bank run:** targets, items allowed, scouts and item
+  bonuses are at the top of `bank-run/bank-run.ts`; item prices and
+  effects in `bank-run/items.ts`; crest chances in `bank-run/crests.ts`.
+  Specs: `tests/bank-run.test.ts`, `tests/use-bank-run.test.ts` and
+  `tests/crests.test.ts`.
 - **Change how a hand is laid out or played:** the rules (which slot a
   click fills, when Play is ready, the play order) are in
   `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between
@@ -410,9 +499,9 @@ fields. They stay in memory until slice 3 stores them.
 - **Change colours, fonts or textures:** edit the tokens and classes in
   `src/style.css`.
 - **Change a button's colours or its click wipe:** `COLOURS` in
-  `components/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
+  `components/ui/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
   `style.css`).
-- **Change an animation:** card motion is in `components/card-motion.ts`
+- **Change an animation:** card motion is in `components/cards/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
   `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
   `FLIP_STAGGER_S` the pause flip, `MAX_TILT_DEG` in `card-tilt.ts` how far a
@@ -422,14 +511,15 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
-- **Change how the combo builds:** the steps, praise and colours are
-  `TIERS` in `ComboMeter.vue`; the glow's brightest combo is
+- **Change how the combo builds:** the ranks, their thresholds, praise and
+  colours are `COMBO_RANKS` in `components/ui/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
-  `components/throw-geometry.ts`.
+  `components/cards/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and
   `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
-  the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there, and
+  the hand's row is `HAND_TILTS_DEG`, `HAND_RAISES_PX` and `HAND_OVERLAP` in
+  `hand-layout.ts`, and
   the float is `FLOAT` and `FLOAT_*_S`. The table's swirl: its colours
   (`DARK_RGB`, `LIGHT_RGB`), loop length (`SWIRL_LOOP_MS`) and band shapes
   are in `background/swirl-shader.ts`; its resolution and frame rate are

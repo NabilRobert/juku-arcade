@@ -10,7 +10,7 @@
  * from the slots is measured again.
  */
 import { onMounted, onUnmounted, ref, type ComponentPublicInstance } from 'vue';
-import type { Box } from '../components/throw-geometry.ts';
+import type { Box } from '../components/cards/throw-geometry.ts';
 
 /** What Vue hands a template ref: the slot element, or null when it's removed. */
 type SlotRef = Element | ComponentPublicInstance | null;
