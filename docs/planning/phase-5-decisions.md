@@ -245,7 +245,7 @@ before it ships.
 CC0 sounds only, muted until the first tap. Sound is first on the cut
 list.
 
-### D24: System fonts for Japanese (settled: Arthur's OK, 2026-11-21)
+### D24: System fonts for Japanese (replaced by D31, 2026-11-22)
 
 - **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before
   subsetting, which works against N1).
@@ -335,7 +335,28 @@ same blocks sit in a bar above the board. Built in slice 4.
 
 The layout follows common card-game conventions, the genre Arthur named as
 inspiration. The look is our own: no other game's card art, table texture,
-score boxes, font or naming (D22).
+score boxes or naming (D22). The English font is the one exception (D31).
 
 - **Beat:** a night-market arcade (flashier, less tied to learning
   Japanese); clean stationery (easy to read, least like an arcade).
+
+### D31: Pixel fonts, English and Japanese (settled: Arthur's choice, 2026-11-22)
+
+After the playtest Arthur picked two fonts: "balatro" by localthunk from
+FontStruct for English, and DotGothic16 (via Fontsource) for Japanese.
+Both are under the SIL Open Font License, which allows shipping them with
+the game. The pixel font's licence and readme ship beside it in
+`public/fonts/balatro/`, as the licence asks.
+
+The English font comes from Balatro's developer, so it's the one place
+the look borrows from that game, by Arthur's choice. The cards, colours,
+table and Japanese theme stay our own (D22, D30). Neither font has a bold
+weight, so faked bold is turned off to keep the pixels sharp.
+
+- **Size:** the pixel font is 4 KB. DotGothic16's Japanese file is 396 KB,
+  loaded once after the page draws and then cached. Fontsource's finely
+  split version was beaten: it adds 80 KB (gzipped) to the stylesheet
+  every page waits for.
+- **Beat:** system fonts (D24: no download, but no game feel); Noto Sans
+  JP (larger, and not a pixel face); m6x11 or other pixel fonts for
+  English (Arthur asked for this one).

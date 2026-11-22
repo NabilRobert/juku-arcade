@@ -20,6 +20,7 @@
     "power": "node scripts/simulate-power.ts"
   },
   "dependencies": {
+    "@fontsource/dotgothic16": "^5.3.1",
     "dexie": "^4.4.7",
     "motion-v": "^2.13.0",
     "vue": "^3.5.46",

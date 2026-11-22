@@ -1,4 +1,24 @@
 @import 'tailwindcss';
+/*
+ * DotGothic16 for Japanese (OFL, via Fontsource): one 396 KB file, loaded
+ * after the page draws and then cached. Its Latin file covers symbols the
+ * pixel font lacks (× ✓ ▶). The finely split 400.css would add 80 KB to
+ * the stylesheet every page waits for.
+ */
+@import '@fontsource/dotgothic16/japanese-400.css';
+@import '@fontsource/dotgothic16/latin-400.css';
+
+/*
+ * A pixel font for English: "balatro" by localthunk, from FontStruct (OFL;
+ * its licence and readme sit beside it in public/fonts/balatro/, as the
+ * licence asks). It has no Japanese, so Japanese text falls through to
+ * DotGothic16 in the font stacks below. Decision D31.
+ */
+@font-face {
+  font-family: 'balatro';
+  src: url('/fonts/balatro/balatro.otf.woff2') format('woff2');
+  font-display: swap;
+}
 
 /*
  * The karuta table look (decision D30): washi-paper cards with a vermilion
@@ -6,11 +26,10 @@
  * look changes in one place. Textures are CSS gradients, not image files.
  */
 @theme {
+  /* English in the pixel font, Japanese in DotGothic16, then system fonts if a webfont fails (D31). */
   --font-sans:
-    system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI',
-    'Yu Gothic', sans-serif;
-  /* Mincho (serif) faces for the cards, as on printed karuta; system fonts only (D24). */
-  --font-card: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP', serif;
+    'balatro', 'DotGothic16', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-card: 'balatro', 'DotGothic16', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
 
   --color-lacquer: #1a0f0b;
   --color-lacquer-light: #2b1912;
@@ -36,6 +55,8 @@
  */
 html {
   font-size: clamp(16px, 1.25vw, 24px);
+  /* Both fonts have one weight; a faked bold would smear the pixels. */
+  font-synthesis-weight: none;
 }
 
 body {

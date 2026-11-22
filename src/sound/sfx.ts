@@ -1,7 +1,8 @@
 /**
  * The game's sound effects. Most are made in code by ZzFX: each is a list
  * of ZzFX's synth settings, shaped by ear. The card sounds (a shuffle when
- * a set is dealt, a slide when a card is picked up, a slap when it lands)
+ * a set is dealt, a short flick of it when a card is picked, a slap when
+ * it lands)
  * are recordings from Kenney's Casino Audio pack (CC0, public/sounds/),
  * because paper is hard to fake; if a recording can't load or play, its
  * synth sound plays instead.
@@ -49,13 +50,18 @@ export type SoundName = keyof typeof SOUNDS;
 /** Recorded sounds, by the sound they replace; one variant is picked at random each time. */
 const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   deal: ['card-shuffle.ogg'],
-  pickUp: ['card-slide-1.ogg', 'card-slide-2.ogg', 'card-slide-3.ogg'],
+  pickUp: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
 };
 /** Recordings are louder than the synth sounds; this evens them out. */
 const RECORDING_VOLUME = 0.5;
-/** The shuffle recording runs 3 s; a deal plays its first riffle, fading out over the end. */
-const RECORDING_MAX_S = 1.2;
+/**
+ * The shuffle recording runs 3 s. A deal plays its first riffle; picking a
+ * card plays just its first flick, so it's over before the next pick.
+ * Each fades out over its last FADE_OUT_S (or half its length, if shorter).
+ */
+const RECORDING_MAX_S: Partial<Record<SoundName, number>> = { deal: 1.2, pickUp: 0.4 };
+const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
 
 /**
@@ -110,15 +116,16 @@ function recordingLoader(context: AudioContext): (file: string) => Promise<Audio
   };
 }
 
-function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number): void {
+function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number, maxS: number): void {
   const source = context.createBufferSource();
   const gain = context.createGain();
   source.buffer = buffer;
   source.playbackRate.value = pitch;
-  const length = Math.min(buffer.duration, RECORDING_MAX_S);
+  const length = Math.min(buffer.duration, maxS);
+  const fade = Math.min(FADE_OUT_S, length / 2);
   const now = context.currentTime;
   gain.gain.setValueAtTime(RECORDING_VOLUME, now);
-  gain.gain.setValueAtTime(RECORDING_VOLUME, now + length - FADE_OUT_S);
+  gain.gain.setValueAtTime(RECORDING_VOLUME, now + length - fade);
   gain.gain.linearRampToValueAtTime(0, now + length);
   source.connect(gain).connect(context.destination);
   source.start(now, 0, length);
@@ -141,7 +148,8 @@ async function loadPlayer(): Promise<Player> {
     const file = files?.[Math.floor(Math.random() * files.length)];
     if (file === undefined) return playSynth(name, pitch);
     try {
-      playBuffer(ZZFX.audioContext, await loadRecording(file), pitch);
+      const maxS = RECORDING_MAX_S[name] ?? DEFAULT_RECORDING_MAX_S;
+      playBuffer(ZZFX.audioContext, await loadRecording(file), pitch, maxS);
     } catch {
       playSynth(name, pitch);
     }

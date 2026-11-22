@@ -196,9 +196,11 @@ detected at each class size.
 ## The look and wellbeing
 
 - **The karuta table (D30)** lives in `src/style.css`: colour tokens
-  (`washi`, `sumi`, `vermilion`, `lacquer`, `pine`, `gold`), the Mincho card
-  font, and two textures made of CSS gradients (`.washi` paper, `.card-back`).
-  No image files.
+  (`washi`, `sumi`, `vermilion`, `lacquer`, `pine`, `gold`), two fonts (a
+  pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
+  Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
+  two textures made of CSS gradients (`.washi` paper, `.card-back`). No
+  image files.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
   system's reduce-motion setting. `components/card-motion.ts` says how
@@ -226,8 +228,8 @@ detected at each class size.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
-  shuffle when a set is dealt, a slide when a card is picked up, and a
-  slap when it lands. The rest are made in code with ZzFX (a tiny MIT
+  shuffle when a set is dealt, the shuffle's first flick when a card is
+  picked, and a slap when it lands. The rest are made in code with ZzFX (a tiny MIT
   synth): a click when a held card is over a word card, a swish when
   it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo
