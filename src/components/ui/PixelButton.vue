@@ -41,6 +41,19 @@ const FLASHES: Record<ButtonColour, string> = {
   paper: 'var(--color-aqua)',
 };
 
+/**
+ * The wipe's two halves, drawn as ::before and ::after: each covers half
+ * the button and grows from its outer edge, in the wipe's colour (--wipe).
+ * Under reduced motion there's no wipe; the colour changes at once.
+ */
+const WIPE_CLASS =
+  'pointer-events-none absolute inset-0 motion-reduce:hidden ' +
+  'before:absolute before:inset-y-0 before:left-0 before:w-1/2 before:origin-left before:bg-(--wipe) ' +
+  'after:absolute after:inset-y-0 after:right-0 after:w-1/2 after:origin-right after:bg-(--wipe)';
+/** A flash sweeps in and fades; a change sweeps in and stays (the button then takes the colour). */
+const WIPE_FLASH = 'before:animate-wipe after:animate-wipe';
+const WIPE_CHANGE = 'before:animate-wipe-change after:animate-wipe-change';
+
 interface Wipe {
   /** A new key re-creates the wipe, which restarts its animation. */
   key: number;
@@ -85,9 +98,9 @@ function finishWipe(): void {
     <span
       v-if="wipe"
       :key="wipe.key"
-      class="pixel-wipe"
-      :class="{ 'is-change': wipe.isChange }"
+      :class="[WIPE_CLASS, wipe.isChange ? WIPE_CHANGE : WIPE_FLASH]"
       :style="{ '--wipe': wipe.fill }"
+      data-testid="wipe"
       aria-hidden="true"
       @animationend="finishWipe"
     />

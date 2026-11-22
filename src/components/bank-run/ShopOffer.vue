@@ -24,7 +24,7 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
     role="dialog"
     aria-label="Shop"
   >
-    <p class="font-card text-3xl font-bold text-aqua">Round {{ run.round }} cleared!</p>
+    <p class="text-3xl font-bold text-aqua">Round {{ run.round }} cleared!</p>
     <p class="text-lg">
       Wallet <PixelIcon name="coin" /> {{ run.wallet
       }}<span v-if="isFull" class="text-washi/60"> · item slots full</span>
@@ -38,7 +38,7 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ type: 'spring', stiffness: 300, damping: 22, delay: index * 0.08 }"
       >
-        <span class="font-card text-5xl" lang="ja">{{ item.kanji }}</span>
+        <span class="text-5xl" lang="ja">{{ item.kanji }}</span>
         <span class="text-lg font-semibold">{{ item.name }}</span>
         <span class="text-center text-sm text-sumi/80">{{ item.effect }}</span>
         <PixelButton

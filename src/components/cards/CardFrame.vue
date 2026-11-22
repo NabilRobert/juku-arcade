@@ -24,6 +24,17 @@ const FRAME_CLASSES: Record<FrameColour, string> = {
   aqua: 'bg-aqua',
 };
 
+/**
+ * The three layers, each with stepped corners (pixel-corners in style.css).
+ * A "pixel" here is a share of the card's width, so the art grows with the
+ * card; the shadow is hard and offset, as in 8-bit card sprites, and the
+ * frame has a lit top edge and a dark bottom edge, so it reads as raised.
+ */
+const LAYER = 'pointer-events-none absolute pixel-corners [--pixel:max(3px,2.2cqw)]';
+const SHADOW_CLASS = `${LAYER} inset-0 translate-y-[calc(var(--pixel)*2)] bg-black/50`;
+const FRAME_CLASS = `${LAYER} inset-0 shadow-[inset_0_var(--pixel)_0_rgb(255_255_255/0.3),inset_0_calc(var(--pixel)*-1)_0_rgb(0_0_0/0.3)]`;
+const FACE_CLASS = `${LAYER} inset-[calc(var(--pixel)*3)] shadow-[inset_0_0_0_var(--pixel)_rgb(0_0_0/0.08)]`;
+
 const isTinted = computed(() => props.tint !== undefined && props.frame === 'crimson');
 const frameStyle = computed(() => (isTinted.value ? { backgroundColor: props.tint } : undefined));
 const faceClass = computed(() => {
@@ -33,17 +44,15 @@ const faceClass = computed(() => {
 </script>
 
 <template>
-  <span class="pixel-shadow" aria-hidden="true" />
+  <span :class="SHADOW_CLASS" aria-hidden="true" />
   <span
-    class="pixel-frame"
-    :class="FRAME_CLASSES[frame]"
+    :class="[FRAME_CLASS, FRAME_CLASSES[frame]]"
     :style="frameStyle"
     :data-tint="isTinted ? tint : undefined"
     aria-hidden="true"
   />
   <span
-    class="pixel-face"
-    :class="faceClass"
+    :class="[FACE_CLASS, faceClass]"
     :style="tint === undefined ? undefined : { '--crest-tint': tint }"
     aria-hidden="true"
   />

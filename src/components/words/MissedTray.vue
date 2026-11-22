@@ -18,7 +18,7 @@ defineEmits<{ flip: [word: DeckWord] }>();
         v-for="word in words"
         :key="word.id"
         colour="paper"
-        class="min-h-11 px-3 font-card text-lg disabled:opacity-60"
+        class="min-h-11 px-3 text-lg disabled:opacity-60"
         :disabled="!isPaused"
         lang="ja"
         @click="$emit('flip', word)"

@@ -34,11 +34,15 @@ watch(
 
 <template>
   <div
-    class="pointer-events-none flex h-[9dvh] items-center justify-center font-card"
+    class="pointer-events-none flex h-[9dvh] items-center justify-center"
     aria-live="polite"
     data-testid="combo-meter"
   >
-    <div v-if="rank" class="animate-float flex items-center gap-3" :style="FLOAT_STYLE">
+    <div
+      v-if="rank"
+      class="flex animate-float items-center gap-3 motion-reduce:animate-none"
+      :style="FLOAT_STYLE"
+    >
       <m.span
         :key="rank.letter"
         class="text-[7dvh] leading-none font-bold"

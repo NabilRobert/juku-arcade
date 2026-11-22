@@ -7,7 +7,7 @@ defineEmits<{ stop: []; keepGoing: [] }>();
 
 <template>
   <section class="pixel-panel washi p-4 text-center text-sumi" role="status">
-    <p class="font-card text-lg font-semibold">
+    <p class="text-lg font-semibold">
       {{ minutes }} minutes: a good place to stop. See you tomorrow!
     </p>
     <p class="mt-1 text-sm text-sumi/70">Short daily practice helps words stick.</p>

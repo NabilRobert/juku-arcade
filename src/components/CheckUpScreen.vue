@@ -58,7 +58,7 @@ onUnmounted(() => clearInterval(timer));
 <template>
   <section class="mx-auto w-full max-w-md space-y-5 text-center" aria-label="Daily check-up">
     <template v-if="index < 0">
-      <h2 class="font-card text-2xl font-semibold text-aqua">Daily check-up</h2>
+      <h2 class="text-2xl font-semibold text-aqua">Daily check-up</h2>
       <p class="text-washi/80">
         {{ questions.length }} quick questions, about a minute. It shows what's sticking. It doesn't
         change your score or your reviews.
@@ -72,10 +72,7 @@ onUnmounted(() => clearInterval(timer));
     </template>
     <template v-else-if="question">
       <p class="text-sm text-washi/60">{{ index + 1 }} / {{ questions.length }}</p>
-      <p
-        class="pixel-panel washi mx-auto w-48 py-6 font-card text-4xl font-semibold text-sumi"
-        lang="ja"
-      >
+      <p class="pixel-panel washi mx-auto w-48 py-6 text-4xl font-semibold text-sumi" lang="ja">
         {{ question.word.word }}
       </p>
       <div class="h-2 overflow-hidden bg-lacquer" role="progressbar" aria-label="Time left">
@@ -86,7 +83,7 @@ onUnmounted(() => clearInterval(timer));
           v-for="option in question.options"
           :key="option"
           colour="paper"
-          class="min-h-14 font-card text-xl"
+          class="min-h-14 text-xl"
           lang="ja"
           @click="answer(option)"
         >

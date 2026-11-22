@@ -38,7 +38,7 @@ const kanjiInWord = computed(() =>
   >
     <header class="flex items-baseline justify-between gap-3">
       <p lang="ja">
-        <span class="font-card text-3xl font-bold">{{ word.word }}</span>
+        <span class="text-3xl font-bold">{{ word.word }}</span>
         <span class="ml-2 text-xl">{{ word.reading }}</span>
       </p>
       <PixelButton colour="steel" class="px-3 py-1 text-sm" @click="$emit('close')">
@@ -57,7 +57,7 @@ const kanjiInWord = computed(() =>
     </section>
     <section v-for="item in kanjiInWord" :key="item.char" class="border-t border-sumi/15 pt-3">
       <p class="flex items-baseline gap-3">
-        <span class="font-card text-3xl" lang="ja">{{ item.char }}</span>
+        <span class="text-3xl" lang="ja">{{ item.char }}</span>
         <span class="text-sm text-sumi/70">{{ item.note.meanings.slice(0, 3).join(', ') }}</span>
       </p>
       <p class="mt-1 flex flex-wrap gap-1.5" lang="ja">

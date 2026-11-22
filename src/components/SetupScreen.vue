@@ -17,7 +17,7 @@ const classCode = ref('');
         v-for="level in JLPT_LEVELS"
         :key="level"
         colour="paper"
-        class="min-h-12 font-card text-lg font-semibold"
+        class="min-h-12 text-lg font-semibold"
         @click="$emit('start', level, classCode.trim() || null)"
       >
         {{ level }}

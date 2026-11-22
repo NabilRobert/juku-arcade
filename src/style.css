@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 /*
+ * The game's styles are Tailwind classes in the components. This file holds
+ * only what classes can't: the theme (colours, fonts, animations), the page
+ * base, and the pixel-art pieces that need SVG textures or a stepped clip
+ * path (decisions D30-D36).
+ */
+
+/*
  * A pixel font for English: "balatro" by localthunk, from FontStruct (OFL;
  * its licence and readme sit beside it in public/fonts/balatro/, as the
  * licence asks). It has no Japanese, so Japanese text falls through to
@@ -12,21 +19,12 @@
   font-display: swap;
 }
 
-/*
- * The karuta table look (decisions D30, D32, D33): pixel karuta cards of
- * washi paper with a crimson hanko stamp, on a navy table. Every colour is a token here, so the
- * look changes in one place. Textures are CSS gradients, not image files.
- */
 @theme {
   /* English in the pixel font, Japanese in Kuronuri, then system fonts if a webfont fails (D31, D41). */
   --font-sans:
     'balatro', 'Kuronuri 70', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
-  --font-card: 'balatro', 'Kuronuri 70', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
 
-  /*
-   * The palette (D33): a navy table, steel blue, pale aqua
-   * highlights, off-white paper and a dark crimson accent.
-   */
+  /* The palette (D33): a navy table, steel blue, pale aqua highlights, off-white paper and a dark crimson accent. */
   --color-lacquer: #1b3a57;
   --color-lacquer-light: #2a5478;
   --color-wood: #16304a;
@@ -34,137 +32,129 @@
   --color-washi-shade: #d6ece8;
   --color-sumi: #13283d;
   --color-crimson: #9b1b30;
-  --color-crimson-light: #b8324a;
   --color-aqua: #a8dadc;
   --color-steel: #457b9d;
-  --color-steel-light: #5b8fb0;
 
+  /* A wrong tap shakes both cards (L4). */
   --animate-shake: shake 0.35s ease-in-out;
+  /* At full heat the table's glow breathes. */
   --animate-glow: glow 1.6s ease-in-out infinite;
+  /* Cards bob and sway while they wait; each card sets how far (--float-px, --float-deg). */
   --animate-float: float 3s ease-in-out infinite;
+  /* A click's colour wipe (PixelButton.vue): in from both edges, then fading; or in and staying. */
+  --animate-wipe: wipe 0.3s forwards;
+  --animate-wipe-change: wipe-change 0.18s steps(10, end) forwards;
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-6px);
+    }
+    75% {
+      transform: translateX(6px);
+    }
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.5);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(calc(var(--float-deg) * -1));
+    }
+    50% {
+      transform: translateY(calc(var(--float-px) * -1)) rotate(var(--float-deg));
+    }
+  }
+
+  /* Fewer, slower steps read as lag, so the sweep is ten quick steps. */
+  @keyframes wipe {
+    0% {
+      transform: scaleX(0);
+      opacity: 1;
+      animation-timing-function: steps(10, end);
+    }
+    40% {
+      transform: scaleX(1);
+      opacity: 1;
+      animation-timing-function: ease-out;
+    }
+    100% {
+      transform: scaleX(1);
+      opacity: 0;
+    }
+  }
+
+  @keyframes wipe-change {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+@layer base {
+  /*
+   * The game fills the browser window on any desktop screen: every size in
+   * rem grows with the window's width (16 px at 1280 px wide, up to 24 px on
+   * very wide screens), and the cards' heights follow the window's height
+   * (GameBoard.vue), so a set always fits without scrolling.
+   */
+  html {
+    font-size: clamp(16px, 1.25vw, 24px);
+    /* Both fonts have one weight; a faked bold would smear the pixels. */
+    font-synthesis-weight: none;
+  }
+
+  body {
+    /* The moving table is drawn behind the page by TableBackground.vue. */
+    background-color: var(--color-lacquer);
+    color: var(--color-washi);
+  }
 }
 
 /*
- * The game fills the browser window on any desktop screen: every size in
- * rem grows with the window's width (16 px at 1280 px wide, up to 24 px on
- * very wide screens), and the cards' heights follow the window's height
- * (GameBoard.vue), so a set always fits without scrolling.
+ * Pixel-art textures as tiny SVG tiles (D32). A "pixel" is --pixel: the
+ * card's own on cards (CardFrame.vue), so the art lines up with it, and
+ * 3 px elsewhere.
  */
-html {
-  font-size: clamp(16px, 1.25vw, 24px);
-  /* Both fonts have one weight; a faked bold would smear the pixels. */
-  font-synthesis-weight: none;
-}
 
-body {
-  /* The moving table is drawn behind the page by TableBackground.vue. */
-  background-color: var(--color-lacquer);
-  color: var(--color-washi);
-}
-
-/*
- * Washi paper, as pixel art (D32): flat paper with a few hard-edged pixel
- * specks on a 6-pixel grid. A "pixel" is the card's own (--pixel), so the
- * specks line up with the card art; panels and buttons use 3 px.
- */
-.washi {
+/* Washi paper: flat paper with a few hard-edged specks on a 6-pixel grid. */
+@utility washi {
   background-color: var(--color-washi);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Crect x='1' y='1' width='1' height='1' fill='%23457b9d' fill-opacity='0.22'/%3E%3Crect x='4' y='4' width='1' height='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%23457b9d' fill-opacity='0.08'/%3E%3C/svg%3E");
   background-size: calc(var(--pixel, 3px) * 6) calc(var(--pixel, 3px) * 6);
 }
 
-/* The back of a card, as pixel art: a crimson diamond lattice on an 8-pixel grid. */
-.card-back {
+/* A card's back: a crimson diamond lattice on an 8-pixel grid. */
+@utility card-back {
   background-color: var(--color-crimson);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='3' y='0' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='4' y='0' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='2' y='1' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='5' y='1' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='6' y='2' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='6' y='5' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='5' y='6' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='4' y='7' width='1' height='1' fill='%23b8324a'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23f1faee' fill-opacity='0.35'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23f1faee' fill-opacity='0.35'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23f1faee' fill-opacity='0.35'/%3E%3Crect x='4' y='4' width='1' height='1' fill='%23f1faee' fill-opacity='0.35'/%3E%3C/svg%3E");
   background-size: calc(var(--pixel, 3px) * 8) calc(var(--pixel, 3px) * 8);
 }
 
-/*
- * A crested card's back (crest-mark.ts): the same lattice, lightened over
- * the crest's colour rather than crimson, so the whole back shows the crest.
- */
-.card-back-tinted {
+/* A crested card's back (crest-mark.ts): the lattice lightened over the crest's colour (--crest-tint). */
+@utility card-back-tinted {
   background-color: var(--crest-tint);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath d='M3 0h2v1H3zM2 1h1v1H2zM5 1h1v1H5zM1 2h1v1H1zM6 2h1v1H6zM0 3h1v2H0zM7 3h1v2H7zM1 5h1v1H1zM6 5h1v1H6zM2 6h1v1H2zM5 6h1v1H5zM3 7h2v1H3z' fill='%23ffffff' fill-opacity='0.22'/%3E%3Crect x='3' y='3' width='2' height='2' fill='%23f1faee' fill-opacity='0.35'/%3E%3C/svg%3E");
   background-size: calc(var(--pixel, 3px) * 8) calc(var(--pixel, 3px) * 8);
 }
 
-/* Behind the cards: an aqua and crimson glow that builds with the combo (GameBoard.vue). */
-.table-glow {
-  background-image: radial-gradient(
-    ellipse at 50% 50%,
-    rgb(168 218 220 / 0.3),
-    rgb(155 27 48 / 0.2) 45%,
-    transparent 72%
-  );
-  transition: opacity 0.5s ease-out;
-}
-
-/* At full heat the glow breathes. */
-@keyframes glow {
-  0%,
-  100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.5);
-  }
-}
-
-/* A wrong tap shakes both cards (L4). */
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-6px);
-  }
-  75% {
-    transform: translateX(6px);
-  }
-}
-
-/* Cards bob and sway while they wait; each card sets how far (--float-px, --float-deg). */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(calc(var(--float-deg) * -1));
-  }
-  50% {
-    transform: translateY(calc(var(--float-px) * -1)) rotate(var(--float-deg));
-  }
-}
-
-/* A faint glow from the centre of the table, over the swirl (TableBackground.vue). */
-.table-light {
-  background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.18), transparent 70%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-shake,
-  .animate-glow,
-  .animate-float {
-    animation: none;
-  }
-
-  /* Without its animation the wipe would stay drawn over the button. */
-  .pixel-wipe {
-    display: none;
-  }
-}
-
-/*
- * Pixel-art cards (D32, CardFrame.vue). Every layer has stepped corners two
- * "pixels" deep; a pixel is a share of the card's width, so the art grows
- * with the card. The shadow is hard and offset, as in 8-bit card sprites.
- */
-.pixel-shadow,
-.pixel-frame,
-.pixel-face,
-.pixel-panel,
-.pixel-button {
+/* Stepped corners two "pixels" deep, as on an 8-bit sprite (cards, panels and buttons). */
+@utility pixel-corners {
   clip-path: polygon(
     calc(var(--pixel) * 2) 0,
     calc(100% - var(--pixel) * 2) 0,
@@ -189,41 +179,16 @@ body {
   );
 }
 
-.pixel-shadow,
-.pixel-frame,
-.pixel-face {
-  --pixel: max(3px, 2.2cqw);
-  position: absolute;
-  pointer-events: none;
-}
-
-.pixel-shadow {
-  inset: 0;
-  translate: 0 calc(var(--pixel) * 2);
-  background: rgb(0 0 0 / 0.5);
-}
-
-/* A lit top edge and a dark bottom edge, so the frame reads as raised. */
-.pixel-frame {
-  inset: 0;
-  box-shadow:
-    inset 0 var(--pixel) 0 rgb(255 255 255 / 0.3),
-    inset 0 calc(var(--pixel) * -1) 0 rgb(0 0 0 / 0.3);
-}
-
-.pixel-face {
-  inset: calc(var(--pixel) * 3);
-  box-shadow: inset 0 0 0 var(--pixel) rgb(0 0 0 / 0.08);
-}
-
 /*
  * Pixel panels and buttons (D36): the cards' stepped corners, three screen
- * pixels deep, with a lit top edge and a shaded bottom edge.
+ * pixels deep, with a lit top edge and a shaded bottom edge. They sit in
+ * the components layer so a utility on the element (absolute, a colour)
+ * still wins.
  */
 @layer components {
-  /* In the components layer, so a utility class on the element (absolute, block) still wins. */
   .pixel-panel,
   .pixel-button {
+    @apply pixel-corners;
     --pixel: 3px;
     box-shadow:
       inset 0 var(--pixel) 0 rgb(255 255 255 / 0.18),
@@ -237,69 +202,5 @@ body {
   /* A transform, not translate: some buttons already use translate to sit in place. */
   .pixel-button:active:not(:disabled) {
     transform: translateY(2px);
-  }
-}
-
-/*
- * A click's colour wipe (PixelButton.vue): the button's --wipe colour
- * sweeps in from both edges in small steps, meets in the middle, then
- * fades back out, all within 0.3 s. Fewer, slower steps read as lag.
- */
-.pixel-wipe {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.pixel-wipe::before,
-.pixel-wipe::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  background: var(--wipe);
-  animation: wipe 0.3s forwards;
-}
-
-.pixel-wipe::before {
-  left: 0;
-  transform-origin: left;
-}
-
-.pixel-wipe::after {
-  right: 0;
-  transform-origin: right;
-}
-
-/* A wipe that changes the button's colour sweeps in and stays; the button then takes the colour. */
-.pixel-wipe.is-change::before,
-.pixel-wipe.is-change::after {
-  animation: wipe-change 0.18s steps(10, end) forwards;
-}
-
-@keyframes wipe-change {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes wipe {
-  0% {
-    transform: scaleX(0);
-    opacity: 1;
-    animation-timing-function: steps(10, end);
-  }
-  40% {
-    transform: scaleX(1);
-    opacity: 1;
-    animation-timing-function: ease-out;
-  }
-  100% {
-    transform: scaleX(1);
-    opacity: 0;
   }
 }

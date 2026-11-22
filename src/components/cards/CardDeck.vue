@@ -21,7 +21,7 @@ const LAYERS = 3;
     <span
       v-for="layer in LAYERS"
       :key="layer"
-      class="@container absolute inset-0 flex items-center justify-center font-card text-3xl text-aqua"
+      class="@container absolute inset-0 flex items-center justify-center text-3xl text-aqua"
       :style="{ transform: `translate(${-layer * 2}px, ${-layer * 3}px)` }"
     >
       <CardFrame frame="crimson" :is-face-down="true" />
