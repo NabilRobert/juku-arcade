@@ -193,7 +193,12 @@ flowchart LR
 4. Check-up answers update only the check-up history
    (**`applyCheckUp`**, kept in `Memory.checkUps`), never the review schedule
    or difficulty.
-5. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
+5. **Stats** (the footer link, **`StatsPage.vue`**) shows the player's own
+   numbers from this browser's event log (**`memory/stats.ts:
+   playerStats`**): words known, right answers today and overall, best
+   combo and set, play today, the words missed most and the kinds of
+   mistake made most. Kanji mode logs nothing, so it isn't counted.
+6. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
    as an anonymous JSON file. Slice 5b's report script reads these files.
 
 ## The flow, part 6: the reports (outside the app)
