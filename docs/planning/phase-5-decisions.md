@@ -434,7 +434,7 @@ Arthur asked for the rest of the UI to be pixelated like the cards, and
 for buttons to animate on click with colour sweeping in from left and
 right and meeting in the middle. Panels and buttons share the cards'
 stepped corners (three screen pixels), with a lit top edge and a shaded
-bottom edge. Every button is one component, `PixelButton.vue`, in five
+bottom edge. Every button is one component, `PixelButton.vue`, in four
 colours. On each click its wipe colour sweeps in from both edges in
 small `steps()`, then fades, within 0.3 s (Arthur found 0.5 s with six
 big steps looked like lag). When a click changes the button's colour (Pause

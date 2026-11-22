@@ -235,7 +235,8 @@ detected at each class size.
   `PixelButton.vue`, which also plays a click animation: its `--wipe`
   colour sweeps in from both edges in small steps, meets in the middle,
   then fades, within 0.3 s. A click that changes the button's colour (Pause
-  turning red) wipes in the new colour, which then stays.
+  or Sound off turning red, Resume or Sound on turning blue) wipes in the new
+  colour, which then stays.
 - **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
   body every card shares (a hard shadow, a thick frame with stepped pixel
   corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share

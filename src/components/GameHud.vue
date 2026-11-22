@@ -77,7 +77,7 @@ function toggleSound(): void {
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
     </PixelButton>
     <PixelButton
-      colour="ghost"
+      :colour="isMuted ? 'crimson' : 'steel'"
       class="min-h-9 px-4 text-xs"
       :aria-pressed="!isMuted"
       @click="toggleSound"
