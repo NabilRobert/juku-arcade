@@ -293,6 +293,11 @@ detected at each class size.
   seal: `PixelSeal.vue`, its circle worked out on a pixel grid in
   `pixel-seal.ts`. It sits beside the title, on every card back and on the
   deck.
+- **Icons** (D43) are pixel art drawn for the game: a magnifying glass on
+  Scout and a speaker on the sound switch (with sound, or crossed out).
+  Each is a grid of letters in `pixel-icons.ts`, one letter per pixel,
+  drawn by `PixelIcon.vue`. To change one, edit its grid; a new colour
+  needs a letter in `PALETTE`.
 - **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
   `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
   top edge and a shaded bottom edge. Every button outside the cards is a

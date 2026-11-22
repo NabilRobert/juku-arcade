@@ -8,6 +8,7 @@
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import PixelButton from '../components/PixelButton.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 import { SETS_PER_ROUND, type BankRun } from './bank-run.ts';
 import { itemById } from './items.ts';
 import { CRESTS } from './specials.ts';
@@ -70,7 +71,9 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       data-testid="scout"
       @click="$emit('scout')"
     >
-      🔍 Scout · {{ run.scoutsLeft }} left
+      <span class="inline-flex items-center gap-2">
+        <PixelIcon name="scout" /> Scout · {{ run.scoutsLeft }} left
+      </span>
     </PixelButton>
     <p class="text-sm">
       Wallet 🪙 <span data-testid="wallet">{{ run.wallet }}</span>
