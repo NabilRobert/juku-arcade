@@ -3,8 +3,10 @@
  * square blocks, and they blink out one by one in a curved front sweeping
  * from the top-left corner to the bottom-right, ragged at the edge like
  * dust blowing away, with nothing left behind. The left side always goes
- * before the right. PlayCard plays it as a series of
- * masks (Web Animations), each hiding a few more blocks.
+ * before the right. usePixelSnap plays it as a series of clip paths
+ * (Web Animations), each cutting away a few more blocks. Clip paths, not
+ * mask images: a mask image is loaded when it's swapped in, and the card
+ * shows unmasked, a flash, until it has loaded.
  */
 import type { RandomSource } from '../game/deal.ts';
 
@@ -14,7 +16,7 @@ import type { RandomSource } from '../game/deal.ts';
  */
 export const SNAP_COLUMNS = 30;
 export const SNAP_ROWS = 40;
-/** Masks in the animation; each hides the next band of blocks. */
+/** Steps in the animation; each cuts away the next band of blocks. */
 export const SNAP_FRAMES = 24;
 /** How ragged the edge is: each block's turn moves by up to this share of the whole snap. */
 const SNAP_JITTER = 0.1;
@@ -47,9 +49,16 @@ export function snapOrder(random: RandomSource): number[][] {
   return turns;
 }
 
-/** The blocks still showing in one row, as runs of neighbours, each drawn as one rectangle. */
-function rowRuns(rowTurns: number[], row: number, shownAfter: number): string {
-  let path = '';
+/** A run of neighbouring blocks still showing in one row, in blocks. */
+export interface BlockRun {
+  column: number;
+  row: number;
+  width: number;
+}
+
+/** The blocks still showing in one row, as runs of neighbours. */
+function rowRuns(rowTurns: number[], row: number, shownAfter: number): BlockRun[] {
+  const runs: BlockRun[] = [];
   let runStart = -1;
   rowTurns.forEach((turn, column) => {
     const isShown = turn > shownAfter;
@@ -57,25 +66,37 @@ function rowRuns(rowTurns: number[], row: number, shownAfter: number): string {
     const isRunOver = runStart !== -1 && (!isShown || column === rowTurns.length - 1);
     if (!isRunOver) return;
     const runEnd = isShown ? column + 1 : column;
-    path += `M${runStart} ${row}h${runEnd - runStart}v1H${runStart}z`;
+    runs.push({ column: runStart, row, width: runEnd - runStart });
     runStart = -1;
   });
-  return path;
+  return runs;
 }
 
-/** One mask, as a data URL: an SVG of the blocks still showing (black shows the card, empty hides it). */
-function maskFor(turns: number[][], shownAfter: number): string {
-  const path = turns.map((rowTurns, row) => rowRuns(rowTurns, row, shownAfter)).join('');
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SNAP_COLUMNS} ${SNAP_ROWS}" ` +
-    `preserveAspectRatio="none" shape-rendering="crispEdges"><path d="${path}"/></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+/** Each step's blocks still showing, first (all of them) to last (none). */
+export function snapFrames(turns: number[][]): BlockRun[][] {
+  const frames: BlockRun[][] = [];
+  for (let frame = 0; frame <= SNAP_FRAMES; frame += 1) {
+    const shownAfter = frame / SNAP_FRAMES;
+    frames.push(turns.flatMap((rowTurns, row) => rowRuns(rowTurns, row, shownAfter)));
+  }
+  return frames;
 }
 
-/** The masks, first (every block showing) to last (none). */
-export function snapMasks(turns: number[][]): string[] {
-  const masks: string[] = [];
-  for (let frame = 0; frame <= SNAP_FRAMES; frame += 1)
-    masks.push(maskFor(turns, frame / SNAP_FRAMES));
-  return masks;
+/** Rounds to hundredths of a pixel, to keep the paths short. */
+const px = (value: number): number => Math.round(value * 100) / 100;
+
+/**
+ * One step as a CSS clip path over a card of the given size in pixels: a
+ * rectangle per run. With nothing left, a single point clips everything.
+ */
+export function toClipPath(runs: readonly BlockRun[], width: number, height: number): string {
+  if (runs.length === 0) return 'path("M0 0")';
+  const blockWidth = width / SNAP_COLUMNS;
+  const blockHeight = height / SNAP_ROWS;
+  const rectangles = runs.map(({ column, row, width: blocks }) => {
+    const left = px(column * blockWidth);
+    const runWidth = px(blocks * blockWidth);
+    return `M${left} ${px(row * blockHeight)}h${runWidth}v${px(blockHeight)}h${-runWidth}z`;
+  });
+  return `path("${rectangles.join('')}")`;
 }

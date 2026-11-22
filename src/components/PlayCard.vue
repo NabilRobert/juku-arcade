@@ -203,11 +203,7 @@ function onClick(): void {
     @click="onClick"
     @animation-complete="isDealt = true"
   >
-    <span
-      ref="snapLayer"
-      class="pixel-snap absolute inset-0 [transform-style:preserve-3d]"
-      :style="tiltStyle"
-    >
+    <span ref="snapLayer" class="absolute inset-0 [transform-style:preserve-3d]" :style="tiltStyle">
       <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
         <CardFrame :frame="frame" :is-face-down="false" />
         <span

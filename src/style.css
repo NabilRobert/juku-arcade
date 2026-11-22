@@ -148,14 +148,6 @@ body {
   background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.18), transparent 70%);
 }
 
-/* The pixel snap's masks (pixel-snap.ts) stretch over the whole card, one block per square. */
-.pixel-snap {
-  mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animate-shake,
   .animate-glow,
