@@ -450,3 +450,26 @@ motion the wipe is skipped.
 reading cards too, with a crimson back. A wrong card's frame now turns
 dark instead of crimson, so it still stands out, with its shake and ✗.
 
+### D37: A kanji mode, as separate practice (settled: Arthur's choices, 2026-11-22)
+
+Arthur asked for a second mode: one kanji shown, a hand of 8 reading
+cards, and the player picks every reading that belongs to it, whether
+that's one card or all eight.
+
+- **Right answers:** the readings the kanji has in this level's words,
+  not every reading in the dictionary (生 lists 20, many rare). A wrong
+  card is a reading of another kanji that the dictionary doesn't list
+  for this one, so it's never secretly right. Kanji are picked in
+  proportion to their readings (up to 4), since most kanji have just one
+  reading in a level.
+- **Separate practice:** kanji mode has its own score and combo and logs
+  no events, so the word reviews and the school's measurement stay as
+  designed. Its play time still counts toward the nudges and the daily
+  cap, through the same clock tick as word mode.
+- **Picking the mode:** on a start screen each time the game opens, and
+  from "Change mode".
+- **Beat:** every dictionary reading (rare ones learners never meet);
+  feeding kanji results into the reviews (new event types and report
+  changes, and it would change what the school measures); a toggle in the
+  side panel (Arthur preferred the start screen).
+

@@ -50,6 +50,7 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 | `scripts/report/`  | The reports: loading exports, the measurement, the class, ability and play reports                                |
 | `src/deck/`        | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game        |
 | `src/game/`        | Game rules in plain TypeScript with no Vue: dealing, taps, levels, score, tags, events, tuning                    |
+| `src/kanji/`       | Kanji mode: its readings, dealing and scoring rounds, and the run that plays them                                 |
 | `src/memory/`      | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
 | `src/background/`  | The swirling table: a WebGL shader drawn behind the game                                                          |
 | `src/composables/` | `useRun` connects the rules to the clock, storage and screen; the rest deal, lay out and throw cards              |
