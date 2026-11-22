@@ -2,9 +2,9 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
-import ComboMeter from '../src/components/ComboMeter.vue';
-import { rankFor } from '../src/components/combo-ranks.ts';
-import { THROW_S } from '../src/components/card-motion.ts';
+import ComboMeter from '../src/components/ui/ComboMeter.vue';
+import { rankFor } from '../src/components/ui/combo-ranks.ts';
+import { THROW_S } from '../src/components/cards/card-motion.ts';
 import { useGameFeel } from '../src/composables/useGameFeel.ts';
 import type { RunState } from '../src/game/run.ts';
 import { comboPitch, isMuted, playSound, setMuted } from '../src/sound/sfx.ts';

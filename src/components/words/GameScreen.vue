@@ -8,24 +8,24 @@
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
 import { computed } from 'vue';
-import type { Deck } from '../deck/types.ts';
-import type { GameEvent } from '../game/events.ts';
-import { useRun } from '../composables/useRun.ts';
-import { useWellbeing } from '../composables/useWellbeing.ts';
-import { usePauseKey } from '../composables/usePauseKey.ts';
-import type { Settings } from '../memory/storage.ts';
+import type { Deck } from '../../deck/types.ts';
+import type { GameEvent } from '../../game/events.ts';
+import { useRun } from '../../composables/useRun.ts';
+import { useWellbeing } from '../../composables/useWellbeing.ts';
+import { usePauseKey } from '../../composables/usePauseKey.ts';
+import type { Settings } from '../../memory/storage.ts';
 import CardBack from './CardBack.vue';
 import DailyBar from './DailyBar.vue';
 import GameBoard from './GameBoard.vue';
 import GameHud from './GameHud.vue';
 import MissedTray from './MissedTray.vue';
 import ScoreBreakdown from './ScoreBreakdown.vue';
-import WellbeingGate from './WellbeingGate.vue';
-import BankPanel from '../roguelike/BankPanel.vue';
-import RunOver from '../roguelike/RunOver.vue';
-import ShopOffer from '../roguelike/ShopOffer.vue';
-import { useBankRun } from '../roguelike/useBankRun.ts';
-import { CRESTS } from '../roguelike/specials.ts';
+import WellbeingGate from '../WellbeingGate.vue';
+import BankPanel from '../bank-run/BankPanel.vue';
+import RunOver from '../bank-run/RunOver.vue';
+import ShopOffer from '../bank-run/ShopOffer.vue';
+import { useBankRun } from '../../bank-run/useBankRun.ts';
+import { CRESTS } from '../../bank-run/crests.ts';
 
 const props = defineProps<{
   deck: Deck;

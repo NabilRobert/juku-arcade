@@ -8,7 +8,7 @@
  * mask images: a mask image is loaded when it's swapped in, and the card
  * shows unmasked, a flash, until it has loaded.
  */
-import type { RandomSource } from '../game/deal.ts';
+import type { RandomSource } from '../../game/deal.ts';
 
 /**
  * The card in blocks: 30 across and 40 down, so the blocks are square on a

@@ -265,7 +265,7 @@ detected at each class size.
   size, stretched to fill it, about 30 times a second.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
-  system's reduce-motion setting. `components/card-motion.ts` says how
+  system's reduce-motion setting. `components/cards/card-motion.ts` says how
   each card moves: a new set comes off the deck face down, one card after
   another, turning face up as it flies; pausing turns every card over in
   a wave (each card draws a front and a back, `PlayCard.vue`); a held
@@ -273,7 +273,7 @@ detected at each class size.
   reading card flies on, spinning, to its word card and hits it, and
   both then vanish block by block in a curved front sweeping from the
   top-left corner to the bottom-right, like dust blowing away (the pixel snap,
-  `components/pixel-snap.ts`, played by `composables/usePixelSnap.ts`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
+  `components/cards/pixel-snap.ts`, played by `composables/usePixelSnap.ts`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
   bundle. Every card sits in a slot the size of the card that never moves
   (`composables/useTableSlots.ts`), so the slots can be measured before
   any card is drawn: `useDeal.ts` measures where the deck is from each
@@ -284,7 +284,7 @@ detected at each class size.
   (`float` in `style.css`) bobs and sways it, each card out of step with
   the next (`floatStyle`).
   Every card also tilts in 3D toward the mouse while it's over the card
-  (`composables/useCardTilt.ts`, maths in `components/card-tilt.ts`), on
+  (`composables/useCardTilt.ts`, maths in `components/cards/card-tilt.ts`), on
   a layer inside the card so it adds to whatever Motion is doing.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
@@ -329,7 +329,7 @@ detected at each class size.
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
   combo between the two rows as a style rank (D39), a letter grade from F
-  up to SSS (`components/combo-ranks.ts`) with a word of praise (がんばれ, よし,
+  up to SSS (`components/ui/combo-ranks.ts`) with a word of praise (がんばれ, よし,
   いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), the combo count and a bar
   toward the next rank. Each rank-up slams the letter in with a sound, and
   the meter floats gently while it waits. A glow behind the cards
@@ -389,7 +389,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
-| **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `roguelike/specials.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
+| **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `bank-run/crests.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
 | **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
@@ -431,7 +431,7 @@ fields. They stay in memory until slice 3 stores them.
   and `tests/kanji-run.test.ts`. Crests' chances, points and scouts are
   at the top of `kanji/kanji-crests.ts` (specs:
   `tests/kanji-crests.test.ts`); their colours are `tint` in
-  `roguelike/specials.ts`.
+  `bank-run/crests.ts`.
 - **Change how a hand is laid out or played:** the rules (which slot a
   click fills, when Play is ready, the play order) are in
   `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between
@@ -449,9 +449,9 @@ fields. They stay in memory until slice 3 stores them.
 - **Change colours, fonts or textures:** edit the tokens and classes in
   `src/style.css`.
 - **Change a button's colours or its click wipe:** `COLOURS` in
-  `components/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
+  `components/ui/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
   `style.css`).
-- **Change an animation:** card motion is in `components/card-motion.ts`
+- **Change an animation:** card motion is in `components/cards/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
   `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
   `FLIP_STAGGER_S` the pause flip, `MAX_TILT_DEG` in `card-tilt.ts` how far a
@@ -462,10 +462,10 @@ fields. They stay in memory until slice 3 stores them.
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
 - **Change how the combo builds:** the ranks, their thresholds, praise and
-  colours are `COMBO_RANKS` in `components/combo-ranks.ts`; the glow's brightest combo is
+  colours are `COMBO_RANKS` in `components/ui/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
-  `components/throw-geometry.ts`.
+  `components/cards/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and
   `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
   the hand's row is `HAND_TILTS_DEG`, `HAND_RAISES_PX` and `HAND_OVERLAP` in

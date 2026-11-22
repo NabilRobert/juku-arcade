@@ -44,24 +44,30 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 
 ## Layout
 
-| Folder             | What it holds                                                                                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `scripts/`         | The deck build (reads pinned OpenJLPT, writes `public/decks/<level>.json`), the report script and the power check |
-| `scripts/report/`  | The reports: loading exports, the measurement, the class, ability and play reports                                |
-| `src/deck/`        | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game        |
-| `src/game/`        | Game rules in plain TypeScript with no Vue: dealing, taps, levels, score, tags, events, tuning                    |
-| `src/kanji/`       | Kanji mode: its readings, dealing and scoring rounds, and the run that plays them                                 |
-| `src/memory/`      | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
-| `src/background/`  | The swirling table: a WebGL shader drawn behind the game                                                          |
-| `src/composables/` | `useRun` connects the rules to the clock, storage and screen; the rest deal, lay out and throw cards              |
-| `src/components/`  | Vue components: the board, the cards, the side panel, the check-up, settings                                      |
-| `public/fonts/`    | The pixel font for English, with its licence (OFL); Japanese uses Kuronuri from npm                               |
-| `public/sounds/`   | Card sounds from Kenney's Casino Audio pack (CC0, licence included)                                               |
-| `public/_headers`  | Cloudflare Pages headers: the content security policy and caching                                                 |
-| `tests/`           | Vitest specs, one behaviour each                                                                                  |
-| `docs/guide.md`    | How a request flows through the code, a glossary, and where to change things                                      |
-| `docs/playtest.md` | Deploying, watching learners play, tuning, and reading the reports                                                |
-| `docs/spikes/`     | Spike reports                                                                                                     |
+| Folder                     | What it holds                                                                                                     |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `scripts/`                 | The deck build (reads pinned OpenJLPT, writes `public/decks/<level>.json`), the report script and the power check |
+| `scripts/report/`          | The reports: loading exports, the measurement, the class, ability and play reports                                |
+| `src/deck/`                | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game        |
+| `src/game/`                | Game rules in plain TypeScript with no Vue: dealing, taps, levels, score, tags, events, tuning                    |
+| `src/kanji/`               | Kanji mode: its readings, dealing and scoring rounds, and the run that plays them                                 |
+| `src/bank-run/`            | The bank run: the pot, wallet, rounds and shop, the items, and the crests on the cards                            |
+| `src/memory/`              | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
+| `src/background/`          | The swirling table: a WebGL shader drawn behind the game                                                          |
+| `src/composables/`         | `useRun` connects the rules to the clock, storage and screen; the rest deal, lay out and throw cards              |
+| `src/components/`          | App-level screens: setup, check-up, mode picker, settings, stats, wellbeing, the table                            |
+| `src/components/cards/`    | The card (front, back, frame, deck) and how it moves: dealing, tilting, throwing, dissolving                      |
+| `src/components/words/`    | Word mode: its screen, board, side panel, missed tray and score                                                   |
+| `src/components/kanji/`    | Kanji mode: its screen, board, result and scout panel                                                             |
+| `src/components/bank-run/` | The bank run on screen: its panel, shop and end screen                                                            |
+| `src/components/ui/`       | Shared pixel pieces: buttons, icons, the seal, stat panels, notices, the combo meter                              |
+| `public/fonts/`            | The pixel font for English, with its licence (OFL); Japanese uses Kuronuri from npm                               |
+| `public/sounds/`           | Card sounds from Kenney's Casino Audio pack (CC0, licence included)                                               |
+| `public/_headers`          | Cloudflare Pages headers: the content security policy and caching                                                 |
+| `tests/`                   | Vitest specs, one behaviour each                                                                                  |
+| `docs/guide.md`            | How a request flows through the code, a glossary, and where to change things                                      |
+| `docs/playtest.md`         | Deploying, watching learners play, tuning, and reading the reports                                                |
+| `docs/spikes/`             | Spike reports                                                                                                     |
 
 ## Data and licences
 

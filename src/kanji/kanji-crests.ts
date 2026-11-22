@@ -1,5 +1,5 @@
 /**
- * Crests in kanji mode (D42): the bank run's crests (roguelike/specials.ts)
+ * Crests in kanji mode (D42): the bank run's crests (bank-run/crests.ts)
  * as score bonuses, since kanji mode has no pot. A round may hide a good
  * crest on one right reading and a curse on one wrong reading; the player
  * sees them only by scouting (useKanjiCrests.ts), which flips the hand
@@ -7,7 +7,7 @@
  * right adds a random bonus, and a cursed card picked costs points.
  */
 import type { RandomSource } from '../game/deal.ts';
-import { CRESTS, type CrestKind } from '../roguelike/specials.ts';
+import { CRESTS, type CrestKind } from '../bank-run/crests.ts';
 import { POINTS_PER_HIT, type KanjiRound } from './kanji-round.ts';
 
 /** The chance a round hides a good crest, and a curse. */

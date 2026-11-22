@@ -1,7 +1,7 @@
 // The pixel button: a colour wipe on every click, and the parent's own click and attributes still work.
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import PixelButton from '../src/components/PixelButton.vue';
+import PixelButton from '../src/components/ui/PixelButton.vue';
 
 describe('the pixel button', () => {
   it('plays a fresh colour wipe on every click', async () => {

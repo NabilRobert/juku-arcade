@@ -8,7 +8,7 @@
  */
 import { useReducedMotion } from 'motion-v';
 import { useTemplateRef, watch } from 'vue';
-import { snapFrames, snapOrder, toClipPath } from '../components/pixel-snap.ts';
+import { snapFrames, snapOrder, toClipPath } from '../components/cards/pixel-snap.ts';
 
 /** How long the snap takes, from the first block to the last. */
 const SNAP_MS = 650;

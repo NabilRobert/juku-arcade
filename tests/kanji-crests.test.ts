@@ -2,8 +2,8 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { defineComponent, h } from 'vue';
-import KanjiResult from '../src/components/KanjiResult.vue';
-import PlayCard from '../src/components/PlayCard.vue';
+import KanjiResult from '../src/components/kanji/KanjiResult.vue';
+import PlayCard from '../src/components/cards/PlayCard.vue';
 import {
   crestBonus,
   CURSE_POINTS,
@@ -13,7 +13,7 @@ import {
 } from '../src/kanji/kanji-crests.ts';
 import { POINTS_PER_HIT, type KanjiRound } from '../src/kanji/kanji-round.ts';
 import { useKanjiCrests } from '../src/kanji/useKanjiCrests.ts';
-import { CRESTS } from '../src/roguelike/specials.ts';
+import { CRESTS } from '../src/bank-run/crests.ts';
 import { seededRandom } from './helpers/fixtures.ts';
 
 const ROUND: KanjiRound = {

@@ -7,7 +7,7 @@
 import { computed, onUnmounted, ref } from 'vue';
 import type { GameEvent, SessionIdentity } from '../game/events.ts';
 import { checkUpEvent, SECONDS_PER_QUESTION, type Question } from '../memory/check-up.ts';
-import PixelButton from './PixelButton.vue';
+import PixelButton from './ui/PixelButton.vue';
 
 const props = defineProps<{ questions: readonly Question[]; identity: SessionIdentity }>();
 const emit = defineEmits<{ done: [events: GameEvent[]]; skip: [] }>();

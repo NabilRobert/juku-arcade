@@ -6,10 +6,10 @@
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
-import PixelButton from '../components/PixelButton.vue';
-import PixelIcon from '../components/PixelIcon.vue';
-import { MAX_ITEMS, type BankRun } from './bank-run.ts';
-import { itemById, type ItemId } from './items.ts';
+import PixelButton from '../ui/PixelButton.vue';
+import PixelIcon from '../ui/PixelIcon.vue';
+import { MAX_ITEMS, type BankRun } from '../../bank-run/bank-run.ts';
+import { itemById, type ItemId } from '../../bank-run/items.ts';
 
 const props = defineProps<{ run: BankRun }>();
 defineEmits<{ buy: [id: ItemId]; leave: [] }>();

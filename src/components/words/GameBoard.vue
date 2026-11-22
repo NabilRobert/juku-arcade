@@ -27,24 +27,24 @@
  */
 import { useAnimate, useReducedMotion } from 'motion-v';
 import { computed, watch } from 'vue';
-import { readingCardStatus, wordCardStatus } from '../game/card-status.ts';
-import type { PlayedPair } from '../game/hand.ts';
-import type { RunState } from '../game/run.ts';
-import type { DeckWord, JlptLevel } from '../deck/types.ts';
-import type { TagTable } from '../game/tags.ts';
-import { useDeal } from '../composables/useDeal.ts';
-import { useGameFeel } from '../composables/useGameFeel.ts';
-import { useHand } from '../composables/useHand.ts';
-import { useTableSlots } from '../composables/useTableSlots.ts';
-import { useThrows } from '../composables/useThrows.ts';
-import { playSound } from '../sound/sfx.ts';
-import CardDeck from './CardDeck.vue';
-import ComboMeter from './ComboMeter.vue';
-import PlayCard from './PlayCard.vue';
-import { floatStyle, handStyle, SLOT_SIZE } from './hand-layout.ts';
-import PixelButton from './PixelButton.vue';
-import type { Point } from './throw-geometry.ts';
-import type { CrestMark } from './crest-mark.ts';
+import { readingCardStatus, wordCardStatus } from '../../game/card-status.ts';
+import type { PlayedPair } from '../../game/hand.ts';
+import type { RunState } from '../../game/run.ts';
+import type { DeckWord, JlptLevel } from '../../deck/types.ts';
+import type { TagTable } from '../../game/tags.ts';
+import { useDeal } from '../../composables/useDeal.ts';
+import { useGameFeel } from '../../composables/useGameFeel.ts';
+import { useHand } from '../../composables/useHand.ts';
+import { useTableSlots } from '../../composables/useTableSlots.ts';
+import { useThrows } from '../../composables/useThrows.ts';
+import { playSound } from '../../sound/sfx.ts';
+import CardDeck from '../cards/CardDeck.vue';
+import ComboMeter from '../ui/ComboMeter.vue';
+import PlayCard from '../cards/PlayCard.vue';
+import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
+import PixelButton from '../ui/PixelButton.vue';
+import type { Point } from '../cards/throw-geometry.ts';
+import type { CrestMark } from '../cards/crest-mark.ts';
 
 const props = defineProps<{
   state: RunState;

@@ -8,7 +8,7 @@ import {
   snapOrder,
   toClipPath,
   type BlockRun,
-} from '../src/components/pixel-snap.ts';
+} from '../src/components/cards/pixel-snap.ts';
 import { seededRandom } from './helpers/fixtures.ts';
 
 /** How many blocks a step still shows: its runs' widths, added up. */

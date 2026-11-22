@@ -2,9 +2,9 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { nextTick } from 'vue';
-import KanjiBoard from '../src/components/KanjiBoard.vue';
+import KanjiBoard from '../src/components/kanji/KanjiBoard.vue';
 import ModePicker from '../src/components/ModePicker.vue';
-import PlayCard from '../src/components/PlayCard.vue';
+import PlayCard from '../src/components/cards/PlayCard.vue';
 import type { KanjiRound } from '../src/kanji/kanji-round.ts';
 
 const ROUND: KanjiRound = {

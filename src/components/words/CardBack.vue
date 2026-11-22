@@ -5,10 +5,10 @@
  * uses are highlighted, next to other words that use the same kanji.
  */
 import { computed } from 'vue';
-import { isKanji, REPEAT_MARK } from '../deck/kana.ts';
-import type { DeckWord, KanjiNote } from '../deck/types.ts';
+import { isKanji, REPEAT_MARK } from '../../deck/kana.ts';
+import type { DeckWord, KanjiNote } from '../../deck/types.ts';
 import FuriganaText from './FuriganaText.vue';
-import PixelButton from './PixelButton.vue';
+import PixelButton from '../ui/PixelButton.vue';
 
 const props = defineProps<{ word: DeckWord; kanji: Readonly<Record<string, KanjiNote>> }>();
 defineEmits<{ close: [] }>();

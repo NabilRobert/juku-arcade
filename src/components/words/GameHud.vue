@@ -6,11 +6,11 @@
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
-import { secondsLeft, type RunState } from '../game/run.ts';
-import { MAX_LEVEL } from '../game/tuning.ts';
-import PixelButton from './PixelButton.vue';
-import SoundToggle from './SoundToggle.vue';
-import StatPanel from './StatPanel.vue';
+import { secondsLeft, type RunState } from '../../game/run.ts';
+import { MAX_LEVEL } from '../../game/tuning.ts';
+import PixelButton from '../ui/PixelButton.vue';
+import SoundToggle from '../ui/SoundToggle.vue';
+import StatPanel from '../ui/StatPanel.vue';
 
 const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();

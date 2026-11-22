@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import PlayCard from '../src/components/PlayCard.vue';
+import PlayCard from '../src/components/cards/PlayCard.vue';
 import { PLAY_STEP_MS } from '../src/composables/useHand.ts';
 import { tapCard } from '../src/game/taps.ts';
 import type { RunState } from '../src/game/run.ts';

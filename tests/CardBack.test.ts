@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import CardBack from '../src/components/CardBack.vue';
-import MissedTray from '../src/components/MissedTray.vue';
+import CardBack from '../src/components/words/CardBack.vue';
+import MissedTray from '../src/components/words/MissedTray.vue';
 import type { DeckWord, KanjiNote } from '../src/deck/types.ts';
 import { deckWord } from './helpers/fixtures.ts';
 

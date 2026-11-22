@@ -1,10 +1,10 @@
 // The throw: a matched reading card flies to its word card, hits it, and both snap away.
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
-import PlayCard from '../src/components/PlayCard.vue';
-import { cardPose, dealtFrom, THROW_S } from '../src/components/card-motion.ts';
-import { SNAP_FRAMES } from '../src/components/pixel-snap.ts';
-import { centreOffset, placementBetween } from '../src/components/throw-geometry.ts';
+import PlayCard from '../src/components/cards/PlayCard.vue';
+import { cardPose, dealtFrom, THROW_S } from '../src/components/cards/card-motion.ts';
+import { SNAP_FRAMES } from '../src/components/cards/pixel-snap.ts';
+import { centreOffset, placementBetween } from '../src/components/cards/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';
 import { tapCard } from '../src/game/taps.ts';
 import { mountBoard } from './helpers/board.ts';

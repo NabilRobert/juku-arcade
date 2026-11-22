@@ -26,14 +26,14 @@
  */
 import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
-import type { CardStatus } from '../game/card-status.ts';
+import type { CardStatus } from '../../game/card-status.ts';
 import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
-import type { JlptLevel } from '../deck/types.ts';
-import { useCardTilt } from '../composables/useCardTilt.ts';
-import { usePixelSnap } from '../composables/usePixelSnap.ts';
+import type { JlptLevel } from '../../deck/types.ts';
+import { useCardTilt } from '../../composables/useCardTilt.ts';
+import { usePixelSnap } from '../../composables/usePixelSnap.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
-import PixelSeal from './PixelSeal.vue';
+import PixelSeal from '../ui/PixelSeal.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
 const props = defineProps<{

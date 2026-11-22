@@ -5,7 +5,7 @@
  * is on the page, and the board waits for it before drawing cards.
  */
 import { computed, type Ref } from 'vue';
-import { placementBetween, type Placement } from '../components/throw-geometry.ts';
+import { placementBetween, type Placement } from '../components/cards/throw-geometry.ts';
 import { boxOf, type Slots } from './useTableSlots.ts';
 
 export interface DealFrom {

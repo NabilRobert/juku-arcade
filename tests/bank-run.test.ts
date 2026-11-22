@@ -14,7 +14,7 @@ import {
   startBankRun,
   targetFor,
   type BankRun,
-} from '../src/roguelike/bank-run.ts';
+} from '../src/bank-run/bank-run.ts';
 
 const FIRST = () => 0;
 

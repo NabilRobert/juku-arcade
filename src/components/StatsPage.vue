@@ -11,8 +11,8 @@ import { localDay, type GameEvent } from '../game/events.ts';
 import { createLocalEngine } from '../memory/review-engine.ts';
 import { accuracy, playerStats, type AnswerCounts } from '../memory/stats.ts';
 import type { Settings } from '../memory/storage.ts';
-import PixelButton from './PixelButton.vue';
-import StatPanel from './StatPanel.vue';
+import PixelButton from './ui/PixelButton.vue';
+import StatPanel from './ui/StatPanel.vue';
 
 const props = defineProps<{ deck: Deck; settings: Settings; events: readonly GameEvent[] }>();
 defineEmits<{ close: [] }>();

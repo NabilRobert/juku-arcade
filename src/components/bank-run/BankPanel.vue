@@ -6,13 +6,13 @@
  * (a pot lost, a crest paying out) drops away under the pot.
  */
 import { computed } from 'vue';
-import PixelButton from '../components/PixelButton.vue';
-import PixelIcon from '../components/PixelIcon.vue';
-import { SETS_PER_ROUND, type BankRun } from './bank-run.ts';
-import { itemById } from './items.ts';
-import { CRESTS } from './specials.ts';
-import type { Notice } from '../composables/useNotice.ts';
-import FloatingNotice from '../components/FloatingNotice.vue';
+import PixelButton from '../ui/PixelButton.vue';
+import PixelIcon from '../ui/PixelIcon.vue';
+import { SETS_PER_ROUND, type BankRun } from '../../bank-run/bank-run.ts';
+import { itemById } from '../../bank-run/items.ts';
+import { CRESTS } from '../../bank-run/crests.ts';
+import type { Notice } from '../../composables/useNotice.ts';
+import FloatingNotice from '../ui/FloatingNotice.vue';
 
 const props = defineProps<{ run: BankRun; notice: Notice | null; canScout: boolean }>();
 defineEmits<{ bank: []; scout: [] }>();

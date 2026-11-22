@@ -5,7 +5,7 @@
  * hangs just below it and never catches the pointer.
  */
 import { m } from 'motion-v';
-import type { Notice } from '../composables/useNotice.ts';
+import type { Notice } from '../../composables/useNotice.ts';
 
 defineProps<{ notice: Notice | null }>();
 

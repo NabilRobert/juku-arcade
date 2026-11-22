@@ -3,7 +3,7 @@
  * The last kanji round's result in the side panel: how many readings were
  * found, missed and wrong, and what its crests added or took (D42).
  */
-import type { PlayedRound } from '../kanji/useKanjiRun.ts';
+import type { PlayedRound } from '../../kanji/useKanjiRun.ts';
 
 defineProps<{ result: PlayedRound | null }>();
 </script>

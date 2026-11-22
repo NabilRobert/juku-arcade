@@ -3,8 +3,8 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import type { RunState } from '../src/game/run.ts';
-import { FIRST_TARGET, SETS_PER_ROUND } from '../src/roguelike/bank-run.ts';
-import { useBankRun } from '../src/roguelike/useBankRun.ts';
+import { FIRST_TARGET, SETS_PER_ROUND } from '../src/bank-run/bank-run.ts';
+import { useBankRun } from '../src/bank-run/useBankRun.ts';
 import { start } from './helpers/run.ts';
 
 vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({

@@ -8,7 +8,7 @@
  * go, so the slap, the chime and the shake wait for the throw (THROW_S).
  */
 import { ref, watch } from 'vue';
-import { THROW_S } from '../components/card-motion.ts';
+import { THROW_S } from '../components/cards/card-motion.ts';
 import type { RunState } from '../game/run.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import { useLater } from './useLater.ts';

@@ -23,14 +23,14 @@ import {
 } from './memory/storage.ts';
 import AboutData from './components/AboutData.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
-import GameScreen from './components/GameScreen.vue';
-import KanjiScreen from './components/KanjiScreen.vue';
+import GameScreen from './components/words/GameScreen.vue';
+import KanjiScreen from './components/kanji/KanjiScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
-import PixelSeal from './components/PixelSeal.vue';
+import PixelSeal from './components/ui/PixelSeal.vue';
 
 type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode' | 'stats';
 

@@ -5,12 +5,12 @@
  * floating away. Scouting flips the hand over to show the crests; the
  * button turns red while it's flipped and turns the hand back.
  */
-import { KANJI_CREST_EFFECTS } from '../kanji/kanji-crests.ts';
-import { CRESTS } from '../roguelike/specials.ts';
-import type { Notice } from '../composables/useNotice.ts';
-import FloatingNotice from './FloatingNotice.vue';
-import PixelButton from './PixelButton.vue';
-import PixelIcon from './PixelIcon.vue';
+import { KANJI_CREST_EFFECTS } from '../../kanji/kanji-crests.ts';
+import { CRESTS } from '../../bank-run/crests.ts';
+import type { Notice } from '../../composables/useNotice.ts';
+import FloatingNotice from '../ui/FloatingNotice.vue';
+import PixelButton from '../ui/PixelButton.vue';
+import PixelIcon from '../ui/PixelIcon.vue';
 
 defineProps<{
   scoutsLeft: number;

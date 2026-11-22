@@ -1,8 +1,8 @@
 // The pixel-art icons: well-formed grids, and the sound switch showing the right speaker.
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it } from 'vitest';
-import SoundToggle from '../src/components/SoundToggle.vue';
-import { iconPaths, ICONS, type IconName } from '../src/components/pixel-icons.ts';
+import SoundToggle from '../src/components/ui/SoundToggle.vue';
+import { iconPaths, ICONS, type IconName } from '../src/components/ui/pixel-icons.ts';
 import { setMuted } from '../src/sound/sfx.ts';
 
 describe('the pixel icons', () => {

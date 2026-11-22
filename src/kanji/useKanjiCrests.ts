@@ -6,10 +6,10 @@
  * scouts and earns one per perfect round, up to three.
  */
 import { computed, ref, shallowRef } from 'vue';
-import type { CrestMark } from '../components/crest-mark.ts';
+import type { CrestMark } from '../components/cards/crest-mark.ts';
 import { useNotice } from '../composables/useNotice.ts';
 import type { RandomSource } from '../game/deal.ts';
-import { CRESTS, type CrestKind } from '../roguelike/specials.ts';
+import { CRESTS, type CrestKind } from '../bank-run/crests.ts';
 import { crestBonus, dealKanjiCrests, MAX_SCOUTS, SCOUTS_AT_START } from './kanji-crests.ts';
 import type { KanjiRound } from './kanji-round.ts';
 

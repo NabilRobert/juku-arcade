@@ -9,18 +9,18 @@
  */
 import { useAnimate, useReducedMotion } from 'motion-v';
 import { reactive, watch } from 'vue';
-import type { JlptLevel } from '../deck/types.ts';
-import type { CardStatus } from '../game/card-status.ts';
-import type { KanjiRound } from '../kanji/kanji-round.ts';
-import type { CrestMark } from './crest-mark.ts';
-import { boxOf, useTableSlots } from '../composables/useTableSlots.ts';
-import { useDeal } from '../composables/useDeal.ts';
-import CardDeck from './CardDeck.vue';
-import ComboMeter from './ComboMeter.vue';
-import PixelButton from './PixelButton.vue';
-import PlayCard from './PlayCard.vue';
-import { floatStyle, handStyle, SLOT_SIZE } from './hand-layout.ts';
-import { centreOffset, type Offset } from './throw-geometry.ts';
+import type { JlptLevel } from '../../deck/types.ts';
+import type { CardStatus } from '../../game/card-status.ts';
+import type { KanjiRound } from '../../kanji/kanji-round.ts';
+import type { CrestMark } from '../cards/crest-mark.ts';
+import { boxOf, useTableSlots } from '../../composables/useTableSlots.ts';
+import { useDeal } from '../../composables/useDeal.ts';
+import CardDeck from '../cards/CardDeck.vue';
+import ComboMeter from '../ui/ComboMeter.vue';
+import PixelButton from '../ui/PixelButton.vue';
+import PlayCard from '../cards/PlayCard.vue';
+import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
+import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 
 /** Eight cards overlap more than word mode's six, to fit the same width. */
 const HAND_OVERLAP = '-4dvh';

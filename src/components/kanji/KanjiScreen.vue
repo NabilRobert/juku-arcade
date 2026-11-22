@@ -11,17 +11,17 @@
  * show them (KanjiScoutPanel.vue).
  */
 import { computed } from 'vue';
-import type { Deck } from '../deck/types.ts';
-import { useKanjiRun } from '../kanji/useKanjiRun.ts';
-import { usePlayClock } from '../composables/usePlayClock.ts';
-import { useWellbeing } from '../composables/useWellbeing.ts';
-import type { Settings } from '../memory/storage.ts';
+import type { Deck } from '../../deck/types.ts';
+import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
+import { usePlayClock } from '../../composables/usePlayClock.ts';
+import { useWellbeing } from '../../composables/useWellbeing.ts';
+import type { Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
-import SoundToggle from './SoundToggle.vue';
-import WellbeingGate from './WellbeingGate.vue';
-import StatPanel from './StatPanel.vue';
+import SoundToggle from '../ui/SoundToggle.vue';
+import WellbeingGate from '../WellbeingGate.vue';
+import StatPanel from '../ui/StatPanel.vue';
 
 const props = defineProps<{
   deck: Deck;

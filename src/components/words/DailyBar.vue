@@ -4,7 +4,7 @@
  * (L12). Days played, not a streak, so missing a day costs nothing.
  */
 import { computed } from 'vue';
-import type { Progress } from '../memory/review-engine.ts';
+import type { Progress } from '../../memory/review-engine.ts';
 
 const props = defineProps<{ progress: Progress; level: string }>();
 

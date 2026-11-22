@@ -1,5 +1,5 @@
 /**
- * The crests on a bank run's word cards (specials.ts): which cards
+ * The crests on a bank run's word cards (crests.ts): which cards
  * carry one this set, scouting (a limited pause that shows them), and what
  * a marked card does when it's matched or missed. useBankRun calls these
  * from its watch on the run.
@@ -8,7 +8,7 @@ import { computed, ref, shallowRef, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import type { RunState } from '../game/run.ts';
 import { addCoins, takeCoins, useScout, type BankRun } from './bank-run.ts';
-import { CRESTS, CURSE_COST, dealCrests, drawOmikuji, type CrestKind } from './specials.ts';
+import { CRESTS, CURSE_COST, dealCrests, drawOmikuji, type CrestKind } from './crests.ts';
 
 type Notify = (text: string, isGood: boolean) => void;
 

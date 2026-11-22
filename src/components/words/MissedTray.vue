@@ -3,8 +3,8 @@
  * This run's latest missed words (L9). While paused, tap one to flip it:
  * these are past misses, so flipping them is free.
  */
-import type { DeckWord } from '../deck/types.ts';
-import PixelButton from './PixelButton.vue';
+import type { DeckWord } from '../../deck/types.ts';
+import PixelButton from '../ui/PixelButton.vue';
 
 defineProps<{ words: readonly DeckWord[]; isPaused: boolean }>();
 defineEmits<{ flip: [word: DeckWord] }>();

@@ -6,7 +6,7 @@
  *
  * A scouted crest (D42) uses the same seal with its own symbol and colour.
  */
-import { DECK_MARK } from './deck-mark.ts';
+import { DECK_MARK } from '../cards/deck-mark.ts';
 import { SEAL_DISC, SEAL_GRID, SEAL_RING } from './pixel-seal.ts';
 
 withDefaults(defineProps<{ mark?: string; ink?: string; label?: string }>(), {

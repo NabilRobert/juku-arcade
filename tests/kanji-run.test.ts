@@ -2,7 +2,7 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
-import { THROW_S } from '../src/components/card-motion.ts';
+import { THROW_S } from '../src/components/cards/card-motion.ts';
 import { PLAY_STEP_MS } from '../src/composables/useHand.ts';
 import type { Deck, KanjiNote } from '../src/deck/types.ts';
 import { CURSE_POINTS } from '../src/kanji/kanji-crests.ts';

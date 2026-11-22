@@ -1,6 +1,6 @@
 // A card tilting toward the mouse: the side under the pointer dips away.
 import { describe, expect, it } from 'vitest';
-import { MAX_TILT_DEG, tiltToward } from '../src/components/card-tilt.ts';
+import { MAX_TILT_DEG, tiltToward } from '../src/components/cards/card-tilt.ts';
 
 const CARD = { left: 100, top: 100, width: 150, height: 200 };
 

@@ -16,7 +16,7 @@ export const FIRST_TARGET = 30;
 const TARGET_GROWTH = 1.6;
 export const MAX_ITEMS = 5;
 export const OFFER_SIZE = 3;
-/** Scouting pauses (they show the crests, specials.ts) allowed each round. */
+/** Scouting pauses (they show the crests, crests.ts) allowed each round. */
 export const SCOUTS_PER_ROUND = 2;
 /** Koi doubles a match's coins from this combo up. */
 const KOI_COMBO = 10;
@@ -70,7 +70,7 @@ export function coinsForMatch(run: BankRun, combo: number): number {
   return holds(run, 'koi') && combo >= KOI_COMBO ? base * 2 : base;
 }
 
-/** A match adds to the pot; a koban card (specials.ts) doubles what it adds. */
+/** A match adds to the pot; a koban card (crests.ts) doubles what it adds. */
 export function addMatch(run: BankRun, combo: number, multiplier = 1): BankRun {
   return { ...run, pot: run.pot + coinsForMatch(run, combo) * multiplier };
 }

@@ -1,7 +1,7 @@
 // Crests on the bank run's cards: a few per set, good ones on words missed before.
 import { describe, expect, it } from 'vitest';
-import { addMatch, startBankRun, takeCoins } from '../src/roguelike/bank-run.ts';
-import { dealCrests, drawOmikuji } from '../src/roguelike/specials.ts';
+import { addMatch, startBankRun, takeCoins } from '../src/bank-run/bank-run.ts';
+import { dealCrests, drawOmikuji } from '../src/bank-run/crests.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
 
 const WORDS = ['学校', '先生', '電車', '時間', '友達'].map((word, index) =>

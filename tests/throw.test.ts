@@ -1,7 +1,7 @@
 // Throwing a reading card at a word card: where it's aimed, and what the throw does.
 import { describe, expect, it } from 'vitest';
-import PlayCard from '../src/components/PlayCard.vue';
-import { aimedWord, type Box } from '../src/components/throw-geometry.ts';
+import PlayCard from '../src/components/cards/PlayCard.vue';
+import { aimedWord, type Box } from '../src/components/cards/throw-geometry.ts';
 import { tapCard, throwReading } from '../src/game/taps.ts';
 import {
   otherWordsReadingIndex,

@@ -4,8 +4,8 @@
  * against the best round, and a button to start again. The learning carries
  * on either way; only the bank run resets.
  */
-import PixelButton from '../components/PixelButton.vue';
-import type { BankRun } from './bank-run.ts';
+import PixelButton from '../ui/PixelButton.vue';
+import type { BankRun } from '../../bank-run/bank-run.ts';
 
 defineProps<{ run: BankRun; bestRound: number }>();
 defineEmits<{ newRun: [] }>();

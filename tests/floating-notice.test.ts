@@ -1,7 +1,7 @@
 // The floating notice: a gain in aqua, a loss in crimson, nothing when there's no message.
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import FloatingNotice from '../src/components/FloatingNotice.vue';
+import FloatingNotice from '../src/components/ui/FloatingNotice.vue';
 
 describe('the floating notice', () => {
   it('shows a gain in aqua and a loss in crimson', () => {

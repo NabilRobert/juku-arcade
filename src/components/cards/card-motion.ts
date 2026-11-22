@@ -11,7 +11,7 @@
  * system asks for reduced motion (App.vue), and a matched card then
  * vanishes at once.
  */
-import type { CardStatus } from '../game/card-status.ts';
+import type { CardStatus } from '../../game/card-status.ts';
 import type { Offset, Placement } from './throw-geometry.ts';
 
 /** How long the thrown card flies before it hits, and how long the hit's jolt then takes to settle. */

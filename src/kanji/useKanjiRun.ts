@@ -16,7 +16,7 @@ import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import type { RandomSource } from '../game/deal.ts';
 import type { Deck } from '../deck/types.ts';
-import { THROW_S } from '../components/card-motion.ts';
+import { THROW_S } from '../components/cards/card-motion.ts';
 import { PLAY_STEP_MS } from '../composables/useHand.ts';
 import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';

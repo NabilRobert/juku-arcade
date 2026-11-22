@@ -6,7 +6,7 @@
  * a face-down pixel card (CardFrame.vue).
  */
 import CardFrame from './CardFrame.vue';
-import PixelSeal from './PixelSeal.vue';
+import PixelSeal from '../ui/PixelSeal.vue';
 
 /** Cards drawn in the stack, each a little higher than the one under it. */
 const LAYERS = 3;

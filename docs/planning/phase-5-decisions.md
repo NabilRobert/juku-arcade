@@ -567,7 +567,7 @@ points and come with their own Scout button:
 
 Arthur then asked for crests to colour the cards, not just a small tile:
 a scouted card's whole back (frame and lattice) and its front frame take
-the crest's colour (`tint` in `specials.ts`, drawn by `CardFrame.vue`),
+the crest's colour (`tint` in `crests.ts`, drawn by `CardFrame.vue`),
 in both modes. The crest's symbol sits on the back in the same round
 pixel seal as 塾 (a light disc in a ring), in the crest's colour, so
 every back reads as one family. The marks stay until the set or round ends, so the player

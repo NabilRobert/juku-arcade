@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Japanese text with readings above the kanji, from Tatoeba's {学校|がっこう} markup. */
 import { computed } from 'vue';
-import { parseFurigana } from '../deck/furigana.ts';
+import { parseFurigana } from '../../deck/furigana.ts';
 
 const props = defineProps<{ marked: string }>();
 const pieces = computed(() => parseFurigana(props.marked));

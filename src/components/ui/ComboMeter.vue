@@ -10,7 +10,7 @@
  */
 import { m } from 'motion-v';
 import { computed, watch } from 'vue';
-import { playSound } from '../sound/sfx.ts';
+import { playSound } from '../../sound/sfx.ts';
 import { rankFor } from './combo-ranks.ts';
 
 const props = defineProps<{ combo: number; brokenCombo: number | null }>();

@@ -5,7 +5,7 @@
  * best set between clears.
  */
 import { onUnmounted, ref, watch } from 'vue';
-import type { SetScore } from '../game/score.ts';
+import type { SetScore } from '../../game/score.ts';
 
 const props = defineProps<{ score: SetScore | null; isShowing: boolean; bestSetScore: number }>();
 
