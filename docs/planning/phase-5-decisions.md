@@ -436,7 +436,8 @@ right and meeting in the middle. Panels and buttons share the cards'
 stepped corners (three screen pixels), with a lit top edge and a shaded
 bottom edge. Every button is one component, `PixelButton.vue`, in five
 colours. On each click its wipe colour sweeps in from both edges in
-`steps()`, so it moves in chunky 8-bit jumps, then fades. Under reduced
+small `steps()`, then fades, within 0.3 s (Arthur found 0.5 s with six
+big steps looked like lag). Under reduced
 motion the wipe is skipped.
 
 - **Beat:** NES.css (MIT, a ready-made pixel UI kit; it brings its own

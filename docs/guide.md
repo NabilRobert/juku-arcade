@@ -233,8 +233,8 @@ detected at each class size.
   `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
   top edge and a shaded bottom edge. Every button outside the cards is a
   `PixelButton.vue`, which also plays a click animation: its `--wipe`
-  colour sweeps in from both edges in chunky steps, meets in the middle,
-  then fades.
+  colour sweeps in from both edges in small steps, meets in the middle,
+  then fades, within 0.3 s.
 - **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
   body every card shares (a hard shadow, a thick frame with stepped pixel
   corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share

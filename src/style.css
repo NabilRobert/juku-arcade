@@ -249,8 +249,8 @@ body {
 
 /*
  * A click's colour wipe (PixelButton.vue): the button's --wipe colour
- * sweeps in from both edges in chunky steps, meets in the middle, then
- * fades back out.
+ * sweeps in from both edges in small steps, meets in the middle, then
+ * fades back out, all within 0.3 s. Fewer, slower steps read as lag.
  */
 .pixel-wipe {
   position: absolute;
@@ -266,7 +266,7 @@ body {
   bottom: 0;
   width: 50%;
   background: var(--wipe);
-  animation: wipe 0.5s forwards;
+  animation: wipe 0.3s forwards;
 }
 
 .pixel-wipe::before {
@@ -283,12 +283,12 @@ body {
   0% {
     transform: scaleX(0);
     opacity: 1;
-    animation-timing-function: steps(6, end);
+    animation-timing-function: steps(10, end);
   }
-  45% {
+  40% {
     transform: scaleX(1);
     opacity: 1;
-    animation-timing-function: steps(3, end);
+    animation-timing-function: ease-out;
   }
   100% {
     transform: scaleX(1);
