@@ -27,10 +27,12 @@ import GameScreen from './components/GameScreen.vue';
 import KanjiScreen from './components/KanjiScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
+import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
+import PixelSeal from './components/PixelSeal.vue';
 
-type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode';
+type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode' | 'stats';
 
 const settings = shallowRef<Settings | null>(null);
 const deck = shallowRef<Deck | null>(null);
@@ -115,6 +117,14 @@ async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
  * just closed saved today's play time, and the next one must count on
  * from it (W2).
  */
+/** Opens the stats page with the latest events and settings, saved since the game started. */
+async function openStats(): Promise<void> {
+  pastEvents.value = await orFallback(loadEvents, pastEvents.value);
+  const latest = await orFallback(loadSettings, null);
+  if (latest) settings.value = latest;
+  page.value = 'stats';
+}
+
 async function chooseMode(next: GameMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
@@ -175,13 +185,23 @@ onMounted(async () => {
     <MotionConfig reduced-motion="user">
       <TableBackground />
       <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
-        <h1 class="text-center font-card text-2xl font-bold tracking-wide text-aqua">
+        <h1
+          class="flex items-center justify-center gap-3 font-card text-2xl font-bold tracking-wide text-aqua"
+        >
+          <PixelSeal class="w-9" />
           juku-arcade
         </h1>
         <p v-if="loadError" role="alert" class="text-center text-crimson">{{ loadError }}</p>
         <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
         <template v-else-if="settings && deck">
           <AboutData v-if="page === 'about'" @close="page = 'game'" />
+          <StatsPage
+            v-if="page === 'stats'"
+            :deck="deck"
+            :settings="settings"
+            :events="pastEvents"
+            @close="page = 'game'"
+          />
           <SettingsPanel
             v-if="page === 'settings'"
             :settings="settings"
@@ -225,6 +245,7 @@ onMounted(async () => {
           class="mt-auto flex justify-center gap-6 text-sm text-washi/60"
         >
           <button type="button" class="underline" @click="page = 'mode'">Change mode</button>
+          <button type="button" class="underline" @click="openStats">Stats</button>
           <button type="button" class="underline" @click="page = 'settings'">Settings</button>
           <button type="button" class="underline" @click="page = 'about'">About the data</button>
         </footer>

@@ -193,7 +193,12 @@ flowchart LR
 4. Check-up answers update only the check-up history
    (**`applyCheckUp`**, kept in `Memory.checkUps`), never the review schedule
    or difficulty.
-5. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
+5. **Stats** (the footer link, **`StatsPage.vue`**) shows the player's own
+   numbers from this browser's event log (**`memory/stats.ts:
+   playerStats`**): words known, right answers today and overall, best
+   combo and set, play today, the words missed most and the kinds of
+   mistake made most. Kanji mode logs nothing, so it isn't counted.
+6. **Settings → Export my data** (**`memory/export.ts`**) downloads all events
    as an anonymous JSON file. Slice 5b's report script reads these files.
 
 ## The flow, part 6: the reports (outside the app)
@@ -268,6 +273,10 @@ detected at each class size.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
+- **The logo** (D40) is red 塾 in a red pixel ring on white, like a hanko
+  seal: `PixelSeal.vue`, its circle worked out on a pixel grid in
+  `pixel-seal.ts`. It sits beside the title, on every card back and on the
+  deck.
 - **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
   `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
   top edge and a shaded bottom edge. Every button outside the cards is a

@@ -33,6 +33,7 @@ import { useCardTilt } from '../composables/useCardTilt.ts';
 import { usePixelSnap } from '../composables/usePixelSnap.ts';
 import type { BackMark } from './back-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
+import PixelSeal from './PixelSeal.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
 const props = defineProps<{
@@ -258,7 +259,7 @@ function onClick(): void {
           data-testid="back-mark"
           >{{ backMark.symbol }}</span
         >
-        <span v-else class="relative">{{ kind === 'word' ? '札' : '' }}</span>
+        <PixelSeal v-else class="w-[42cqw]" />
       </span>
     </span>
   </m.button>
