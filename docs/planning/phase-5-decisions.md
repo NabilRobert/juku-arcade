@@ -481,7 +481,10 @@ E from 4, D from 6, C from 9, B from 12, A from 15, S from 20, SS from 25
 and SSS from 30. Each has a word of praise in easy Japanese (がんばれ, よし,
 いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), so even the
 cheering is reading practice, and a bar fills toward the next rank. A
-rank-up slams the letter in with a sound pitched above the level-up's. The
+rank-up slams the letter in with a sound pitched above the level-up's. The letter, the word and
+the combo count warm rank by rank, from off-white through aqua and pinks
+to a bright red at SSS (brighter than the palette's crimson, which is too
+dark to read on the navy table). The
 meter floats gently while it waits, like the cards. Letter grades are a
 common way to score style; the words and thresholds are our own.
 
