@@ -24,21 +24,28 @@ export interface Impact {
   combo: number;
 }
 
+/** Runs actions after a delay, and cancels any still waiting when the component goes. */
+function useLater(): (action: () => void, delayMs: number) => void {
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  onUnmounted(() => {
+    for (const timer of timers) clearTimeout(timer);
+  });
+  return (action, delayMs) => {
+    const timer = setTimeout(() => {
+      timers.delete(timer);
+      action();
+    }, delayMs);
+    timers.add(timer);
+  };
+}
+
 export function useGameFeel(state: () => RunState) {
   const impact = ref<Impact>({ count: 0, combo: 0 });
   /** The combo the table shows: it rises on each hit, after the throw lands. */
   const shownCombo = ref(state().combo);
   /** The streak just lost, shown briefly as it breaks; null when none. */
   const brokenCombo = ref<number | null>(null);
-  const timers = new Set<ReturnType<typeof setTimeout>>();
-
-  function later(action: () => void, delayMs: number): void {
-    const timer = setTimeout(() => {
-      timers.delete(timer);
-      action();
-    }, delayMs);
-    timers.add(timer);
-  }
+  const later = useLater();
 
   function landHit(combo: number, isLevelUp: boolean): void {
     playSound('slap');
@@ -48,10 +55,12 @@ export function useGameFeel(state: () => RunState) {
     shownCombo.value = combo;
   }
 
-  function breakCombo(lost: number): void {
-    playSound('miss');
+  /** SPIKE: a combo that ends without a miss or a timeout was banked (the bank run), not broken. */
+  function endCombo(now: RunState, before: RunState): void {
     shownCombo.value = 0;
-    if (lost >= STREAK_COMBO) brokenCombo.value = lost;
+    if (now.flash === before.flash && now.phase !== 'timedOut') return;
+    playSound('miss');
+    if (before.combo >= STREAK_COMBO) brokenCombo.value = before.combo;
   }
 
   watch(state, (now, before) => {
@@ -60,14 +69,10 @@ export function useGameFeel(state: () => RunState) {
       const isLevelUp = now.level > before.level;
       later(() => landHit(now.combo, isLevelUp), THROW_MS);
     }
-    if (now.combo === 0 && before.combo > 0) breakCombo(before.combo);
+    if (now.combo === 0 && before.combo > 0) endCombo(now, before);
     if (now.phase === 'cleared' && before.phase !== 'cleared') {
       later(() => playSound('cleared'), THROW_MS * 2);
     }
-  });
-
-  onUnmounted(() => {
-    for (const timer of timers) clearTimeout(timer);
   });
 
   return { impact, shownCombo, brokenCombo, clearBroken: () => (brokenCombo.value = null) };

@@ -15,6 +15,8 @@ vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
 }));
 
 const THROW_MS = THROW_S * 1000;
+/** What a miss leaves on the state: the right and wrong cards flashing. */
+const MISS_FLASH = { wordId: 'w', correctIndex: 0, wrongIndex: 1, untilMs: 0 };
 
 /** Runs useGameFeel inside a component, driven by a state the test changes. */
 function feelFor(initial: RunState) {
@@ -79,6 +81,14 @@ describe('the game answering a match', () => {
     expect(playSound).toHaveBeenCalledWith('deal');
   });
 
+  it('ends a banked combo quietly: no miss sound and no lost streak', async () => {
+    const { state, feel } = feelFor({ ...start().state, combo: 7 });
+    state.value = { ...state.value, combo: 0 };
+    await nextTick();
+    expect(feel.brokenCombo.value).toBeNull();
+    expect(playSound).not.toHaveBeenCalledWith('miss');
+  });
+
   it('plays the level-up sound when a match raises the level', async () => {
     const { state } = feelFor(start().state);
     state.value = withMatch(state.value, 10, state.value.level + 1);
@@ -89,13 +99,13 @@ describe('the game answering a match', () => {
 
   it('shows a lost streak of 3 or more, but not a lost combo of 2', async () => {
     const { state, feel } = feelFor({ ...start().state, combo: 5 });
-    state.value = { ...state.value, combo: 0 };
+    state.value = { ...state.value, combo: 0, flash: MISS_FLASH };
     await nextTick();
     expect(feel.brokenCombo.value).toBe(5);
     expect(playSound).toHaveBeenCalledWith('miss');
 
     const short = feelFor({ ...start().state, combo: 2 });
-    short.state.value = { ...short.state.value, combo: 0 };
+    short.state.value = { ...short.state.value, combo: 0, flash: MISS_FLASH };
     await nextTick();
     expect(short.feel.brokenCombo.value).toBeNull();
   });
