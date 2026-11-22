@@ -144,33 +144,15 @@ body {
   }
 }
 
-/* The drifting table (TableBackground.vue): one tile of overhang, one tile of travel per loop. */
-.table-swirl {
-  --tile: 600px;
-  position: absolute;
-  inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
-  background-size: var(--tile) var(--tile);
-  animation: table-drift 80s linear infinite;
-  will-change: transform;
-}
-
-@keyframes table-drift {
-  to {
-    transform: translate(var(--tile), var(--tile));
-  }
-}
-
+/* A faint glow from the centre of the table, over the swirl (TableBackground.vue). */
 .table-light {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.35), transparent 70%);
+  background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.18), transparent 70%);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-shake,
   .animate-glow,
-  .animate-float,
-  .table-swirl {
+  .animate-float {
     animation: none;
   }
 }

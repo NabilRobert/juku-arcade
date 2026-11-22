@@ -409,3 +409,22 @@ motion.
   makes crispness pointless, and it adds two dev dependencies); a
   canvas redrawn every frame (real flowing motion, but constant CPU).
 
+### D35: A swirling shader table (settled: Arthur's choice, 2026-11-22)
+
+D34's drifting tile only slid; Arthur wanted bands that bend and swirl,
+like a looping psychedelic clip, and found the table and the reading
+cards too alike. A WebGL fragment shader now draws the table: coordinates
+are bent by a few sine waves, then cut into rings that also turn with the
+angle, so they spiral. Every moving term turns a whole number of times per
+24-second loop, so the loop has no jump. The shades are darker (deep navy
+on navy), so both card frames stand out.
+
+The canvas is a quarter of the window's size, stretched to fill it, and
+redraws at most 30 times a second; the browser stops it while the tab is
+hidden. Reduced motion shows a still frame, and without WebGL the plain
+navy table shows. This replaces D34's SVG tile.
+
+- **Beat:** D34's sliding tile (doesn't swirl); a looping video
+  (megabytes, and fixed to one size); a library like three.js (far more
+  than one full-screen shader needs; the WebGL setup is about 40 lines).
+

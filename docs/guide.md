@@ -201,10 +201,10 @@ detected at each class size.
   pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
   Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
   two textures made of CSS gradients (`.washi` paper, `.card-back`).
-  Behind everything, `TableBackground.vue` drifts soft marbled navy bands
-  that loop (D34): one blurred tile, `assets/table-swirl.svg`, drawn from
-  noise by SVG filters rather than as a picture, moved one tile per loop
-  (`table-drift` in `style.css`, 80 s).
+  Behind everything, `TableBackground.vue` shows marbled navy bands that
+  warp and spiral in a 24-second loop (D35). A WebGL shader draws them
+  (`background/swirl-shader.ts`) on a canvas a quarter of the window's
+  size, stretched to fill it, about 30 times a second.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
   system's reduce-motion setting. `components/card-motion.ts` says how
@@ -375,9 +375,10 @@ fields. They stay in memory until slice 3 stores them.
 - **Change how big the game is:** the `html` font size in `style.css`, and
   `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
   the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there, and
-  the float is `FLOAT` and `FLOAT_*_S`. The table's swirl: its bands and
-  colours are in `assets/table-swirl.svg`, its speed is `table-drift` in
-  `style.css`.
+  the float is `FLOAT` and `FLOAT_*_S`. The table's swirl: its colours
+  (`DARK_RGB`, `LIGHT_RGB`), loop length (`SWIRL_LOOP_MS`) and band shapes
+  are in `background/swirl-shader.ts`; its resolution and frame rate are
+  `SHRINK` and `FRAME_MS` in `TableBackground.vue`.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Change the check-up (questions, options, timer, hold):** the numbers are
