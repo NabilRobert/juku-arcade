@@ -33,7 +33,7 @@ const run = useRun({
   settings: props.settings,
   pastEvents: props.pastEvents,
 });
-const { state, nowMs, tags, progress, tap, throwReading, pause, resume, flip } = run;
+const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
 
 const CAP_MINUTES = parseCapMinutes(import.meta.env.VITE_DAILY_CAP_MINUTES);
 const shownNudges = ref<number[]>([]);
@@ -85,7 +85,6 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
         :state="state"
         :now-ms="nowMs"
         :tags="tags"
-        @tap="tap"
         @throw="throwReading"
         @flip="flip"
       />

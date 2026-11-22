@@ -1,7 +1,5 @@
 // Throwing a reading card at a word card: where it's aimed, and what the throw does.
-import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import GameBoard from '../src/components/GameBoard.vue';
 import PlayCard from '../src/components/PlayCard.vue';
 import { aimedWord, type Box } from '../src/components/throw-geometry.ts';
 import { tapCard, throwReading } from '../src/game/taps.ts';
@@ -12,6 +10,7 @@ import {
   START_MS,
   wordIdAt,
 } from './helpers/run.ts';
+import { mountBoard } from './helpers/board.ts';
 
 const CARD = { width: 120, height: 160 };
 const WORDS = new Map<string, Box>([
@@ -79,15 +78,17 @@ describe('throwing a reading card', () => {
     );
   });
 
-  it('is sent by the board when a reading card is let go on a word card', () => {
+  it('lays a reading card let go on a word card for that word, without throwing it yet', async () => {
     const { state, context } = start();
-    const board = mount(GameBoard, { props: { state, nowMs: START_MS, tags: context.tags } });
-    const firstSlot = board.find('[data-testid="word-row"] > div').element;
-    firstSlot.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, ...CARD });
+    const board = await mountBoard(state, context.tags);
+    const wordSlot = board.find('[data-testid="word-row"] > div > div').element;
+    wordSlot.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, ...CARD });
     const reading = board
       .findAllComponents(PlayCard)
       .find((card) => card.props('kind') === 'reading');
     reading?.vm.$emit('release', { x: 50, y: 50 }, STILL);
-    expect(board.emitted('throw')?.[0]).toEqual([0, wordIdAt(state, 0)]);
+    await board.vm.$nextTick();
+    expect(reading?.props('order')).toBe(1);
+    expect(board.emitted('throw')).toBeUndefined();
   });
 });

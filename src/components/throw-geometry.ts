@@ -12,6 +12,11 @@ export interface Point {
 
 export type Offset = Point;
 
+/** Where a card sits away from its own slot: an offset, and its size there. */
+export interface Placement extends Offset {
+  scale: number;
+}
+
 export interface Box {
   left: number;
   top: number;
@@ -40,6 +45,16 @@ export function centreOffset(from: Box, to: Box): Offset {
   const start = centre(from);
   const end = centre(to);
   return { x: end.x - start.x, y: end.y - start.y };
+}
+
+/**
+ * How to draw a card from one box as if it sat in another: moved centre to
+ * centre, and scaled from one height to the other.
+ */
+export function placementBetween(from: Box, to: Box): Placement {
+  // A box not laid out yet has no height; keep the card its own size rather than divide by zero.
+  const scale = from.height > 0 ? to.height / from.height : 1;
+  return { ...centreOffset(from, to), scale };
 }
 
 /** The word card under a point, if any. */

@@ -3,8 +3,8 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import GameBoard from '../src/components/GameBoard.vue';
 import PlayCard from '../src/components/PlayCard.vue';
-import { cardPose } from '../src/components/card-motion.ts';
-import { centreOffset } from '../src/components/throw-geometry.ts';
+import { cardPose, dealtFrom } from '../src/components/card-motion.ts';
+import { centreOffset, placementBetween } from '../src/components/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';
 import { tapCard } from '../src/game/taps.ts';
 import { readingIndexOf, start, START_MS, wordIdAt } from './helpers/run.ts';
@@ -39,10 +39,31 @@ describe('the throw', () => {
     expect((pose.rotateX as number[])[LAST]).toBeGreaterThan(45);
   });
 
-  it('names x in every pose, so no card slides back to where it was dealt from', () => {
+  it('starts a dealt card on top of the deck, at the size of the deck', () => {
+    const slot = { left: 0, top: 0, width: 150, height: 200 };
+    const deck = { left: 600, top: 400, width: 75, height: 100 };
+    const pose = dealtFrom(placementBetween(slot, deck));
+    expect(pose).toMatchObject({ x: 562.5, y: 350, scale: 0.5, opacity: 1 });
+  });
+
+  it('shifts a laid reading card up out of the hand, and flies it from there once matched', () => {
+    const laid = cardPose({ status: 'idle', kind: 'reading', index: 0, isLaid: true });
+    expect(laid.y).toBeLessThan(0);
+    const thrown = cardPose({
+      status: 'matched',
+      kind: 'reading',
+      index: 0,
+      isLaid: true,
+      throwTo: { x: 1, y: -100 },
+    });
+    expect((thrown.y as number[])[HIT]).toBe(-100);
+  });
+
+  it('names x and the depth in every pose, so no card slides or warps back to where it was dealt from', () => {
     const statuses: CardStatus[] = ['idle', 'selected', 'matched', 'wrong', 'hidden'];
     for (const status of statuses) {
       expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('x');
+      expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('transformPerspective');
       expect(
         cardPose({ status, kind: 'reading', index: 0, throwTo: { x: 1, y: 1 } }),
       ).toHaveProperty('x');

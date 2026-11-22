@@ -6,10 +6,11 @@
  * the suit 言 and a hanko stamp for their tag; reading cards have a pine
  * frame and the suit 音. How the card moves lives in card-motion.ts.
  *
- * Reading cards can be picked up and thrown (Motion's drag): the card
- * reports where it is while dragged and where and how fast it was let go,
- * and the board decides which word card it was aimed at. It springs back
- * to its place unless a match sends it flying on to its word card.
+ * Reading cards can be picked up and dropped under a word card (Motion's
+ * drag): the card reports where it is while dragged and where and how fast
+ * it was let go, and the board decides which word card it was aimed at.
+ * A laid card shifts up with a tag naming its word card (1 to 5) until
+ * the hand is played; a match then sends it flying on to its word card.
  *
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
  * shows ✗, a right one shows ✓. While paused, cards are face down (D8):
@@ -18,8 +19,8 @@
 import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
-import { cardPose, cardTransition, DEAL_FROM } from './card-motion.ts';
-import type { Offset, Point } from './throw-geometry.ts';
+import { cardPose, cardTransition, dealtFrom } from './card-motion.ts';
+import type { Offset, Placement, Point } from './throw-geometry.ts';
 
 const props = defineProps<{
   text: string;
@@ -37,6 +38,10 @@ const props = defineProps<{
   throwTo?: Offset;
   /** For a word card: a dragged reading card is over it. */
   isTargeted?: boolean;
+  /** Where the deck is, so the card is dealt off it. */
+  dealFrom?: Placement;
+  /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
+  order?: number;
 }>();
 
 const emit = defineEmits<{
@@ -116,10 +121,15 @@ const isDisabled = computed(
 );
 
 const isThrowable = computed(
-  () => props.kind === 'reading' && (props.status === 'idle' || props.status === 'selected'),
+  () =>
+    props.kind === 'reading' &&
+    props.order === undefined &&
+    (props.status === 'idle' || props.status === 'selected'),
 );
+/** Read once, when the card is dealt. */
+const dealtPose = dealtFrom(props.dealFrom);
 
-const pose = computed(() => cardPose(props));
+const pose = computed(() => cardPose({ ...props, isLaid: props.order !== undefined }));
 const transition = computed(() => cardTransition(props.status, props.index, isDealt.value));
 
 function onRelease(info: PanInfo): void {
@@ -148,7 +158,7 @@ function onClick(): void {
       isThrowable ? 'cursor-grab active:cursor-grabbing' : '',
       isTargeted ? 'ring-4 ring-gold' : '',
     ]"
-    :initial="DEAL_FROM"
+    :initial="dealtPose"
     :animate="pose"
     :transition="transition"
     :disabled="isDisabled"
@@ -195,6 +205,13 @@ function onClick(): void {
         class="absolute -top-2 -right-2 rounded-md bg-vermilion px-1 py-0.5 font-sans text-[0.65rem] font-bold text-washi shadow"
         lang="en"
         >+{{ tag.toFixed(1) }}×</span
+      >
+      <span
+        v-if="order !== undefined"
+        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center rounded-full bg-gold font-sans text-base font-bold text-sumi shadow-md"
+        lang="en"
+        data-testid="order-tag"
+        >{{ order }}</span
       >
     </template>
   </m.button>

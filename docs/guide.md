@@ -47,17 +47,17 @@ flowchart TD
    **`GameBoard.vue`** shows the cards, each one a **`PlayCard.vue`**,
    styled by **`card-status.ts`**.
 
-## The flow, part 2: one throw (or two taps)
+## The flow, part 2: lay out a hand, then play it
 
 ```mermaid
 flowchart LR
+    A["PlayCard click"] --> L["useHand: lay → hand.ts: layReading<br/>(first open word card)"]
     T["PlayCard drag ends"] --> U["useThrows: release →<br/>throw-geometry.ts: aimedWord"]
-    U -->|"aimed at a word card"| V["GameBoard emits throw"]
+    U -->|"aimed at a word card"| L2["useHand: lay → hand.ts: layReading<br/>(that word card)"]
+    P["Play button"] --> Q["useHand: play → hand.ts: playOrder"]
+    Q -->|"one card every PLAY_STEP_MS"| V["GameBoard emits throw"]
     V --> W["useRun: throwReading → taps.ts: throwReading"]
-    W --> D
-    A["PlayCard click"] --> B["GameBoard emits tap"]
-    B --> C["useRun: tap"]
-    C --> D["taps.ts: tapCard"]
+    W --> D["taps.ts: tapCard"]
     D -->|"right pair"| E["match: combo +1, levels.ts: levelAfterMatch,<br/>event 'match'"]
     D -->|"wrong pair"| F["miss: combo 0, levels.ts: levelAfterMiss,<br/>flash, event 'miss' with error type"]
     E -->|"last card"| G["score.ts: scoreSet → phase 'cleared'"]
@@ -66,29 +66,39 @@ flowchart LR
     I --> J
 ```
 
-1. The main way to play is to **throw**: drag a reading card and let go
-   of it on a word card, or fling it at one. While it's dragged, the word
-   card under it lights up (**`useThrows: trackDrag`**). On release,
-   **`throw-geometry.ts: aimedWord`** picks the word card it was dropped
-   on, or else the one it was heading for 0.15 s ahead at its release
-   speed. **`taps.ts: throwReading`** pairs the two, whatever was selected
-   before. A card let go away from every word card springs back.
-   Tapping still works, for the keyboard: a tap selects a card, and a tap
-   on a card of the other kind pairs the two (**`taps.ts: tapCard`**).
-2. A right pair is a **match**. The combo goes up, and every 10 combo the
+1. The player **lays out a hand**: a reading card for each word card. The
+   reading cards are held in a fan under the word cards, which are
+   numbered 1 to 5. Clicking a reading card (or pressing Enter on it)
+   lays it for the first word card still open, from the left
+   (**`hand.ts: layReading`**): it shifts up out of the fan with a gold
+   tag showing that word's number. Dragging it onto a word card, or
+   flinging it at one, lays it for that word instead: while it's dragged
+   the word card under it lights up (**`useThrows: trackDrag`**), and on
+   release **`throw-geometry.ts: aimedWord`** picks the word card it was
+   dropped on, or else the one it was heading for 0.15 s ahead. A card
+   already laid for that word goes back down. Clicking a laid card takes
+   it back. Nothing is checked yet.
+2. Once every word card has a reading under it, **Play** lights up
+   (**`hand.ts: isHandReady`**). Pressing it throws the laid cards at
+   their words, left to right, one every `PLAY_STEP_MS`
+   (**`useHand: play`**). Each throw goes through
+   **`taps.ts: throwReading`**, so it scores exactly like a pair of taps.
+   If the game pauses or the set ends mid-hand, the rest stay laid out.
+3. A right pair is a **match**. The combo goes up, and every 10 combo the
    level goes up (**`levels.ts: levelAfterMatch`**). If the word wasn't
    missed in this set, its tag joins the set's multiplier.
-3. A wrong pair is a **miss**, counted against the word card in it. The
+4. A wrong pair is a **miss**, counted against the word card in it. The
    combo resets, the level drops (from 5 straight to 1), and the right
-   reading flashes. The event records whether the wrong reading was the
+   reading flashes. The wrong card springs back to the hand, to be laid
+   again. The event records whether the wrong reading was the
    decoy (and its error type) or another word's reading (a mix-up).
-4. Matching the last word clears the set. **`score.ts: scoreSet`** works
+5. Matching the last word clears the set. **`score.ts: scoreSet`** works
    out chips × multiplier.
-5. **`useRun`** ticks every 100 ms. When time runs out,
+6. **`useRun`** ticks every 100 ms. When time runs out,
    **`run.ts: timeUp`** logs a timeout for each unmatched word (never a
    miss), resets the combo, drops the level, and shows the answers.
-6. After a short pause, **`run.ts: nextSet`** deals the next set at the
-   current level's time.
+7. After a short pause, **`run.ts: nextSet`** deals the next set at the
+   current level's time, and the hand starts empty again.
 
 ## The flow, part 3: pause and flip
 
@@ -192,12 +202,17 @@ detected at each class size.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
   system's reduce-motion setting. `components/card-motion.ts` says how
-  each card moves: cards deal in one after another, a selected or held
-  card lifts, and a matched reading card flies on, spinning, to its word
-  card, hits it, and both fall over. Dragging uses Motion's drag, so
-  `App.vue` loads the `domMax` bundle. `composables/useThrows.ts`
-  measures how far the thrown card flies from the slot each card sits in,
-  before the board redraws.
+  each card moves: a new set comes off the deck one card after another,
+  a held card lifts, a laid card shifts up out of the fan, and a matched
+  reading card flies on, spinning, to its word card, hits it, and both
+  fall over. Dragging uses Motion's drag, so `App.vue` loads the `domMax`
+  bundle. Every card sits in a slot the size of the card that never moves
+  (`composables/useTableSlots.ts`), so the slots can be measured before
+  any card is drawn: `useDeal.ts` measures where the deck is from each
+  slot, and `useThrows.ts` how far a thrown card flies (before the board
+  redraws). A card moves by being drawn away from its own slot. The fan
+  is a fixed turn and drop on each reading card's slot (`fanStyle` in
+  `GameBoard.vue`).
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
@@ -226,8 +241,9 @@ detected at each class size.
   player has touched the page.
 - **Layout (desktop only):** the school plays on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
-  `ScoreBreakdown`) beside the table: 5 word cards above 6 smaller reading
-  cards. The game fills the window: the root font size grows with the
+  `ScoreBreakdown`) beside the table: 5 numbered word cards, the combo
+  and the Play button, then the hand of 6 reading cards held in a fan,
+  next to the deck. The game fills the window: the root font size grows with the
   window's width (`html` in `style.css`), and each card row in
   `GameBoard.vue` sets its cards' height as a share of the window's
   height (`--card-height`), so a set fits without scrolling.
@@ -273,7 +289,11 @@ fields. They stay in memory until slice 3 stores them.
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
 | **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
-| **Throw** | Dragging a reading card and letting go on, or flinging it at, a word card; a right pair spins on and knocks the word card down | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
+| **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
+| **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
+| **Throw** | A laid reading card flying at its word card; a right pair spins on and knocks the word card down. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
+| **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
+| **Slot** | The fixed place a card sits in; cards move by being drawn away from it | `useTableSlots.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
 | **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
@@ -302,6 +322,10 @@ fields. They stay in memory until slice 3 stores them.
   `src/game/tuning.ts`. Every number the playtest may change is there.
 - **Change what happens on a tap:** edit `src/game/taps.ts`; timeouts and
   dealing are in `src/game/run.ts`. Specs: `tests/run.test.ts`.
+- **Change how a hand is laid out or played:** the rules (which slot a
+  click fills, when Play is ready, the play order) are in
+  `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between
+  throws is `PLAY_STEP_MS` in `composables/useHand.ts`.
 - **Change what a card's back shows:** edit `src/components/CardBack.vue`;
   the data comes from `scripts/deck-words.ts` and `scripts/deck-kanji.ts`.
 - **Change pause or peek rules:** edit `src/game/pause.ts`. Specs:
@@ -316,7 +340,7 @@ fields. They stay in memory until slice 3 stores them.
   `src/style.css`.
 - **Change an animation:** card motion is in `components/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
-  `DEAL_FROM` the deal-in, `HELD_POSE` in `PlayCard.vue` a held card);
+  `DEAL_STAGGER_S` the time between dealt cards, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
 - **Change a sound:** edit its numbers in `SOUNDS` in `sound/sfx.ts`
   (the comment there names each one), or point it at a different file in
@@ -328,7 +352,8 @@ fields. They stay in memory until slice 3 stores them.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
   `components/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and
-  `--card-height` on each row in `GameBoard.vue`.
+  `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
+  the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Change the check-up (questions, options, timer, hold):** the numbers are

@@ -51,7 +51,7 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 | `src/deck/`        | Deck types, kana rules, decoy generators and kanji-reading combinations, shared by the script and the game        |
 | `src/game/`        | Game rules in plain TypeScript with no Vue: dealing, taps, levels, score, tags, events, tuning                    |
 | `src/memory/`      | The review engine, daily deck, learned difficulty, check-up, storage (IndexedDB) and export                       |
-| `src/composables/` | `useRun`: connects the game rules to the clock, storage and the screen                                            |
+| `src/composables/` | `useRun` connects the rules to the clock, storage and screen; the rest deal, lay out and throw cards              |
 | `src/components/`  | Vue components: the board, the cards, the side panel, the check-up, settings                                      |
 | `public/sounds/`   | Card sounds from Kenney's Casino Audio pack (CC0, licence included)                                               |
 | `public/_headers`  | Cloudflare Pages headers: the content security policy and caching                                                 |
