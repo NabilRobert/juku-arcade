@@ -488,3 +488,8 @@ common way to score style; the words and thresholds are our own.
 - **Beat:** another game's rank names (D22); a gauge that drains when idle
   (it would change the game's rules, not just how the combo looks).
 
+**D32 update (2026-11-22):** Arthur found the card backs and faces didn't
+look pixelated. Both textures are now tiny SVG tiles of hard-edged pixels
+on the card's own pixel grid: specks on the washi faces (and on paper
+panels and buttons), and a diamond lattice on the crimson backs.
+

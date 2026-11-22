@@ -200,7 +200,8 @@ detected at each class size.
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
   Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
-  two textures made of CSS gradients (`.washi` paper, `.card-back`).
+  two pixel-art textures, tiny SVG tiles drawn on the card's own pixel grid
+  (`.washi` paper with pixel specks, `.card-back` with a diamond lattice).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
   warp and spiral in a 19-second loop (D35). A WebGL shader draws them
   (`background/swirl-shader.ts`) on a canvas a sixth of the window's
