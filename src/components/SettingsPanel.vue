@@ -5,6 +5,7 @@
  */
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
+import PixelButton from './PixelButton.vue';
 
 defineProps<{ settings: Settings }>();
 const emit = defineEmits<{
@@ -27,42 +28,37 @@ function confirmDelete(): void {
     <h2 class="text-xl font-semibold">Settings</h2>
     <p class="text-sm">
       Your anonymous player ID:
-      <code class="rounded bg-lacquer-light px-1 break-all">{{ settings.playerId }}</code>
+      <code class="bg-lacquer-light px-1 break-all">{{ settings.playerId }}</code>
       <span v-if="settings.classCode"> · class {{ settings.classCode }}</span>
     </p>
     <div class="space-y-2">
       <p class="text-sm">Level (your progress at each level is kept)</p>
       <div class="flex gap-2">
-        <button
+        <PixelButton
           v-for="level in JLPT_LEVELS"
           :key="level"
-          type="button"
-          class="min-h-11 rounded-lg px-3 font-semibold"
-          :class="level === settings.level ? 'bg-aqua text-sumi' : 'bg-steel'"
+          :colour="level === settings.level ? 'aqua' : 'steel'"
+          class="min-h-11 px-3 font-semibold"
           @click="emit('changeLevel', level)"
         >
           {{ level }}
-        </button>
+        </PixelButton>
       </div>
     </div>
     <div class="space-y-2">
-      <button
-        type="button"
-        class="rounded-lg bg-aqua px-4 py-2 text-sumi"
-        @click="emit('exportData')"
-      >
+      <PixelButton colour="aqua" class="px-4 py-2" @click="emit('exportData')">
         Export my data
-      </button>
+      </PixelButton>
       <p class="text-sm text-washi/70">
         Downloads a file with your anonymous player ID, class code, and every answer with its
         timing. No name, and nothing is sent anywhere. Give it to your teacher only if you want to.
       </p>
     </div>
-    <button type="button" class="rounded-lg bg-crimson px-4 py-2" @click="confirmDelete">
+    <PixelButton colour="crimson" class="px-4 py-2" @click="confirmDelete">
       Delete my data
-    </button>
-    <button type="button" class="block rounded-lg bg-steel px-4 py-2" @click="emit('close')">
+    </PixelButton>
+    <PixelButton colour="steel" class="block px-4 py-2" @click="emit('close')">
       Back to the game
-    </button>
+    </PixelButton>
   </section>
 </template>

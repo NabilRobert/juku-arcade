@@ -428,3 +428,18 @@ navy table shows. This replaces D34's SVG tile.
   (megabytes, and fixed to one size); a library like three.js (far more
   than one full-screen shader needs; the WebGL setup is about 40 lines).
 
+### D36: Pixel buttons and panels, with a click wipe (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the rest of the UI to be pixelated like the cards, and
+for buttons to animate on click with colour sweeping in from left and
+right and meeting in the middle. Panels and buttons share the cards'
+stepped corners (three screen pixels), with a lit top edge and a shaded
+bottom edge. Every button is one component, `PixelButton.vue`, in five
+colours. On each click its wipe colour sweeps in from both edges in
+`steps()`, so it moves in chunky 8-bit jumps, then fades. Under reduced
+motion the wipe is skipped.
+
+- **Beat:** NES.css (MIT, a ready-made pixel UI kit; it brings its own
+  look and font, and we'd override most of it); styling each button
+  separately (the same code eleven times).
+

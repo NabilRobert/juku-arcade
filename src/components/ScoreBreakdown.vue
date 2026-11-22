@@ -42,12 +42,12 @@ onUnmounted(() => cancelAnimationFrame(frame));
 </script>
 
 <template>
-  <section class="rounded-xl bg-wood/80 p-3 text-center" aria-label="Set score">
+  <section class="pixel-panel bg-wood/80 p-3 text-center" aria-label="Set score">
     <template v-if="isShowing && score">
       <p class="flex items-center justify-center gap-2 text-2xl font-bold">
-        <span class="washi rounded-md px-3 py-1 text-sumi" title="Chips">{{ score.chips }}</span>
+        <span class="washi px-3 py-1 text-sumi" title="Chips">{{ score.chips }}</span>
         <span class="text-aqua">×</span>
-        <span class="rounded-md bg-crimson px-3 py-1 text-washi" title="Multiplier">{{
+        <span class="bg-crimson px-3 py-1 text-washi" title="Multiplier">{{
           score.multiplier
         }}</span>
       </p>

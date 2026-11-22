@@ -229,6 +229,12 @@ detected at each class size.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
+- **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
+  `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
+  top edge and a shaded bottom edge. Every button outside the cards is a
+  `PixelButton.vue`, which also plays a click animation: its `--wipe`
+  colour sweeps in from both edges in chunky steps, meets in the middle,
+  then fades.
 - **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
   body every card shares (a hard shadow, a thick frame with stepped pixel
   corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
@@ -357,6 +363,9 @@ fields. They stay in memory until slice 3 stores them.
   Dexie version if the stores change.
 - **Change colours, fonts or textures:** edit the tokens and classes in
   `src/style.css`.
+- **Change a button's colours or its click wipe:** `COLOURS` in
+  `components/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
+  `style.css`).
 - **Change an animation:** card motion is in `components/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
   `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and

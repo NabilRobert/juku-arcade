@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import { secondsLeft, type RunState } from '../game/run.ts';
 import { MAX_LEVEL } from '../game/tuning.ts';
 import { isMuted, playSound, setMuted } from '../sound/sfx.ts';
+import PixelButton from './PixelButton.vue';
 
 const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
@@ -28,7 +29,7 @@ function toggleSound(): void {
 <template>
   <section class="flex flex-col gap-3" aria-label="Run">
     <div class="grid grid-cols-2 gap-3">
-      <p class="rounded-xl bg-wood/80 p-3 text-center">
+      <p class="pixel-panel bg-wood/80 p-3 text-center">
         <span class="block text-xs tracking-widest text-aqua/80 uppercase">Level</span>
         <m.span
           :key="state.level"
@@ -41,7 +42,7 @@ function toggleSound(): void {
         >
         <span class="text-sm text-washi/60"> / {{ MAX_LEVEL }}</span>
       </p>
-      <p class="rounded-xl bg-wood/80 p-3 text-center">
+      <p class="pixel-panel bg-wood/80 p-3 text-center">
         <span class="block text-xs tracking-widest text-aqua/80 uppercase">Combo</span>
         <m.span
           :key="state.combo"
@@ -55,34 +56,34 @@ function toggleSound(): void {
       </p>
     </div>
     <div
-      class="h-2.5 overflow-hidden rounded-full bg-lacquer"
+      class="h-2.5 overflow-hidden bg-lacquer"
       role="progressbar"
       aria-label="Time left in this set"
       :aria-valuenow="Math.round(timeShare * 100)"
     >
       <div
-        class="h-full rounded-full transition-[width] duration-100"
+        class="h-full transition-[width] duration-100"
         :class="isTimeLow ? 'bg-crimson' : 'bg-aqua'"
         :style="{ width: `${timeShare * 100}%` }"
       />
     </div>
-    <button
-      type="button"
-      class="min-h-11 rounded-lg bg-steel px-4 text-sm font-semibold text-washi disabled:opacity-50"
+    <PixelButton
+      colour="steel"
+      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50"
       :disabled="state.phase !== 'playing'"
       :aria-pressed="isPaused"
       @click="isPaused ? $emit('resume') : $emit('pause')"
     >
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-    </button>
-    <button
-      type="button"
-      class="min-h-9 rounded-lg border border-washi/20 px-4 text-xs text-washi/80"
+    </PixelButton>
+    <PixelButton
+      colour="ghost"
+      class="min-h-9 px-4 text-xs"
       :aria-pressed="!isMuted"
       @click="toggleSound"
     >
       {{ isMuted ? '🔇 Sound off' : '🔊 Sound on' }}
-    </button>
+    </PixelButton>
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
     <p v-if="isPaused" class="text-center text-sm text-aqua" role="status">
       Paused. Tap a word card to flip it. A card you peek at won't score.

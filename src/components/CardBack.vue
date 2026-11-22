@@ -8,6 +8,7 @@ import { computed } from 'vue';
 import { isKanji, REPEAT_MARK } from '../deck/kana.ts';
 import type { DeckWord, KanjiNote } from '../deck/types.ts';
 import FuriganaText from './FuriganaText.vue';
+import PixelButton from './PixelButton.vue';
 
 const props = defineProps<{ word: DeckWord; kanji: Readonly<Record<string, KanjiNote>> }>();
 defineEmits<{ close: [] }>();
@@ -32,7 +33,7 @@ const kanjiInWord = computed(() =>
 
 <template>
   <article
-    class="max-h-[70vh] space-y-4 overflow-y-auto rounded-2xl washi border-2 border-crimson/60 p-4 text-sumi shadow-xl"
+    class="max-h-[70vh] space-y-4 overflow-y-auto pixel-panel washi p-4 text-sumi"
     aria-label="Card back"
   >
     <header class="flex items-baseline justify-between gap-3">
@@ -40,16 +41,12 @@ const kanjiInWord = computed(() =>
         <span class="font-card text-3xl font-bold">{{ word.word }}</span>
         <span class="ml-2 text-xl">{{ word.reading }}</span>
       </p>
-      <button
-        type="button"
-        class="rounded-lg bg-steel px-3 py-1 text-sm text-washi"
-        @click="$emit('close')"
-      >
+      <PixelButton colour="steel" class="px-3 py-1 text-sm" @click="$emit('close')">
         Turn over
-      </button>
+      </PixelButton>
     </header>
     <p class="text-lg">{{ word.meanings.join('; ') }}</p>
-    <section v-if="word.example" class="rounded-xl bg-white/50 p-3">
+    <section v-if="word.example" class="pixel-panel bg-white/50 p-3">
       <p class="text-lg leading-loose"><FuriganaText :marked="word.example.text" /></p>
       <p class="text-sm text-sumi/70">{{ word.example.english }}</p>
       <a
@@ -67,7 +64,8 @@ const kanjiInWord = computed(() =>
         <span
           v-for="reading in [...item.note.onyomi, ...item.note.kunyomi]"
           :key="reading"
-          class="rounded px-1.5 py-0.5 text-sm"
+          class="px-1.5 py-0.5 text-sm"
+          data-testid="kanji-reading"
           :class="
             item.used.includes(reading) ? 'bg-crimson font-semibold text-washi' : 'bg-washi-shade'
           "

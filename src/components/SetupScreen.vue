@@ -2,6 +2,7 @@
 /** First launch (L15, R9): pick a JLPT level, and type a class code if the teacher gave one. */
 import { ref } from 'vue';
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
+import PixelButton from './PixelButton.vue';
 
 defineEmits<{ start: [level: JlptLevel, classCode: string | null] }>();
 
@@ -12,21 +13,21 @@ const classCode = ref('');
   <section class="mx-auto max-w-sm space-y-6 text-center">
     <h2 class="text-xl font-semibold">Which JLPT level are you studying?</h2>
     <div class="grid grid-cols-5 gap-2">
-      <button
+      <PixelButton
         v-for="level in JLPT_LEVELS"
         :key="level"
-        type="button"
-        class="min-h-12 washi rounded-lg font-card text-lg font-semibold text-sumi"
+        colour="paper"
+        class="min-h-12 font-card text-lg font-semibold"
         @click="$emit('start', level, classCode.trim() || null)"
       >
         {{ level }}
-      </button>
+      </PixelButton>
     </div>
     <label class="block space-y-1 text-left text-sm text-washi/80">
       <span>Class code (optional, from your teacher)</span>
       <input
         v-model="classCode"
-        class="w-full rounded-lg bg-lacquer-light px-3 py-2 text-washi"
+        class="pixel-panel w-full bg-lacquer-light px-3 py-2 text-washi"
         maxlength="32"
         autocomplete="off"
       />

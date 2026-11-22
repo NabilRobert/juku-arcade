@@ -41,6 +41,7 @@ import { playSound } from '../sound/sfx.ts';
 import CardDeck from './CardDeck.vue';
 import ComboMeter from './ComboMeter.vue';
 import PlayCard from './PlayCard.vue';
+import PixelButton from './PixelButton.vue';
 import type { Point } from './throw-geometry.ts';
 
 const props = defineProps<{
@@ -196,15 +197,15 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
     </div>
     <div class="relative">
       <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
-      <button
-        type="button"
-        class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 rounded-lg bg-crimson px-8 py-2 text-xl font-bold text-washi shadow-lg transition disabled:bg-washi/15 disabled:text-washi/40"
+      <PixelButton
+        colour="crimson"
+        class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 px-8 py-2 text-xl font-bold disabled:bg-washi/15 disabled:text-washi/40"
         :disabled="!isReady || isPlaying"
         data-testid="play"
         @click="hand.play"
       >
         Play ▶
-      </button>
+      </PixelButton>
     </div>
     <div class="flex items-start gap-4 pt-4">
       <div class="flex flex-1 justify-center [--card-height:24dvh]" data-testid="reading-row">
