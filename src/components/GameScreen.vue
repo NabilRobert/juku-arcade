@@ -20,6 +20,10 @@ import GameHud from './GameHud.vue';
 import MissedTray from './MissedTray.vue';
 import ScoreBreakdown from './ScoreBreakdown.vue';
 import WellbeingGate from './WellbeingGate.vue';
+import BankPanel from '../roguelike/BankPanel.vue';
+import RunOver from '../roguelike/RunOver.vue';
+import ShopOffer from '../roguelike/ShopOffer.vue';
+import { useBankRun } from '../roguelike/useBankRun.ts';
 
 const props = defineProps<{
   deck: Deck;
@@ -32,8 +36,12 @@ const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
+  // SPIKE: the bank run holds the next set while its shop or end screen is open.
+  isHoldingNextDeal: () => bankRun.isHolding.value,
 });
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
+const bankRun = useBankRun(() => state.value, run.endCombo);
+const { run: bank, lastLoss, bestRound } = bankRun;
 
 const { nudge, isCapped, dismissNudge } = useWellbeing({
   sessionPlayMs: run.sessionPlayMs,
@@ -55,6 +63,7 @@ usePauseKey({
     <aside class="sticky top-6 flex flex-col gap-4">
       <DailyBar :progress="progress" :level="deck.level" />
       <GameHud :state="state" :now-ms="nowMs" @pause="pause" @resume="resume" />
+      <BankPanel :run="bank" :last-loss="lastLoss" @bank="bankRun.bank" />
       <ScoreBreakdown
         :score="state.lastSetScore"
         :is-showing="state.phase === 'cleared'"
@@ -81,5 +90,17 @@ usePauseKey({
       </WellbeingGate>
       <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
     </div>
+    <ShopOffer
+      v-if="bank.offer !== null"
+      :run="bank"
+      @buy="bankRun.buy"
+      @leave="bankRun.leaveShop"
+    />
+    <RunOver
+      v-else-if="bank.isOver"
+      :run="bank"
+      :best-round="bestRound"
+      @new-run="bankRun.newRun"
+    />
   </div>
 </template>

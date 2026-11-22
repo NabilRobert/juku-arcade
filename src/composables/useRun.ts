@@ -23,6 +23,8 @@ export interface RunSetup {
   words: readonly DeckWord[];
   settings: Settings;
   pastEvents: readonly GameEvent[];
+  /** SPIKE: while this is true, the next set waits (the bank run's shop and end screens). */
+  isHoldingNextDeal?: () => boolean;
 }
 
 const today = (): string => localDay(new Date());
@@ -72,6 +74,7 @@ interface Driver {
   syncedCount: number;
   setEndedAtMs: number | null;
   clock: PlayClock;
+  isHoldingNextDeal: () => boolean;
 }
 
 /** The Vue state a run shows. */
@@ -107,6 +110,7 @@ function createDriver(setup: RunSetup): Driver {
     syncedCount: 0,
     setEndedAtMs: null,
     clock: { lastTickMs: Date.now(), lastSaveMs: Date.now() },
+    isHoldingNextDeal: setup.isHoldingNextDeal ?? (() => false),
   };
 }
 
@@ -118,6 +122,7 @@ function afterChange(driver: Driver, view: RunView): void {
 
 /** Once a set has ended, waits out its pause, then deals from a fresh pool. */
 function dealNextSetAfterPause(driver: Driver, view: RunView): void {
+  if (driver.isHoldingNextDeal()) return;
   const nowMs = view.nowMs.value;
   driver.setEndedAtMs ??= nowMs;
   const pauseMs = view.state.value.phase === 'timedOut' ? TIMED_OUT_PAUSE_MS : CLEARED_PAUSE_MS;
@@ -173,6 +178,8 @@ export function useRun(setup: RunSetup) {
     throwReading: (readingIndex: number, wordId: string) =>
       act((current, context) => throwReading(current, context, readingIndex, wordId, Date.now())),
     pause: () => act((current, context) => pause(current, context, Date.now())),
+    /** SPIKE: banking the pot ends the combo (the bank run). */
+    endCombo: () => act((current) => ({ ...current, combo: 0 })),
     resume: () => act((current, context) => resume(current, context, Date.now())),
     flip: (word: DeckWord) =>
       act((current, context) => flipCard(current, context, word, Date.now())),
