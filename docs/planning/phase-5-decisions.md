@@ -482,10 +482,11 @@ ash left behind. Each card is cut into 30 by 40 square blocks (first 12 by
 16; Arthur found those too big). A block's turn is its distance from the
 top-left corner, with across counting more than down so the left side
 always clears before the right, plus a little randomness for a ragged
-edge. The snap plays 25 masks in 0.65 s (Web Animations), each hiding a
-few more blocks, starting when the throw hits. The masks are decoded
-while the card flies, because a mask swapped in undecoded flashes the
-whole card. Under
+edge. The snap plays 25 clip paths in 0.65 s (Web Animations), each
+cutting away a few more blocks, starting when the throw hits. It first
+used mask images, but the browser loads each one as it's swapped in and
+shows the card unmasked until then, which flashed; a clip path applies at
+once. Under
 reduced motion a matched card vanishes at once.
 
 - **Beat:** the top-down row wipe (Arthur: not this); particles flying

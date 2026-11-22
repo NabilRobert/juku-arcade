@@ -53,12 +53,10 @@ describe('the throw', () => {
     });
     expect(animate).not.toHaveBeenCalled();
     await card.setProps({ status: 'matched' });
-    // The masks are decoded first, within the throw's flight time.
-    await vi.waitFor(() => expect(animate).toHaveBeenCalled(), { timeout: THROW_S * 1000 + 500 });
     const [frames, timing] = animate.mock.calls[0] ?? [];
     expect(frames).toHaveLength(SNAP_FRAMES + 1);
-    expect(timing).toMatchObject({ fill: 'forwards' });
-    expect(timing.delay).toBeLessThanOrEqual(THROW_S * 1000);
+    expect(frames[0]).toHaveProperty('clipPath');
+    expect(timing).toMatchObject({ delay: THROW_S * 1000, fill: 'forwards' });
   });
 
   it('starts a dealt card on top of the deck, at the size of the deck', () => {
