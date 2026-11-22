@@ -519,3 +519,12 @@ look pixelated. Both textures are now tiny SVG tiles of hard-edged pixels
 on the card's own pixel grid: specks on the washi faces (and on paper
 panels and buttons), and a diamond lattice on the crimson backs.
 
+### D40: A pixel seal logo, and 塾 on every card back (settled: Arthur's choice, 2026-11-22)
+
+Arthur pointed out the card backs should carry 塾 (juku, a cram school,
+the game's name) rather than 札 (fuda, "card"), and asked for a logo like
+a hanko seal in our pixel style. The logo is red 塾 inside a red ring on
+a white disc, with the circle worked out on a 24-pixel grid so its edge
+steps like pixel art (`pixel-seal.ts`, drawn by `PixelSeal.vue`). It sits
+beside the title, on every card back (both kinds) and on the deck.
+

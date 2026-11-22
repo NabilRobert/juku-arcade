@@ -30,6 +30,7 @@ import SettingsPanel from './components/SettingsPanel.vue';
 import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
+import PixelSeal from './components/PixelSeal.vue';
 
 type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode' | 'stats';
 
@@ -184,7 +185,10 @@ onMounted(async () => {
     <MotionConfig reduced-motion="user">
       <TableBackground />
       <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
-        <h1 class="text-center font-card text-2xl font-bold tracking-wide text-aqua">
+        <h1
+          class="flex items-center justify-center gap-3 font-card text-2xl font-bold tracking-wide text-aqua"
+        >
+          <PixelSeal class="w-9" />
           juku-arcade
         </h1>
         <p v-if="loadError" role="alert" class="text-center text-crimson">{{ loadError }}</p>
