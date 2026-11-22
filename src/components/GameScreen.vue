@@ -11,6 +11,7 @@ import type { Deck } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import { useRun } from '../composables/useRun.ts';
 import { useWellbeing } from '../composables/useWellbeing.ts';
+import { usePauseKey } from '../composables/usePauseKey.ts';
 import type { Settings } from '../memory/storage.ts';
 import CardBack from './CardBack.vue';
 import DailyBar from './DailyBar.vue';
@@ -39,6 +40,13 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   playMsToday: run.playMsToday,
   isAway: () => props.isAway,
   pause,
+});
+
+usePauseKey({
+  isPaused: () => state.value.pausedAtMs !== null,
+  isAvailable: () => !props.isAway && state.value.phase === 'playing',
+  pause,
+  resume,
 });
 </script>
 
