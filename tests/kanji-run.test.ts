@@ -1,0 +1,121 @@
+// Playing a kanji round: pick readings, throw them in turn, see the ones you missed.
+import { mount } from '@vue/test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
+import { THROW_S } from '../src/components/card-motion.ts';
+import { PLAY_STEP_MS } from '../src/composables/useHand.ts';
+import type { Deck, KanjiNote } from '../src/deck/types.ts';
+import { POINTS_PER_HIT } from '../src/kanji/kanji-round.ts';
+import { useKanjiRun } from '../src/kanji/useKanjiRun.ts';
+import { deckWord, seededRandom } from './helpers/fixtures.ts';
+
+vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/sound/sfx.ts')>()),
+  playSound: vi.fn(),
+}));
+
+const note = (onyomi: string[], kunyomi: string[]): KanjiNote => ({
+  onyomi,
+  kunyomi,
+  meanings: [],
+  words: [],
+});
+const used = (id: string, readings: Record<string, string[]>) => ({
+  ...deckWord(id, id, ''),
+  kanjiReadingsUsed: readings,
+});
+
+const DECK: Deck = {
+  level: 'N5',
+  sourceCommit: 'test',
+  kanji: Object.fromEntries(
+    ['生', '学', '日', '人', '山', '川', '木', '火', '水'].map((kanji) => [kanji, note([], [])]),
+  ),
+  words: [
+    used('a', { 生: ['セイ', 'う.まれる'] }),
+    used('b', { 学: ['ガク'] }),
+    used('c', { 日: ['ニチ'] }),
+    used('d', { 人: ['ひと'] }),
+    used('e', { 山: ['やま'] }),
+    used('f', { 川: ['かわ'] }),
+    used('g', { 木: ['き'] }),
+    used('h', { 火: ['ひ'] }),
+    used('i', { 水: ['みず'] }),
+  ],
+};
+
+const THROW_MS = THROW_S * 1000;
+
+function runFor() {
+  let run!: ReturnType<typeof useKanjiRun>;
+  mount(
+    defineComponent({
+      setup() {
+        run = useKanjiRun(DECK, seededRandom(2));
+        return () => h('div');
+      },
+    }),
+  );
+  return run;
+}
+
+function rightIndexes(run: ReturnType<typeof useKanjiRun>): number[] {
+  return run.round.value.cards.flatMap((card, index) => (card.isRight ? [index] : []));
+}
+
+describe('a kanji round', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('lets the player pick cards and put them back, and plays only once something is picked', () => {
+    const run = runFor();
+    expect(run.canPlay.value).toBe(false);
+    run.toggle(0);
+    expect(run.statusOf(0)).toBe('selected');
+    run.toggle(0);
+    expect(run.statusOf(0)).toBe('idle');
+  });
+
+  it('throws the picked cards one at a time, then shows the right readings left in the hand', () => {
+    const run = runFor();
+    const rights = rightIndexes(run);
+    const wrong = run.round.value.cards.findIndex((card) => !card.isRight);
+    const [firstRight] = rights;
+    if (firstRight === undefined) throw new Error('the round has no right reading');
+    run.toggle(firstRight);
+    run.toggle(wrong);
+    run.play();
+    vi.advanceTimersByTime(0);
+    expect(run.thrown.value).toHaveLength(1);
+    vi.advanceTimersByTime(PLAY_STEP_MS + THROW_MS);
+    expect(run.phase.value).toBe('revealed');
+    expect(run.statusOf(firstRight)).toBe('matched');
+    expect(run.statusOf(wrong)).toBe('wrong');
+    for (const missed of rights.slice(1)) expect(run.statusOf(missed)).toBe('correct');
+    expect(run.score.value).toBe(POINTS_PER_HIT);
+  });
+
+  it('builds the combo with each right card and breaks it on a wrong one', () => {
+    const run = runFor();
+    const rights = rightIndexes(run);
+    for (const index of rights) run.toggle(index);
+    run.play();
+    vi.advanceTimersByTime(10_000);
+    expect(run.combo.value).toBe(rights.length);
+    run.toggle(run.round.value.cards.findIndex((card) => !card.isRight));
+    run.play();
+    vi.advanceTimersByTime(THROW_MS);
+    expect(run.combo.value).toBe(0);
+  });
+
+  it('deals the next kanji after the answers have shown', () => {
+    const run = runFor();
+    const first = run.round.value.kanji;
+    run.toggle(rightIndexes(run)[0] ?? 0);
+    run.play();
+    vi.advanceTimersByTime(10_000);
+    expect(run.roundNumber.value).toBe(2);
+    expect(run.round.value.kanji).not.toBe(first);
+    expect(run.phase.value).toBe('picking');
+  });
+});

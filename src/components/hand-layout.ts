@@ -30,13 +30,20 @@ export function floatStyle(kind: 'word' | 'reading', index: number): Record<stri
   };
 }
 
-/** A reading card's place in a fan of `count` cards: turned and dropped by how far it is from the middle. */
-export function fanStyle(index: number, count: number): Record<string, string> {
+/**
+ * A reading card's place in a fan of `count` cards: turned and dropped by
+ * how far it is from the middle. A bigger hand overlaps more, to fit.
+ */
+export function fanStyle(
+  index: number,
+  count: number,
+  overlap: string = HAND_OVERLAP,
+): Record<string, string> {
   const fromMiddle = index - (count - 1) / 2;
   const turn = fromMiddle * FAN_TURN_DEG;
   const drop = fromMiddle * fromMiddle * FAN_DROP_PX;
   return {
     transform: `translateY(${drop}px) rotate(${turn}deg)`,
-    marginLeft: index === 0 ? '0' : HAND_OVERLAP,
+    marginLeft: index === 0 ? '0' : overlap,
   };
 }
