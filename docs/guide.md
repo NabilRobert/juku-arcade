@@ -102,7 +102,7 @@ flowchart LR
 
 ## The flow, part 3: pause and flip
 
-1. **⏸ Pause** in **`GameHud.vue`** (or hiding the tab, or opening the
+1. **⏸ Pause** in **`GameHud.vue`**, or the Esc key (**`usePauseKey.ts`**) (or hiding the tab, or opening the
    About page) calls **`pause.ts: pause`**. The clock stops, and
    **`card-status.ts`** turns every card face down.
 2. Tapping a face-down word card calls **`pause.ts: flipCard`**.

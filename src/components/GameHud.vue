@@ -75,6 +75,7 @@ function toggleSound(): void {
       @click="isPaused ? $emit('resume') : $emit('pause')"
     >
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
+      <span class="ml-1 text-xs opacity-70" aria-hidden="true">Esc</span>
     </PixelButton>
     <PixelButton
       :colour="isMuted ? 'crimson' : 'steel'"

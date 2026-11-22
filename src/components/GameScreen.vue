@@ -12,6 +12,7 @@ import type { Deck } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import { dueNudge, isOverDailyCap, parseCapMinutes } from '../game/wellbeing.ts';
 import { useRun } from '../composables/useRun.ts';
+import { usePauseKey } from '../composables/usePauseKey.ts';
 import type { Settings } from '../memory/storage.ts';
 import CardBack from './CardBack.vue';
 import DailyBar from './DailyBar.vue';
@@ -44,6 +45,13 @@ function dismissNudge(isStopping: boolean): void {
   if (nudge.value !== null) shownNudges.value = [...shownNudges.value, nudge.value];
   if (isStopping) pause();
 }
+
+usePauseKey({
+  isPaused: () => state.value.pausedAtMs !== null,
+  isAvailable: () => !props.isAway && state.value.phase === 'playing',
+  pause,
+  resume,
+});
 
 watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
   if (isAway || capped || due !== null) pause();
