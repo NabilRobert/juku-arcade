@@ -6,7 +6,7 @@
  * a face-down pixel card (CardFrame.vue).
  */
 import CardFrame from './CardFrame.vue';
-import { DECK_MARK } from './deck-mark.ts';
+import PixelSeal from './PixelSeal.vue';
 
 /** Cards drawn in the stack, each a little higher than the one under it. */
 const LAYERS = 3;
@@ -25,7 +25,7 @@ const LAYERS = 3;
       :style="{ transform: `translate(${-layer * 2}px, ${-layer * 3}px)` }"
     >
       <CardFrame frame="crimson" :is-face-down="true" />
-      <span v-if="layer === LAYERS" class="relative" lang="ja">{{ DECK_MARK }}</span>
+      <PixelSeal v-if="layer === LAYERS" class="w-[52cqw]" />
     </span>
   </div>
 </template>

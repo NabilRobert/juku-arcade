@@ -232,6 +232,10 @@ detected at each class size.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
+- **The logo** (D40) is red 塾 in a red pixel ring on white, like a hanko
+  seal: `PixelSeal.vue`, its circle worked out on a pixel grid in
+  `pixel-seal.ts`. It sits beside the title, on every card back and on the
+  deck.
 - **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
   `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
   top edge and a shaded bottom edge. Every button outside the cards is a
