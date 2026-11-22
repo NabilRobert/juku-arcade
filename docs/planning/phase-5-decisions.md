@@ -446,3 +446,7 @@ motion the wipe is skipped.
   look and font, and we'd override most of it); styling each button
   separately (the same code eleven times).
 
+**D33 update (2026-11-22):** Arthur asked for every card to be crimson,
+reading cards too, with a crimson back. A wrong card's frame now turns
+dark instead of crimson, so it still stands out, with its shake and ✗.
+
