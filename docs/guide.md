@@ -212,8 +212,9 @@ detected at each class size.
   another, turning face up as it flies; pausing turns every card over in
   a wave (each card draws a front and a back, `PlayCard.vue`); a held
   card lifts, a laid card shifts up out of the fan, and a matched
-  reading card flies on, spinning, to its word card, hits it, and both
-  fall over. Dragging uses Motion's drag, so `App.vue` loads the `domMax`
+  reading card flies on, spinning, to its word card and hits it, and
+  both then dissolve from the top down in chunky pixel rows
+  (`.pixel-dissolve` in `style.css`). Dragging uses Motion's drag, so `App.vue` loads the `domMax`
   bundle. Every card sits in a slot the size of the card that never moves
   (`composables/useTableSlots.ts`), so the slots can be measured before
   any card is drawn: `useDeal.ts` measures where the deck is from each
@@ -317,7 +318,7 @@ fields. They stay in memory until slice 3 stores them.
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
-| **Throw** | A laid reading card flying at its word card; a right pair spins on and knocks the word card down. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
+| **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both dissolve. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
 | **Slot** | The fixed place a card sits in; cards move by being drawn away from it | `useTableSlots.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the crimson difficulty tag) | `style.css`, `PlayCard.vue` |

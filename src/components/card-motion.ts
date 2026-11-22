@@ -1,25 +1,25 @@
 /**
  * How a card moves (PlayCard passes these to Motion). A matched pair plays
- * one throw: the reading card spins through the air to its word card, hits
- * it, and both fall over. Whether the player dragged and flung the card or
+ * one throw: the reading card spins through the air to its word card and
+ * hits it, the word card jolts, and both then dissolve from the top down
+ * in chunky pixel rows (a CSS animation, .pixel-dissolve, PlayCard.vue). Whether the player dragged and flung the card or
  * laid it and played the hand, the flight starts from wherever the card
  * is. A laid card shifts up out of the hand, a word card a dragged card
  * is over rises to meet it, and a new set comes off the deck face down,
  * one card after another, turning face up as it flies. Pausing turns
- * every card over in a quick wave. Motion skips the movement
- * and keeps the fades when the system asks for reduced motion (App.vue).
+ * every card over in a quick wave. Motion skips the movement when the
+ * system asks for reduced motion (App.vue), and a matched card then
+ * vanishes at once.
  */
 import type { CardStatus } from '../game/card-status.ts';
 import type { Offset, Placement } from './throw-geometry.ts';
 
-/** How long the thrown card flies before it hits, and how long both then take to fall. */
+/** How long the thrown card flies before it hits, and how long the hit's jolt then takes to settle. */
 export const THROW_S = 0.36;
 export const FALL_S = 0.34;
 /** Whole turns the thrown card spins in flight, so it lands square on the word card. */
 const THROW_TURNS = 2;
-/** How far the knocked-down cards drop, in pixels. */
-const FALL_PX = 40;
-/** Depth for tipping the word card back; smaller looks more dramatic. */
+/** Depth for 3D turns (the flip); smaller looks more dramatic. */
 const KNOCK_PERSPECTIVE_PX = 500;
 /** Seconds between one card coming off the deck and the next: slow enough to see each one dealt. */
 const DEAL_STAGGER_S = 0.07;
@@ -28,7 +28,7 @@ const DEAL_TURN_DEG = -8;
 
 /** The share of the whole animation at which the thrown card hits. */
 const HIT_AT = THROW_S / (THROW_S + FALL_S);
-/** Keyframe times: start, the hit, a short bump on impact, lying flat. */
+/** Keyframe times: start, the hit, a short bump on impact, settled. */
 const KNOCK_TIMES = [0, HIT_AT, HIT_AT + 0.12, 1];
 
 // Every pose names every value: Motion sends a value a pose leaves out back
@@ -38,7 +38,7 @@ export type Pose = Record<string, number | Keyframes>;
 export type Transition = Record<string, unknown>;
 
 /** With no deck measured (only in tests): a card fades in from above its place. */
-/** The 3D values every pose names; the depth only shows once a word card tips back. */
+/** The 3D values every pose names; the depth only shows while a card turns over. */
 const FLAT: Pose = { rotateX: 0, rotateY: 0, transformPerspective: KNOCK_PERSPECTIVE_PX };
 /** A card turned over: its back faces the player (PlayCard draws both sides). */
 const FACE_DOWN_DEG = 180;
@@ -66,28 +66,23 @@ function thrown(target: Offset): Pose {
   const spin = THROW_TURNS * 360;
   return {
     x: [null, target.x, target.x, target.x],
-    y: [null, target.y, target.y - 4, target.y + FALL_PX],
-    rotate: [null, spin, spin, spin + 10],
-    scale: [null, 0.92, 0.92, 0.8],
-    opacity: [null, 1, 1, 0],
+    y: [null, target.y, target.y - 4, target.y],
+    rotate: [null, spin, spin, spin],
+    scale: [null, 0.92, 0.97, 0.92],
+    opacity: 1,
     ...FLAT,
   };
 }
 
-/** The word card stands until the hit, jolts, then tips back and falls. */
-function knockedDown(index: number): Pose {
-  const tilt = index % 2 === 0 ? -12 : 12;
-  return {
-    x: 0,
-    rotateY: 0,
-    y: [null, 0, -6, FALL_PX],
-    rotate: [null, 0, 0, tilt],
-    rotateX: [null, 0, 0, 70],
-    transformPerspective: KNOCK_PERSPECTIVE_PX,
-    scale: [null, 1, 1.08, 0.85],
-    opacity: [null, 1, 1, 0],
-  };
-}
+/** The word card stands until the hit, then jolts and settles where it is. */
+const JOLTED: Pose = {
+  ...FLAT,
+  x: 0,
+  y: [null, 0, -6, 0],
+  rotate: 0,
+  scale: [null, 1, 1.08, 1],
+  opacity: 1,
+};
 
 export interface CardMotionInput {
   status: CardStatus;
@@ -110,9 +105,9 @@ function tablePose({ status, isTargeted, isLaid }: CardMotionInput): Pose {
 }
 
 export function cardPose(input: CardMotionInput): Pose {
-  const { status, kind, index, throwTo } = input;
+  const { status, kind, throwTo } = input;
   if (status !== 'matched') return tablePose(input);
-  if (kind === 'word') return knockedDown(index);
+  if (kind === 'word') return JOLTED;
   return throwTo === undefined ? FLOWN_OFF : thrown(throwTo);
 }
 
