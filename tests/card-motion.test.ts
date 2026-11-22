@@ -1,4 +1,5 @@
-// The throw: a matched reading card flies to its word card and knocks it down.
+// The throw: a matched reading card flies to its word card, hits it, and both dissolve.
+import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import PlayCard from '../src/components/PlayCard.vue';
 import { cardPose, dealtFrom } from '../src/components/card-motion.ts';
@@ -28,14 +29,24 @@ describe('the throw', () => {
     expect((pose.x as number[])[HIT]).toBe(60);
     expect((pose.y as number[])[HIT]).toBe(-190);
     expect(((pose.rotate as number[])[HIT] ?? 1) % 360).toBe(0);
-    expect((pose.opacity as number[])[LAST]).toBe(0);
+    // It stays on the word card after the hit, to dissolve there.
+    expect((pose.y as number[])[LAST]).toBe(-190);
   });
 
-  it('keeps the word card standing until the hit, then knocks it over', () => {
+  it('jolts the word card at the hit and leaves it standing, to dissolve where it is', () => {
     const pose = cardPose({ status: 'matched', kind: 'word', index: 0 });
-    expect((pose.rotateX as number[])[HIT]).toBe(0);
-    expect((pose.opacity as number[])[HIT]).toBe(1);
-    expect((pose.rotateX as number[])[LAST]).toBeGreaterThan(45);
+    expect((pose.scale as number[])[HIT + 1]).toBeGreaterThan(1);
+    expect((pose.y as number[])[LAST]).toBe(0);
+    expect(pose.opacity).toBe(1);
+  });
+
+  it('dissolves a matched card once the throw has hit', async () => {
+    const card = mount(PlayCard, {
+      props: { text: '学校', kind: 'word', index: 0, status: 'idle', level: 'N5' },
+    });
+    expect(card.find('.pixel-dissolve').exists()).toBe(false);
+    await card.setProps({ status: 'matched' });
+    expect(card.find('.pixel-dissolve').exists()).toBe(true);
   });
 
   it('starts a dealt card on top of the deck, at the size of the deck', () => {

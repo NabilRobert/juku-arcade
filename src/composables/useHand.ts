@@ -3,7 +3,7 @@
  * goes with which word card, and playing the hand. A laid card stays in
  * the player's hand, lifted, tagged with its word's number (1 to 5). Playing throws the laid cards one after another, left to
  * right, each through the same throw a dragged card makes (taps.ts), so
- * every hit lands, knocks its word down and builds the combo in turn.
+ * every hit lands, dissolves with its word and builds the combo in turn.
  * A wrong card springs back to the player's hand to be laid again.
  */
 import { computed, onUnmounted, ref, shallowRef, watch, type ShallowRef } from 'vue';

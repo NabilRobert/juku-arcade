@@ -27,7 +27,7 @@
 import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
-import { cardPose, cardTransition, dealtFrom } from './card-motion.ts';
+import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../deck/types.ts';
 import { useCardTilt } from '../composables/useCardTilt.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
@@ -106,6 +106,9 @@ const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
  */
 const SIDE_CLASS =
   'absolute inset-0 flex flex-col items-center justify-center px-2 backface-hidden';
+
+/** A matched card starts to dissolve when the throw hits (.pixel-dissolve in style.css). */
+const DISSOLVE_DELAY = { '--dissolve-delay': `${THROW_S}s` };
 
 const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correct: '✓' };
 
@@ -201,7 +204,11 @@ function onClick(): void {
     @click="onClick"
     @animation-complete="isDealt = true"
   >
-    <span class="absolute inset-0 [transform-style:preserve-3d]" :style="tiltStyle">
+    <span
+      class="absolute inset-0 [transform-style:preserve-3d]"
+      :class="{ 'pixel-dissolve': status === 'matched' }"
+      :style="[tiltStyle, DISSOLVE_DELAY]"
+    >
       <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
         <CardFrame :frame="frame" :is-face-down="false" />
         <span
