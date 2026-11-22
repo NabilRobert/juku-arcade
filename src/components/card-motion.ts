@@ -4,8 +4,9 @@
  * it, and both fall over. Whether the player dragged and flung the card or
  * laid it and played the hand, the flight starts from wherever the card
  * is. A laid card shifts up out of the hand, a word card a dragged card
- * is over rises to meet it, and a new set
- * comes off the deck one card after another. Motion skips the movement
+ * is over rises to meet it, and a new set comes off the deck face down,
+ * one card after another, turning face up as it flies. Pausing turns
+ * every card over in a quick wave. Motion skips the movement
  * and keeps the fades when the system asks for reduced motion (App.vue).
  */
 import type { CardStatus } from '../game/card-status.ts';
@@ -38,7 +39,11 @@ export type Transition = Record<string, unknown>;
 
 /** With no deck measured (only in tests): a card fades in from above its place. */
 /** The 3D values every pose names; the depth only shows once a word card tips back. */
-const FLAT: Pose = { rotateX: 0, transformPerspective: KNOCK_PERSPECTIVE_PX };
+const FLAT: Pose = { rotateX: 0, rotateY: 0, transformPerspective: KNOCK_PERSPECTIVE_PX };
+/** A card turned over: its back faces the player (PlayCard draws both sides). */
+const FACE_DOWN_DEG = 180;
+/** Seconds between one card flipping over and the next, when the game pauses. */
+const FLIP_STAGGER_S = 0.03;
 
 const DEAL_FROM_ABOVE: Pose = { ...FLAT, opacity: 0, x: -24, y: -70, rotate: -14, scale: 0.9 };
 
@@ -49,10 +54,11 @@ const LAID: Pose = { ...RESTING, y: -22 };
 /** A matched card with nowhere measured to fly (only in tests): it floats away. */
 const FLOWN_OFF: Pose = { ...RESTING, opacity: 0, y: -28, scale: 0.8 };
 
-/** Where a card starts before it's dealt: on top of the deck, the deck's size. */
+/** Where a card starts before it's dealt: face down on top of the deck, the deck's size. */
 export function dealtFrom(deck: Placement | undefined): Pose {
   if (deck === undefined) return DEAL_FROM_ABOVE;
-  return { ...FLAT, opacity: 1, x: deck.x, y: deck.y, rotate: DEAL_TURN_DEG, scale: deck.scale };
+  const { x, y, scale } = deck;
+  return { ...FLAT, rotateY: FACE_DOWN_DEG, opacity: 1, x, y, rotate: DEAL_TURN_DEG, scale };
 }
 
 /** The reading card's flight: `null` starts from wherever the card is now. */
@@ -73,6 +79,7 @@ function knockedDown(index: number): Pose {
   const tilt = index % 2 === 0 ? -12 : 12;
   return {
     x: 0,
+    rotateY: 0,
     y: [null, 0, -6, FALL_PX],
     rotate: [null, 0, 0, tilt],
     rotateX: [null, 0, 0, 70],
@@ -94,16 +101,25 @@ export interface CardMotionInput {
   isLaid?: boolean;
 }
 
-export function cardPose(input: CardMotionInput): Pose {
-  const { status, kind, index, throwTo, isTargeted, isLaid } = input;
+/** A card still on the table: face down while paused, else lifted, laid or resting. */
+function tablePose({ status, isTargeted, isLaid }: CardMotionInput): Pose {
+  const base = isLaid === true ? LAID : RESTING;
+  if (status === 'hidden') return { ...base, rotateY: FACE_DOWN_DEG };
   if (status === 'selected' || (isTargeted === true && status === 'idle')) return LIFTED;
-  if (isLaid === true && status !== 'matched') return LAID;
-  if (status !== 'matched') return RESTING;
+  return base;
+}
+
+export function cardPose(input: CardMotionInput): Pose {
+  const { status, kind, index, throwTo } = input;
+  if (status !== 'matched') return tablePose(input);
   if (kind === 'word') return knockedDown(index);
   return throwTo === undefined ? FLOWN_OFF : thrown(throwTo);
 }
 
-/** Only the deal is staggered; after that a card answers a click at once. */
+/** A flip turns a little slower and softer than other moves, so it reads as a turn. */
+const FLIP_SPRING: Transition = { type: 'spring', stiffness: 260, damping: 22 };
+
+/** The deal and the pause flip are staggered; otherwise a card answers a click at once. */
 export function cardTransition(status: CardStatus, index: number, isDealt: boolean): Transition {
   if (status === 'matched') {
     return {
@@ -112,6 +128,8 @@ export function cardTransition(status: CardStatus, index: number, isDealt: boole
       ease: ['easeIn', 'easeOut', 'easeIn'],
     };
   }
+  if (status === 'hidden') return { ...FLIP_SPRING, delay: index * FLIP_STAGGER_S };
   const delay = isDealt ? 0 : index * DEAL_STAGGER_S;
-  return { type: 'spring', stiffness: 380, damping: 26, delay };
+  // Turning over keeps its softer spring, whichever way the card turns.
+  return { type: 'spring', stiffness: 380, damping: 26, delay, rotateY: { ...FLIP_SPRING, delay } };
 }

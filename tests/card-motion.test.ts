@@ -58,11 +58,21 @@ describe('the throw', () => {
     expect((thrown.y as number[])[HIT]).toBe(-100);
   });
 
+  it('turns a card face down when the game pauses, and face up again after', () => {
+    expect(cardPose({ status: 'hidden', kind: 'word', index: 0 }).rotateY).toBe(180);
+    expect(cardPose({ status: 'idle', kind: 'word', index: 0 }).rotateY).toBe(0);
+  });
+
+  it('deals a card face down off the deck, so it turns face up as it flies', () => {
+    expect(dealtFrom({ x: 0, y: 0, scale: 1 }).rotateY).toBe(180);
+  });
+
   it('names x and the depth in every pose, so no card slides or warps back to where it was dealt from', () => {
     const statuses: CardStatus[] = ['idle', 'selected', 'matched', 'wrong', 'hidden'];
     for (const status of statuses) {
       expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('x');
       expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('transformPerspective');
+      expect(cardPose({ status, kind: 'word', index: 0 })).toHaveProperty('rotateY');
       expect(
         cardPose({ status, kind: 'reading', index: 0, throwTo: { x: 1, y: 1 } }),
       ).toHaveProperty('x');

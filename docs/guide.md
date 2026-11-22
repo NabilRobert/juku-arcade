@@ -208,8 +208,10 @@ detected at each class size.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the
   system's reduce-motion setting. `components/card-motion.ts` says how
-  each card moves: a new set comes off the deck one card after another,
-  a held card lifts, a laid card shifts up out of the fan, and a matched
+  each card moves: a new set comes off the deck face down, one card after
+  another, turning face up as it flies; pausing turns every card over in
+  a wave (each card draws a front and a back, `PlayCard.vue`); a held
+  card lifts, a laid card shifts up out of the fan, and a matched
   reading card flies on, spinning, to its word card, hits it, and both
   fall over. Dragging uses Motion's drag, so `App.vue` loads the `domMax`
   bundle. Every card sits in a slot the size of the card that never moves
@@ -221,6 +223,9 @@ detected at each class size.
   `GameBoard.vue`). Inside its slot every card floats: a CSS animation
   (`float` in `style.css`) bobs and sways it, each card out of step with
   the next (`floatStyle`).
+  Every card also tilts in 3D toward the mouse while it's over the card
+  (`composables/useCardTilt.ts`, maths in `components/card-tilt.ts`), on
+  a layer inside the card so it adds to whatever Motion is doing.
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
@@ -354,7 +359,9 @@ fields. They stay in memory until slice 3 stores them.
   `src/style.css`.
 - **Change an animation:** card motion is in `components/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
-  `DEAL_STAGGER_S` the time between dealt cards, `HELD_POSE` in `PlayCard.vue` a held card);
+  `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
+  `FLIP_STAGGER_S` the pause flip, `MAX_TILT_DEG` in `card-tilt.ts` how far a
+  card leans toward the mouse, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
 - **Change a sound:** edit its numbers in `SOUNDS` in `sound/sfx.ts`
   (the comment there names each one), or point it at a different file in

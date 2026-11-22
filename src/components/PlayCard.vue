@@ -8,6 +8,9 @@
  * as karuta's grab cards are; word cards carry a hanko stamp for their
  * tag. How the card moves lives in card-motion.ts.
  *
+ * Every card tilts toward the mouse while it's over the card
+ * (useCardTilt.ts), as a held card turns to the light.
+ *
  * Reading cards can be picked up and dropped under a word card (Motion's
  * drag): the card reports where it is while dragged and where and how fast
  * it was let go, and the board decides which word card it was aimed at.
@@ -17,14 +20,16 @@
  * The frame's colour shows the card's state: white when aimed at, crimson
  * when wrong, aqua when it's the right answer.
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
- * shows ✗, a right one shows ✓. While paused, cards are face down (D8):
- * word cards can be tapped to flip them, reading cards can't.
+ * shows ✗, a right one shows ✓. While paused, cards turn face down (D8),
+ * showing the back drawn on the other side: word cards can be tapped to
+ * flip them, reading cards can't.
  */
 import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import { cardPose, cardTransition, dealtFrom } from './card-motion.ts';
 import type { JlptLevel } from '../deck/types.ts';
+import { useCardTilt } from '../composables/useCardTilt.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
@@ -65,6 +70,8 @@ const emit = defineEmits<{
 /** A held card grows and tilts, as a card does when picked up off the table. */
 const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 
+const { tiltStyle, follow, settle } = useCardTilt();
+
 /** Largest text size (rem): short words are big, as on a printed card. */
 const MAX_TEXT_REM = { word: 3.5, reading: 2.6 } as const;
 /**
@@ -98,6 +105,13 @@ const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
   wrong: 'crimson',
   correct: 'aqua',
 };
+
+/**
+ * Each side of the card fills it and hides when turned away, so turning
+ * the card over (card-motion.ts) shows the front or the back.
+ */
+const SIDE_CLASS =
+  'absolute inset-0 flex flex-col items-center justify-center px-2 backface-hidden';
 
 const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correct: '✓' };
 
@@ -158,6 +172,7 @@ function onRelease(info: PanInfo): void {
 
 function onPickUp(): void {
   wasDragged.value = true;
+  settle();
   emit('pickUp');
 }
 
@@ -171,7 +186,7 @@ function onClick(): void {
 <template>
   <m.button
     type="button"
-    class="@container relative mx-auto flex aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] flex-col items-center justify-center px-2 font-card whitespace-nowrap text-sumi"
+    class="@container relative mx-auto block aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] font-card whitespace-nowrap text-sumi [transform-style:preserve-3d]"
     :class="[STATUS_CLASSES[status], isThrowable ? 'cursor-grab active:cursor-grabbing' : '']"
     :initial="dealtPose"
     :animate="pose"
@@ -184,56 +199,61 @@ function onClick(): void {
     drag-snap-to-origin
     :while-drag="HELD_POSE"
     @pointerdown="wasDragged = false"
+    @pointermove="follow"
+    @pointerleave="settle"
     @drag-start="onPickUp"
     @drag="(_event: PointerEvent, info: PanInfo) => emit('drag', info.point)"
     @drag-end="(_event: PointerEvent, info: PanInfo) => onRelease(info)"
     @click="onClick"
     @animation-complete="isDealt = true"
   >
-    <CardFrame :frame="frame" :is-face-down="isFaceDown" />
-    <span v-if="isFaceDown" aria-hidden="true" class="relative text-3xl text-aqua">{{
-      kind === 'word' ? '札' : ''
-    }}</span>
-    <template v-else>
-      <span
-        class="absolute top-[9cqw] left-[9cqw] text-[7cqw] leading-none"
-        :class="suitClass"
-        aria-hidden="true"
-        >{{ cornerMark }}</span
-      >
-      <span
-        class="absolute right-[9cqw] bottom-[9cqw] rotate-180 text-[7cqw] leading-none"
-        :class="suitClass"
-        aria-hidden="true"
-        >{{ SUITS[kind] }}</span
-      >
-      <span
-        class="absolute bottom-[8cqw] left-[9cqw] font-sans text-[10cqw] leading-none text-sumi/75"
-        lang="en"
-        data-testid="level-mark"
-        >{{ level }}</span
-      >
-      <span
-        class="relative flex flex-col items-center leading-tight"
-        :class="kind === 'reading' ? '[writing-mode:vertical-rl]' : ''"
-        :style="textStyle"
-      >
-        <span v-for="line in lines" :key="line">{{ line }}</span>
+    <span class="absolute inset-0 [transform-style:preserve-3d]" :style="tiltStyle">
+      <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
+        <CardFrame :frame="frame" :is-face-down="false" />
+        <span
+          class="absolute top-[9cqw] left-[9cqw] text-[7cqw] leading-none"
+          :class="suitClass"
+          aria-hidden="true"
+          >{{ cornerMark }}</span
+        >
+        <span
+          class="absolute right-[9cqw] bottom-[9cqw] rotate-180 text-[7cqw] leading-none"
+          :class="suitClass"
+          aria-hidden="true"
+          >{{ SUITS[kind] }}</span
+        >
+        <span
+          class="absolute bottom-[8cqw] left-[9cqw] font-sans text-[10cqw] leading-none text-sumi/75"
+          lang="en"
+          data-testid="level-mark"
+          >{{ level }}</span
+        >
+        <span
+          class="relative flex flex-col items-center leading-tight"
+          :class="kind === 'reading' ? '[writing-mode:vertical-rl]' : ''"
+          :style="textStyle"
+        >
+          <span v-for="line in lines" :key="line">{{ line }}</span>
+        </span>
+        <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
+        <span
+          v-if="tag !== undefined"
+          class="absolute -top-2 -right-2 border-2 border-crimson bg-washi px-1 py-0.5 font-sans text-[0.65rem] text-crimson shadow-[0_2px_0_rgb(0_0_0/0.5)]"
+          lang="en"
+          >+{{ tag.toFixed(1) }}×</span
+        >
+        <span
+          v-if="order !== undefined"
+          class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
+          lang="en"
+          data-testid="order-tag"
+          >{{ order }}</span
+        >
       </span>
-      <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
-      <span
-        v-if="tag !== undefined"
-        class="absolute -top-2 -right-2 border-2 border-crimson bg-washi px-1 py-0.5 font-sans text-[0.65rem] text-crimson shadow-[0_2px_0_rgb(0_0_0/0.5)]"
-        lang="en"
-        >+{{ tag.toFixed(1) }}×</span
-      >
-      <span
-        v-if="order !== undefined"
-        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
-        lang="en"
-        data-testid="order-tag"
-        >{{ order }}</span
-      >
-    </template>
+      <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
+        <CardFrame frame="plain" :is-face-down="true" />
+        <span class="relative">{{ kind === 'word' ? '札' : '' }}</span>
+      </span>
+    </span>
   </m.button>
 </template>
