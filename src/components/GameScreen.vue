@@ -7,11 +7,10 @@
  * or a flipped card's back while paused, then the missed tray. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
-import { computed, ref, watch } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
-import { dueNudge, isOverDailyCap, parseCapMinutes } from '../game/wellbeing.ts';
 import { useRun } from '../composables/useRun.ts';
+import { useWellbeing } from '../composables/useWellbeing.ts';
 import type { Settings } from '../memory/storage.ts';
 import CardBack from './CardBack.vue';
 import DailyBar from './DailyBar.vue';
@@ -19,7 +18,7 @@ import GameBoard from './GameBoard.vue';
 import GameHud from './GameHud.vue';
 import MissedTray from './MissedTray.vue';
 import ScoreBreakdown from './ScoreBreakdown.vue';
-import WellbeingNudge from './WellbeingNudge.vue';
+import WellbeingGate from './WellbeingGate.vue';
 
 const props = defineProps<{
   deck: Deck;
@@ -35,18 +34,11 @@ const run = useRun({
 });
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
 
-const CAP_MINUTES = parseCapMinutes(import.meta.env.VITE_DAILY_CAP_MINUTES);
-const shownNudges = ref<number[]>([]);
-const nudge = computed(() => dueNudge(run.sessionPlayMs.value, shownNudges.value));
-const isCapped = computed(() => isOverDailyCap(run.playMsToday.value, CAP_MINUTES));
-
-function dismissNudge(isStopping: boolean): void {
-  if (nudge.value !== null) shownNudges.value = [...shownNudges.value, nudge.value];
-  if (isStopping) pause();
-}
-
-watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
-  if (isAway || capped || due !== null) pause();
+const { nudge, isCapped, dismissNudge } = useWellbeing({
+  sessionPlayMs: run.sessionPlayMs,
+  playMsToday: run.playMsToday,
+  isAway: () => props.isAway,
+  pause,
 });
 </script>
 
@@ -62,33 +54,23 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
       />
     </aside>
     <div class="flex flex-col gap-5">
-      <section v-if="isCapped" class="pixel-panel washi p-6 text-center text-sumi" role="status">
-        <p class="font-card text-xl font-semibold">That's today's play. See you tomorrow!</p>
-        <p class="mt-1 text-sm text-sumi/70">
-          Your school set a daily limit of {{ CAP_MINUTES }} minutes.
-        </p>
-      </section>
-      <WellbeingNudge
-        v-else-if="nudge !== null"
-        :minutes="nudge"
-        @stop="dismissNudge(true)"
-        @keep-going="dismissNudge(false)"
-      />
-      <CardBack
-        v-else-if="state.flippedWord"
-        :word="state.flippedWord"
-        :kanji="deck.kanji"
-        @close="flip(state.flippedWord)"
-      />
-      <GameBoard
-        v-else
-        :state="state"
-        :now-ms="nowMs"
-        :tags="tags"
-        :level="deck.level"
-        @throw="throwReading"
-        @flip="flip"
-      />
+      <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
+        <CardBack
+          v-if="state.flippedWord"
+          :word="state.flippedWord"
+          :kanji="deck.kanji"
+          @close="flip(state.flippedWord)"
+        />
+        <GameBoard
+          v-else
+          :state="state"
+          :now-ms="nowMs"
+          :tags="tags"
+          :level="deck.level"
+          @throw="throwReading"
+          @flip="flip"
+        />
+      </WellbeingGate>
       <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
     </div>
   </div>

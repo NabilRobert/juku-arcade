@@ -16,7 +16,9 @@ flowchart TD
     E --> G["src/deck/readings.ts<br/>irregular check, other-reading decoy"]
     E --> H["public/decks/n5.json … n1.json"]
     H --> I["src/App.vue: loadDeck"]
-    I --> J["GameScreen.vue → composables/useRun.ts"]
+    I --> M["ModePicker.vue: Words or Kanji"]
+    M -->|"Words"| J["GameScreen.vue → composables/useRun.ts"]
+    M -->|"Kanji"| N["KanjiScreen.vue → kanji/useKanjiRun.ts<br/>(the flow, part 2b)"]
     J --> K["src/game/run.ts: startRun → deal.ts: dealSet"]
     K --> L["GameHud.vue + GameBoard.vue → PlayCard.vue"]
 ```
@@ -99,6 +101,40 @@ flowchart LR
    miss), resets the combo, drops the level, and shows the answers.
 7. After a short pause, **`run.ts: nextSet`** deals the next set at the
    current level's time, and the hand starts empty again.
+
+## The flow, part 2b: kanji mode
+
+Each time the game opens (after the daily check-up), and from "Change
+mode", **`ModePicker.vue`** offers Words or Kanji (D37). Kanji mode is
+practice: it logs nothing and changes no reviews.
+
+```mermaid
+flowchart LR
+    A["KanjiScreen.vue"] --> B["kanji/useKanjiRun.ts"]
+    B --> C["kanji-round.ts: kanjiPool → dealKanjiRound"]
+    C --> D["readings.ts: readingsUsedByKanji<br/>(right) and allReadingsOf (never a decoy)"]
+    B -->|"Play"| E["throw each picked card in turn"]
+    E --> F["reveal: scoreRound → next kanji"]
+    A --> G["usePlayClock + useWellbeing<br/>(counts toward the nudges and cap)"]
+```
+
+1. **`kanji-round.ts: kanjiPool`** works out, once per deck, the readings
+   each kanji has in the level's words (**`readings.ts:
+   readingsUsedByKanji`**). Readings show okurigana in brackets, まな(ぶ).
+2. **`dealKanjiRound`** picks a kanji not shown recently, more often if it
+   has several readings, and deals 8 cards: all its readings, plus readings
+   of other kanji that the dictionary doesn't list for it.
+3. **`KanjiBoard.vue`** shows the kanji and its meanings over a fan of the 8
+   readings. Clicking one picks it (it lifts) or puts it back.
+4. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
+   in turn. A right one hits and dissolves, the kanji jolts, and the combo
+   builds; a wrong one shakes and its frame goes dark.
+5. Then the right readings left in the hand light up aqua (✓),
+   **`scoreRound`** adds the points (a bonus for a perfect round), and a
+   new kanji is dealt off the deck.
+6. **`usePlayClock`** counts the play toward the nudges and the school's
+   daily cap with the same tick as word mode (**`wellbeing.ts:
+   tickPlayClock`**), and **`WellbeingGate.vue`** shows the same screens.
 
 ## The flow, part 3: pause and flip
 
@@ -317,6 +353,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
 | **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
+| **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
+| **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
 | **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
 | **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both snap away block by block. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
@@ -350,6 +388,11 @@ fields. They stay in memory until slice 3 stores them.
   `src/game/tuning.ts`. Every number the playtest may change is there.
 - **Change what happens on a tap:** edit `src/game/taps.ts`; timeouts and
   dealing are in `src/game/run.ts`. Specs: `tests/run.test.ts`.
+- **Change kanji mode:** the hand size and points are at the top of
+  `kanji/kanji-round.ts` (`CARDS_PER_ROUND`, `POINTS_PER_HIT`,
+  `PERFECT_ROUND_BONUS`, `MAX_PICK_WEIGHT`); how long the answers show is
+  `REVEAL_MS` in `kanji/useKanjiRun.ts`. Specs: `tests/kanji-round.test.ts`
+  and `tests/kanji-run.test.ts`.
 - **Change how a hand is laid out or played:** the rules (which slot a
   click fills, when Play is ready, the play order) are in
   `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between

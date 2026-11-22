@@ -12,16 +12,12 @@ import { nextSet, startRun, timeUp, type RunContext, type RunState } from '../ga
 import type { TagTable } from '../game/tags.ts';
 import { throwReading } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
-import { withPlayTime } from '../game/wellbeing.ts';
+import { tickPlayClock, withPlayTime, type PlayClock } from '../game/wellbeing.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
 import { appendEvents, saveSettings, type Settings } from '../memory/storage.ts';
 
 /** Often enough for a smooth timer bar, rarely enough to stay cheap on phones. */
 const TICK_MS = 100;
-/** The longest gap between ticks still counted as play. */
-const MAX_TICK_GAP_MS = 1000;
-/** How often today's play time is saved. */
-const PLAY_SAVE_EVERY_MS = 15_000;
 
 export interface RunSetup {
   words: readonly DeckWord[];
@@ -75,8 +71,7 @@ interface Driver {
   context: RunContext;
   syncedCount: number;
   setEndedAtMs: number | null;
-  lastTickMs: number;
-  lastPlaySaveMs: number;
+  clock: PlayClock;
 }
 
 /** The Vue state a run shows. */
@@ -111,8 +106,7 @@ function createDriver(setup: RunSetup): Driver {
     context: refreshed(base, engine),
     syncedCount: 0,
     setEndedAtMs: null,
-    lastTickMs: Date.now(),
-    lastPlaySaveMs: Date.now(),
+    clock: { lastTickMs: Date.now(), lastSaveMs: Date.now() },
   };
 }
 
@@ -134,21 +128,16 @@ function dealNextSetAfterPause(driver: Driver, view: RunView): void {
   view.state.value = nextSet(view.state.value, driver.context, nowMs);
 }
 
-/**
- * Counts play time while the game isn't paused (W1, W2), and saves today's
- * total now and then, so a closed tab loses at most a few seconds of it.
- */
+/** Counts play time while the game isn't paused (W1, W2), and saves it now and then. */
 function countPlayTime(driver: Driver, view: RunView): void {
-  const nowMs = view.nowMs.value;
-  // A sleeping laptop or a throttled tab can stall the timer; never count a stall as play.
-  const playedMs = Math.min(nowMs - driver.lastTickMs, MAX_TICK_GAP_MS);
-  driver.lastTickMs = nowMs;
-  if (view.state.value.pausedAtMs !== null) return;
-  view.sessionPlayMs.value += playedMs;
-  driver.settings = withPlayTime(driver.settings, today(), playedMs);
+  const now = { ms: view.nowMs.value, day: today() };
+  const isPaused = view.state.value.pausedAtMs !== null;
+  const played = tickPlayClock(driver.clock, driver.settings, now, isPaused);
+  driver.clock = played.clock;
+  driver.settings = played.record;
+  view.sessionPlayMs.value += played.playedMs;
   view.playMsToday.value = driver.settings.playMsToday;
-  if (nowMs - driver.lastPlaySaveMs < PLAY_SAVE_EVERY_MS) return;
-  driver.lastPlaySaveMs = nowMs;
+  if (!played.isSaveDue) return;
   saveSettings(driver.settings).catch((error: unknown) =>
     console.warn('Could not save play time:', error),
   );

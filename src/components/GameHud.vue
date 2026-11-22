@@ -8,8 +8,8 @@ import { m } from 'motion-v';
 import { computed } from 'vue';
 import { secondsLeft, type RunState } from '../game/run.ts';
 import { MAX_LEVEL } from '../game/tuning.ts';
-import { isMuted, playSound, setMuted } from '../sound/sfx.ts';
 import PixelButton from './PixelButton.vue';
+import SoundToggle from './SoundToggle.vue';
 
 const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
@@ -19,11 +19,6 @@ const timeShare = computed(
   () => secondsLeft(props.state, props.nowMs) / (props.state.setDurationMs / 1000),
 );
 const isTimeLow = computed(() => timeShare.value < 0.25);
-
-function toggleSound(): void {
-  setMuted(!isMuted.value);
-  playSound('pickUp');
-}
 </script>
 
 <template>
@@ -76,14 +71,7 @@ function toggleSound(): void {
     >
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
     </PixelButton>
-    <PixelButton
-      :colour="isMuted ? 'crimson' : 'steel'"
-      class="min-h-9 px-4 text-xs"
-      :aria-pressed="!isMuted"
-      @click="toggleSound"
-    >
-      {{ isMuted ? '🔇 Sound off' : '🔊 Sound on' }}
-    </PixelButton>
+    <SoundToggle />
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
     <p v-if="isPaused" class="text-center text-sm text-aqua" role="status">
       Paused. Tap a word card to flip it. A card you peek at won't score.

@@ -1,0 +1,160 @@
+/**
+ * A run of kanji mode (D37), for the kanji screen: the round on the table,
+ * the cards the player has picked, and playing them. Playing throws the
+ * picked cards at the kanji one after another, left to right, as word mode
+ * plays a hand (useHand.ts). A right card hits and builds the combo; a
+ * wrong one breaks it. Then the right readings left in the hand light up,
+ * the round is scored (kanji-round.ts), and a new kanji is dealt.
+ *
+ * Kanji mode is practice (D37): nothing here is logged or reviewed.
+ */
+import { computed, onUnmounted, ref, shallowRef } from 'vue';
+import type { CardStatus } from '../game/card-status.ts';
+import type { RandomSource } from '../game/deal.ts';
+import type { Deck } from '../deck/types.ts';
+import { THROW_S } from '../components/card-motion.ts';
+import { PLAY_STEP_MS } from '../composables/useHand.ts';
+import { comboPitch, playSound } from '../sound/sfx.ts';
+import {
+  dealKanjiRound,
+  kanjiPool,
+  scoreRound,
+  type KanjiRound,
+  type RoundResult,
+} from './kanji-round.ts';
+
+export type KanjiPhase = 'picking' | 'playing' | 'revealed';
+
+/** A thrown card reaches the kanji this long after it leaves the hand. */
+const THROW_MS = THROW_S * 1000;
+/** How long the answers show before the next kanji is dealt. */
+const REVEAL_MS = 2200;
+/** A kanji isn't dealt again until this many others have been. */
+const RECENT_KANJI = 8;
+
+function useRounds(deck: Deck, random: RandomSource) {
+  const pool = kanjiPool(deck);
+  const recent: string[] = [];
+  function deal(): KanjiRound {
+    const round = dealKanjiRound(pool, random, recent);
+    recent.unshift(round.kanji);
+    recent.splice(RECENT_KANJI);
+    return round;
+  }
+  return { deal };
+}
+
+/** The combo, the score and the impacts the board shakes to. */
+function useTally() {
+  const score = ref(0);
+  const combo = ref(0);
+  const bestCombo = ref(0);
+  /** Counts hits, so the board can jolt the kanji on each one. */
+  const impacts = ref(0);
+  function land(isRight: boolean): void {
+    if (!isRight) {
+      combo.value = 0;
+      playSound('miss');
+      return;
+    }
+    combo.value += 1;
+    bestCombo.value = Math.max(bestCombo.value, combo.value);
+    impacts.value += 1;
+    playSound('slap');
+    playSound('chime', comboPitch(combo.value));
+  }
+  function finish(result: RoundResult): void {
+    score.value += result.points;
+    if (result.misses > 0) combo.value = 0;
+    if (result.isPerfect) playSound('cleared');
+  }
+  return { score, combo, bestCombo, impacts, land, finish };
+}
+
+/** The cards on the table: the round, which cards are picked and which have been thrown. */
+function useTable(firstRound: KanjiRound) {
+  const round = shallowRef(firstRound);
+  const roundNumber = ref(1);
+  const picked = ref<number[]>([]);
+  const thrown = ref<number[]>([]);
+  const phase = ref<KanjiPhase>('picking');
+
+  function newRound(next: KanjiRound): void {
+    round.value = next;
+    roundNumber.value += 1;
+    picked.value = [];
+    thrown.value = [];
+    phase.value = 'picking';
+  }
+
+  function toggle(index: number): void {
+    if (phase.value !== 'picking') return;
+    const isPicked = picked.value.includes(index);
+    picked.value = isPicked ? picked.value.filter((i) => i !== index) : [...picked.value, index];
+    playSound('pickUp');
+  }
+
+  function statusOf(index: number): CardStatus {
+    const card = round.value.cards[index];
+    if (thrown.value.includes(index)) return card?.isRight === true ? 'matched' : 'wrong';
+    if (phase.value === 'revealed' && card?.isRight === true) return 'correct';
+    return picked.value.includes(index) ? 'selected' : 'idle';
+  }
+
+  return { round, roundNumber, picked, thrown, phase, newRound, toggle, statusOf };
+}
+
+type Table = ReturnType<typeof useTable>;
+type Tally = ReturnType<typeof useTally>;
+
+/** Playing the picked cards: throws them in turn, then reveals and scores the round. */
+function usePlayback(table: Table, tally: Tally, deal: () => KanjiRound) {
+  const lastResult = shallowRef<RoundResult | null>(null);
+  let timers: ReturnType<typeof setTimeout>[] = [];
+  const later = (run: () => void, ms: number): void => {
+    timers.push(setTimeout(run, ms));
+  };
+
+  function throwCard(index: number): void {
+    table.thrown.value = [...table.thrown.value, index];
+    playSound('whoosh');
+    later(() => tally.land(table.round.value.cards[index]?.isRight === true), THROW_MS);
+  }
+
+  function reveal(): void {
+    const result = scoreRound(table.round.value, table.picked.value);
+    lastResult.value = result;
+    tally.finish(result);
+    table.phase.value = 'revealed';
+    later(() => table.newRound(deal()), REVEAL_MS);
+  }
+
+  function play(): void {
+    if (table.phase.value !== 'picking' || table.picked.value.length === 0) return;
+    table.phase.value = 'playing';
+    timers = [];
+    const order = [...table.picked.value].sort((a, b) => a - b);
+    order.forEach((index, step) => later(() => throwCard(index), step * PLAY_STEP_MS));
+    later(reveal, (order.length - 1) * PLAY_STEP_MS + THROW_MS);
+  }
+
+  onUnmounted(() => timers.forEach(clearTimeout));
+  return { lastResult, play };
+}
+
+export function useKanjiRun(deck: Deck, random: RandomSource = Math.random) {
+  const { deal } = useRounds(deck, random);
+  const tally = useTally();
+  const table = useTable(deal());
+  const { lastResult, play } = usePlayback(table, tally, deal);
+  return {
+    ...table,
+    lastResult,
+    play,
+    score: tally.score,
+    combo: tally.combo,
+    bestCombo: tally.bestCombo,
+    impacts: tally.impacts,
+    canPlay: computed(() => table.phase.value === 'picking' && table.picked.value.length > 0),
+  };
+}

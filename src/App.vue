@@ -24,11 +24,13 @@ import {
 import AboutData from './components/AboutData.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/GameScreen.vue';
+import KanjiScreen from './components/KanjiScreen.vue';
+import ModePicker, { type GameMode } from './components/ModePicker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 
-type Page = 'game' | 'about' | 'settings' | 'checkUp';
+type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode';
 
 const settings = shallowRef<Settings | null>(null);
 const deck = shallowRef<Deck | null>(null);
@@ -36,6 +38,8 @@ const pastEvents = shallowRef<readonly GameEvent[]>([]);
 const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
+/** Word mode or kanji mode (D37), picked on the start screen each time the game opens. */
+const mode = ref<GameMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
 const isAway = computed(() => page.value !== 'game');
@@ -73,6 +77,7 @@ async function startGame(current: Settings): Promise<void> {
     deck.value = await loadDeck(current.level);
     settings.value = current;
     offerCheckUp(current, deck.value);
+    if (page.value !== 'checkUp') page.value = 'mode';
     runKey.value += 1;
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : String(error);
@@ -102,6 +107,18 @@ async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
   await orFallback(() => appendEvents(answers), undefined);
   pastEvents.value = [...pastEvents.value, ...answers];
   settings.value = updated;
+  page.value = 'mode';
+}
+
+/**
+ * Starts the chosen mode. Settings are read again first: the mode that
+ * just closed saved today's play time, and the next one must count on
+ * from it (W2).
+ */
+async function chooseMode(next: GameMode): Promise<void> {
+  const latest = await orFallback(loadSettings, null);
+  if (latest) settings.value = latest;
+  mode.value = next;
   page.value = 'game';
   runKey.value += 1;
 }
@@ -180,6 +197,17 @@ onMounted(async () => {
             @done="finishCheckUp"
             @skip="finishCheckUp([])"
           />
+          <ModePicker v-else-if="page === 'mode'" :level="deck.level" @choose="chooseMode" />
+          <KanjiScreen
+            v-else-if="mode === 'kanji'"
+            v-show="!isAway"
+            :key="`kanji-${runKey}`"
+            class="my-auto"
+            :deck="deck"
+            :settings="settings"
+            :is-away="isAway"
+            @leave="page = 'mode'"
+          />
           <GameScreen
             v-else
             v-show="!isAway"
@@ -196,6 +224,7 @@ onMounted(async () => {
           v-if="settings && page === 'game'"
           class="mt-auto flex justify-center gap-6 text-sm text-washi/60"
         >
+          <button type="button" class="underline" @click="page = 'mode'">Change mode</button>
           <button type="button" class="underline" @click="page = 'settings'">Settings</button>
           <button type="button" class="underline" @click="page = 'about'">About the data</button>
         </footer>

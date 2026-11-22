@@ -39,3 +39,45 @@ export function parseCapMinutes(raw: string | undefined): number | null {
   const minutes = Number.parseInt(raw ?? '', 10);
   return Number.isInteger(minutes) && minutes > 0 ? minutes : null;
 }
+
+/** The longest gap between ticks still counted as play. */
+export const MAX_TICK_GAP_MS = 1000;
+/** How often today's play time is saved. */
+export const PLAY_SAVE_EVERY_MS = 15_000;
+
+/** When the play clock last ticked, and when it last saved. */
+export interface PlayClock {
+  lastTickMs: number;
+  lastSaveMs: number;
+}
+
+export interface PlayTick<T> {
+  clock: PlayClock;
+  record: T;
+  /** Play counted by this tick: 0 while paused. */
+  playedMs: number;
+  /** True when it's time to save the record. */
+  isSaveDue: boolean;
+}
+
+/**
+ * One tick of the play clock (W1, W2), shared by both game modes: counts
+ * the time since the last tick as play unless the game is paused, and says
+ * when to save, so a closed tab loses at most a few seconds of play.
+ */
+export function tickPlayClock<T extends PlayTime>(
+  clock: PlayClock,
+  record: T,
+  now: { ms: number; day: string },
+  isPaused: boolean,
+): PlayTick<T> {
+  // A sleeping laptop or a throttled tab can stall the timer; never count a stall as play.
+  const playedMs = isPaused ? 0 : Math.min(now.ms - clock.lastTickMs, MAX_TICK_GAP_MS);
+  const isSaveDue = playedMs > 0 && now.ms - clock.lastSaveMs >= PLAY_SAVE_EVERY_MS;
+  return {
+    clock: { lastTickMs: now.ms, lastSaveMs: isSaveDue ? now.ms : clock.lastSaveMs },
+    record: playedMs > 0 ? withPlayTime(record, now.day, playedMs) : record,
+    playedMs,
+    isSaveDue,
+  };
+}

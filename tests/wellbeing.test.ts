@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { dueNudge, isOverDailyCap, parseCapMinutes, withPlayTime } from '../src/game/wellbeing.ts';
+import {
+  dueNudge,
+  isOverDailyCap,
+  MAX_TICK_GAP_MS,
+  parseCapMinutes,
+  PLAY_SAVE_EVERY_MS,
+  tickPlayClock,
+  withPlayTime,
+} from '../src/game/wellbeing.ts';
 
 const MINUTE = 60_000;
 
@@ -41,5 +49,31 @@ describe('wellbeing', () => {
       parseCapMinutes('0'),
       parseCapMinutes('abc'),
     ]).toEqual([null, null, null, null]);
+  });
+});
+
+describe('the play clock, shared by both modes', () => {
+  const record = { playDay: '2026-11-22', playMsToday: 0 };
+  const clock = { lastTickMs: 0, lastSaveMs: 0 };
+  const day = '2026-11-22';
+
+  it('counts the time since the last tick as play', () => {
+    const tick = tickPlayClock(clock, record, { ms: 100, day }, false);
+    expect(tick.playedMs).toBe(100);
+    expect(tick.record.playMsToday).toBe(100);
+  });
+
+  it('counts nothing while paused, and never a stalled tab as play', () => {
+    expect(tickPlayClock(clock, record, { ms: 100, day }, true).playedMs).toBe(0);
+    expect(tickPlayClock(clock, record, { ms: 60_000, day }, false).playedMs).toBe(MAX_TICK_GAP_MS);
+  });
+
+  it('asks for a save once enough time has passed since the last one', () => {
+    const early = { lastTickMs: 1000, lastSaveMs: 0 };
+    expect(tickPlayClock(early, record, { ms: 1100, day }, false).isSaveDue).toBe(false);
+    const late = { lastTickMs: PLAY_SAVE_EVERY_MS, lastSaveMs: 0 };
+    const due = tickPlayClock(late, record, { ms: PLAY_SAVE_EVERY_MS + 100, day }, false);
+    expect(due.isSaveDue).toBe(true);
+    expect(due.clock.lastSaveMs).toBe(PLAY_SAVE_EVERY_MS + 100);
   });
 });
