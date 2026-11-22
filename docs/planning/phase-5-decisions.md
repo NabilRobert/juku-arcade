@@ -450,3 +450,17 @@ motion the wipe is skipped.
 reading cards too, with a crimson back. A wrong card's frame now turns
 dark instead of crimson, so it still stands out, with its shake and ✗.
 
+### D38: Matched cards snap away pixel by pixel (settled: Arthur's choice, 2026-11-22)
+
+Arthur didn't want matched cards to fall and fade, nor to wipe away in
+rows: they should vanish pixel by pixel in a circle, from the top-left
+corner to the bottom-right, like the snap in a well-known film, with no
+ash left behind. Each card is cut into 12 by 16 square blocks. A block's
+turn is its distance from the top-left corner plus some randomness, so
+the edge is ragged. The snap plays 15 masks in 0.65 s (Web Animations),
+each hiding a few more blocks, starting when the throw hits. Under
+reduced motion a matched card vanishes at once.
+
+- **Beat:** the top-down row wipe (Arthur: not this); particles flying
+  off (that's the ash he didn't want, and costs more to draw).
+

@@ -1,8 +1,8 @@
 /**
  * How a card moves (PlayCard passes these to Motion). A matched pair plays
  * one throw: the reading card spins through the air to its word card and
- * hits it, the word card jolts, and both then dissolve from the top down
- * in chunky pixel rows (a CSS animation, .pixel-dissolve, PlayCard.vue). Whether the player dragged and flung the card or
+ * hits it, the word card jolts, and both then vanish block by block in a
+ * circle spreading from the top-left corner (the pixel snap, pixel-snap.ts). Whether the player dragged and flung the card or
  * laid it and played the hand, the flight starts from wherever the card
  * is. A laid card shifts up out of the hand, a word card a dragged card
  * is over rises to meet it, and a new set comes off the deck face down,
