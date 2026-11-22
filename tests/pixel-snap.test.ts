@@ -31,6 +31,13 @@ describe('the pixel snap', () => {
     expect(Math.max(...leftColumn)).toBeLessThan(Math.min(...rightColumn));
   });
 
+  it('takes the same number of blocks at every step, so it never seems to stall', () => {
+    const shown = frames.map(blocksShown);
+    const perStep = shown.slice(1).map((count, step) => (shown[step] ?? 0) - count);
+    const even = (SNAP_COLUMNS * SNAP_ROWS) / SNAP_FRAMES;
+    for (const taken of perStep) expect(Math.abs(taken - even)).toBeLessThanOrEqual(1);
+  });
+
   it('starts with the whole card showing and ends with nothing left', () => {
     expect(frames).toHaveLength(SNAP_FRAMES + 1);
     expect(blocksShown(frames[0] ?? [])).toBe(SNAP_COLUMNS * SNAP_ROWS);

@@ -42,18 +42,27 @@ describe('the throw', () => {
   });
 
   it('snaps a matched card away once the throw has hit', async () => {
-    const animate = vi.fn();
+    const animate = vi.fn((frames: Keyframe[], timing: KeyframeAnimationOptions) => {
+      void frames;
+      void timing;
+      return { finished: new Promise(() => undefined) };
+    });
     const original = HTMLElement.prototype.animate;
-    HTMLElement.prototype.animate = animate;
+    HTMLElement.prototype.animate = animate as unknown as typeof original;
+    // The test browser lays nothing out; give the card a size to cut into blocks.
+    const width = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(150);
+    const height = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(200);
     onTestFinished(() => {
       HTMLElement.prototype.animate = original;
+      width.mockRestore();
+      height.mockRestore();
     });
     const card = mount(PlayCard, {
       props: { text: '学校', kind: 'word', index: 0, status: 'idle', level: 'N5' },
     });
     expect(animate).not.toHaveBeenCalled();
     await card.setProps({ status: 'matched' });
-    const [frames, timing] = animate.mock.calls[0] ?? [];
+    const [frames, timing] = animate.mock.calls[0] ?? [[], {}];
     expect(frames).toHaveLength(SNAP_FRAMES + 1);
     expect(frames[0]).toHaveProperty('clipPath');
     expect(timing).toMatchObject({ delay: THROW_S * 1000, fill: 'forwards' });
@@ -86,6 +95,25 @@ describe('the throw', () => {
 
   it('deals a card face down off the deck, so it turns face up as it flies', () => {
     expect(dealtFrom({ x: 0, y: 0, scale: 1 }).rotateY).toBe(180);
+  });
+
+  it('hides a snapped card outright once the snap ends, so none is left part-way', async () => {
+    const original = HTMLElement.prototype.animate;
+    HTMLElement.prototype.animate = vi.fn(() => ({ finished: Promise.resolve() })) as never;
+    const width = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(150);
+    const height = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(200);
+    onTestFinished(() => {
+      HTMLElement.prototype.animate = original;
+      width.mockRestore();
+      height.mockRestore();
+    });
+    const card = mount(PlayCard, {
+      props: { text: '学校', kind: 'word', index: 0, status: 'idle', level: 'N5' },
+    });
+    await card.setProps({ status: 'matched' });
+    await vi.waitFor(() => {
+      expect(card.find('button > span').attributes('style')).toContain('visibility: hidden');
+    });
   });
 
   it('names x and the depth in every pose, so no card slides or warps back to where it was dealt from', () => {

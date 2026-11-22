@@ -27,25 +27,36 @@ const SNAP_JITTER = 0.1;
  */
 const DOWN_WEIGHT = 0.6;
 
+/** How far along the front a block is: its distance from the top-left corner, across counting more than down, plus a little randomness. */
+function rawTurn(column: number, row: number, random: RandomSource): number {
+  const across = (column + 0.5) / SNAP_COLUMNS;
+  const down = ((row + 0.5) / SNAP_ROWS) * DOWN_WEIGHT;
+  const distance = Math.hypot(across, down) / Math.hypot(1, DOWN_WEIGHT);
+  return distance * (1 - SNAP_JITTER) + random() * SNAP_JITTER;
+}
+
 /**
- * When each block vanishes, from 0 (first) to 1 (last): its distance from
- * the top-left corner, with across counting more than down, plus a little
- * randomness so the edge isn't a clean arc.
+ * When each block vanishes, from 0 (first) to 1 (last), by row then
+ * column. Blocks go in the order of their place along the front, but
+ * spaced evenly: a curved front crosses only a few blocks near the
+ * corners, so timing by distance alone would crawl at the end and look
+ * stuck. By rank, every step takes the same number of blocks.
  */
 export function snapOrder(random: RandomSource): number[][] {
-  const farthest = Math.hypot(1, DOWN_WEIGHT);
-  const turns: number[][] = [];
+  const blocks: { column: number; row: number; raw: number }[] = [];
   for (let row = 0; row < SNAP_ROWS; row += 1) {
-    const rowTurns: number[] = [];
     for (let column = 0; column < SNAP_COLUMNS; column += 1) {
-      const across = (column + 0.5) / SNAP_COLUMNS;
-      const down = ((row + 0.5) / SNAP_ROWS) * DOWN_WEIGHT;
-      const distance = Math.hypot(across, down) / farthest;
-      const turn = distance * (1 - SNAP_JITTER) + random() * SNAP_JITTER;
-      rowTurns.push(Math.min(turn, 1));
+      blocks.push({ column, row, raw: rawTurn(column, row, random) });
     }
-    turns.push(rowTurns);
   }
+  const turns = Array.from({ length: SNAP_ROWS }, () => new Array<number>(SNAP_COLUMNS).fill(0));
+  // Turns run from just above 0 to exactly 1, so the first step shows every block and the last none.
+  [...blocks]
+    .sort((a, b) => a.raw - b.raw)
+    .forEach((block, rank) => {
+      const row = turns[block.row];
+      if (row !== undefined) row[block.column] = (rank + 1) / blocks.length;
+    });
   return turns;
 }
 

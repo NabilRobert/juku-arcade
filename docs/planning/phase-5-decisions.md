@@ -487,7 +487,11 @@ cutting away a few more blocks, starting when the throw hits. It first
 used mask images, but the browser loads each one as it's swapped in and
 shows the card unmasked until then, which flashed; a clip path applies at
 once. Under
-reduced motion a matched card vanishes at once.
+reduced motion a matched card vanishes at once. Blocks are timed by their rank along the front rather than their
+distance, so every step takes the same number: a curved front crosses
+few blocks near the corners, and timing by distance crawled at the end
+and looked stuck. A snapped card is hidden outright when the snap ends or
+is interrupted, so none is ever left part-way.
 
 - **Beat:** the top-down row wipe (Arthur: not this); particles flying
   off (that's the ash he didn't want, and costs more to draw).
