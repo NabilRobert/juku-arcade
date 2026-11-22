@@ -437,7 +437,9 @@ stepped corners (three screen pixels), with a lit top edge and a shaded
 bottom edge. Every button is one component, `PixelButton.vue`, in five
 colours. On each click its wipe colour sweeps in from both edges in
 small `steps()`, then fades, within 0.3 s (Arthur found 0.5 s with six
-big steps looked like lag). Under reduced
+big steps looked like lag). When a click changes the button's colour (Pause
+turns red, Resume turns back to blue), the wipe is the new colour and the
+button keeps it once the halves meet. Under reduced
 motion the wipe is skipped.
 
 - **Beat:** NES.css (MIT, a ready-made pixel UI kit; it brings its own

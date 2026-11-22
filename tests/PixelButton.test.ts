@@ -25,6 +25,17 @@ describe('the pixel button', () => {
     expect(clicks).toEqual(['clicked']);
   });
 
+  it('turns a new colour with a wipe in that colour, once the wipe meets in the middle', async () => {
+    const button = mount(PixelButton, { props: { colour: 'steel' }, slots: { default: 'Pause' } });
+    await button.setProps({ colour: 'crimson' });
+    const wipe = button.find('.pixel-wipe.is-change');
+    expect(wipe.attributes('style')).toContain('--color-crimson');
+    expect(button.classes()).toContain('bg-steel');
+    await wipe.trigger('animationend');
+    expect(button.classes()).toContain('bg-crimson');
+    expect(button.find('.pixel-wipe').exists()).toBe(false);
+  });
+
   it('can be disabled by the parent', () => {
     const button = mount(PixelButton, { attrs: { disabled: true }, slots: { default: 'Play' } });
     expect(button.attributes('disabled')).toBeDefined();
