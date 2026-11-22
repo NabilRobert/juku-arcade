@@ -32,6 +32,14 @@ describe('GameBoard', () => {
     expect(board.find('[data-testid="deck"]').exists()).toBe(true);
   });
 
+  it("marks every card with the deck's JLPT level", async () => {
+    const { state, context } = start();
+    const board = await mountBoard(state, context.tags);
+    const marks = board.findAll('[data-testid="level-mark"]').map((mark) => mark.text());
+    expect(marks).toHaveLength(state.set.words.length + state.set.readings.length);
+    expect(new Set(marks)).toEqual(new Set(['N5']));
+  });
+
   it('lays a clicked reading card for the first open word card, tagged 1, and takes it back on a second click', async () => {
     const { state, context } = start();
     const board = await mountBoard(state, context.tags);

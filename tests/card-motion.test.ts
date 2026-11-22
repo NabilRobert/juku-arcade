@@ -1,12 +1,11 @@
 // The throw: a matched reading card flies to its word card and knocks it down.
-import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import GameBoard from '../src/components/GameBoard.vue';
 import PlayCard from '../src/components/PlayCard.vue';
 import { cardPose, dealtFrom } from '../src/components/card-motion.ts';
 import { centreOffset, placementBetween } from '../src/components/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';
 import { tapCard } from '../src/game/taps.ts';
+import { mountBoard } from './helpers/board.ts';
 import { readingIndexOf, start, START_MS, wordIdAt } from './helpers/run.ts';
 
 const HIT = 1;
@@ -72,7 +71,7 @@ describe('the throw', () => {
 
   it('gives the matched reading card a target to fly to, and no other card', async () => {
     const { state, context } = start();
-    const board = mount(GameBoard, { props: { state, nowMs: START_MS, tags: context.tags } });
+    const board = await mountBoard(state, context.tags);
     const wordId = wordIdAt(state, 0);
     const selected = tapCard(state, context, { kind: 'word', wordId }, START_MS);
     const readingIndex = readingIndexOf(state, wordId);

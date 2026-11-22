@@ -7,7 +7,7 @@ import type { TagTable } from '../../src/game/tags.ts';
 import { START_MS } from './run.ts';
 
 export async function mountBoard(state: RunState, tags: TagTable) {
-  const board = mount(GameBoard, { props: { state, nowMs: START_MS, tags } });
+  const board = mount(GameBoard, { props: { state, nowMs: START_MS, tags, level: 'N5' as const } });
   await nextTick();
   return board;
 }

@@ -33,7 +33,7 @@ defineEmits<{ close: [] }>();
       JLPT levels are approximate: the Japan Foundation hasn't published official word lists since
       2010. The game's word decks are derived from OpenJLPT, so they are also CC BY-SA 4.0.
     </p>
-    <button type="button" class="rounded-lg bg-pine px-4 py-2" @click="$emit('close')">
+    <button type="button" class="rounded-lg bg-steel px-4 py-2" @click="$emit('close')">
       Back to the game
     </button>
   </article>

@@ -13,14 +13,14 @@ defineEmits<{ stop: []; keepGoing: [] }>();
     <div class="mt-3 flex justify-center gap-3">
       <button
         type="button"
-        class="min-h-11 rounded-lg bg-vermilion px-4 text-washi"
+        class="min-h-11 rounded-lg bg-crimson px-4 text-washi"
         @click="$emit('stop')"
       >
         Stop for today
       </button>
       <button
         type="button"
-        class="min-h-11 rounded-lg bg-pine px-4 text-washi"
+        class="min-h-11 rounded-lg bg-steel px-4 text-washi"
         @click="$emit('keepGoing')"
       >
         Keep going

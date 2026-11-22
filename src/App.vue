@@ -156,10 +156,10 @@ onMounted(async () => {
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
       <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
-        <h1 class="text-center font-card text-2xl font-bold tracking-wide text-gold">
+        <h1 class="text-center font-card text-2xl font-bold tracking-wide text-aqua">
           juku-arcade
         </h1>
-        <p v-if="loadError" role="alert" class="text-center text-vermilion">{{ loadError }}</p>
+        <p v-if="loadError" role="alert" class="text-center text-crimson">{{ loadError }}</p>
         <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
         <template v-else-if="settings && deck">
           <AboutData v-if="page === 'about'" @close="page = 'game'" />

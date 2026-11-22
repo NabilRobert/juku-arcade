@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * The set score as it's earned (L7): chips on paper, the multiplier in a
- * vermilion stamp, and the total counting up when a set clears. Shows the
+ * crimson stamp, and the total counting up when a set clears. Shows the
  * best set between clears.
  */
 import { onUnmounted, ref, watch } from 'vue';
@@ -46,15 +46,15 @@ onUnmounted(() => cancelAnimationFrame(frame));
     <template v-if="isShowing && score">
       <p class="flex items-center justify-center gap-2 text-2xl font-bold">
         <span class="washi rounded-md px-3 py-1 text-sumi" title="Chips">{{ score.chips }}</span>
-        <span class="text-gold">×</span>
-        <span class="rounded-md bg-vermilion px-3 py-1 text-washi" title="Multiplier">{{
+        <span class="text-aqua">×</span>
+        <span class="rounded-md bg-crimson px-3 py-1 text-washi" title="Multiplier">{{
           score.multiplier
         }}</span>
       </p>
-      <p class="mt-2 text-3xl font-bold text-gold" role="status">{{ shownTotal }}</p>
+      <p class="mt-2 text-3xl font-bold text-aqua" role="status">{{ shownTotal }}</p>
     </template>
     <template v-else>
-      <p class="text-xs tracking-widest text-gold/80 uppercase">Best set</p>
+      <p class="text-xs tracking-widest text-aqua/80 uppercase">Best set</p>
       <p class="text-2xl font-bold">{{ bestSetScore }}</p>
     </template>
   </section>

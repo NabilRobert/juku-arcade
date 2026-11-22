@@ -30,7 +30,7 @@ import { computed, watch } from 'vue';
 import { readingCardStatus, wordCardStatus } from '../game/card-status.ts';
 import type { PlayedPair } from '../game/hand.ts';
 import type { RunState } from '../game/run.ts';
-import type { DeckWord } from '../deck/types.ts';
+import type { DeckWord, JlptLevel } from '../deck/types.ts';
 import type { TagTable } from '../game/tags.ts';
 import { useDeal } from '../composables/useDeal.ts';
 import { useGameFeel } from '../composables/useGameFeel.ts';
@@ -43,7 +43,13 @@ import ComboMeter from './ComboMeter.vue';
 import PlayCard from './PlayCard.vue';
 import type { Point } from './throw-geometry.ts';
 
-const props = defineProps<{ state: RunState; nowMs: number; tags: TagTable }>();
+const props = defineProps<{
+  state: RunState;
+  nowMs: number;
+  tags: TagTable;
+  /** The deck's JLPT level, marked on every card. */
+  level: JlptLevel;
+}>();
 const emit = defineEmits<{
   throw: [readingIndex: number, wordId: string];
   flip: [word: DeckWord];
@@ -168,6 +174,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               :key="`${state.setIndex}-${word.id}`"
               :text="word.word"
               kind="word"
+              :level="level"
               :index="position"
               :status="wordCardStatus(state, word.id, nowMs)"
               :tag="tags.get(word.id)"
@@ -181,7 +188,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         </div>
         <span
           class="font-sans text-sm font-bold"
-          :class="isMatched(word.id) ? 'invisible' : 'text-gold/80'"
+          :class="isMatched(word.id) ? 'invisible' : 'text-aqua/80'"
           aria-hidden="true"
           >{{ position + 1 }}</span
         >
@@ -191,7 +198,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
       <button
         type="button"
-        class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 rounded-lg bg-vermilion px-8 py-2 text-xl font-bold text-washi shadow-lg transition disabled:bg-washi/15 disabled:text-washi/40"
+        class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 rounded-lg bg-crimson px-8 py-2 text-xl font-bold text-washi shadow-lg transition disabled:bg-washi/15 disabled:text-washi/40"
         :disabled="!isReady || isPlaying"
         data-testid="play"
         @click="hand.play"
@@ -215,6 +222,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               :key="`${state.setIndex}-${card.text}`"
               :text="card.text"
               kind="reading"
+              :level="level"
               :index="state.set.words.length + index"
               :status="readingCardStatus(state, index, nowMs)"
               :throw-to="throws.get(index)"

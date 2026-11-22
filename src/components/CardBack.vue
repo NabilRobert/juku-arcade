@@ -32,7 +32,7 @@ const kanjiInWord = computed(() =>
 
 <template>
   <article
-    class="max-h-[70vh] space-y-4 overflow-y-auto rounded-2xl washi border-2 border-vermilion/60 p-4 text-sumi shadow-xl"
+    class="max-h-[70vh] space-y-4 overflow-y-auto rounded-2xl washi border-2 border-crimson/60 p-4 text-sumi shadow-xl"
     aria-label="Card back"
   >
     <header class="flex items-baseline justify-between gap-3">
@@ -42,7 +42,7 @@ const kanjiInWord = computed(() =>
       </p>
       <button
         type="button"
-        class="rounded-lg bg-pine px-3 py-1 text-sm text-washi"
+        class="rounded-lg bg-steel px-3 py-1 text-sm text-washi"
         @click="$emit('close')"
       >
         Turn over
@@ -69,7 +69,7 @@ const kanjiInWord = computed(() =>
           :key="reading"
           class="rounded px-1.5 py-0.5 text-sm"
           :class="
-            item.used.includes(reading) ? 'bg-vermilion font-semibold text-washi' : 'bg-washi-shade'
+            item.used.includes(reading) ? 'bg-crimson font-semibold text-washi' : 'bg-washi-shade'
           "
           >{{ reading }}</span
         >

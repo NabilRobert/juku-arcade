@@ -29,12 +29,12 @@ function toggleSound(): void {
   <section class="flex flex-col gap-3" aria-label="Run">
     <div class="grid grid-cols-2 gap-3">
       <p class="rounded-xl bg-wood/80 p-3 text-center">
-        <span class="block text-xs tracking-widest text-gold/80 uppercase">Level</span>
+        <span class="block text-xs tracking-widest text-aqua/80 uppercase">Level</span>
         <m.span
           :key="state.level"
           class="inline-block text-3xl font-bold"
           data-testid="level"
-          :initial="{ scale: 1.8, color: '#c9a24a' }"
+          :initial="{ scale: 1.8, color: '#a8dadc' }"
           :animate="{ scale: 1, color: '#f6efdf' }"
           :transition="{ type: 'spring', stiffness: 400, damping: 15 }"
           >{{ state.level }}</m.span
@@ -42,10 +42,10 @@ function toggleSound(): void {
         <span class="text-sm text-washi/60"> / {{ MAX_LEVEL }}</span>
       </p>
       <p class="rounded-xl bg-wood/80 p-3 text-center">
-        <span class="block text-xs tracking-widest text-gold/80 uppercase">Combo</span>
+        <span class="block text-xs tracking-widest text-aqua/80 uppercase">Combo</span>
         <m.span
           :key="state.combo"
-          class="inline-block text-3xl font-bold text-gold"
+          class="inline-block text-3xl font-bold text-aqua"
           data-testid="combo"
           :initial="{ scale: state.combo > 0 ? 1.5 : 1 }"
           :animate="{ scale: 1 }"
@@ -62,13 +62,13 @@ function toggleSound(): void {
     >
       <div
         class="h-full rounded-full transition-[width] duration-100"
-        :class="isTimeLow ? 'bg-vermilion' : 'bg-gold'"
+        :class="isTimeLow ? 'bg-crimson' : 'bg-aqua'"
         :style="{ width: `${timeShare * 100}%` }"
       />
     </div>
     <button
       type="button"
-      class="min-h-11 rounded-lg bg-pine px-4 text-sm font-semibold text-washi disabled:opacity-50"
+      class="min-h-11 rounded-lg bg-steel px-4 text-sm font-semibold text-washi disabled:opacity-50"
       :disabled="state.phase !== 'playing'"
       :aria-pressed="isPaused"
       @click="isPaused ? $emit('resume') : $emit('pause')"
@@ -84,12 +84,12 @@ function toggleSound(): void {
       {{ isMuted ? '🔇 Sound off' : '🔊 Sound on' }}
     </button>
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
-    <p v-if="isPaused" class="text-center text-sm text-gold" role="status">
+    <p v-if="isPaused" class="text-center text-sm text-aqua" role="status">
       Paused. Tap a word card to flip it. A card you peek at won't score.
     </p>
     <p
       v-else-if="state.phase === 'timedOut'"
-      class="text-center text-sm text-vermilion"
+      class="text-center text-sm text-crimson"
       role="status"
     >
       Time's up: here are the answers

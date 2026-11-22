@@ -377,3 +377,17 @@ tag from D30 stay; the washi texture and soft shadow go.
   playing-card faces don't fit karuta, and it would be someone else's
   art, D22).
 
+### D33: A navy, aqua and crimson palette (settled: Arthur's choice, 2026-11-22)
+
+Arthur found the pixel cards too plain and picked a blue and dark red
+palette: navy `#1B3A57` (the table), crimson `#9B1B30`, pale aqua
+`#A8DADC`, off-white `#F1FAEE` (the paper) and steel blue `#457B9D`. The
+washi texture is back behind the card text. Word cards have a crimson
+frame and reading cards a steel one, so the two rows read apart. Crimson
+text gets a light glow where it sits on the navy table, as the two are
+too close in brightness. Each card also shows the deck's JLPT level in
+its bottom-left corner. This replaces D30's lacquer, vermilion, gold and
+pine colours.
+
+- **Beat:** keeping D30's colours (Arthur: boring with the pixel cards).
+

@@ -20,10 +20,10 @@ const LAYERS = 3;
     <span
       v-for="layer in LAYERS"
       :key="layer"
-      class="@container absolute inset-0 flex items-center justify-center font-card text-3xl text-gold"
+      class="@container absolute inset-0 flex items-center justify-center font-card text-3xl text-aqua"
       :style="{ transform: `translate(${-layer * 2}px, ${-layer * 3}px)` }"
     >
-      <CardFrame frame="karuta" :is-face-down="true" />
+      <CardFrame frame="plain" :is-face-down="true" />
       <span v-if="layer === LAYERS" class="relative">札</span>
     </span>
   </div>

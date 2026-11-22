@@ -70,7 +70,7 @@ flowchart LR
    reading cards are held in a fan under the word cards, which are
    numbered 1 to 5. Clicking a reading card (or pressing Enter on it)
    lays it for the first word card still open, from the left
-   (**`hand.ts: layReading`**): it shifts up out of the fan with a gold
+   (**`hand.ts: layReading`**): it shifts up out of the fan with an aqua
    tag showing that word's number. Dragging it onto a word card, or
    flinging it at one, lays it for that word instead: while it's dragged
    the word card under it lights up (**`useThrows: trackDrag`**), and on
@@ -195,8 +195,9 @@ detected at each class size.
 
 ## The look and wellbeing
 
-- **The karuta table (D30)** lives in `src/style.css`: colour tokens
-  (`washi`, `sumi`, `vermilion`, `lacquer`, `pine`, `gold`), two fonts (a
+- **The karuta table (D30)** lives in `src/style.css`: colour tokens for
+  the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
+  highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
   Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
   two textures made of CSS gradients (`.washi` paper, `.card-back`). No
@@ -221,15 +222,15 @@ detected at each class size.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
 - **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
-  body every card shares (a hard shadow, a thick karuta-green frame with
-  stepped pixel corners, and white paper, or the patterned back when face
-  down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
+  body every card shares (a hard shadow, a thick frame with stepped pixel
+  corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
   of the card's width (`--pixel` in `style.css`), so the art scales with
   the card. Reading cards are written top to bottom, like karuta's grab
-  cards; word cards keep their kanji across. The frame turns gold when a
-  dragged card aims at it, vermilion when wrong and bright green for the
-  right answer. A suit mark sits in two corners (言 on word cards, 音 on
-  reading cards). The text sizes itself to the card with container
+  cards; word cards keep their kanji across. Word cards have a crimson
+  frame and reading cards a steel-blue one. The frame turns white when a
+  dragged card aims at it, crimson when wrong and aqua for the right
+  answer. A suit mark sits in two corners (言 on word cards, 音 on reading
+  cards), and the deck's JLPT level (N5 to N1) in the bottom-left. The text sizes itself to the card with container
   units, and a reading longer than 6 kana goes in two columns.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
@@ -242,10 +243,10 @@ detected at each class size.
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
-  combo between the two rows, growing and warming (gold from 5, vermilion
+  combo between the two rows, growing and warming (aqua from 5, crimson
   from 10, with いいね！, すごい！, さいこう！). A glow behind the cards
   (`.table-glow`) brightens with the combo and the table jolts on each
-  hit. A lost streak of 3 or more drops away in vermilion. The 🔊 button
+  hit. A lost streak of 3 or more drops away in crimson. The 🔊 button
   in the side panel mutes it all, remembered in this browser. ZzFX is
   loaded on the first sound, because browsers only allow sound after the
   player has touched the page.
@@ -304,7 +305,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Throw** | A laid reading card flying at its word card; a right pair spins on and knocks the word card down. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
 | **Slot** | The fixed place a card sits in; cards move by being drawn away from it | `useTableSlots.ts` |
-| **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the vermilion difficulty tag) | `style.css`, `PlayCard.vue` |
+| **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the crimson difficulty tag) | `style.css`, `PlayCard.vue` |
 | **Nudge / daily cap** | A dismissible suggestion to stop after 15 and 30 minutes; a school-set daily limit for minors | `game/wellbeing.ts` |
 | **Check-up roles** | before (first check, before play), after (re-check after play), held back (re-check without play): the measurement plan's three groups | `memory/check-up.ts` |
 | **Held back** | 1 word in 3, chosen by hash, kept out of play for 3 days after its first check: the control group | `isHeldBack`, `isOnHold` |

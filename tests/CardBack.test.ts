@@ -48,9 +48,7 @@ describe('CardBack', () => {
       'キョウ',
     ]);
     expect(
-      readings
-        .filter((reading) => reading.classes('bg-vermilion'))
-        .map((reading) => reading.text()),
+      readings.filter((reading) => reading.classes('bg-crimson')).map((reading) => reading.text()),
     ).toEqual(['ガク', 'コウ']);
   });
 

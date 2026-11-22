@@ -21,8 +21,8 @@
 }
 
 /*
- * The karuta table look (decision D30): washi-paper cards with a vermilion
- * hanko stamp, on a dark lacquer table. Every colour is a token here, so the
+ * The karuta table look (decisions D30, D32, D33): pixel karuta cards of
+ * washi paper with a crimson hanko stamp, on a navy table. Every colour is a token here, so the
  * look changes in one place. Textures are CSS gradients, not image files.
  */
 @theme {
@@ -31,20 +31,22 @@
     'balatro', 'DotGothic16', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
   --font-card: 'balatro', 'DotGothic16', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
 
-  --color-lacquer: #1a0f0b;
-  --color-lacquer-light: #2b1912;
-  --color-wood: #3a2418;
-  --color-washi: #f6efdf;
-  --color-washi-shade: #e8dcc2;
-  --color-sumi: #1f1a17;
-  --color-vermilion: #c3361f;
-  --color-gold: #c9a24a;
-  --color-pine: #1f3b2c;
-  --color-pine-light: #2e5641;
-  /* The pixel cards (D32): karuta's green frame, a brighter green for a right answer, white paper. */
-  --color-karuta: #23633a;
-  --color-karuta-bright: #5bbf5f;
-  --color-paper: #fbf8f0;
+  /*
+   * The palette (D33, Arthur's pick): a navy table, steel blue, pale aqua
+   * highlights, off-white paper and a dark crimson accent.
+   */
+  --color-lacquer: #1b3a57;
+  --color-lacquer-light: #2a5478;
+  --color-wood: #16304a;
+  --color-washi: #f1faee;
+  --color-washi-shade: #d6ece8;
+  --color-sumi: #13283d;
+  --color-crimson: #9b1b30;
+  --color-aqua: #a8dadc;
+  --color-steel: #457b9d;
+  --color-steel-light: #5b8fb0;
+  /* The pixel cards' frame (D32). */
+  --color-frame: #457b9d;
 
   --animate-shake: shake 0.35s ease-in-out;
   --animate-glow: glow 1.6s ease-in-out infinite;
@@ -80,7 +82,7 @@ body {
   background-color: var(--color-washi);
   background-image:
     radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.55) 0 1px, transparent 2px),
-    radial-gradient(circle at 70% 80%, rgb(160 130 90 / 0.12) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 80%, rgb(69 123 157 / 0.14) 0 1px, transparent 2px),
     linear-gradient(160deg, var(--color-washi), var(--color-washi-shade));
   background-size:
     9px 9px,
@@ -88,25 +90,25 @@ body {
     100% 100%;
 }
 
-/* The back of a card: pine green with a thin gold frame, as karuta backs are. */
+/* The back of a card: steel blue stripes inside a thin aqua line. */
 .card-back {
-  background-color: var(--color-pine);
+  background-color: var(--color-steel);
   background-image: repeating-linear-gradient(
     45deg,
-    var(--color-pine) 0 6px,
-    var(--color-pine-light) 6px 7px
+    var(--color-steel) 0 6px,
+    var(--color-steel-light) 6px 7px
   );
   box-shadow:
-    inset 0 0 0 3px var(--color-pine),
-    inset 0 0 0 4px var(--color-gold);
+    inset 0 0 0 3px var(--color-steel),
+    inset 0 0 0 4px var(--color-aqua);
 }
 
-/* Behind the cards: a gold glow that warms as the combo builds (GameBoard.vue). */
+/* Behind the cards: an aqua and crimson glow that builds with the combo (GameBoard.vue). */
 .table-glow {
   background-image: radial-gradient(
     ellipse at 50% 50%,
-    rgb(201 162 74 / 0.32),
-    rgb(195 54 31 / 0.12) 45%,
+    rgb(168 218 220 / 0.3),
+    rgb(155 27 48 / 0.2) 45%,
     transparent 72%
   );
   transition: opacity 0.5s ease-out;

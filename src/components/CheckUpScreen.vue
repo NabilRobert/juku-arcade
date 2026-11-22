@@ -57,22 +57,18 @@ onUnmounted(() => clearInterval(timer));
 <template>
   <section class="mx-auto w-full max-w-md space-y-5 text-center" aria-label="Daily check-up">
     <template v-if="index < 0">
-      <h2 class="font-card text-2xl font-semibold text-gold">Daily check-up</h2>
+      <h2 class="font-card text-2xl font-semibold text-aqua">Daily check-up</h2>
       <p class="text-washi/80">
         {{ questions.length }} quick questions, about a minute. It shows what's sticking. It doesn't
         change your score or your reviews.
       </p>
       <div class="flex justify-center gap-3">
-        <button
-          type="button"
-          class="min-h-11 rounded-lg bg-vermilion px-5 text-washi"
-          @click="start"
-        >
+        <button type="button" class="min-h-11 rounded-lg bg-crimson px-5 text-washi" @click="start">
           Start
         </button>
         <button
           type="button"
-          class="min-h-11 rounded-lg bg-pine px-5 text-washi"
+          class="min-h-11 rounded-lg bg-steel px-5 text-washi"
           @click="emit('skip')"
         >
           Skip today
@@ -82,7 +78,7 @@ onUnmounted(() => clearInterval(timer));
     <template v-else-if="question">
       <p class="text-sm text-washi/60">{{ index + 1 }} / {{ questions.length }}</p>
       <p
-        class="washi mx-auto w-48 rounded-lg border-2 border-vermilion/70 py-6 font-card text-4xl font-semibold text-sumi"
+        class="washi mx-auto w-48 rounded-lg border-2 border-crimson/70 py-6 font-card text-4xl font-semibold text-sumi"
         lang="ja"
       >
         {{ question.word.word }}
@@ -92,14 +88,14 @@ onUnmounted(() => clearInterval(timer));
         role="progressbar"
         aria-label="Time left"
       >
-        <div class="h-full bg-gold" :style="{ width: `${timeShare * 100}%` }" />
+        <div class="h-full bg-aqua" :style="{ width: `${timeShare * 100}%` }" />
       </div>
       <div class="grid grid-cols-2 gap-3">
         <button
           v-for="option in question.options"
           :key="option"
           type="button"
-          class="washi min-h-14 rounded-lg border-2 border-pine/70 font-card text-xl text-sumi"
+          class="washi min-h-14 rounded-lg border-2 border-steel/70 font-card text-xl text-sumi"
           lang="ja"
           @click="answer(option)"
         >

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
  * One card on the board: a word card (学校) or a reading card (がっこう),
- * drawn as a pixel-art karuta card (D32, CardFrame.vue): a green frame
- * around white paper, with a suit mark in two opposite corners, 言 on word
- * cards and 音 on reading cards. Reading cards are written top to bottom,
+ * drawn as a pixel-art karuta card (D32, CardFrame.vue): washi paper in
+ * a crimson frame for a word card or a steel-blue one for a reading card, with a suit mark in two opposite corners, 言
+ * on word cards and 音 on reading cards, and the deck's JLPT level (N5 to
+ * N1) in the bottom-left corner. Reading cards are written top to bottom,
  * as karuta's grab cards are; word cards carry a hanko stamp for their
  * tag. How the card moves lives in card-motion.ts.
  *
@@ -13,8 +14,8 @@
  * A laid card shifts up with a tag naming its word card (1 to 5) until
  * the hand is played; a match then sends it flying on to its word card.
  *
- * The frame's colour shows the card's state: gold when picked up or aimed
- * at, vermilion when wrong, bright green when it's the right answer.
+ * The frame's colour shows the card's state: white when aimed at, crimson
+ * when wrong, aqua when it's the right answer.
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
  * shows ✗, a right one shows ✓. While paused, cards are face down (D8):
  * word cards can be tapped to flip them, reading cards can't.
@@ -23,6 +24,7 @@ import { m, type PanInfo } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import { cardPose, cardTransition, dealtFrom } from './card-motion.ts';
+import type { JlptLevel } from '../deck/types.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
@@ -42,6 +44,8 @@ const props = defineProps<{
   throwTo?: Offset;
   /** For a word card: a dragged reading card is over it. */
   isTargeted?: boolean;
+  /** The deck's JLPT level, shown in the bottom-left corner. */
+  level: JlptLevel;
   /** Where the deck is, so the card is dealt off it. */
   dealFrom?: Placement;
   /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
@@ -83,10 +87,16 @@ const STATUS_CLASSES: Partial<Record<CardStatus, string>> = {
   wrong: 'animate-shake',
 };
 
+/** Each kind of card has its own frame, so the two rows read apart at a glance. */
+const KIND_FRAMES = { word: 'crimson', reading: 'plain' } as const satisfies Record<
+  'word' | 'reading',
+  FrameColour
+>;
+
 const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
-  selected: 'gold',
-  wrong: 'vermilion',
-  correct: 'bright',
+  selected: 'lit',
+  wrong: 'crimson',
+  correct: 'aqua',
 };
 
 const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correct: '✓' };
@@ -117,9 +127,9 @@ const textStyle = computed(() => {
 });
 
 const frame = computed<FrameColour>(() =>
-  props.isTargeted === true ? 'gold' : (STATUS_FRAMES[props.status] ?? 'karuta'),
+  props.isTargeted === true ? 'lit' : (STATUS_FRAMES[props.status] ?? KIND_FRAMES[props.kind]),
 );
-const suitClass = computed(() => (props.kind === 'word' ? 'text-vermilion' : 'text-karuta'));
+const suitClass = computed(() => (props.kind === 'word' ? 'text-crimson' : 'text-frame'));
 
 /** The top corner shows ✓, ✗ or 👁 when there is one, else the suit. */
 const cornerMark = computed(
@@ -181,7 +191,7 @@ function onClick(): void {
     @animation-complete="isDealt = true"
   >
     <CardFrame :frame="frame" :is-face-down="isFaceDown" />
-    <span v-if="isFaceDown" aria-hidden="true" class="relative text-3xl text-gold">{{
+    <span v-if="isFaceDown" aria-hidden="true" class="relative text-3xl text-aqua">{{
       kind === 'word' ? '札' : ''
     }}</span>
     <template v-else>
@@ -198,6 +208,12 @@ function onClick(): void {
         >{{ SUITS[kind] }}</span
       >
       <span
+        class="absolute bottom-[8cqw] left-[9cqw] font-sans text-[10cqw] leading-none text-sumi/75"
+        lang="en"
+        data-testid="level-mark"
+        >{{ level }}</span
+      >
+      <span
         class="relative flex flex-col items-center leading-tight"
         :class="kind === 'reading' ? '[writing-mode:vertical-rl]' : ''"
         :style="textStyle"
@@ -207,13 +223,13 @@ function onClick(): void {
       <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
       <span
         v-if="tag !== undefined"
-        class="absolute -top-2 -right-2 bg-vermilion px-1 py-0.5 font-sans text-[0.65rem] text-washi shadow-[0_2px_0_rgb(0_0_0/0.5)]"
+        class="absolute -top-2 -right-2 border-2 border-crimson bg-washi px-1 py-0.5 font-sans text-[0.65rem] text-crimson shadow-[0_2px_0_rgb(0_0_0/0.5)]"
         lang="en"
         >+{{ tag.toFixed(1) }}×</span
       >
       <span
         v-if="order !== undefined"
-        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-gold font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
+        class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
         lang="en"
         data-testid="order-tag"
         >{{ order }}</span

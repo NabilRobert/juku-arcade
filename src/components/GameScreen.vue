@@ -85,6 +85,7 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
         :state="state"
         :now-ms="nowMs"
         :tags="tags"
+        :level="deck.level"
         @throw="throwReading"
         @flip="flip"
       />

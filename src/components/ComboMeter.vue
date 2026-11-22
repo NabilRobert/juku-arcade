@@ -2,8 +2,9 @@
 /**
  * The combo, on the table between the two rows of cards, where the player
  * is looking. It pops on every hit and grows and warms as the combo
- * builds: washi white, then gold from 5, then vermilion from 10, with a
- * word of praise at each step. A lost streak drops away in vermilion.
+ * builds: washi white, then aqua from 5, then crimson from 10 (with a light
+ * glow so it reads on the navy table), with a word of praise at each step.
+ * A lost streak drops away in crimson.
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
@@ -28,14 +29,14 @@ const TIERS: Tier[] = [
   {
     from: 20,
     praise: 'さいこう！',
-    colour: 'text-vermilion drop-shadow-[0_0_14px_rgb(195_54_31/0.9)]',
+    colour: 'text-crimson drop-shadow-[0_0_10px_rgb(241_250_238/1)]',
   },
   {
     from: 10,
     praise: 'すごい！',
-    colour: 'text-vermilion drop-shadow-[0_0_10px_rgb(201_162_74/0.8)]',
+    colour: 'text-crimson drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]',
   },
-  { from: 5, praise: 'いいね！', colour: 'text-gold drop-shadow-[0_0_8px_rgb(201_162_74/0.6)]' },
+  { from: 5, praise: 'いいね！', colour: 'text-aqua drop-shadow-[0_0_8px_rgb(168_218_220/0.6)]' },
   { from: 0, praise: '', colour: 'text-washi' },
 ];
 
@@ -67,7 +68,7 @@ const scale = computed(() => 1 + Math.min(props.combo * GROWTH_PER_MATCH, MAX_GR
     <m.p
       v-else-if="brokenCombo !== null"
       :key="`broken-${brokenCombo}`"
-      class="font-bold text-vermilion"
+      class="font-bold text-crimson"
       :initial="{ y: 0, opacity: 1, rotate: 0 }"
       :animate="{ y: 30, opacity: 0, rotate: -8 }"
       :transition="{ duration: 0.9, ease: 'easeIn' }"

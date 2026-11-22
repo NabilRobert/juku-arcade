@@ -38,7 +38,7 @@ function confirmDelete(): void {
           :key="level"
           type="button"
           class="min-h-11 rounded-lg px-3 font-semibold"
-          :class="level === settings.level ? 'bg-gold text-sumi' : 'bg-pine'"
+          :class="level === settings.level ? 'bg-aqua text-sumi' : 'bg-steel'"
           @click="emit('changeLevel', level)"
         >
           {{ level }}
@@ -48,7 +48,7 @@ function confirmDelete(): void {
     <div class="space-y-2">
       <button
         type="button"
-        class="rounded-lg bg-gold px-4 py-2 text-sumi"
+        class="rounded-lg bg-aqua px-4 py-2 text-sumi"
         @click="emit('exportData')"
       >
         Export my data
@@ -58,10 +58,10 @@ function confirmDelete(): void {
         timing. No name, and nothing is sent anywhere. Give it to your teacher only if you want to.
       </p>
     </div>
-    <button type="button" class="rounded-lg bg-vermilion px-4 py-2" @click="confirmDelete">
+    <button type="button" class="rounded-lg bg-crimson px-4 py-2" @click="confirmDelete">
       Delete my data
     </button>
-    <button type="button" class="block rounded-lg bg-pine px-4 py-2" @click="emit('close')">
+    <button type="button" class="block rounded-lg bg-steel px-4 py-2" @click="emit('close')">
       Back to the game
     </button>
   </section>
