@@ -579,7 +579,7 @@ an always-coloured front would make scouting pointless. A status colour
   (it has no wallet or shop); colouring fronts without a scout (gives
   the crests away).
 
-### D43: Pixel-art icons for Scout and sound (settled: Arthur's choice, 2026-11-22)
+### D43: Pixel-art icons for Scout, sound and coins (settled: Arthur's choice, 2026-11-22)
 
 Arthur sent two stock pictures to model the icons on: a pixel magnifying
 glass for Scout, and a pixel speaker for the sound switch (only "on" and
@@ -587,6 +587,10 @@ glass for Scout, and a pixel speaker for the sound switch (only "on" and
 so the game doesn't use the files. It draws its own icons in the same
 style: a grey glass with an aqua lens and a white glint, and an orange and
 yellow speaker with sound waves or a cross, outlined in near-black.
+
+He then sent a pixel coin (a Freepik asset) for the pot and prices; the
+game draws its own in that style too: an octagonal gold coin with a lit
+rim, an orange inner ring and a $.
 
 Each icon is a grid of letters, one per pixel, in `pixel-icons.ts`, drawn
 as one SVG path per colour by `PixelIcon.vue`. The grid reads like the

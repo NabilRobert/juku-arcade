@@ -41,7 +41,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
     </div>
     <div class="relative py-1">
       <p class="text-xs tracking-widest text-aqua/80 uppercase">Pot</p>
-      <p class="text-3xl font-bold" data-testid="pot">🪙 {{ run.pot }}</p>
+      <p class="text-3xl font-bold" data-testid="pot"><PixelIcon name="coin" /> {{ run.pot }}</p>
       <m.p
         v-if="notice"
         :key="notice.key"
@@ -61,7 +61,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       data-testid="bank"
       @click="$emit('bank')"
     >
-      Bank 🪙 {{ run.pot }}
+      Bank <PixelIcon name="coin" /> {{ run.pot }}
     </PixelButton>
     <PixelButton
       colour="steel"
@@ -76,7 +76,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       </span>
     </PixelButton>
     <p class="text-sm">
-      Wallet 🪙 <span data-testid="wallet">{{ run.wallet }}</span>
+      Wallet <PixelIcon name="coin" /> <span data-testid="wallet">{{ run.wallet }}</span>
     </p>
     <p v-if="items.length" class="flex justify-center gap-1 font-card text-xl" lang="ja">
       <span v-for="item in items" :key="item.id" :title="`${item.name}: ${item.effect}`">{{
