@@ -149,6 +149,48 @@ flowchart LR
    daily cap with the same tick as word mode (**`wellbeing.ts:
    tickPlayClock`**), and **`WellbeingGate.vue`** shows the same screens.
 
+## The flow, part 2c: the bank run (word mode)
+
+Word mode plays as a push-your-luck run (D44). Every match adds coins to
+an unbanked **pot**; banking it moves the coins to the **wallet** and ends
+the combo, and a miss or a timeout loses it.
+
+```mermaid
+flowchart LR
+    A["words/GameScreen.vue"] --> B["bank-run/useBankRun.ts<br/>(watches the run)"]
+    B -->|"match"| C["bank-run.ts: addMatch<br/>(pot grows with the combo)"]
+    B -->|"miss / timeout"| D["losePot"]
+    A -->|"Bank"| E["bankPot → wallet"]
+    B -->|"set ends"| F["endSet: next set, the shop, or run over"]
+    F --> G["ShopOffer.vue: buyItem"]
+    B --> H["useCrests.ts: crests and scouting"]
+```
+
+1. **`words/GameScreen.vue`** starts **`useBankRun`** beside the word run
+   (`useRun`). It watches the run's state: a new match calls
+   **`bank-run.ts: addMatch`**, which adds the combo's length in coins to
+   the pot (**`coinsForMatch`**; items can add more), and a broken combo
+   calls **`losePot`**.
+2. **Bank** (**`components/bank-run/BankPanel.vue`**) calls **`bankPot`**:
+   the pot goes to the wallet and counts toward this round's target, and
+   `useRun: endCombo` ends the combo.
+3. A round is 3 sets (**`SETS_PER_ROUND`**). After each set,
+   **`endSet`** moves on, or after the third opens the shop if the round's
+   target was banked, else ends the run (**`RunOver.vue`**). If the pot
+   alone would reach the target on the last set, it's banked at the bell
+   (**`shouldBankAtBell`**).
+4. In the shop (**`ShopOffer.vue`**), the wallet buys items
+   (**`items.ts`**, **`buyItem`**) that bend the risk: more coins per
+   match, half the pot kept on a miss, a bonus for banking, interest on
+   savings. `useRun` holds the next set while the shop or end screen is
+   open (`useBankRun: isHolding`, passed as `isHoldingNextDeal`).
+5. **Crests** (**`useCrests.ts`**, **`crests.ts: dealCrests`**) hide on a
+   few word cards each set; **Scout** pauses the game to show them. A
+   koban doubles a match's coins, an omikuji gives a gift, and a curse
+   costs wallet coins when missed.
+6. The best round reached is kept in this browser (`useBankRun:
+   useBestRound`).
+
 ## The flow, part 3: pause and flip
 
 1. **⏸ Pause** in **`GameHud.vue`**, or the Esc key (**`usePauseKey.ts`**) (or hiding the tab, or opening the
@@ -389,6 +431,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
+| **Pot / bank / wallet** | The bank run's coins: the pot grows with each match and is lost on a miss; banking moves it to the wallet, which buys items (D44) | `bank-run/bank-run.ts` |
+| **Round target** | Coins to bank in a round's 3 sets to reach the shop; it grows each round | `bank-run.ts: targetFor` |
+| **Item** | A charm bought in the shop that changes the bank run's odds (lucky cat, koi, omamori, crane, fan, bamboo) | `bank-run/items.ts` |
 | **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `bank-run/crests.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
 | **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
@@ -432,6 +477,11 @@ fields. They stay in memory until slice 3 stores them.
   at the top of `kanji/kanji-crests.ts` (specs:
   `tests/kanji-crests.test.ts`); their colours are `tint` in
   `bank-run/crests.ts`.
+- **Change the bank run:** targets, items allowed, scouts and item
+  bonuses are at the top of `bank-run/bank-run.ts`; item prices and
+  effects in `bank-run/items.ts`; crest chances in `bank-run/crests.ts`.
+  Specs: `tests/bank-run.test.ts`, `tests/use-bank-run.test.ts` and
+  `tests/crests.test.ts`.
 - **Change how a hand is laid out or played:** the rules (which slot a
   click fills, when Play is ready, the play order) are in
   `src/game/hand.ts` (specs: `tests/hand.test.ts`); the time between

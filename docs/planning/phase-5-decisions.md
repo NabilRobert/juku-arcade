@@ -600,3 +600,23 @@ from the palette throws rather than leaving a hole.
 - **Beat:** downloading the stock images (licence); emoji (they don't
   match the pixel style, and look different on every system); an icon
   font (a dependency for three icons).
+
+### D44: Word mode plays as a bank run (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked what makes a roguelike fun, then picked his own idea: the
+combo is money. Every match adds coins to a pot, more the longer the
+combo; banking keeps the coins but ends the combo, and a miss loses the
+pot. Coins buy items between rounds, and a round of 3 sets must bank a
+target that grows, or the run ends. It was built as a spike
+(`spike/roguelike-bank`), playtested on his localhost and merged (PR #10),
+so it now ships as word mode's run (`src/bank-run/`). Crests and scouting
+(D42) grew out of it.
+
+- **Why it fits:** the risk sits on the thing the game teaches. Riding a
+  combo means knowing more readings in a row, so the push-your-luck
+  choice rewards learning, not luck.
+- **Kept separate:** the bank run's coins never touch the review engine
+  or the logs; the words played still count as reviews as before.
+- **Beat:** a charm run with rounds, targets and upgrades (a second spike,
+  `spike/roguelike-charms`, kept as a local branch); no run at all (less
+  reason to keep a combo going).
