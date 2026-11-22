@@ -15,7 +15,9 @@
  * the card, so the slots can be measured before any card is drawn: cards
  * are dealt off the deck (useDeal.ts) and thrown (useThrows.ts) by moving
  * them away from their own slot. The fan is a fixed turn and drop on each
- * reading card's slot, so the slots still never move. Each row
+ * reading card's slot, so the slots still never move. Inside its slot each
+ * card floats, bobbing and swaying out of step with its neighbours, so the
+ * table never looks frozen. Each row
  * sets its cards' height as a share of the window's height
  * (--card-height), so the board fits the window.
  *
@@ -69,6 +71,22 @@ const FAN_TURN_DEG = 4;
 const FAN_DROP_PX = 4;
 /** How far each card in the hand overlaps the one before it. */
 const HAND_OVERLAP = '-3dvh';
+
+/** How far a card floats up (px) and sways (degrees): the held reading cards more than the word cards. */
+const FLOAT = { word: { px: 4, deg: 0.6 }, reading: { px: 7, deg: 1.2 } } as const;
+/** Floats last FLOAT_BASE_S plus up to two FLOAT_STEP_S, and start FLOAT_PHASE_S apart, so no two cards move together. */
+const FLOAT_BASE_S = 2.8;
+const FLOAT_STEP_S = 0.45;
+const FLOAT_PHASE_S = 0.7;
+
+function floatStyle(kind: 'word' | 'reading', index: number): Record<string, string> {
+  return {
+    '--float-px': `${FLOAT[kind].px}px`,
+    '--float-deg': `${FLOAT[kind].deg}deg`,
+    animationDuration: `${FLOAT_BASE_S + (index % 3) * FLOAT_STEP_S}s`,
+    animationDelay: `${-index * FLOAT_PHASE_S}s`,
+  };
+}
 
 /** A reading card's place in the fan: turned and dropped by how far it is from the middle. */
 function fanStyle(index: number): Record<string, string> {
@@ -144,20 +162,22 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         class="flex flex-col items-center gap-1"
       >
         <div :ref="registerWord(position)" :class="SLOT_SIZE">
-          <PlayCard
-            v-if="dealFrom"
-            :key="`${state.setIndex}-${word.id}`"
-            :text="word.word"
-            kind="word"
-            :index="position"
-            :status="wordCardStatus(state, word.id, nowMs)"
-            :tag="tags.get(word.id)"
-            :hint="state.phase === 'timedOut' ? word.reading : undefined"
-            :is-peeked="state.peekedWordIds.includes(word.id)"
-            :is-targeted="targetWordId === word.id"
-            :deal-from="dealFrom.words[position]"
-            @tap="onWordTap(word)"
-          />
+          <div class="animate-float" :style="floatStyle('word', position)">
+            <PlayCard
+              v-if="dealFrom"
+              :key="`${state.setIndex}-${word.id}`"
+              :text="word.word"
+              kind="word"
+              :index="position"
+              :status="wordCardStatus(state, word.id, nowMs)"
+              :tag="tags.get(word.id)"
+              :hint="state.phase === 'timedOut' ? word.reading : undefined"
+              :is-peeked="state.peekedWordIds.includes(word.id)"
+              :is-targeted="targetWordId === word.id"
+              :deal-from="dealFrom.words[position]"
+              @tap="onWordTap(word)"
+            />
+          </div>
         </div>
         <span
           class="font-sans text-sm font-bold"
@@ -189,21 +209,23 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
           :class="orderOf(index) !== undefined ? 'z-10' : ''"
           :style="fanStyle(index)"
         >
-          <PlayCard
-            v-if="dealFrom"
-            :key="`${state.setIndex}-${card.text}`"
-            :text="card.text"
-            kind="reading"
-            :index="state.set.words.length + index"
-            :status="readingCardStatus(state, index, nowMs)"
-            :throw-to="throws.get(index)"
-            :deal-from="dealFrom.readings[index]"
-            :order="orderOf(index)"
-            @tap="onReadingTap(index)"
-            @pick-up="playSound('pickUp')"
-            @drag="trackDrag"
-            @release="(point, velocity) => onRelease(index, point, velocity)"
-          />
+          <div class="animate-float" :style="floatStyle('reading', index)">
+            <PlayCard
+              v-if="dealFrom"
+              :key="`${state.setIndex}-${card.text}`"
+              :text="card.text"
+              kind="reading"
+              :index="state.set.words.length + index"
+              :status="readingCardStatus(state, index, nowMs)"
+              :throw-to="throws.get(index)"
+              :deal-from="dealFrom.readings[index]"
+              :order="orderOf(index)"
+              @tap="onReadingTap(index)"
+              @pick-up="playSound('pickUp')"
+              @drag="trackDrag"
+              @release="(point, velocity) => onRelease(index, point, velocity)"
+            />
+          </div>
         </div>
       </div>
       <div :ref="registerDeck" class="w-[calc(var(--card-height)*0.75)] [--card-height:22dvh]">

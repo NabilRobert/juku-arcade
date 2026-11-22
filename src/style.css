@@ -25,6 +25,7 @@
 
   --animate-shake: shake 0.35s ease-in-out;
   --animate-glow: glow 1.6s ease-in-out infinite;
+  --animate-float: float 3s ease-in-out infinite;
 }
 
 /*
@@ -111,9 +112,21 @@ body {
   }
 }
 
+/* Cards bob and sway while they wait; each card sets how far (--float-px, --float-deg). */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(calc(var(--float-deg) * -1));
+  }
+  50% {
+    transform: translateY(calc(var(--float-px) * -1)) rotate(var(--float-deg));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-shake,
-  .animate-glow {
+  .animate-glow,
+  .animate-float {
     animation: none;
   }
 }

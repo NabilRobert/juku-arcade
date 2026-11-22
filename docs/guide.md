@@ -212,7 +212,9 @@ detected at each class size.
   slot, and `useThrows.ts` how far a thrown card flies (before the board
   redraws). A card moves by being drawn away from its own slot. The fan
   is a fixed turn and drop on each reading card's slot (`fanStyle` in
-  `GameBoard.vue`).
+  `GameBoard.vue`). Inside its slot every card floats: a CSS animation
+  (`float` in `style.css`) bobs and sways it, each card out of step with
+  the next (`floatStyle`).
   `GameHud.vue` pops the combo and level.
   The score total counts up with a short `requestAnimationFrame` loop in
   `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
@@ -353,7 +355,8 @@ fields. They stay in memory until slice 3 stores them.
   `components/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and
   `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
-  the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there.
+  the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there, and
+  the float is `FLOAT` and `FLOAT_*_S`.
 - **Set a daily cap for a school:** set `VITE_DAILY_CAP_MINUTES` in `.env`
   before building. Nudge times are `NUDGE_MINUTES` in `game/wellbeing.ts`.
 - **Change the check-up (questions, options, timer, hold):** the numbers are
