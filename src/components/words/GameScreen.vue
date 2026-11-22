@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * One run on screen, laid out as a card table (D30) for a laptop or
- * desktop screen, the only kind the school uses: a side panel (today's
+ * desktop screen, the only kind the game supports: a side panel (today's
  * progress, the run's numbers, the set score) beside the table. The
  * table shows the board,
  * or a flipped card's back while paused, then the missed tray. Also shows

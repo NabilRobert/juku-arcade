@@ -294,7 +294,7 @@ The class report, the ability reports per learner and the measurement
 report are written as static HTML or Markdown, plus a CSV of events.
 
 - **Beat:** a live dashboard (needs the deferred backend); a CSV only
-  (leaves the school to do the analysis, and they asked for insight, not
+  (leaves the school to do the analysis, when it needs insight, not
   data).
 
 ## Kanji readings (added 2026-11-21)

@@ -1,11 +1,11 @@
 # Playtest guide (slice 6)
 
-How to put juku-arcade in front of the school, watch it being played,
+How to put juku-arcade in front of a school, watch it being played,
 tune it, and read what the data says. The plan is in
 `docs/planning/slice-plan.md` (slice 6) and the measures are in
 `docs/planning/phase-3-measurement-plan.md`.
 
-## 1. Before: what the school needs to tell us
+## 1. Before: what the school needs to say
 
 | Question | Why it matters |
 |---|---|
@@ -13,7 +13,6 @@ tune it, and read what the data says. The plan is in
 | Are any of them under 18? | If so, set the daily play limit (W2, D19): `VITE_DAILY_CAP_MINUTES` in the deploy settings. |
 | Who collects the export files, and how often? | Exports are the only way data leaves a browser (D18). Weekly works; the report drops duplicates, so sending a file twice is harmless. |
 | A class code? | Optional (R9). Lets one report folder hold several classes and still tell them apart. |
-| Who owns the code? | Decides the code licence (D21: MIT once the school confirms). |
 
 ## 2. Deploy to Cloudflare Pages (D20)
 
