@@ -7,10 +7,11 @@
  * A match lands when the thrown card hits its word card, not when it's let
  * go, so the slap, the chime and the shake wait for the throw (THROW_S).
  */
-import { onUnmounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { THROW_S } from '../components/card-motion.ts';
 import type { RunState } from '../game/run.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
+import { useLater } from './useLater.ts';
 
 /** A combo this long is a streak worth losing: breaking it shows on the table. */
 export const STREAK_COMBO = 3;
@@ -22,21 +23,6 @@ export interface Impact {
   count: number;
   /** The combo the hit made, which sets how hard the table shakes. */
   combo: number;
-}
-
-/** Runs actions after a delay, and cancels any still waiting when the component goes. */
-function useLater(): (action: () => void, delayMs: number) => void {
-  const timers = new Set<ReturnType<typeof setTimeout>>();
-  onUnmounted(() => {
-    for (const timer of timers) clearTimeout(timer);
-  });
-  return (action, delayMs) => {
-    const timer = setTimeout(() => {
-      timers.delete(timer);
-      action();
-    }, delayMs);
-    timers.add(timer);
-  };
 }
 
 export function useGameFeel(state: () => RunState) {
