@@ -1,6 +1,6 @@
 # Slice plan
 
-Each slice is one branch and one PR. It's playable on Arthur's localhost
+Each slice is one branch and one PR. It's playable locally
 before the PR, and it passes lint, types and tests in CI. The loop comes
 first: the first slices make it fun to play, and the later ones make it
 remember and measure.
@@ -41,7 +41,7 @@ The heart of the game. No memory between runs yet.
 - Decoys that test error types (D27). Every action emits an R6 event,
   kept in memory, with a test that each event has every field.
 - Bests kept for the current visit only.
-- **Done when:** Arthur plays a 5-minute run on his phone over the local
+- **Done when:** a 5-minute run plays well on a phone over the local
   network, and each rule in L1–L8 has a test named after it
   (`it("drops from level 5 to level 1 on a miss")`).
 - About 450 lines.
@@ -56,8 +56,8 @@ The heart of the game. No memory between runs yet.
 - The peek rule, the eye mark, and the missed tray of the last 8.
 - Comebacks within 2 sets (R3).
 - Hidden card faces while paused (D8).
-- **Done when:** the peek rule's tests pass, and Arthur has tried
-  pausing mid-set on his phone.
+- **Done when:** the peek rule's tests pass, and pausing mid-set
+  works on a phone.
 - About 250 lines.
 
 ## Slice 3: Memory (`feat/review-engine`)
@@ -85,7 +85,7 @@ The heart of the game. No memory between runs yet.
   (W2).
 - Sound effects with mute (L14), if time allows.
 - **Done when:** a phone holds 60 fps through a level-5 set (Chrome
-  DevTools performance trace), and Arthur says it feels good to play.
+  DevTools performance trace), and it feels good to play.
 - About 300 lines.
 
 ## Slice 5a: Check-up and export (`feat/check-up`)
@@ -106,15 +106,15 @@ The heart of the game. No memory between runs yet.
 - **Simulated players:** a planted play effect is recovered, and zero
   gives "not enough data" or a CI that includes 0. Planted weak words and
   error types appear in the class report's flags.
-- **Done when:** the simulated-player tests pass, and Arthur reads the
-  class report built from his own play plus simulated classmates and
-  finds it useful.
+- **Done when:** the simulated-player tests pass, and the class
+  report built from real play plus simulated classmates reads as
+  useful.
 - About 400 lines.
 
 ## Slice 6: Playtest (`chore/playtest`)
 
-- Deploy to Cloudflare Pages (D20), after Arthur's OK and the school's
-  answers.
+- Deploy to Cloudflare Pages (D20), once a school has
+  answered the open questions.
 - Watch two or three learners play. Tune `tuning.ts` (timer, `k`, tag
   steps, deck size).
 - First readout of S1–S6, and of the headline once the minimum data

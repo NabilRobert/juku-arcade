@@ -97,7 +97,7 @@ const SUITS = { word: '言', reading: '音' } as const;
 
 const STATUS_CLASSES: Partial<Record<CardStatus, string>> = {
   matched: 'pointer-events-none z-10',
-  wrong: 'animate-shake',
+  wrong: 'animate-shake motion-reduce:animate-none',
 };
 
 const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
@@ -186,7 +186,7 @@ function onClick(): void {
 <template>
   <m.button
     type="button"
-    class="@container relative mx-auto block aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] font-card whitespace-nowrap text-sumi [transform-style:preserve-3d]"
+    class="@container relative mx-auto block aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] whitespace-nowrap text-sumi [transform-style:preserve-3d]"
     :class="[STATUS_CLASSES[status], isThrowable ? 'cursor-grab active:cursor-grabbing' : '']"
     :initial="dealtPose"
     :animate="pose"

@@ -186,7 +186,7 @@ onMounted(async () => {
       <TableBackground />
       <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
         <h1
-          class="flex items-center justify-center gap-3 font-card text-2xl font-bold tracking-wide text-aqua"
+          class="flex items-center justify-center gap-3 text-2xl font-bold tracking-wide text-aqua"
         >
           <PixelSeal class="w-9" />
           juku-arcade

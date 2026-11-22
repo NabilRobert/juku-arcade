@@ -6,11 +6,11 @@ import PixelButton from '../src/components/ui/PixelButton.vue';
 describe('the pixel button', () => {
   it('plays a fresh colour wipe on every click', async () => {
     const button = mount(PixelButton, { slots: { default: 'Play' } });
-    expect(button.find('.pixel-wipe').exists()).toBe(false);
+    expect(button.find('[data-testid="wipe"]').exists()).toBe(false);
     await button.trigger('click');
-    const first = button.find('.pixel-wipe').element;
+    const first = button.find('[data-testid="wipe"]').element;
     await button.trigger('click');
-    expect(button.find('.pixel-wipe').element).not.toBe(first);
+    expect(button.find('[data-testid="wipe"]').element).not.toBe(first);
   });
 
   it("passes the parent's click and classes to the button", async () => {
@@ -28,12 +28,13 @@ describe('the pixel button', () => {
   it('turns a new colour with a wipe in that colour, once the wipe meets in the middle', async () => {
     const button = mount(PixelButton, { props: { colour: 'steel' }, slots: { default: 'Pause' } });
     await button.setProps({ colour: 'crimson' });
-    const wipe = button.find('.pixel-wipe.is-change');
+    const wipe = button.find('[data-testid="wipe"]');
+    expect(wipe.classes()).toContain('before:animate-wipe-change');
     expect(wipe.attributes('style')).toContain('--color-crimson');
     expect(button.classes()).toContain('bg-steel');
     await wipe.trigger('animationend');
     expect(button.classes()).toContain('bg-crimson');
-    expect(button.find('.pixel-wipe').exists()).toBe(false);
+    expect(button.find('[data-testid="wipe"]').exists()).toBe(false);
   });
 
   it('can be disabled by the parent', () => {

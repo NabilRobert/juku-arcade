@@ -56,6 +56,9 @@ onUnmounted(() => cancelAnimationFrame(frame));
 <template>
   <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
     <canvas ref="canvas" class="size-full" />
-    <div class="table-light absolute inset-0" />
+    <!-- A faint glow from the centre of the table, over the swirl. -->
+    <div
+      class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgb(69_123_157/0.18),transparent_70%)]"
+    />
   </div>
 </template>

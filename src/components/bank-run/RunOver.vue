@@ -17,7 +17,7 @@ defineEmits<{ newRun: [] }>();
     role="dialog"
     aria-label="Run over"
   >
-    <p class="font-card text-4xl font-bold text-crimson drop-shadow-[0_0_8px_rgb(241_250_238/0.8)]">
+    <p class="text-4xl font-bold text-crimson drop-shadow-[0_0_8px_rgb(241_250_238/0.8)]">
       Run over
     </p>
     <p class="text-lg">

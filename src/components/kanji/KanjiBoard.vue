@@ -77,7 +77,7 @@ watch(
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
     <div class="flex flex-col items-center gap-2 [--card-height:34dvh]" data-testid="kanji-row">
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
-        <div class="animate-float" :style="floatStyle('word', 0)">
+        <div class="animate-float motion-reduce:animate-none" :style="floatStyle('word', 0)">
           <!-- Its own layer: the float's CSS animation would override a jolt on the same element. -->
           <div ref="kanjiElement">
             <PlayCard
@@ -119,7 +119,10 @@ watch(
           :class="statusOf(index) === 'selected' ? 'z-10' : ''"
           :style="handStyle(index, HAND_OVERLAP)"
         >
-          <div class="animate-float" :style="floatStyle('reading', index)">
+          <div
+            class="animate-float motion-reduce:animate-none"
+            :style="floatStyle('reading', index)"
+          >
             <PlayCard
               v-if="dealFrom"
               :key="`${roundNumber}-${card.text}`"

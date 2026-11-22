@@ -1,12 +1,12 @@
 # Phase 1: Problem brief
 
-**Project:** juku-arcade (working name), an arcade-style card game for
-learning Japanese words and their kanji readings. It is a web app, owned by
-Arthur, and its first user is a friend's company that teaches Japanese.
+**Project:** juku-arcade, an arcade-style card game for learning Japanese
+words and their kanji readings. It is a web app for Japanese schools and
+their learners.
 
-**Status (2026-11-21):** planning only. Arthur hasn't met his friend yet,
-so everything about the learners is still open (see "Open questions"). The
-core loop below is Arthur's design, refined with him on 2026-11-21.
+**Status (2026-11-21):** planning, written before the build. What a school
+needs is still open (see "Open questions"). The core loop below was
+refined on 2026-11-21.
 
 ## The problem
 
@@ -17,7 +17,7 @@ repetition, spread over days. Repetition is boring, so learners stop.
 - Flashcard apps do the spacing well, but they feel like homework.
 - Games are fun, but most don't schedule reviews, so the words don't
   stick.
-- The school wants something its learners **come back to every day by
+- Schools want something their learners **come back to every day by
   choice**.
 
 ## What we'll build
@@ -50,7 +50,7 @@ It's the same kind of engine as Juku's: missed words come back sooner and
 known words come back later. It sits behind a small interface shaped like
 Juku's, so after a playtest the game can switch to Juku's API.
 
-## Why it's worth building (portfolio)
+## Why it's worth building
 
 - **It measures learning, not just fun.** An optional daily check-up
   tests each word before you first play it and again after. A random set
@@ -63,9 +63,9 @@ Juku's, so after a playtest the game can switch to Juku's API.
 - **It turns play into decisions.** The score is only for motivation.
   The detailed log behind it shows where learners struggle: which words,
   which confusions, which kinds of error (long vowels, small っ, look-alike
-  kanji). Reports start from the school's decisions, such as what to
+  kanji). Reports start from a school's decisions, such as what to
   re-teach this week and who may need help.
-- **It reuses Arthur's work:** the same open word data as Juku
+- **It reuses earlier work:** the same open word data as Juku
   (OpenJLPT), and Juku's review scheduling, ported to the browser.
 
 ## In scope now
@@ -73,13 +73,13 @@ Juku's, so after a playtest the game can switch to Juku's API.
 - Kanji-to-reading matching for JLPT words, N5 first.
 - The loop, scoring, pause and peek, daily deck, review engine and
   check-up, all in the browser with no server.
-- A barebones way for the school to get anonymous data out: an export
+- A barebones way for a school to get anonymous data out: an export
   file, and a script that writes a class report, ability reports per
   learner and the measurement report.
 
 ## Not in scope now
 
-- **Grammar (bunpou).** Arthur's call (2026-11-21): grammar is harder than
+- **Grammar (bunpou).** Grammar is harder than
   matching cards, so it's planned after the playtest. A candidate design is
   recorded in the decisions (D11).
 - **An admin backend.** It will be barebones for now (D18). A tiny backend
@@ -93,22 +93,20 @@ Juku's, so after a playtest the game can switch to Juku's API.
   scoring table or look (D22).
 - **Learners' wellbeing.** No pay-to-win and no loot boxes. A soft
   reminder to stop after 15 minutes, and a daily cap if minors play (D19).
-- **Licensed content.** Open data only (OpenJLPT, CC BY-SA 4.0). The
+- **Licensed content.** Open data only (OpenJLPT, CC BY-SA 4.0). A
   school's own lists can come in later, if the school owns them. No lists
   copied from commercial textbooks.
 - **$0.** Static hosting on a free tier, and no paid services.
-- **Never touch Arthur's running Juku stack** (`juku-rehearsal`).
 
-## Open questions (for the meeting with the friend)
+## Open questions (for a school using it)
 
 | Topic | Question | Why it matters |
 |---|---|---|
 | Learners | Ages? Any minors? JLPT levels? How many? | The minors cap (D19), which decks ship first |
 | Content | Do they have their own word lists, and do they own them? | Import format, licence |
 | Use | In class, homework or free time? Phone or laptop? | Session length, layout priority |
-| Language | Which language for menus and meanings: English or Indonesian? | OpenJLPT meanings are English |
+| Language | Which language for menus and meanings: English or the learners' own? | OpenJLPT meanings are English |
 | Success | What would make them call it a success? | Adds to the measurement plan |
 | Decisions | What would teachers and managers decide with this data, and how often? Weekly? Per term? | The decision report (phase 3) is built around their answers |
 | Learner privacy | Is class-level data enough, or do teachers need to know which learner is which? Who collects consent for minors? | Whether learners share their anonymous ID with the teacher (N5) |
 | Measurement | Will they ask learners to do the check-up and export their stats? Would they compare with a class that doesn't play? | The headline measure needs check-up data |
-| Deal | Free or paid? Can Arthur show it in his portfolio? Their branding? Deadline? | Public repo or private; slice order |

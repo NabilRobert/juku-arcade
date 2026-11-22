@@ -71,7 +71,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
     <p class="text-sm">
       Wallet <PixelIcon name="coin" /> <span data-testid="wallet">{{ run.wallet }}</span>
     </p>
-    <p v-if="items.length" class="flex justify-center gap-1 font-card text-xl" lang="ja">
+    <p v-if="items.length" class="flex justify-center gap-1 text-xl" lang="ja">
       <span v-for="item in items" :key="item.id" :title="`${item.name}: ${item.effect}`">{{
         item.kanji
       }}</span>

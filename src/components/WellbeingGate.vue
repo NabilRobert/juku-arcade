@@ -13,7 +13,7 @@ defineEmits<{ dismiss: [isStopping: boolean] }>();
 
 <template>
   <section v-if="isCapped" class="pixel-panel washi p-6 text-center text-sumi" role="status">
-    <p class="font-card text-xl font-semibold">That's today's play. See you tomorrow!</p>
+    <p class="text-xl font-semibold">That's today's play. See you tomorrow!</p>
     <p class="mt-1 text-sm text-sumi/70">
       Your school set a daily limit of {{ CAP_MINUTES }} minutes.
     </p>

@@ -291,7 +291,9 @@ detected at each class size.
 
 ## The look and wellbeing
 
-- **The karuta table (D30)** lives in `src/style.css`: colour tokens for
+- **The styles** are Tailwind classes in the components. `src/style.css`
+  holds only what classes can't: the theme, the page base and the pixel-art
+  utilities (D30). The theme has colour tokens for
   the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and Kuronuri for
@@ -300,7 +302,8 @@ detected at each class size.
   weight in `src/fonts/kuronuri.css`, which `main.ts` loads after the page
   draws), and
   two pixel-art textures, tiny SVG tiles drawn on the card's own pixel grid
-  (`.washi` paper with pixel specks, `.card-back` with a diamond lattice).
+  (the `washi` utility, paper with pixel specks, and `card-back`, a diamond
+  lattice, with `card-back-tinted` for a scouted crest's colour).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
   warp and spiral in a 19-second loop (D35). A WebGL shader draws them
   (`background/swirl-shader.ts`) on a canvas a sixth of the window's
@@ -341,9 +344,9 @@ detected at each class size.
   Each is a grid of letters in `pixel-icons.ts`, one letter per pixel,
   drawn by `PixelIcon.vue`. To change one, edit its grid; a new colour
   needs a letter in `PALETTE`.
-- **Buttons and panels** are pixel art too (D36): `.pixel-panel` and
-  `.pixel-button` in `style.css` give them the cards' stepped corners, a lit
-  top edge and a shaded bottom edge. Every button outside the cards is a
+- **Buttons and panels** are pixel art too (D36): `pixel-panel` and
+  `pixel-button` in `style.css` give them the cards' stepped corners
+  (the `pixel-corners` utility), a lit top edge and a shaded bottom edge. Every button outside the cards is a
   `PixelButton.vue`, which also plays a click animation: its `--wipe`
   colour sweeps in from both edges in small steps, meets in the middle,
   then fades, within 0.3 s. A click that changes the button's colour (Pause
@@ -352,7 +355,7 @@ detected at each class size.
 - **Cards** are pixel-art karuta cards (D32): `CardFrame.vue` draws the
   body every card shares (a hard shadow, a thick frame with stepped pixel
   corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
-  of the card's width (`--pixel` in `style.css`), so the art scales with
+  of the card's width (`--pixel` in `CardFrame.vue`), so the art scales with
   the card. Reading cards are written top to bottom, like karuta's grab
   cards; word cards keep their kanji across. Every card has a crimson
   frame and a crimson back. The frame turns white when a dragged card
@@ -375,12 +378,12 @@ detected at each class size.
   いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), the combo count and a bar
   toward the next rank. Each rank-up slams the letter in with a sound, and
   the meter floats gently while it waits. A glow behind the cards
-  (`.table-glow`) brightens with the combo and the table jolts on each
+  (a gradient in `GameBoard.vue`) brightens with the combo and the table jolts on each
   hit. A lost streak of 3 or more drops away in crimson. The 🔊 button
   in the side panel mutes it all, remembered in this browser. ZzFX is
   loaded on the first sound, because browsers only allow sound after the
   player has touched the page.
-- **Layout (desktop only):** the school plays on laptops and desktops, so
+- **Layout (desktop only):** the game is played on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
   `ScoreBreakdown`) beside the table: 5 numbered word cards, the combo
   and the Play button, then the hand of 6 reading cards in an overlapping row,
@@ -496,11 +499,11 @@ fields. They stay in memory until slice 3 stores them.
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
   Dexie version if the stores change.
-- **Change colours, fonts or textures:** edit the tokens and classes in
-  `src/style.css`.
-- **Change a button's colours or its click wipe:** `COLOURS` in
-  `components/ui/PixelButton.vue` (the wipe's timing is `@keyframes wipe` in
-  `style.css`).
+- **Change colours, fonts or textures:** edit the theme tokens and
+  utilities in `src/style.css`.
+- **Change a button's colours or its click wipe:** `BACKGROUNDS`, `FILLS` and
+  `FLASHES` in `components/ui/PixelButton.vue` (the wipe's timing is
+  `@keyframes wipe` in `style.css`).
 - **Change an animation:** card motion is in `components/cards/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
   `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
