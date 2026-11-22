@@ -14,7 +14,7 @@
 import { useReducedMotion } from 'motion-v';
 import { ref, watch } from 'vue';
 
-export type ButtonColour = 'crimson' | 'steel' | 'aqua' | 'paper' | 'ghost';
+export type ButtonColour = 'crimson' | 'steel' | 'aqua' | 'paper';
 
 const props = withDefaults(defineProps<{ colour?: ButtonColour }>(), { colour: 'steel' });
 
@@ -23,7 +23,6 @@ const BACKGROUNDS: Record<ButtonColour, string> = {
   steel: 'bg-steel text-washi',
   aqua: 'bg-aqua text-sumi',
   paper: 'washi text-sumi',
-  ghost: 'bg-washi/10 text-washi/80',
 };
 
 /** Each colour as a CSS colour, for a wipe that turns the button that colour. */
@@ -32,7 +31,6 @@ const FILLS: Record<ButtonColour, string> = {
   steel: 'var(--color-steel)',
   aqua: 'var(--color-aqua)',
   paper: 'var(--color-washi)',
-  ghost: 'rgb(241 250 238 / 0.1)',
 };
 
 /** The contrasting colour a plain click wipes in. */
@@ -41,7 +39,6 @@ const FLASHES: Record<ButtonColour, string> = {
   steel: 'var(--color-crimson)',
   aqua: 'var(--color-washi)',
   paper: 'var(--color-aqua)',
-  ghost: 'rgb(168 218 220 / 0.4)',
 };
 
 interface Wipe {
