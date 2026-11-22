@@ -111,17 +111,17 @@ describe('the combo meter', () => {
   it('shows a style rank that climbs with the combo, with a word of praise', () => {
     const rankAt = (combo: number) =>
       mount(ComboMeter, { props: { combo, brokenCombo: null } }).find('[data-testid="combo-rank"]');
-    expect(rankAt(2).text()).toBe('D');
-    expect(rankAt(12).text()).toBe('B');
-    expect(rankAt(45).text()).toBe('SSS');
-    expect(mount(ComboMeter, { props: { combo: 5, brokenCombo: null } }).text()).toContain(
+    expect(rankAt(2).text()).toBe('F');
+    expect(rankAt(10).text()).toBe('C');
+    expect(rankAt(40).text()).toBe('SSS');
+    expect(mount(ComboMeter, { props: { combo: 6, brokenCombo: null } }).text()).toContain(
       'いいね',
     );
   });
 
   it('fills the bar toward the next rank', () => {
-    expect(rankFor(10).towardNext).toBe(0);
-    expect(rankFor(12).towardNext).toBeCloseTo(0.4);
+    expect(rankFor(9).towardNext).toBe(0);
+    expect(rankFor(10).towardNext).toBeCloseTo(1 / 3);
     expect(rankFor(50).towardNext).toBe(1);
     expect(rankFor(1).rank).toBeNull();
   });

@@ -260,9 +260,9 @@ detected at each class size.
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
-  combo between the two rows as a style rank (D39), a letter grade from D
-  up to SSS (`components/combo-ranks.ts`) with a word of praise (よし, いいね,
-  うまい, すごい, さいこう, てんさい, でんせつ), the combo count and a bar
+  combo between the two rows as a style rank (D39), a letter grade from F
+  up to SSS (`components/combo-ranks.ts`) with a word of praise (がんばれ, よし,
+  いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), the combo count and a bar
   toward the next rank. Each rank-up slams the letter in with a sound, and
   the meter floats gently while it waits. A glow behind the cards
   (`.table-glow`) brightens with the combo and the table jolts on each
@@ -318,7 +318,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
-| **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (D to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
+| **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |

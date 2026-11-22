@@ -476,9 +476,10 @@ is interrupted, so none is ever left part-way.
 ### D39: The combo as a style rank (settled: Arthur's choice, 2026-11-22)
 
 Arthur asked for combo tiers like an action game's style meter. The
-combo shows as a letter grade: D from 2, C from 5, B from 10, A from 15,
-S from 20, SS from 30 and SSS from 40. Each has a word of praise in easy
-Japanese (よし, いいね, うまい, すごい, さいこう, てんさい, でんせつ), so even the
+combo shows as a letter grade from F to SSS, as Arthur asked: F from 2,
+E from 4, D from 6, C from 9, B from 12, A from 15, S from 20, SS from 25
+and SSS from 30. Each has a word of praise in easy Japanese (がんばれ, よし,
+いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), so even the
 cheering is reading practice, and a bar fills toward the next rank. A
 rank-up slams the letter in with a sound pitched above the level-up's. The
 meter floats gently while it waits, like the cards. Letter grades are a
