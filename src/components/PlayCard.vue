@@ -2,8 +2,8 @@
 /**
  * One card on the board: a word card (学校) or a reading card (がっこう),
  * drawn as a pixel-art karuta card (D32, CardFrame.vue): washi paper in
- * a crimson frame for a word card or a steel-blue one for a reading card, with a suit mark in two opposite corners, 言
- * on word cards and 音 on reading cards, and the deck's JLPT level (N5 to
+ * a crimson frame, with a red back, a suit mark in two opposite corners
+ * (言 on word cards, 音 on reading cards), and the deck's JLPT level (N5 to
  * N1) in the bottom-left corner. Reading cards are written top to bottom,
  * as karuta's grab cards are; word cards carry a hanko stamp for their
  * tag. How the card moves lives in card-motion.ts.
@@ -17,7 +17,7 @@
  * A laid card shifts up with a tag naming its word card (1 to 5) until
  * the hand is played; a match then sends it flying on to its word card.
  *
- * The frame's colour shows the card's state: white when aimed at, crimson
+ * The frame's colour shows the card's state: white when aimed at, dark
  * when wrong, aqua when it's the right answer.
  * Feedback never relies on colour alone (N4): a wrong card also shakes and
  * shows ✗, a right one shows ✓. While paused, cards turn face down (D8),
@@ -94,15 +94,9 @@ const STATUS_CLASSES: Partial<Record<CardStatus, string>> = {
   wrong: 'animate-shake',
 };
 
-/** Each kind of card has its own frame, so the two rows read apart at a glance. */
-const KIND_FRAMES = { word: 'crimson', reading: 'plain' } as const satisfies Record<
-  'word' | 'reading',
-  FrameColour
->;
-
 const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
   selected: 'lit',
-  wrong: 'crimson',
+  wrong: 'ink',
   correct: 'aqua',
 };
 
@@ -141,9 +135,9 @@ const textStyle = computed(() => {
 });
 
 const frame = computed<FrameColour>(() =>
-  props.isTargeted === true ? 'lit' : (STATUS_FRAMES[props.status] ?? KIND_FRAMES[props.kind]),
+  props.isTargeted === true ? 'lit' : (STATUS_FRAMES[props.status] ?? 'crimson'),
 );
-const suitClass = computed(() => (props.kind === 'word' ? 'text-crimson' : 'text-frame'));
+const suitClass = computed(() => (props.kind === 'word' ? 'text-crimson' : 'text-steel'));
 
 /** The top corner shows ✓, ✗ or 👁 when there is one, else the suit. */
 const cornerMark = computed(
@@ -251,7 +245,7 @@ function onClick(): void {
         >
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
-        <CardFrame frame="plain" :is-face-down="true" />
+        <CardFrame frame="crimson" :is-face-down="true" />
         <span class="relative">{{ kind === 'word' ? '札' : '' }}</span>
       </span>
     </span>

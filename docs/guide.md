@@ -242,10 +242,9 @@ detected at each class size.
   corners, and washi paper, or the patterned back when face down), and `PlayCard.vue` puts the text on it. One "pixel" is a share
   of the card's width (`--pixel` in `style.css`), so the art scales with
   the card. Reading cards are written top to bottom, like karuta's grab
-  cards; word cards keep their kanji across. Word cards have a crimson
-  frame and reading cards a steel-blue one. The frame turns white when a
-  dragged card aims at it, crimson when wrong and aqua for the right
-  answer. A suit mark sits in two corners (言 on word cards, 音 on reading
+  cards; word cards keep their kanji across. Every card has a crimson
+  frame and a crimson back. The frame turns white when a dragged card
+  aims at it, dark when wrong and aqua for the right answer. A suit mark sits in two corners (言 on word cards, 音 on reading
   cards), and the deck's JLPT level (N5 to N1) in the bottom-left. The text sizes itself to the card with container
   units, and a reading longer than 6 kana goes in two columns.
 - **Sound and the combo (feeling involved):** every move gets an answer.
