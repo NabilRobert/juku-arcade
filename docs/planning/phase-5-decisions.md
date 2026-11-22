@@ -578,3 +578,21 @@ an always-coloured front would make scouting pointless. A status colour
 - **Beat:** reusing the pause (kanji mode has none); coins in kanji mode
   (it has no wallet or shop); colouring fronts without a scout (gives
   the crests away).
+
+### D43: Pixel-art icons for Scout and sound (settled: Arthur's choice, 2026-11-22)
+
+Arthur sent two stock pictures to model the icons on: a pixel magnifying
+glass for Scout, and a pixel speaker for the sound switch (only "on" and
+"off"). Both are stock art with licence terms (one watermarked and paid),
+so the game doesn't use the files. It draws its own icons in the same
+style: a grey glass with an aqua lens and a white glint, and an orange and
+yellow speaker with sound waves or a cross, outlined in near-black.
+
+Each icon is a grid of letters, one per pixel, in `pixel-icons.ts`, drawn
+as one SVG path per colour by `PixelIcon.vue`. The grid reads like the
+sprite, so changing a pixel is a one-letter edit, and a letter missing
+from the palette throws rather than leaving a hole.
+
+- **Beat:** downloading the stock images (licence); emoji (they don't
+  match the pixel style, and look different on every system); an icon
+  font (a dependency for three icons).

@@ -9,6 +9,7 @@ import { m } from 'motion-v';
 import { KANJI_CREST_EFFECTS } from '../kanji/kanji-crests.ts';
 import { CRESTS } from '../roguelike/specials.ts';
 import PixelButton from './PixelButton.vue';
+import PixelIcon from './PixelIcon.vue';
 
 defineProps<{
   scoutsLeft: number;
@@ -35,7 +36,9 @@ const crestGuide = Object.values(CRESTS)
       @click="$emit('scout')"
     >
       <template v-if="isScouting">↩ Turn back</template>
-      <template v-else>🔍 Scout · {{ scoutsLeft }} left</template>
+      <span v-else class="inline-flex items-center gap-2">
+        <PixelIcon name="scout" /> Scout · {{ scoutsLeft }} left
+      </span>
     </PixelButton>
     <p class="text-xs text-washi/60">A perfect round earns a scout.</p>
     <m.p
