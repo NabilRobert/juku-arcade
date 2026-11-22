@@ -202,8 +202,8 @@ detected at each class size.
   Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
   two textures made of CSS gradients (`.washi` paper, `.card-back`).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
-  warp and spiral in a 24-second loop (D35). A WebGL shader draws them
-  (`background/swirl-shader.ts`) on a canvas a quarter of the window's
+  warp and spiral in a 16-second loop (D35). A WebGL shader draws them
+  (`background/swirl-shader.ts`) on a canvas a sixth of the window's
   size, stretched to fill it, about 30 times a second.
 - **Animation** uses Motion for Vue's small bundle (`LazyMotion` with
   `domAnimation` in `App.vue`, and `m.*` elements). `MotionConfig` follows the

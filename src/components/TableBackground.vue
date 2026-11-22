@@ -2,7 +2,7 @@
 /**
  * The table behind everything (D35): marbled navy bands that warp and
  * spiral in a loop, under a faint glow from the centre. The graphics card
- * draws them (background/swirl-shader.ts) on a canvas a quarter of the
+ * draws them (background/swirl-shader.ts) on a canvas a sixth of the
  * window's size, stretched to fill it: that keeps it cheap on school
  * laptops and keeps the bands soft. It redraws about 30 times a second,
  * stops while the tab is hidden (the browser pauses animation frames),
@@ -14,7 +14,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { createSwirl, swirlPhase, type Swirl } from '../background/swirl-shader.ts';
 
 /** The canvas is this many times smaller than the window, then stretched to fill it. */
-const SHRINK = 4;
+const SHRINK = 6;
 /** Redraw at most this often: the bands move slowly, so 30 a second looks smooth. */
 const FRAME_MS = 1000 / 30;
 

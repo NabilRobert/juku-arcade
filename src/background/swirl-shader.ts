@@ -9,7 +9,7 @@
  */
 
 /** One loop of the swirl, in milliseconds. */
-export const SWIRL_LOOP_MS = 24_000;
+export const SWIRL_LOOP_MS = 16_000;
 
 /** Where in the loop the swirl is at a moment: 0 at the start, up to 2π. */
 export function swirlPhase(nowMs: number): number {
@@ -27,7 +27,7 @@ void main() { gl_Position = vec4(a_corner, 0.0, 1.0); }
 
 // Domain warping: each pass bends the coordinates with slow sine waves, then
 // the bands are rings around the centre that also turn with the angle, which
-// is what makes them spiral. smoothstep gives soft band edges.
+// is what makes them spiral. A wide smoothstep blurs the band edges.
 const FRAGMENT_SOURCE = `
 precision mediump float;
 uniform vec2 u_size;
@@ -41,7 +41,7 @@ void main() {
     p += 0.22 / f * vec2(sin(f * 2.1 * p.y + u_phase + f), cos(f * 1.7 * p.x - u_phase + f * 1.3));
   }
   float rings = sin(length(p) * 26.0 - 4.0 * u_phase + 2.0 * atan(p.y, p.x));
-  gl_FragColor = vec4(mix(u_dark, u_light, smoothstep(-0.3, 0.3, rings)), 1.0);
+  gl_FragColor = vec4(mix(u_dark, u_light, smoothstep(-0.6, 0.6, rings)), 1.0);
 }
 `;
 
