@@ -162,7 +162,7 @@ onMounted(async () => {
         <h1
           class="flex items-center justify-center gap-3 font-card text-2xl font-bold tracking-wide text-aqua"
         >
-          <PixelSeal class="w-12" />
+          <PixelSeal class="w-9" />
           juku-arcade
         </h1>
         <p v-if="loadError" role="alert" class="text-center text-crimson">{{ loadError }}</p>

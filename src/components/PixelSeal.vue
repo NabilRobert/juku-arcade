@@ -6,28 +6,38 @@
  */
 import { DECK_MARK } from './deck-mark.ts';
 import { SEAL_DISC, SEAL_GRID, SEAL_RING } from './pixel-seal.ts';
+
+/** The kanji's size on the seal's grid: a little over half the seal, as on a hanko. */
+const KANJI_SIZE = 12;
 </script>
 
 <template>
   <span
-    class="@container relative inline-flex aspect-square items-center justify-center drop-shadow-[0_2px_0_rgb(0_0_0/0.45)]"
+    class="relative inline-block aspect-square drop-shadow-[0_2px_0_rgb(0_0_0/0.45)]"
     role="img"
     :aria-label="`${DECK_MARK} (juku)`"
   >
     <svg
-      class="absolute inset-0 size-full"
+      class="block size-full"
       :viewBox="`0 0 ${SEAL_GRID} ${SEAL_GRID}`"
       shape-rendering="crispEdges"
       aria-hidden="true"
     >
       <path :d="SEAL_DISC" fill="var(--color-washi)" />
       <path :d="SEAL_RING" fill="var(--color-crimson)" />
+      <!-- Centred on the middle of its em box, so the font's line spacing can't push it off. -->
+      <text
+        :x="SEAL_GRID / 2"
+        :y="SEAL_GRID / 2"
+        text-anchor="middle"
+        dominant-baseline="central"
+        :font-size="KANJI_SIZE"
+        fill="var(--color-crimson)"
+        font-family="DotGothic16, sans-serif"
+        lang="ja"
+      >
+        {{ DECK_MARK }}
+      </text>
     </svg>
-    <span
-      class="relative font-card text-[56cqw] leading-none text-crimson"
-      lang="ja"
-      aria-hidden="true"
-      >{{ DECK_MARK }}</span
-    >
   </span>
 </template>

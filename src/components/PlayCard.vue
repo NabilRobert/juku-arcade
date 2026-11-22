@@ -249,7 +249,7 @@ function onClick(): void {
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
         <CardFrame frame="crimson" :is-face-down="true" />
-        <PixelSeal class="w-[52cqw]" />
+        <PixelSeal class="w-[42cqw]" />
       </span>
     </span>
   </m.button>

@@ -25,7 +25,7 @@ const LAYERS = 3;
       :style="{ transform: `translate(${-layer * 2}px, ${-layer * 3}px)` }"
     >
       <CardFrame frame="crimson" :is-face-down="true" />
-      <PixelSeal v-if="layer === LAYERS" class="w-[52cqw]" />
+      <PixelSeal v-if="layer === LAYERS" class="w-[42cqw]" />
     </span>
   </div>
 </template>
