@@ -68,7 +68,7 @@ function toggleSound(): void {
       />
     </div>
     <PixelButton
-      colour="steel"
+      :colour="isPaused ? 'crimson' : 'steel'"
       class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50"
       :disabled="state.phase !== 'playing'"
       :aria-pressed="isPaused"

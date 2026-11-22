@@ -279,6 +279,21 @@ body {
   transform-origin: right;
 }
 
+/* A wipe that changes the button's colour sweeps in and stays; the button then takes the colour. */
+.pixel-wipe.is-change::before,
+.pixel-wipe.is-change::after {
+  animation: wipe-change 0.18s steps(10, end) forwards;
+}
+
+@keyframes wipe-change {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes wipe {
   0% {
     transform: scaleX(0);
