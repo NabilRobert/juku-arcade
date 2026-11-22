@@ -10,23 +10,6 @@ import type { RunState } from '../game/run.ts';
 import { addCoins, takeCoins, useScout, type BankRun } from './bank-run.ts';
 import { CRESTS, CURSE_COST, dealCrests, drawOmikuji, type CrestKind } from './specials.ts';
 
-/** A short message in the bank panel: a gain, a loss, or a crest paying out. */
-export interface Notice {
-  text: string;
-  isGood: boolean;
-  key: number;
-}
-
-export function useNotice() {
-  const notice = ref<Notice | null>(null);
-  return {
-    notice,
-    notify: (text: string, isGood: boolean) => {
-      notice.value = { text, isGood, key: (notice.value?.key ?? 0) + 1 };
-    },
-  };
-}
-
 type Notify = (text: string, isGood: boolean) => void;
 
 /** Scouting: a limited pause that shows the crests (the caller pauses the game). */

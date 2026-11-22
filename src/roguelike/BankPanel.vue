@@ -5,14 +5,14 @@
  * shows which cards carry a crest), the wallet and the items held. News
  * (a pot lost, a crest paying out) drops away under the pot.
  */
-import { m } from 'motion-v';
 import { computed } from 'vue';
 import PixelButton from '../components/PixelButton.vue';
 import PixelIcon from '../components/PixelIcon.vue';
 import { SETS_PER_ROUND, type BankRun } from './bank-run.ts';
 import { itemById } from './items.ts';
 import { CRESTS } from './specials.ts';
-import type { Notice } from './useCrests.ts';
+import type { Notice } from '../composables/useNotice.ts';
+import FloatingNotice from '../components/FloatingNotice.vue';
 
 const props = defineProps<{ run: BankRun; notice: Notice | null; canScout: boolean }>();
 defineEmits<{ bank: []; scout: [] }>();
@@ -45,17 +45,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
         <!-- A step smaller than the number, so the coin doesn't outweigh it. -->
         <span class="text-2xl"><PixelIcon name="coin" /></span> {{ run.pot }}
       </p>
-      <m.p
-        v-if="notice"
-        :key="notice.key"
-        class="pointer-events-none absolute inset-x-0 top-full font-bold drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
-        :class="notice.isGood ? 'text-aqua' : 'text-crimson'"
-        :initial="{ y: 0, opacity: 1 }"
-        :animate="{ y: 24, opacity: 0 }"
-        :transition="{ duration: 1.2, ease: 'easeIn' }"
-      >
-        {{ notice.text }}
-      </m.p>
+      <FloatingNotice :notice="notice" />
     </div>
     <PixelButton
       colour="aqua"

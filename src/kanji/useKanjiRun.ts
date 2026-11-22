@@ -178,7 +178,7 @@ export function useKanjiRun(deck: Deck, random: RandomSource = Math.random) {
     lastResult,
     play,
     crestMarks: crests.crestMarks,
-    news: crests.news,
+    notice: crests.notice,
     scoutsLeft: crests.scoutsLeft,
     isScouting: crests.isScouting,
     /** Scouting is for picking time: once the hand is played, the crests are spent. */

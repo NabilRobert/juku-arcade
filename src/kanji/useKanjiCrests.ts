@@ -7,6 +7,7 @@
  */
 import { computed, ref, shallowRef } from 'vue';
 import type { CrestMark } from '../components/crest-mark.ts';
+import { useNotice } from '../composables/useNotice.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { CRESTS, type CrestKind } from '../roguelike/specials.ts';
 import { crestBonus, dealKanjiCrests, MAX_SCOUTS, SCOUTS_AT_START } from './kanji-crests.ts';
@@ -18,13 +19,13 @@ export function useKanjiCrests(firstRound: KanjiRound, random: RandomSource) {
   const isScouting = ref(false);
   /** True from a scout until the next round: the scouted crests stay marked on the cards. */
   const isRevealed = ref(false);
-  /** The last crest that paid out (or cost), for the side panel; the key makes each show afresh. */
-  const news = ref<{ text: string; isGood: boolean; key: number } | null>(null);
+  /** The last crest that paid out (or cost), for the side panel. */
+  const { notice, notify } = useNotice();
 
   return {
     scoutsLeft,
     isScouting,
-    news,
+    notice,
     /** The scouted crests, by card index: from a scout until the round ends. */
     crestMarks: computed(() => {
       if (!isRevealed.value) return new Map<number, CrestMark>();
@@ -51,7 +52,7 @@ export function useKanjiCrests(firstRound: KanjiRound, random: RandomSource) {
     pointsFor: (index: number, isRight: boolean): number => {
       const bonus = crestBonus(crests.value.get(index), isRight, random);
       if (bonus === null) return 0;
-      news.value = { text: bonus.label, isGood: bonus.points > 0, key: (news.value?.key ?? 0) + 1 };
+      notify(bonus.label, bonus.points > 0);
       return bonus.points;
     },
   };

@@ -32,7 +32,7 @@ const emit = defineEmits<{ leave: [] }>();
 
 const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
-const { crestMarks, news, scoutsLeft, isScouting, phase } = run;
+const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -84,7 +84,7 @@ function dismiss(isStopping: boolean): void {
         :scouts-left="scoutsLeft"
         :is-scouting="isScouting"
         :can-scout="phase === 'picking'"
-        :news="news"
+        :notice="notice"
         @scout="run.toggleScout"
       />
       <SoundToggle />

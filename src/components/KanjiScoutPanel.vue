@@ -5,9 +5,10 @@
  * floating away. Scouting flips the hand over to show the crests; the
  * button turns red while it's flipped and turns the hand back.
  */
-import { m } from 'motion-v';
 import { KANJI_CREST_EFFECTS } from '../kanji/kanji-crests.ts';
 import { CRESTS } from '../roguelike/specials.ts';
+import type { Notice } from '../composables/useNotice.ts';
+import FloatingNotice from './FloatingNotice.vue';
 import PixelButton from './PixelButton.vue';
 import PixelIcon from './PixelIcon.vue';
 
@@ -15,7 +16,7 @@ defineProps<{
   scoutsLeft: number;
   isScouting: boolean;
   canScout: boolean;
-  news: { text: string; isGood: boolean; key: number } | null;
+  notice: Notice | null;
 }>();
 defineEmits<{ scout: [] }>();
 
@@ -41,17 +42,6 @@ const crestGuide = Object.values(CRESTS)
       </span>
     </PixelButton>
     <p class="text-xs text-washi/60">A perfect round earns a scout.</p>
-    <m.p
-      v-if="news"
-      :key="news.key"
-      class="pointer-events-none absolute inset-x-0 top-full font-bold drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
-      :class="news.isGood ? 'text-aqua' : 'text-crimson'"
-      :initial="{ y: 0, opacity: 1 }"
-      :animate="{ y: 24, opacity: 0 }"
-      :transition="{ duration: 1.4, ease: 'easeIn' }"
-      data-testid="crest-news"
-    >
-      {{ news.text }}
-    </m.p>
+    <FloatingNotice :notice="notice" />
   </section>
 </template>

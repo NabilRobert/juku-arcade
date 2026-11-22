@@ -21,7 +21,8 @@ import {
   type BankRun,
 } from './bank-run.ts';
 import type { ItemId } from './items.ts';
-import { useCrests, useNotice } from './useCrests.ts';
+import { useNotice } from '../composables/useNotice.ts';
+import { useCrests } from './useCrests.ts';
 
 const BEST_ROUND_KEY = 'juku-arcade:best-bank-round';
 

@@ -115,7 +115,7 @@ describe('scouting for crests in kanji mode', () => {
   it('reports what a thrown crest paid', () => {
     const crests = crestsFor();
     expect(crests.pointsFor(0, false)).toBe(-CURSE_POINTS);
-    expect(crests.news.value).toMatchObject({
+    expect(crests.notice.value).toMatchObject({
       isGood: false,
       text: expect.stringContaining('Cursed'),
     });
