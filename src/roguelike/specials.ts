@@ -1,5 +1,5 @@
 /**
- * SPIKE: special cards in the bank run (our own, as omamori-style crests).
+ * Special cards in the bank run (our own, as omamori-style crests).
  * A few word cards each set carry a crest on their back, which only shows
  * while the player scouts (a limited pause). Matching a marked card right
  * pays out; the cursed one is a trap. Words the player has missed before

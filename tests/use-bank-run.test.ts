@@ -1,4 +1,4 @@
-// SPIKE: the bank run alongside a word run: matches fill the pot, a miss empties it, banking keeps it.
+// The bank run alongside a word run: matches fill the pot, a miss empties it, banking keeps it.
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';

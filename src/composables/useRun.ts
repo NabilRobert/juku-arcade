@@ -23,7 +23,7 @@ export interface RunSetup {
   words: readonly DeckWord[];
   settings: Settings;
   pastEvents: readonly GameEvent[];
-  /** SPIKE: while this is true, the next set waits (the bank run's shop and end screens). */
+  /** While this is true, the next set waits (the bank run's shop and end screens). */
   isHoldingNextDeal?: () => boolean;
 }
 
@@ -178,7 +178,7 @@ export function useRun(setup: RunSetup) {
     throwReading: (readingIndex: number, wordId: string) =>
       act((current, context) => throwReading(current, context, readingIndex, wordId, Date.now())),
     pause: () => act((current, context) => pause(current, context, Date.now())),
-    /** SPIKE: banking the pot ends the combo (the bank run). */
+    /** Banking the pot ends the combo (the bank run). */
     endCombo: () => act((current) => ({ ...current, combo: 0 })),
     resume: () => act((current, context) => resume(current, context, Date.now())),
     flip: (word: DeckWord) =>

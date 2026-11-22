@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * SPIKE: the shop after a round is won: up to three items, each with its
+ * The shop after a round is won: up to three items, each with its
  * price; buy any your wallet covers (up to five held), then go on to the
  * next round. The next set waits until the player leaves.
  */

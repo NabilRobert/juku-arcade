@@ -38,13 +38,13 @@ const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
-  // SPIKE: the bank run holds the next set while its shop or end screen is open.
+  // The bank run holds the next set while its shop or end screen is open.
   isHoldingNextDeal: () => bankRun.isHolding.value,
 });
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
 const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause });
 const { run: bank, notice, bestRound, shownCrests } = bankRun;
-/** SPIKE: the scouted crests, marked on the word cards until the set ends. */
+/** The scouted crests, marked on the word cards until the set ends. */
 const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
 );

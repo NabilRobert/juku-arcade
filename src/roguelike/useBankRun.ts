@@ -1,5 +1,5 @@
 /**
- * SPIKE: runs the bank run (bank-run.ts) alongside a word-mode run. It
+ * Runs the bank run (bank-run.ts) alongside a word-mode run. It
  * watches the run: each match adds to the pot, a combo that breaks (a miss
  * or a timeout) loses it, and each set that ends counts toward the round.
  * Banking ends the run's combo through `endCombo`. While the shop or the

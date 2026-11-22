@@ -1,5 +1,5 @@
 /**
- * SPIKE: the items a bank run's shop sells (our own, as omamori-style
+ * The items a bank run's shop sells (our own, as omamori-style
  * charms; no other game's items). Each bends the risk of riding a combo:
  * more coins per match, a safety net on a miss, a bonus for banking, or
  * interest on what you save. bank-run.ts applies them.

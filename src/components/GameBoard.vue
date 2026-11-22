@@ -52,7 +52,7 @@ const props = defineProps<{
   tags: TagTable;
   /** The deck's JLPT level, marked on every card. */
   level: JlptLevel;
-  /** SPIKE: marks on word cards' backs, by word id (the bank run's crests while scouting). */
+  /** Scouted crests on the word cards, by word id (the bank run's crests, D42). */
   crestMarks?: ReadonlyMap<string, CrestMark>;
 }>();
 const emit = defineEmits<{

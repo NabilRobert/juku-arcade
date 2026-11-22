@@ -1,5 +1,5 @@
 /**
- * SPIKE: the crests on a bank run's word cards (specials.ts): which cards
+ * The crests on a bank run's word cards (specials.ts): which cards
  * carry one this set, scouting (a limited pause that shows them), and what
  * a marked card does when it's matched or missed. useBankRun calls these
  * from its watch on the run.

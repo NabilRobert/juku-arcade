@@ -41,7 +41,7 @@ export function useGameFeel(state: () => RunState) {
     shownCombo.value = combo;
   }
 
-  /** SPIKE: a combo that ends without a miss or a timeout was banked (the bank run), not broken. */
+  /** A combo that ends without a miss or a timeout was banked (the bank run), not broken. */
   function endCombo(now: RunState, before: RunState): void {
     shownCombo.value = 0;
     if (now.flash === before.flash && now.phase !== 'timedOut') return;

@@ -56,7 +56,7 @@ const props = defineProps<{
   level: JlptLevel;
   /** Where the deck is, so the card is dealt off it. */
   dealFrom?: Placement;
-  /** SPIKE: a scouted crest: its symbol on the back, its colour on both frames and the back. */
+  /** A scouted crest: its symbol on the back, its colour on both frames and the back. */
   crestMark?: CrestMark;
   /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
   order?: number;

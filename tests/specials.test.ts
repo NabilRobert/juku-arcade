@@ -1,4 +1,4 @@
-// SPIKE: crests on the bank run's cards: a few per set, good ones on words missed before.
+// Crests on the bank run's cards: a few per set, good ones on words missed before.
 import { describe, expect, it } from 'vitest';
 import { addMatch, startBankRun, takeCoins } from '../src/roguelike/bank-run.ts';
 import { dealCrests, drawOmikuji } from '../src/roguelike/specials.ts';

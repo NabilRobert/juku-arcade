@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * SPIKE: the end of a bank run: the round it reached and what was banked,
+ * The end of a bank run: the round it reached and what was banked,
  * against the best round, and a button to start again. The learning carries
  * on either way; only the bank run resets.
  */

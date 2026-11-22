@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * SPIKE: the bank run in the side panel: the round and its target, the
+ * The bank run in the side panel: the round and its target, the
  * unbanked pot with the Bank button, the Scout button (a limited pause that
  * shows which cards carry a crest), the wallet and the items held. News
  * (a pot lost, a crest paying out) drops away under the pot.

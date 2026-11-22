@@ -1,4 +1,4 @@
-// SPIKE: the bank run: ride the combo for a bigger pot, bank it before a miss takes it.
+// The bank run: ride the combo for a bigger pot, bank it before a miss takes it.
 import { describe, expect, it } from 'vitest';
 import {
   addMatch,
