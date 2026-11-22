@@ -245,7 +245,7 @@ before it ships.
 CC0 sounds only, muted until the first tap. Sound is first on the cut
 list.
 
-### D24: System fonts for Japanese (settled: Arthur's OK, 2026-11-21)
+### D24: System fonts for Japanese (replaced by D31, 2026-11-22)
 
 - **Beat:** a Noto Sans JP webfont (OFL licence, but megabytes before
   subsetting, which works against N1).
@@ -335,7 +335,141 @@ same blocks sit in a bar above the board. Built in slice 4.
 
 The layout follows common card-game conventions, the genre Arthur named as
 inspiration. The look is our own: no other game's card art, table texture,
-score boxes, font or naming (D22).
+score boxes or naming (D22). The English font is the one exception (D31).
 
 - **Beat:** a night-market arcade (flashier, less tied to learning
   Japanese); clean stationery (easy to read, least like an arcade).
+
+### D31: Pixel fonts, English and Japanese (settled: Arthur's choice, 2026-11-22)
+
+After the playtest Arthur picked two fonts: "balatro" by localthunk from
+FontStruct for English, and DotGothic16 (via Fontsource) for Japanese.
+Both are under the SIL Open Font License, which allows shipping them with
+the game. The pixel font's licence and readme ship beside it in
+`public/fonts/balatro/`, as the licence asks.
+
+The English font comes from Balatro's developer, so it's the one place
+the look borrows from that game, by Arthur's choice. The cards, colours,
+table and Japanese theme stay our own (D22, D30). Neither font has a bold
+weight, so faked bold is turned off to keep the pixels sharp.
+
+- **Size:** the pixel font is 4 KB. DotGothic16's Japanese file is 396 KB,
+  loaded once after the page draws and then cached. Fontsource's finely
+  split version was beaten: it adds 80 KB (gzipped) to the stylesheet
+  every page waits for.
+- **Beat:** system fonts (D24: no download, but no game feel); Noto Sans
+  JP (larger, and not a pixel face); m6x11 or other pixel fonts for
+  English (Arthur asked for this one).
+
+### D32: Pixel-art karuta cards (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the cards to look like an 8-bit card sprite sheet,
+modelled on real karuta: a pixelated karuta card. Each card is a white
+paper face in a thick karuta-green frame, with stepped pixel corners, a
+lit top edge and a hard offset shadow, all drawn in CSS (no image files),
+so it scales with the card. Reading cards are written top to bottom, as
+karuta's grab cards are. The card's state shows in the frame's colour,
+backed by the shake and the ✓ and ✗ marks (N4). The suit marks and hanko
+tag from D30 stay; the washi texture and soft shadow go.
+
+- **Beat:** image sprites drawn per card (sharper pixels, but an asset
+  pipeline and fixed sizes); buying or reusing a pixel card pack (its
+  playing-card faces don't fit karuta, and it would be someone else's
+  art, D22).
+
+### D33: A navy, aqua and crimson palette (settled: Arthur's choice, 2026-11-22)
+
+Arthur found the pixel cards too plain and picked a blue and dark red
+palette: navy `#1B3A57` (the table), crimson `#9B1B30`, pale aqua
+`#A8DADC`, off-white `#F1FAEE` (the paper) and steel blue `#457B9D`. The
+washi texture is back behind the card text. Word cards have a crimson
+frame and reading cards a steel one, so the two rows read apart. Crimson
+text gets a light glow where it sits on the navy table, as the two are
+too close in brightness. Each card also shows the deck's JLPT level in
+its bottom-left corner. This replaces D30's lacquer, vermilion, gold and
+pine colours.
+
+- **Beat:** keeping D30's colours (Arthur: boring with the pixel cards).
+
+### D34: A drifting marbled table (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for a background like a liquid marble pattern, in our
+colours, blurred, and moving gently in a loop. The table is soft navy
+bands on navy. The tile is drawn by SVG filters (smooth noise cut into
+bands, coloured, then blurred) rather than as a picture, so it's a 2 KB
+file. It's repeated 3 by 3 inside the SVG before blurring, so the tile
+has no seam. A layer one tile larger than the window drifts by exactly
+one tile every 80 seconds, so the loop has no jump. That's a transform,
+which the graphics card moves without redrawing; a CSS blur every frame
+would cost far more on school laptops. It stands still under reduced
+motion.
+
+- **Beat:** a looping GIF or video (megabytes, and blurry when scaled);
+  tracing noise into vector shapes with d3-contour (crisp, but the blur
+  makes crispness pointless, and it adds two dev dependencies); a
+  canvas redrawn every frame (real flowing motion, but constant CPU).
+
+### D35: A swirling shader table (settled: Arthur's choice, 2026-11-22)
+
+D34's drifting tile only slid; Arthur wanted bands that bend and swirl,
+like a looping psychedelic clip, and found the table and the reading
+cards too alike. A WebGL fragment shader now draws the table: coordinates
+are bent by a few sine waves, then cut into rings that also turn with the
+angle, so they spiral. Every moving term turns a whole number of times per
+24-second loop, so the loop has no jump. The shades are darker (deep navy
+on navy), so both card frames stand out.
+
+The canvas is a quarter of the window's size, stretched to fill it, and
+redraws at most 30 times a second; the browser stops it while the tab is
+hidden. Reduced motion shows a still frame, and without WebGL the plain
+navy table shows. This replaces D34's SVG tile.
+
+- **Beat:** D34's sliding tile (doesn't swirl); a looping video
+  (megabytes, and fixed to one size); a library like three.js (far more
+  than one full-screen shader needs; the WebGL setup is about 40 lines).
+
+### D36: Pixel buttons and panels, with a click wipe (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the rest of the UI to be pixelated like the cards, and
+for buttons to animate on click with colour sweeping in from left and
+right and meeting in the middle. Panels and buttons share the cards'
+stepped corners (three screen pixels), with a lit top edge and a shaded
+bottom edge. Every button is one component, `PixelButton.vue`, in four
+colours. On each click its wipe colour sweeps in from both edges in
+small `steps()`, then fades, within 0.3 s (Arthur found 0.5 s with six
+big steps looked like lag). When a click changes the button's colour (Pause
+turns red, Resume turns back to blue), the wipe is the new colour and the
+button keeps it once the halves meet. Under reduced
+motion the wipe is skipped.
+
+- **Beat:** NES.css (MIT, a ready-made pixel UI kit; it brings its own
+  look and font, and we'd override most of it); styling each button
+  separately (the same code eleven times).
+
+**D33 update (2026-11-22):** Arthur asked for every card to be crimson,
+reading cards too, with a crimson back. A wrong card's frame now turns
+dark instead of crimson, so it still stands out, with its shake and ✗.
+
+### D38: Matched cards snap away pixel by pixel (settled: Arthur's choice, 2026-11-22)
+
+Arthur didn't want matched cards to fall and fade, nor to wipe away in
+rows: they should vanish pixel by pixel in a circle, from the top-left
+corner to the bottom-right, like the snap in a well-known film, with no
+ash left behind. Each card is cut into 30 by 40 square blocks (first 12 by
+16; Arthur found those too big). A block's turn is its distance from the
+top-left corner, with across counting more than down so the left side
+always clears before the right, plus a little randomness for a ragged
+edge. The snap plays 25 clip paths in 0.65 s (Web Animations), each
+cutting away a few more blocks, starting when the throw hits. It first
+used mask images, but the browser loads each one as it's swapped in and
+shows the card unmasked until then, which flashed; a clip path applies at
+once. Under
+reduced motion a matched card vanishes at once. Blocks are timed by their rank along the front rather than their
+distance, so every step takes the same number: a curved front crosses
+few blocks near the corners, and timing by distance crawled at the end
+and looked stuck. A snapped card is hidden outright when the snap ends or
+is interrupted, so none is ever left part-way.
+
+- **Beat:** the top-down row wipe (Arthur: not this); particles flying
+  off (that's the ash he didn't want, and costs more to draw).
+

@@ -172,3 +172,19 @@ export function tapCard(
   const next = isRight ? match(state, context, nowMs, pair) : miss(state, context, nowMs, pair);
   return { ...next, selected: null, lastActionAtMs: nowMs };
 }
+
+/**
+ * Throwing a reading card at a word card pairs those two, whatever was
+ * selected before: the throw says which word the player means.
+ */
+export function throwReading(
+  state: RunState,
+  context: RunContext,
+  readingIndex: number,
+  wordId: string,
+  nowMs: number,
+): RunState {
+  const reading: CardRef = { kind: 'reading', index: readingIndex };
+  if (!acceptsTaps(state) || isMatched(state, reading)) return state;
+  return tapCard({ ...state, selected: reading }, context, { kind: 'word', wordId }, nowMs);
+}

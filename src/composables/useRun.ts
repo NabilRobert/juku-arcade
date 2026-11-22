@@ -8,16 +8,9 @@ import { onUnmounted, ref, shallowRef, type Ref, type ShallowRef } from 'vue';
 import type { DeckWord } from '../deck/types.ts';
 import { localDay, type GameEvent } from '../game/events.ts';
 import { flipCard, pause, resume } from '../game/pause.ts';
-import {
-  nextSet,
-  startRun,
-  timeUp,
-  type CardRef,
-  type RunContext,
-  type RunState,
-} from '../game/run.ts';
+import { nextSet, startRun, timeUp, type RunContext, type RunState } from '../game/run.ts';
 import type { TagTable } from '../game/tags.ts';
-import { tapCard } from '../game/taps.ts';
+import { throwReading } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
 import { withPlayTime } from '../game/wellbeing.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
@@ -188,7 +181,8 @@ export function useRun(setup: RunSetup) {
   usePauseWhenHidden(() => act((current, context) => pause(current, context, Date.now())));
   return {
     ...view,
-    tap: (card: CardRef) => act((current, context) => tapCard(current, context, card, Date.now())),
+    throwReading: (readingIndex: number, wordId: string) =>
+      act((current, context) => throwReading(current, context, readingIndex, wordId, Date.now())),
     pause: () => act((current, context) => pause(current, context, Date.now())),
     resume: () => act((current, context) => resume(current, context, Date.now())),
     flip: (word: DeckWord) =>

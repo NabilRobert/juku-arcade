@@ -7,6 +7,7 @@
 import { computed, onUnmounted, ref } from 'vue';
 import type { GameEvent, SessionIdentity } from '../game/events.ts';
 import { checkUpEvent, SECONDS_PER_QUESTION, type Question } from '../memory/check-up.ts';
+import PixelButton from './PixelButton.vue';
 
 const props = defineProps<{ questions: readonly Question[]; identity: SessionIdentity }>();
 const emit = defineEmits<{ done: [events: GameEvent[]]; skip: [] }>();
@@ -57,54 +58,40 @@ onUnmounted(() => clearInterval(timer));
 <template>
   <section class="mx-auto w-full max-w-md space-y-5 text-center" aria-label="Daily check-up">
     <template v-if="index < 0">
-      <h2 class="font-card text-2xl font-semibold text-gold">Daily check-up</h2>
+      <h2 class="font-card text-2xl font-semibold text-aqua">Daily check-up</h2>
       <p class="text-washi/80">
         {{ questions.length }} quick questions, about a minute. It shows what's sticking. It doesn't
         change your score or your reviews.
       </p>
       <div class="flex justify-center gap-3">
-        <button
-          type="button"
-          class="min-h-11 rounded-lg bg-vermilion px-5 text-washi"
-          @click="start"
-        >
-          Start
-        </button>
-        <button
-          type="button"
-          class="min-h-11 rounded-lg bg-pine px-5 text-washi"
-          @click="emit('skip')"
-        >
+        <PixelButton colour="crimson" class="min-h-11 px-5" @click="start"> Start </PixelButton>
+        <PixelButton colour="steel" class="min-h-11 px-5" @click="emit('skip')">
           Skip today
-        </button>
+        </PixelButton>
       </div>
     </template>
     <template v-else-if="question">
       <p class="text-sm text-washi/60">{{ index + 1 }} / {{ questions.length }}</p>
       <p
-        class="washi mx-auto w-48 rounded-lg border-2 border-vermilion/70 py-6 font-card text-4xl font-semibold text-sumi"
+        class="pixel-panel washi mx-auto w-48 py-6 font-card text-4xl font-semibold text-sumi"
         lang="ja"
       >
         {{ question.word.word }}
       </p>
-      <div
-        class="h-2 overflow-hidden rounded-full bg-lacquer"
-        role="progressbar"
-        aria-label="Time left"
-      >
-        <div class="h-full bg-gold" :style="{ width: `${timeShare * 100}%` }" />
+      <div class="h-2 overflow-hidden bg-lacquer" role="progressbar" aria-label="Time left">
+        <div class="h-full bg-aqua" :style="{ width: `${timeShare * 100}%` }" />
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <button
+        <PixelButton
           v-for="option in question.options"
           :key="option"
-          type="button"
-          class="washi min-h-14 rounded-lg border-2 border-pine/70 font-card text-xl text-sumi"
+          colour="paper"
+          class="min-h-14 font-card text-xl"
           lang="ja"
           @click="answer(option)"
         >
           {{ option }}
-        </button>
+        </PixelButton>
       </div>
     </template>
   </section>

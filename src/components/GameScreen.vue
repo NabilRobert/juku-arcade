@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
- * One run on screen, laid out as a card table (D30): on laptops a side
- * panel (today's progress, the run's numbers, the set score) beside the
- * table; on phones the panel stacks above it. The table shows the board,
+ * One run on screen, laid out as a card table (D30) for a laptop or
+ * desktop screen, the only kind the school uses: a side panel (today's
+ * progress, the run's numbers, the set score) beside the table. The
+ * table shows the board,
  * or a flipped card's back while paused, then the missed tray. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
@@ -32,7 +33,7 @@ const run = useRun({
   settings: props.settings,
   pastEvents: props.pastEvents,
 });
-const { state, nowMs, tags, progress, tap, pause, resume, flip } = run;
+const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
 
 const CAP_MINUTES = parseCapMinutes(import.meta.env.VITE_DAILY_CAP_MINUTES);
 const shownNudges = ref<number[]>([]);
@@ -50,8 +51,8 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
-    <aside class="flex flex-col gap-4 md:sticky md:top-6">
+  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
+    <aside class="sticky top-6 flex flex-col gap-4">
       <DailyBar :progress="progress" :level="deck.level" />
       <GameHud :state="state" :now-ms="nowMs" @pause="pause" @resume="resume" />
       <ScoreBreakdown
@@ -61,7 +62,7 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
       />
     </aside>
     <div class="flex flex-col gap-5">
-      <section v-if="isCapped" class="washi rounded-xl p-6 text-center text-sumi" role="status">
+      <section v-if="isCapped" class="pixel-panel washi p-6 text-center text-sumi" role="status">
         <p class="font-card text-xl font-semibold">That's today's play. See you tomorrow!</p>
         <p class="mt-1 text-sm text-sumi/70">
           Your school set a daily limit of {{ CAP_MINUTES }} minutes.
@@ -79,7 +80,15 @@ watch([() => props.isAway, isCapped, nudge], ([isAway, capped, due]) => {
         :kanji="deck.kanji"
         @close="flip(state.flippedWord)"
       />
-      <GameBoard v-else :state="state" :now-ms="nowMs" :tags="tags" @tap="tap" @flip="flip" />
+      <GameBoard
+        v-else
+        :state="state"
+        :now-ms="nowMs"
+        :tags="tags"
+        :level="deck.level"
+        @throw="throwReading"
+        @flip="flip"
+      />
       <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
     </div>
   </div>

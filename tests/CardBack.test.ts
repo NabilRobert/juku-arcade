@@ -40,7 +40,7 @@ describe('CardBack', () => {
 
   it('lists every reading of each kanji and highlights the ones this word uses', () => {
     const back = mount(CardBack, { props: { word: SCHOOL, kanji: KANJI } });
-    const readings = back.findAll('span.rounded');
+    const readings = back.findAll('[data-testid="kanji-reading"]');
     expect(readings.map((reading) => reading.text())).toEqual([
       'ガク',
       'まな.ぶ',
@@ -48,9 +48,7 @@ describe('CardBack', () => {
       'キョウ',
     ]);
     expect(
-      readings
-        .filter((reading) => reading.classes('bg-vermilion'))
-        .map((reading) => reading.text()),
+      readings.filter((reading) => reading.classes('bg-crimson')).map((reading) => reading.text()),
     ).toEqual(['ガク', 'コウ']);
   });
 
