@@ -456,10 +456,13 @@ Arthur didn't want matched cards to fall and fade, nor to wipe away in
 rows: they should vanish pixel by pixel in a circle, from the top-left
 corner to the bottom-right, like the snap in a well-known film, with no
 ash left behind. Each card is cut into 30 by 40 square blocks (first 12 by
-16; Arthur found those too big). A block's
-turn is its distance from the top-left corner plus some randomness, so
-the edge is ragged. The snap plays 15 masks in 0.65 s (Web Animations),
-each hiding a few more blocks, starting when the throw hits. Under
+16; Arthur found those too big). A block's turn is its distance from the
+top-left corner, with across counting more than down so the left side
+always clears before the right, plus a little randomness for a ragged
+edge. The snap plays 25 masks in 0.65 s (Web Animations), each hiding a
+few more blocks, starting when the throw hits. The masks are decoded
+while the card flies, because a mask swapped in undecoded flashes the
+whole card. Under
 reduced motion a matched card vanishes at once.
 
 - **Beat:** the top-down row wipe (Arthur: not this); particles flying

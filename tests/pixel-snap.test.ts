@@ -27,6 +27,12 @@ describe('the pixel snap', () => {
     expect(bottomRight).toBeGreaterThan(0.6);
   });
 
+  it('clears the left side before any block on the right goes', () => {
+    const leftColumn = turns.map((rowTurns) => rowTurns[0] ?? 1);
+    const rightColumn = turns.map((rowTurns) => rowTurns[SNAP_COLUMNS - 1] ?? 0);
+    expect(Math.max(...leftColumn)).toBeLessThan(Math.min(...rightColumn));
+  });
+
   it('starts with the whole card showing and ends with nothing left', () => {
     const masks = snapMasks(turns);
     expect(masks).toHaveLength(SNAP_FRAMES + 1);
