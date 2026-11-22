@@ -9,9 +9,12 @@ import {
 } from '../src/components/pixel-snap.ts';
 import { seededRandom } from './helpers/fixtures.ts';
 
-/** How many blocks a mask still shows: one square path per block. */
+/** How many blocks a mask still shows: the widths of its rectangles (each one block tall), added up. */
 function blocksShown(mask: string): number {
-  return decodeURIComponent(mask).match(/h1v1h-1z/g)?.length ?? 0;
+  const widths = [...decodeURIComponent(mask).matchAll(/h(\d+)v1H/g)].map((match) =>
+    Number(match[1]),
+  );
+  return widths.reduce((sum, width) => sum + width, 0);
 }
 
 describe('the pixel snap', () => {
@@ -36,5 +39,12 @@ describe('the pixel snap', () => {
     for (let frame = 1; frame < shown.length; frame += 1) {
       expect(shown[frame]).toBeLessThanOrEqual(shown[frame - 1] ?? 0);
     }
+  });
+
+  it('shows exactly the blocks whose turn has not come yet in every frame', () => {
+    snapMasks(turns).forEach((mask, frame) => {
+      const stillShowing = turns.flat().filter((turn) => turn > frame / SNAP_FRAMES).length;
+      expect(blocksShown(mask)).toBe(stillShowing);
+    });
   });
 });

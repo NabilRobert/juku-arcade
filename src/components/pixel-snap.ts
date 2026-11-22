@@ -7,9 +7,12 @@
  */
 import type { RandomSource } from '../game/deal.ts';
 
-/** The card in blocks: 12 across and 16 down, so the blocks are square on a 3:4 card. */
-export const SNAP_COLUMNS = 12;
-export const SNAP_ROWS = 16;
+/**
+ * The card in blocks: 30 across and 40 down, so the blocks are square on a
+ * 3:4 card and small, about the size of the card art's own pixels.
+ */
+export const SNAP_COLUMNS = 30;
+export const SNAP_ROWS = 40;
 /** Masks in the animation; each hides the next band of blocks. */
 export const SNAP_FRAMES = 14;
 /** How ragged the edge is: each block's turn moves by up to this share of the whole snap. */
@@ -34,17 +37,28 @@ export function snapOrder(random: RandomSource): number[][] {
   return turns;
 }
 
-/** One mask: an SVG with a black square for each block still showing (black shows, empty hides). */
-function maskFor(turns: number[][], shownAfter: number): string {
-  let squares = '';
-  turns.forEach((rowTurns, row) => {
-    rowTurns.forEach((turn, column) => {
-      if (turn > shownAfter) squares += `M${column} ${row}h1v1h-1z`;
-    });
+/** The blocks still showing in one row, as runs of neighbours, each drawn as one rectangle. */
+function rowRuns(rowTurns: number[], row: number, shownAfter: number): string {
+  let path = '';
+  let runStart = -1;
+  rowTurns.forEach((turn, column) => {
+    const isShown = turn > shownAfter;
+    if (isShown && runStart === -1) runStart = column;
+    const isRunOver = runStart !== -1 && (!isShown || column === rowTurns.length - 1);
+    if (!isRunOver) return;
+    const runEnd = isShown ? column + 1 : column;
+    path += `M${runStart} ${row}h${runEnd - runStart}v1H${runStart}z`;
+    runStart = -1;
   });
+  return path;
+}
+
+/** One mask: an SVG of the blocks still showing (black shows the card, empty hides it). */
+function maskFor(turns: number[][], shownAfter: number): string {
+  const path = turns.map((rowTurns, row) => rowRuns(rowTurns, row, shownAfter)).join('');
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SNAP_COLUMNS} ${SNAP_ROWS}" ` +
-    `preserveAspectRatio="none" shape-rendering="crispEdges"><path d="${squares}"/></svg>`;
+    `preserveAspectRatio="none" shape-rendering="crispEdges"><path d="${path}"/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
