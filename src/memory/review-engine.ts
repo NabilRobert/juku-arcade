@@ -1,7 +1,7 @@
 /**
  * The review engine the game talks to (R1). Its shape follows Juku's engine
- * API (recommend_words, record_quiz_answer, get_progress in juku-agents
- * engine/api.py), so a Juku-backed version can replace this local one after
+ * API (recommend_words, record_quiz_answer, get_progress in Juku's
+ * engine/api.py, NabilRobert/juku-agents-ai), so a Juku-backed version can replace this local one after
  * the playtest without the game changing.
  */
 import type { DeckWord } from '../deck/types.ts';

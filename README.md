@@ -5,7 +5,8 @@ kanji word cards (学校) to their readings (がっこう), with a decoy in the
 mix. Combos raise the level, and each level gives less time. There's no
 game over.
 
-Built for a friend's Japanese school, as a static web app with no server.
+Built for Japanese schools and their learners, as a static web app with
+no server.
 The plan, with its measurement plan, decisions and slices, is in
 [`docs/planning/`](docs/planning/).
 
@@ -74,4 +75,4 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 Word data comes from [OpenJLPT](https://github.com/evanclan/OpenJLPT)
 (CC BY-SA 4.0), which uses JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's
 JLPT lists, and Tatoeba. The generated decks are CC BY-SA 4.0 too. The code
-licence will be added once ownership is confirmed (decision D21).
+licence isn't chosen yet (decision D21).

@@ -7,7 +7,7 @@ its reason are added at the bottom, and the old text stays.
 
 **Does playing juku-arcade improve learners' recall of word readings?**
 
-Arthur's call (2026-11-21): running a class study isn't our job. So the
+Running a class study is out of scope (2026-11-21). So the
 measure is built into the game, through the optional daily check-up
 (phase 2, C1–C4). It compares each player with themselves, using a random
 control, so no class that doesn't play is needed.
@@ -82,9 +82,9 @@ From the same export (A1) and summary script (A2).
 
 ## Decision report: data for the people who decide
 
-Arthur (2026-11-21): the data is there to help decision makers decide,
+The data is there to help decision makers decide,
 and to show where learners struggle. So every report section starts from
-a decision, not from a chart. The meeting with the school confirms this
+a decision, not from a chart. A school using the game confirms this
 list (phase 1, open questions).
 
 | Who | Decision | Evidence in the report | When it flags |

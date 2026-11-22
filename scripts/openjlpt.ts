@@ -1,7 +1,7 @@
 /**
  * The pinned OpenJLPT build, and reading its SQLite file (decision D15).
  *
- * The commit and checksum are the ones Juku pins (juku-agents
+ * The commit and checksum are the ones Juku pins (NabilRobert/juku-agents-ai,
  * packages/juku-data/src/juku_data/dictionary/pin.py at 4e6c409), so both
  * projects use the same data. Moving to a newer build is a reviewed change
  * to this file.

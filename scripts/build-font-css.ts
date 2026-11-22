@@ -12,7 +12,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-/** How pixelated the font is, from 0 (smooth) to 100 (blockiest); Arthur chose 70. */
+/** How pixelated the font is, from 0 (smooth) to 100 (blockiest); 70 was chosen (D41). */
 const PIXEL_LEVEL = 70;
 const OUTPUT = 'src/fonts/kuronuri.css';
 

@@ -1,7 +1,7 @@
 /**
  * One word's long-term memory state, and how an answer changes it (R2).
  *
- * Ported from Juku's review engine (juku-agents
+ * Ported from Juku's review engine (NabilRobert/juku-agents-ai,
  * packages/juku-data/src/juku_data/engine/state.py, after_quiz_answer, at
  * commit 4e6c409), so the game can move to Juku's API later without its
  * scheduling changing. Two deliberate differences:

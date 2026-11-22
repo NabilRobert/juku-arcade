@@ -317,11 +317,8 @@ deferred until after the playtest, and not planned yet.
 
 - **$0:** static hosting on a free tier (D20), and no paid services or
   APIs.
-- **Licences:** code under a licence of Arthur's choosing (D21). Data
+- **Licences:** code under a licence still to be chosen (D21). Data
   under CC BY-SA 4.0, with attribution.
 - **Original:** see D22.
-- **Separate from Juku:** no code, branch or commit in juku-agents. Never
-  touch `juku-rehearsal`. Juku's code is reused by porting it, with the
-  source commit credited.
-- **Portfolio:** the repo stays private until Arthur's friend agrees he
-  can show it.
+- **Separate from Juku:** Juku's code is reused by porting it, with the
+  source credited, never by depending on its repo.

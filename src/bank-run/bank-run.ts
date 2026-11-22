@@ -1,5 +1,5 @@
 /**
- * The bank run, Arthur's push-your-luck roguelike. Every match adds
+ * The bank run, a push-your-luck roguelike (D44). Every match adds
  * coins to an unbanked pot, more the longer the combo runs. Banking moves
  * the pot to your wallet safely but ends the combo; a miss or a timeout
  * loses the pot. A run is rounds of 3 sets, each with a target of coins

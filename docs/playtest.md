@@ -50,7 +50,7 @@ lives in `src/game/tuning.ts`.
 | Sets often run out of time at a level | That level's timer is too short | `SET_SECONDS_BY_LEVEL` |
 | Learners waiting with nothing to do | The timer is too long | `SET_SECONDS_BY_LEVEL` |
 | They never reach level 3 | Levels come too slowly | `COMBO_PER_LEVEL` |
-| Groans or quitting after level 5 drops to 1 | The 5→1 rule is too harsh (D3) | Arthur's call: the rule is a design decision, not a number |
+| Groans or quitting after level 5 drops to 1 | The 5→1 rule is too harsh (D3) | A design call: the rule is a decision, not a number |
 | They clear the daily deck in a couple of minutes | The deck is too small | `NEW_WORDS_PER_DAY` |
 | They never clear it | The deck is too big | `NEW_WORDS_PER_DAY` |
 | Tags all look the same | The tag steps are too close | `TAG_STEPS` |
@@ -93,6 +93,6 @@ than 30% of play days have a check-up, the headline will be thin by day
 
 ## 5. Then decide
 
-After 14 days with the minimum data, slice 6 ends with Arthur's choice of
+After 14 days with the minimum data, slice 6 ends with a choice of
 what comes next: grammar mode (D11), a small backend with an admin page
 (D18), or moving to Juku's review engine API (R1).
