@@ -41,7 +41,10 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
     </div>
     <div class="relative py-1">
       <p class="text-xs tracking-widest text-aqua/80 uppercase">Pot</p>
-      <p class="text-3xl font-bold" data-testid="pot"><PixelIcon name="coin" /> {{ run.pot }}</p>
+      <p class="text-3xl font-bold" data-testid="pot">
+        <!-- A step smaller than the number, so the coin doesn't outweigh it. -->
+        <span class="text-2xl"><PixelIcon name="coin" /></span> {{ run.pot }}
+      </p>
       <m.p
         v-if="notice"
         :key="notice.key"
