@@ -148,21 +148,12 @@ body {
   background-image: radial-gradient(ellipse at 50% 35%, rgb(69 123 157 / 0.18), transparent 70%);
 }
 
-/*
- * A matched card dissolves from the top down in chunky pixel rows, once the
- * throw has hit (PlayCard.vue sets --dissolve-delay to the flight time).
- */
-.pixel-dissolve {
-  animation: pixel-dissolve 0.45s steps(9, end) var(--dissolve-delay, 0s) forwards;
-}
-
-@keyframes pixel-dissolve {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(100% 0 0 0);
-  }
+/* The pixel snap's masks (pixel-snap.ts) stretch over the whole card, one block per square. */
+.pixel-snap {
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -170,12 +161,6 @@ body {
   .animate-glow,
   .animate-float {
     animation: none;
-  }
-
-  /* Without the animation a matched card vanishes at once rather than staying. */
-  .pixel-dissolve {
-    animation: none;
-    clip-path: inset(100% 0 0 0);
   }
 
   /* Without its animation the wipe would stay drawn over the button. */

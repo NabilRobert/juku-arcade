@@ -1,8 +1,9 @@
-// The throw: a matched reading card flies to its word card, hits it, and both dissolve.
+// The throw: a matched reading card flies to its word card, hits it, and both snap away.
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import PlayCard from '../src/components/PlayCard.vue';
-import { cardPose, dealtFrom } from '../src/components/card-motion.ts';
+import { cardPose, dealtFrom, THROW_S } from '../src/components/card-motion.ts';
+import { SNAP_FRAMES } from '../src/components/pixel-snap.ts';
 import { centreOffset, placementBetween } from '../src/components/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';
 import { tapCard } from '../src/game/taps.ts';
@@ -40,13 +41,21 @@ describe('the throw', () => {
     expect(pose.opacity).toBe(1);
   });
 
-  it('dissolves a matched card once the throw has hit', async () => {
+  it('snaps a matched card away once the throw has hit', async () => {
+    const animate = vi.fn();
+    const original = HTMLElement.prototype.animate;
+    HTMLElement.prototype.animate = animate;
+    onTestFinished(() => {
+      HTMLElement.prototype.animate = original;
+    });
     const card = mount(PlayCard, {
       props: { text: '学校', kind: 'word', index: 0, status: 'idle', level: 'N5' },
     });
-    expect(card.find('.pixel-dissolve').exists()).toBe(false);
+    expect(animate).not.toHaveBeenCalled();
     await card.setProps({ status: 'matched' });
-    expect(card.find('.pixel-dissolve').exists()).toBe(true);
+    const [frames, timing] = animate.mock.calls[0] ?? [];
+    expect(frames).toHaveLength(SNAP_FRAMES + 1);
+    expect(timing).toMatchObject({ delay: THROW_S * 1000, fill: 'forwards' });
   });
 
   it('starts a dealt card on top of the deck, at the size of the deck', () => {

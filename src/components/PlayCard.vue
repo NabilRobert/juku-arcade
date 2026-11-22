@@ -30,6 +30,7 @@ import type { CardStatus } from '../game/card-status.ts';
 import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../deck/types.ts';
 import { useCardTilt } from '../composables/useCardTilt.ts';
+import { usePixelSnap } from '../composables/usePixelSnap.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
@@ -71,6 +72,7 @@ const emit = defineEmits<{
 const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 
 const { tiltStyle, follow, settle } = useCardTilt();
+usePixelSnap('snapLayer', () => props.status === 'matched', THROW_S * 1000);
 
 /** Largest text size (rem): short words are big, as on a printed card. */
 const MAX_TEXT_REM = { word: 3.5, reading: 2.6 } as const;
@@ -106,9 +108,6 @@ const STATUS_FRAMES: Partial<Record<CardStatus, FrameColour>> = {
  */
 const SIDE_CLASS =
   'absolute inset-0 flex flex-col items-center justify-center px-2 backface-hidden';
-
-/** A matched card starts to dissolve when the throw hits (.pixel-dissolve in style.css). */
-const DISSOLVE_DELAY = { '--dissolve-delay': `${THROW_S}s` };
 
 const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correct: '✓' };
 
@@ -205,9 +204,9 @@ function onClick(): void {
     @animation-complete="isDealt = true"
   >
     <span
-      class="absolute inset-0 [transform-style:preserve-3d]"
-      :class="{ 'pixel-dissolve': status === 'matched' }"
-      :style="[tiltStyle, DISSOLVE_DELAY]"
+      ref="snapLayer"
+      class="pixel-snap absolute inset-0 [transform-style:preserve-3d]"
+      :style="tiltStyle"
     >
       <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
         <CardFrame :frame="frame" :is-face-down="false" />
