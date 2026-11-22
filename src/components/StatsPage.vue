@@ -12,6 +12,7 @@ import { createLocalEngine } from '../memory/review-engine.ts';
 import { accuracy, playerStats, type AnswerCounts } from '../memory/stats.ts';
 import type { Settings } from '../memory/storage.ts';
 import PixelButton from './PixelButton.vue';
+import StatPanel from './StatPanel.vue';
 
 const props = defineProps<{ deck: Deck; settings: Settings; events: readonly GameEvent[] }>();
 defineEmits<{ close: [] }>();
@@ -59,11 +60,9 @@ const tiles = computed(() => [
   <article class="mx-auto w-full max-w-3xl space-y-5 text-washi/90" aria-label="Your stats">
     <h2 class="text-xl font-semibold">Your stats</h2>
     <div class="grid grid-cols-4 gap-3">
-      <p v-for="tile in tiles" :key="tile.label" class="pixel-panel bg-wood/80 p-3 text-center">
-        <span class="block text-xs tracking-widest text-aqua/80 uppercase">{{ tile.label }}</span>
+      <StatPanel v-for="tile in tiles" :key="tile.label" :label="tile.label" :note="tile.note">
         <span class="block text-2xl font-bold">{{ tile.value }}</span>
-        <span v-if="tile.note" class="block text-xs text-washi/60">{{ tile.note }}</span>
-      </p>
+      </StatPanel>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <section class="pixel-panel bg-wood/80 p-3">

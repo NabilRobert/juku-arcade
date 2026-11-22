@@ -21,6 +21,7 @@ import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
 import SoundToggle from './SoundToggle.vue';
 import WellbeingGate from './WellbeingGate.vue';
+import StatPanel from './StatPanel.vue';
 
 const props = defineProps<{
   deck: Deck;
@@ -66,18 +67,11 @@ function dismiss(isStopping: boolean): void {
         <p class="text-sm text-washi/70">Round {{ roundNumber }}</p>
       </section>
       <div class="grid grid-cols-2 gap-3">
-        <p
-          v-for="panel in panels"
-          :key="panel.label"
-          class="pixel-panel bg-wood/80 p-3 text-center"
-        >
-          <span class="block text-xs tracking-widest text-aqua/80 uppercase">{{
-            panel.label
-          }}</span>
+        <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
             panel.value
           }}</span>
-        </p>
+        </StatPanel>
       </div>
       <KanjiResult :result="lastResult" />
       <KanjiScoutPanel

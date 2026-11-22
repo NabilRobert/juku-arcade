@@ -10,6 +10,7 @@ import { secondsLeft, type RunState } from '../game/run.ts';
 import { MAX_LEVEL } from '../game/tuning.ts';
 import PixelButton from './PixelButton.vue';
 import SoundToggle from './SoundToggle.vue';
+import StatPanel from './StatPanel.vue';
 
 const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
@@ -24,8 +25,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
 <template>
   <section class="flex flex-col gap-3" aria-label="Run">
     <div class="grid grid-cols-2 gap-3">
-      <p class="pixel-panel bg-wood/80 p-3 text-center">
-        <span class="block text-xs tracking-widest text-aqua/80 uppercase">Level</span>
+      <StatPanel label="Level">
         <m.span
           :key="state.level"
           class="inline-block text-3xl font-bold"
@@ -36,9 +36,8 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
           >{{ state.level }}</m.span
         >
         <span class="text-sm text-washi/60"> / {{ MAX_LEVEL }}</span>
-      </p>
-      <p class="pixel-panel bg-wood/80 p-3 text-center">
-        <span class="block text-xs tracking-widest text-aqua/80 uppercase">Combo</span>
+      </StatPanel>
+      <StatPanel label="Combo">
         <m.span
           :key="state.combo"
           class="inline-block text-3xl font-bold text-aqua"
@@ -48,7 +47,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
           :transition="{ type: 'spring', stiffness: 500, damping: 18 }"
           >{{ state.combo }}</m.span
         >
-      </p>
+      </StatPanel>
     </div>
     <div
       class="h-2.5 overflow-hidden bg-lacquer"
