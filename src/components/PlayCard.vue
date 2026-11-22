@@ -32,6 +32,7 @@ import type { JlptLevel } from '../deck/types.ts';
 import { useCardTilt } from '../composables/useCardTilt.ts';
 import { usePixelSnap } from '../composables/usePixelSnap.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
+import { DECK_MARK } from './deck-mark.ts';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
 
 const props = defineProps<{
@@ -248,7 +249,7 @@ function onClick(): void {
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
         <CardFrame frame="crimson" :is-face-down="true" />
-        <span class="relative">{{ kind === 'word' ? '札' : '' }}</span>
+        <span class="relative">{{ DECK_MARK }}</span>
       </span>
     </span>
   </m.button>
