@@ -9,7 +9,7 @@
  */
 
 /** One loop of the swirl, in milliseconds. */
-export const SWIRL_LOOP_MS = 16_000;
+export const SWIRL_LOOP_MS = 19_000;
 
 /** Where in the loop the swirl is at a moment: 0 at the start, up to 2π. */
 export function swirlPhase(nowMs: number): number {
