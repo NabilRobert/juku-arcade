@@ -260,8 +260,11 @@ detected at each class size.
   chimes the next note of a pentatonic scale (`comboPitch`), so a streak
   climbs a tune. `composables/useGameFeel.ts` watches the run and plays
   these when the thrown card lands, and drives `ComboMeter.vue`: the
-  combo between the two rows, growing and warming (aqua from 5, crimson
-  from 10, with いいね！, すごい！, さいこう！). A glow behind the cards
+  combo between the two rows as a style rank (D39), a letter grade from D
+  up to SSS (`components/combo-ranks.ts`) with a word of praise (よし, いいね,
+  うまい, すごい, さいこう, てんさい, でんせつ), the combo count and a bar
+  toward the next rank. Each rank-up slams the letter in with a sound, and
+  the meter floats gently while it waits. A glow behind the cards
   (`.table-glow`) brightens with the combo and the table jolts on each
   hit. A lost streak of 3 or more drops away in crimson. The 🔊 button
   in the side panel mutes it all, remembered in this browser. ZzFX is
@@ -315,7 +318,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Learned miss chance** | (misses + 5 × guess) / (attempts + 5): the guess, corrected by the player's own record | `memory/difficulty.ts` |
 | **Word known** | Answered right on 2 separate days (Juku's LE1 rule) | `leitner.ts: CORRECT_DAYS_TO_KNOW` |
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
-| **Combo meter / heat** | The combo shown between the card rows, and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
+| **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (D to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
@@ -379,8 +382,8 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
-- **Change how the combo builds:** the steps, praise and colours are
-  `TIERS` in `ComboMeter.vue`; the glow's brightest combo is
+- **Change how the combo builds:** the ranks, their thresholds, praise and
+  colours are `COMBO_RANKS` in `components/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.
 - **Change how forgiving a fling is:** `AIM_AHEAD_S` in
   `components/throw-geometry.ts`.
