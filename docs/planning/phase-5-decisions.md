@@ -496,3 +496,23 @@ is interrupted, so none is ever left part-way.
 - **Beat:** the top-down row wipe (Arthur: not this); particles flying
   off (that's the ash he didn't want, and costs more to draw).
 
+### D39: The combo as a style rank (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for combo tiers like an action game's style meter. The
+combo shows as a letter grade from F to SSS, as Arthur asked: F from 2,
+E from 4, D from 6, C from 9, B from 12, A from 15, S from 20, SS from 25
+and SSS from 30. Each has a word of praise in easy Japanese (がんばれ, よし,
+いいね, うまい, すごい, さいこう, かんぺき, てんさい, でんせつ), so even the
+cheering is reading practice, and a bar fills toward the next rank. A
+rank-up slams the letter in with a sound pitched above the level-up's. The
+meter floats gently while it waits, like the cards. Letter grades are a
+common way to score style; the words and thresholds are our own.
+
+- **Beat:** another game's rank names (D22); a gauge that drains when idle
+  (it would change the game's rules, not just how the combo looks).
+
+**D32 update (2026-11-22):** Arthur found the card backs and faces didn't
+look pixelated. Both textures are now tiny SVG tiles of hard-edged pixels
+on the card's own pixel grid: specks on the washi faces (and on paper
+panels and buttons), and a diamond lattice on the crimson backs.
+
