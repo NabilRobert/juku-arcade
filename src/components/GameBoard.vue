@@ -41,6 +41,7 @@ import { playSound } from '../sound/sfx.ts';
 import CardDeck from './CardDeck.vue';
 import ComboMeter from './ComboMeter.vue';
 import PlayCard from './PlayCard.vue';
+import { fanStyle, floatStyle, SLOT_SIZE } from './hand-layout.ts';
 import PixelButton from './PixelButton.vue';
 import type { Point } from './throw-geometry.ts';
 
@@ -70,42 +71,6 @@ const FULL_HEAT_COMBO = 15;
 const SHAKE_BASE_PX = 3;
 const SHAKE_PER_COMBO_PX = 0.4;
 const SHAKE_MAX_PX = 10;
-/** Each slot is the size of the card in it (PlayCard draws the card the same size). */
-const SLOT_SIZE = 'mx-auto aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))]';
-/** The fan the hand is held in: each card turns this much more than the one before it... */
-const FAN_TURN_DEG = 4;
-/** ...and the cards towards the ends drop lower, by this times the square of their distance from the middle. */
-const FAN_DROP_PX = 4;
-/** How far each card in the hand overlaps the one before it. */
-const HAND_OVERLAP = '-3dvh';
-
-/** How far a card floats up (px) and sways (degrees): the held reading cards more than the word cards. */
-const FLOAT = { word: { px: 4, deg: 0.6 }, reading: { px: 7, deg: 1.2 } } as const;
-/** Floats last FLOAT_BASE_S plus up to two FLOAT_STEP_S, and start FLOAT_PHASE_S apart, so no two cards move together. */
-const FLOAT_BASE_S = 2.8;
-const FLOAT_STEP_S = 0.45;
-const FLOAT_PHASE_S = 0.7;
-
-function floatStyle(kind: 'word' | 'reading', index: number): Record<string, string> {
-  return {
-    '--float-px': `${FLOAT[kind].px}px`,
-    '--float-deg': `${FLOAT[kind].deg}deg`,
-    animationDuration: `${FLOAT_BASE_S + (index % 3) * FLOAT_STEP_S}s`,
-    animationDelay: `${-index * FLOAT_PHASE_S}s`,
-  };
-}
-
-/** A reading card's place in the fan: turned and dropped by how far it is from the middle. */
-function fanStyle(index: number): Record<string, string> {
-  const fromMiddle = index - (props.state.set.readings.length - 1) / 2;
-  const turn = fromMiddle * FAN_TURN_DEG;
-  const drop = fromMiddle * fromMiddle * FAN_DROP_PX;
-  return {
-    transform: `translateY(${drop}px) rotate(${turn}deg)`,
-    marginLeft: index === 0 ? '0' : HAND_OVERLAP,
-  };
-}
-
 const heat = computed(() => Math.min(shownCombo.value / FULL_HEAT_COMBO, 1));
 const [tableElement, animate] = useAnimate();
 const isReducedMotion = useReducedMotion();
@@ -215,7 +180,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
           :ref="registerReading(index)"
           class="relative aspect-[3/4] w-[calc(var(--card-height)*0.75)] shrink-0 hover:z-20"
           :class="orderOf(index) !== undefined ? 'z-10' : ''"
-          :style="fanStyle(index)"
+          :style="fanStyle(index, state.set.readings.length)"
         >
           <div class="animate-float" :style="floatStyle('reading', index)">
             <PlayCard
