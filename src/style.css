@@ -1,18 +1,10 @@
 @import 'tailwindcss';
 /*
- * DotGothic16 for Japanese (OFL, via Fontsource): one 396 KB file, loaded
- * after the page draws and then cached. Its Latin file covers symbols the
- * pixel font lacks (× ✓ ▶). The finely split 400.css would add 80 KB to
- * the stylesheet every page waits for.
- */
-@import '@fontsource/dotgothic16/japanese-400.css';
-@import '@fontsource/dotgothic16/latin-400.css';
-
-/*
  * A pixel font for English: "balatro" by localthunk, from FontStruct (OFL;
  * its licence and readme sit beside it in public/fonts/balatro/, as the
  * licence asks). It has no Japanese, so Japanese text falls through to
- * DotGothic16 in the font stacks below. Decision D31.
+ * Kuronuri, a pixel Japanese font (OFL) that main.ts loads after the page
+ * draws (decisions D31, D41).
  */
 @font-face {
   font-family: 'balatro';
@@ -26,10 +18,10 @@
  * look changes in one place. Textures are CSS gradients, not image files.
  */
 @theme {
-  /* English in the pixel font, Japanese in DotGothic16, then system fonts if a webfont fails (D31). */
+  /* English in the pixel font, Japanese in Kuronuri, then system fonts if a webfont fails (D31, D41). */
   --font-sans:
-    'balatro', 'DotGothic16', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
-  --font-card: 'balatro', 'DotGothic16', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+    'balatro', 'Kuronuri 70', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-card: 'balatro', 'Kuronuri 70', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
 
   /*
    * The palette (D33, Arthur's pick): a navy table, steel blue, pale aqua

@@ -33,7 +33,7 @@ const KANJI_SIZE = 12;
         dominant-baseline="central"
         :font-size="KANJI_SIZE"
         fill="var(--color-crimson)"
-        font-family="DotGothic16, sans-serif"
+        font-family="'Kuronuri 70', sans-serif"
         lang="ja"
       >
         {{ DECK_MARK }}

@@ -9,8 +9,9 @@
   "scripts": {
     "decks": "node scripts/build-decks.ts",
     "decks:report": "node scripts/build-decks.ts --report",
-    "dev": "npm run decks && vite",
-    "build": "npm run decks && vite build",
+    "fonts": "node scripts/build-font-css.ts",
+    "dev": "npm run decks && npm run fonts && vite",
+    "build": "npm run decks && npm run fonts && vite build",
     "preview": "vite preview",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
@@ -20,7 +21,7 @@
     "power": "node scripts/simulate-power.ts"
   },
   "dependencies": {
-    "@fontsource/dotgothic16": "^5.3.1",
+    "@lihbr/kuronuri": "^0.0.3",
     "dexie": "^4.4.7",
     "motion-v": "^2.13.0",
     "vue": "^3.5.46",
