@@ -16,6 +16,8 @@ export const FIRST_TARGET = 30;
 const TARGET_GROWTH = 1.6;
 export const MAX_ITEMS = 5;
 export const OFFER_SIZE = 3;
+/** Scouting pauses (they show the crests, specials.ts) allowed each round. */
+export const SCOUTS_PER_ROUND = 2;
 /** Koi doubles a match's coins from this combo up. */
 const KOI_COMBO = 10;
 /** The fan's banking bonus, and the bamboo's interest: a coin per this many saved, up to a cap. */
@@ -35,6 +37,8 @@ export interface BankRun {
   isCraneUsed: boolean;
   /** The shop's items while it's open, else null. */
   offer: ItemId[] | null;
+  /** Scouting pauses left this round. */
+  scoutsLeft: number;
   isOver: boolean;
 }
 
@@ -54,6 +58,7 @@ export function startBankRun(): BankRun {
     isCraneUsed: false,
     offer: null,
     isOver: false,
+    scoutsLeft: SCOUTS_PER_ROUND,
   };
 }
 
@@ -65,8 +70,23 @@ export function coinsForMatch(run: BankRun, combo: number): number {
   return holds(run, 'koi') && combo >= KOI_COMBO ? base * 2 : base;
 }
 
-export function addMatch(run: BankRun, combo: number): BankRun {
-  return { ...run, pot: run.pot + coinsForMatch(run, combo) };
+/** A match adds to the pot; a koban card (specials.ts) doubles what it adds. */
+export function addMatch(run: BankRun, combo: number, multiplier = 1): BankRun {
+  return { ...run, pot: run.pot + coinsForMatch(run, combo) * multiplier };
+}
+
+/** Coins from outside a match (an omikuji's gift), into the pot or the wallet. */
+export function addCoins(run: BankRun, to: 'pot' | 'wallet', coins: number): BankRun {
+  return to === 'pot' ? { ...run, pot: run.pot + coins } : { ...run, wallet: run.wallet + coins };
+}
+
+/** Coins taken from the wallet (a cursed card), never below none. */
+export function takeCoins(run: BankRun, coins: number): BankRun {
+  return { ...run, wallet: Math.max(0, run.wallet - coins) };
+}
+
+export function useScout(run: BankRun): BankRun {
+  return run.scoutsLeft > 0 ? { ...run, scoutsLeft: run.scoutsLeft - 1 } : run;
 }
 
 /** A miss or a timeout: the pot is lost, unless an item saves some or all of it. */
@@ -142,5 +162,6 @@ export function nextRound(run: BankRun): BankRun {
     setsThisRound: 0,
     isCraneUsed: false,
     offer: null,
+    scoutsLeft: SCOUTS_PER_ROUND,
   };
 }

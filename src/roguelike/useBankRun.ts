@@ -21,6 +21,7 @@ import {
   type BankRun,
 } from './bank-run.ts';
 import type { ItemId } from './items.ts';
+import { useCrests, useNotice } from './useCrests.ts';
 
 const BEST_ROUND_KEY = 'juku-arcade:best-bank-round';
 
@@ -40,12 +41,6 @@ function saveBestRound(round: number): void {
   }
 }
 
-/** A pot just lost, for the panel to show; the key makes each loss show afresh. */
-export interface PotLoss {
-  amount: number;
-  key: number;
-}
-
 /** The best round any bank run reached in this browser. */
 function useBestRound() {
   const bestRound = ref(readBestRound());
@@ -60,7 +55,7 @@ function useBestRound() {
 }
 
 /** The shop and end screens' actions. */
-function shopActions(run: Ref<BankRun>, lastLoss: Ref<PotLoss | null>) {
+function shopActions(run: Ref<BankRun>, reset: () => void) {
   return {
     buy: (id: ItemId) => {
       run.value = buyItem(run.value, id);
@@ -71,37 +66,29 @@ function shopActions(run: Ref<BankRun>, lastLoss: Ref<PotLoss | null>) {
     },
     newRun: () => {
       run.value = startBankRun();
-      lastLoss.value = null;
+      reset();
     },
   };
 }
 
-export function useBankRun(
+/** What the bank run needs from the word run: ending the combo (banking) and pausing (scouting). */
+export interface BankRunActions {
+  endCombo: () => void;
+  pause: () => void;
+}
+
+type Crests = ReturnType<typeof useCrests>;
+type Notify = (text: string, isGood: boolean) => void;
+
+/** The pot: banking it, losing it on a miss, filling it on a match, and closing a set's books. */
+function usePot(
   state: () => RunState,
-  endCombo: () => void,
-  random: RandomSource = Math.random,
+  run: Ref<BankRun>,
+  setup: { endCombo: () => void; crests: Crests; notify: Notify; random: RandomSource },
 ) {
-  const run = shallowRef<BankRun>(startBankRun());
-  const lastLoss = ref<PotLoss | null>(null);
-  const best = useBestRound();
+  const { endCombo, crests, notify, random } = setup;
   /** Set while our own bank ends the combo, so that isn't taken for a miss. */
   let isBanking = false;
-
-  function loseThePot(): void {
-    const { run: next, lost } = losePot(run.value);
-    run.value = next;
-    if (lost > 0) lastLoss.value = { amount: lost, key: (lastLoss.value?.key ?? 0) + 1 };
-  }
-
-  watch(state, (now, before) => {
-    if (now.combo > before.combo) run.value = addMatch(run.value, now.combo);
-    if (now.combo === 0 && before.combo > 0 && !isBanking) loseThePot();
-    isBanking = false;
-    if (now.phase === 'playing' || before.phase !== 'playing') return;
-    if (shouldBankAtBell(run.value)) bank();
-    run.value = endSet(run.value, random);
-    if (run.value.isOver) best.record(run.value.round);
-  });
 
   function bank(): void {
     if (run.value.pot <= 0) return;
@@ -112,12 +99,60 @@ export function useBankRun(
     endCombo();
   }
 
+  /** A match, a miss or a banked combo: the pot and the crests answer. */
+  function onPlay(now: RunState, before: RunState): void {
+    if (now.combo > before.combo) {
+      const matched = now.matchedWordIds.find((id) => !before.matchedWordIds.includes(id));
+      run.value = addMatch(run.value, now.combo, crests.multiplierFor(matched));
+    }
+    if (now.combo === 0 && before.combo > 0 && !isBanking) {
+      const { run: next, lost } = losePot(run.value);
+      run.value = next;
+      if (lost > 0) notify(`−${lost} lost!`, false);
+    }
+    isBanking = false;
+    if (now.flash !== null && now.flash !== before.flash) crests.onMiss(now.flash.wordId);
+  }
+
+  /** The end of a set counts toward the round, banking at the bell if that reaches the target. */
+  function onSetEnd(): void {
+    if (shouldBankAtBell(run.value)) bank();
+    run.value = endSet(run.value, random);
+  }
+
+  return { bank, onPlay, onSetEnd };
+}
+
+export function useBankRun(
+  state: () => RunState,
+  actions: BankRunActions,
+  random: RandomSource = Math.random,
+) {
+  const run = shallowRef<BankRun>(startBankRun());
+  const { notice, notify } = useNotice();
+  const best = useBestRound();
+  const crests = useCrests(state, run, random, notify);
+  const pot = usePot(state, run, { endCombo: actions.endCombo, crests, notify, random });
+
+  watch(state, (now, before) => {
+    if (now.setIndex !== before.setIndex) crests.deal(now);
+    if (now.pausedAtMs === null) crests.isScouting.value = false;
+    pot.onPlay(now, before);
+    if (now.phase === 'playing' || before.phase !== 'playing') return;
+    pot.onSetEnd();
+    if (run.value.isOver) best.record(run.value.round);
+  });
+
   return {
     run,
-    lastLoss,
+    notice,
     bestRound: best.bestRound,
-    bank,
+    bank: pot.bank,
+    shownCrests: crests.shownCrests,
+    scout: () => {
+      if (crests.scout()) actions.pause();
+    },
     isHolding: computed(() => run.value.offer !== null || run.value.isOver),
-    ...shopActions(run, lastLoss),
+    ...shopActions(run, () => (notice.value = null)),
   };
 }

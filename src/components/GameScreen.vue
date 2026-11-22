@@ -7,6 +7,7 @@
  * or a flipped card's back while paused, then the missed tray. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
+import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import { useRun } from '../composables/useRun.ts';
@@ -24,6 +25,7 @@ import BankPanel from '../roguelike/BankPanel.vue';
 import RunOver from '../roguelike/RunOver.vue';
 import ShopOffer from '../roguelike/ShopOffer.vue';
 import { useBankRun } from '../roguelike/useBankRun.ts';
+import { CRESTS } from '../roguelike/specials.ts';
 
 const props = defineProps<{
   deck: Deck;
@@ -40,8 +42,12 @@ const run = useRun({
   isHoldingNextDeal: () => bankRun.isHolding.value,
 });
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
-const bankRun = useBankRun(() => state.value, run.endCombo);
-const { run: bank, lastLoss, bestRound } = bankRun;
+const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause });
+const { run: bank, notice, bestRound, shownCrests } = bankRun;
+/** SPIKE: the crests to draw on the word cards' backs while scouting. */
+const backMarks = computed(
+  () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
+);
 
 const { nudge, isCapped, dismissNudge } = useWellbeing({
   sessionPlayMs: run.sessionPlayMs,
@@ -63,7 +69,13 @@ usePauseKey({
     <aside class="sticky top-6 flex flex-col gap-4">
       <DailyBar :progress="progress" :level="deck.level" />
       <GameHud :state="state" :now-ms="nowMs" @pause="pause" @resume="resume" />
-      <BankPanel :run="bank" :last-loss="lastLoss" @bank="bankRun.bank" />
+      <BankPanel
+        :run="bank"
+        :notice="notice"
+        :can-scout="state.phase === 'playing' && state.pausedAtMs === null"
+        @bank="bankRun.bank"
+        @scout="bankRun.scout"
+      />
       <ScoreBreakdown
         :score="state.lastSetScore"
         :is-showing="state.phase === 'cleared'"
@@ -84,6 +96,7 @@ usePauseKey({
           :now-ms="nowMs"
           :tags="tags"
           :level="deck.level"
+          :back-marks="backMarks"
           @throw="throwReading"
           @flip="flip"
         />

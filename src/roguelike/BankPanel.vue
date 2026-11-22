@@ -1,18 +1,25 @@
 <script setup lang="ts">
 /**
  * SPIKE: the bank run in the side panel: the round and its target, the
- * unbanked pot with the Bank button, the wallet, and the items held. A pot
- * that's lost drops away in crimson.
+ * unbanked pot with the Bank button, the Scout button (a limited pause that
+ * shows which cards carry a crest), the wallet and the items held. News
+ * (a pot lost, a crest paying out) drops away under the pot.
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import PixelButton from '../components/PixelButton.vue';
 import { SETS_PER_ROUND, type BankRun } from './bank-run.ts';
 import { itemById } from './items.ts';
-import type { PotLoss } from './useBankRun.ts';
+import { CRESTS } from './specials.ts';
+import type { Notice } from './useCrests.ts';
 
-const props = defineProps<{ run: BankRun; lastLoss: PotLoss | null }>();
-defineEmits<{ bank: [] }>();
+const props = defineProps<{ run: BankRun; notice: Notice | null; canScout: boolean }>();
+defineEmits<{ bank: []; scout: [] }>();
+
+/** What each crest does, for the Scout button's tooltip. */
+const crestGuide = Object.values(CRESTS)
+  .map((crest) => `${crest.symbol} ${crest.name}: ${crest.effect}`)
+  .join('\n');
 
 const targetShare = computed(() => Math.min(props.run.bankedThisRound / props.run.target, 1));
 const setShown = computed(() => Math.min(props.run.setsThisRound + 1, SETS_PER_ROUND));
@@ -35,14 +42,15 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       <p class="text-xs tracking-widest text-aqua/80 uppercase">Pot</p>
       <p class="text-3xl font-bold" data-testid="pot">🪙 {{ run.pot }}</p>
       <m.p
-        v-if="lastLoss"
-        :key="lastLoss.key"
-        class="pointer-events-none absolute inset-x-0 top-full font-bold text-crimson drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
+        v-if="notice"
+        :key="notice.key"
+        class="pointer-events-none absolute inset-x-0 top-full font-bold drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
+        :class="notice.isGood ? 'text-aqua' : 'text-crimson'"
         :initial="{ y: 0, opacity: 1 }"
         :animate="{ y: 24, opacity: 0 }"
         :transition="{ duration: 1.2, ease: 'easeIn' }"
       >
-        −{{ lastLoss.amount }} lost!
+        {{ notice.text }}
       </m.p>
     </div>
     <PixelButton
@@ -53,6 +61,16 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       @click="$emit('bank')"
     >
       Bank 🪙 {{ run.pot }}
+    </PixelButton>
+    <PixelButton
+      colour="steel"
+      class="min-h-9 px-4 text-sm disabled:opacity-40"
+      :disabled="!canScout || run.scoutsLeft === 0"
+      :title="crestGuide"
+      data-testid="scout"
+      @click="$emit('scout')"
+    >
+      🔍 Scout · {{ run.scoutsLeft }} left
     </PixelButton>
     <p class="text-sm">
       Wallet 🪙 <span data-testid="wallet">{{ run.wallet }}</span>
