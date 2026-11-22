@@ -12,7 +12,11 @@ export interface ComboRank {
   praise: string;
   /** What the praise means, for the card's title. */
   meaning: string;
-  /** Text colour, and a glow so crimson still reads on the navy table. */
+  /**
+   * Text colour: it warms rank by rank, from off-white through aqua and
+   * pinks to a bright red at SSS, with a growing glow. Brighter reds than
+   * the palette's crimson, which is too dark to read on the navy table.
+   */
   colour: string;
 }
 
@@ -26,42 +30,42 @@ export const COMBO_RANKS: readonly ComboRank[] = [
     letter: 'C',
     praise: 'うまい',
     meaning: 'skilful',
-    colour: 'text-aqua drop-shadow-[0_0_8px_rgb(168_218_220/0.7)]',
+    colour: 'text-[#f4c2c8]',
   },
   {
     from: 12,
     letter: 'B',
     praise: 'すごい',
     meaning: 'amazing',
-    colour: 'text-crimson drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]',
+    colour: 'text-[#f09aa5]',
   },
   {
     from: 15,
     letter: 'A',
     praise: 'さいこう',
     meaning: 'the best',
-    colour: 'text-crimson drop-shadow-[0_0_10px_rgb(241_250_238/1)]',
+    colour: 'text-[#ec7283] drop-shadow-[0_0_6px_rgb(236_114_131/0.6)]',
   },
   {
     from: 20,
     letter: 'S',
     praise: 'かんぺき',
     meaning: 'perfect',
-    colour: 'text-washi drop-shadow-[0_0_12px_rgb(155_27_48/1)]',
+    colour: 'text-[#e84a5f] drop-shadow-[0_0_8px_rgb(232_74_95/0.7)]',
   },
   {
     from: 25,
     letter: 'SS',
     praise: 'てんさい',
     meaning: 'genius',
-    colour: 'text-washi drop-shadow-[0_0_14px_rgb(168_218_220/1)]',
+    colour: 'text-[#e5283f] drop-shadow-[0_0_12px_rgb(229_40_63/0.8)]',
   },
   {
     from: 30,
     letter: 'SSS',
     praise: 'でんせつ',
     meaning: 'legend',
-    colour: 'text-aqua drop-shadow-[0_0_18px_rgb(155_27_48/1)]',
+    colour: 'text-[#ff1f3a] drop-shadow-[0_0_18px_rgb(255_31_58/1)]',
   },
 ];
 
