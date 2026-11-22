@@ -528,3 +528,24 @@ a white disc, with the circle worked out on a 24-pixel grid so its edge
 steps like pixel art (`pixel-seal.ts`, drawn by `PixelSeal.vue`). It sits
 beside the title, on every card back (both kinds) and on the deck.
 
+### D41: Kuronuri for Japanese (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for Kuronuri (黒塗り, by lihbr, SIL OFL 1.1) as the Japanese
+font. It's drawn in Redaction's photocopied style and comes in seven
+pixel levels; Arthur chose 70, clearly pixelated but easy to read, which
+matters for learners. It covers JIS levels 1 to 4, so it replaces
+DotGothic16 (D31) and that package is removed.
+
+The npm package (@lihbr/kuronuri) splits the font into character slices,
+so a browser downloads only the slices a page shows. Its stylesheet also
+carries italic and bold, three times the size (89 KB against 29 KB
+gzipped), so `npm run fonts` keeps only the regular rules, generated like
+the decks and never committed, and `main.ts` loads them after the page
+draws.
+
+- **Watch:** the package is new (0.0.3, one author). If it breaks, switch
+  the font stacks in `style.css` back to DotGothic16.
+- **Beat:** DotGothic16 (D31; Arthur preferred Kuronuri's look); level 100
+  (complex kanji like 塾 blur at card size); the package's full stylesheet
+  (89 KB gzipped for weights the game never uses).
+

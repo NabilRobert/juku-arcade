@@ -55,7 +55,7 @@ Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
 | `src/background/`  | The swirling table: a WebGL shader drawn behind the game                                                          |
 | `src/composables/` | `useRun` connects the rules to the clock, storage and screen; the rest deal, lay out and throw cards              |
 | `src/components/`  | Vue components: the board, the cards, the side panel, the check-up, settings                                      |
-| `public/fonts/`    | The pixel font for English, with its licence (OFL); Japanese uses DotGothic16 from npm                            |
+| `public/fonts/`    | The pixel font for English, with its licence (OFL); Japanese uses Kuronuri from npm                               |
 | `public/sounds/`   | Card sounds from Kenney's Casino Audio pack (CC0, licence included)                                               |
 | `public/_headers`  | Cloudflare Pages headers: the content security policy and caching                                                 |
 | `tests/`           | Vitest specs, one behaviour each                                                                                  |

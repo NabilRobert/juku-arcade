@@ -239,8 +239,11 @@ detected at each class size.
 - **The karuta table (D30)** lives in `src/style.css`: colour tokens for
   the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
-  pixel font for English, `public/fonts/balatro/`, and DotGothic16 for
-  Japanese, from the `@fontsource/dotgothic16` package; decision D31), and
+  pixel font for English, `public/fonts/balatro/`, and Kuronuri for
+  Japanese at pixel level 70, from the `@lihbr/kuronuri` package; decisions
+  D31, D41: `npm run fonts` (`scripts/build-font-css.ts`) keeps its regular
+  weight in `src/fonts/kuronuri.css`, which `main.ts` loads after the page
+  draws), and
   two pixel-art textures, tiny SVG tiles drawn on the card's own pixel grid
   (`.washi` paper with pixel specks, `.card-back` with a diamond lattice).
   Behind everything, `TableBackground.vue` shows marbled navy bands that
