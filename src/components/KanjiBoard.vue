@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * The table in kanji mode (D37): one big kanji card on top, then the combo
- * and the Play button, then a hand of 8 reading cards in a fan beside the
- * deck. Clicking a reading card picks it (it lifts) or puts it back; Play
+ * and the Play button, then a hand of 8 reading cards in an overlapping
+ * row beside the deck. Clicking a reading card picks it (it lifts) or puts it back; Play
  * throws the picked cards at the kanji. A right card flies in and the
  * kanji jolts; a wrong one shakes; the right readings left in the hand
  * light up. Each round is dealt off the deck, as in word mode.
@@ -18,8 +18,11 @@ import CardDeck from './CardDeck.vue';
 import ComboMeter from './ComboMeter.vue';
 import PixelButton from './PixelButton.vue';
 import PlayCard from './PlayCard.vue';
-import { fanStyle, floatStyle, SLOT_SIZE } from './hand-layout.ts';
+import { floatStyle, handStyle, SLOT_SIZE } from './hand-layout.ts';
 import { centreOffset, type Offset } from './throw-geometry.ts';
+
+/** Eight cards overlap more than word mode's six, to fit the same width. */
+const HAND_OVERLAP = '-4dvh';
 
 const props = defineProps<{
   round: KanjiRound;
@@ -33,8 +36,6 @@ const props = defineProps<{
 }>();
 defineEmits<{ toggle: [index: number]; play: [] }>();
 
-/** Eight cards need more overlap than word mode's six to fit the same width. */
-const HAND_OVERLAP = '-4dvh';
 /** The kanji is the word slot at position 0; the reading slots are the hand. */
 const KANJI_SLOT = 0;
 
@@ -113,7 +114,7 @@ watch(
           :ref="table.registerReading(index)"
           class="relative aspect-[3/4] w-[calc(var(--card-height)*0.75)] shrink-0 hover:z-20"
           :class="statusOf(index) === 'selected' ? 'z-10' : ''"
-          :style="fanStyle(index, round.cards.length, HAND_OVERLAP)"
+          :style="handStyle(index, HAND_OVERLAP)"
         >
           <div class="animate-float" :style="floatStyle('reading', index)">
             <PlayCard

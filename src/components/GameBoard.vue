@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * The board for one set (L1): the word cards on top, numbered 1 to 5, and
- * the player's hand of reading cards below, held in a fan, next to the
+ * the player's hand of reading cards below, laid out in an overlapping row, next to the
  * deck the set was dealt from. When a set times out, each word card shows its
  * reading (L6). While paused, tapping a word card flips it (L9).
  *
@@ -14,8 +14,8 @@
  * Each card sits in a slot that never moves (useTableSlots.ts), sized like
  * the card, so the slots can be measured before any card is drawn: cards
  * are dealt off the deck (useDeal.ts) and thrown (useThrows.ts) by moving
- * them away from their own slot. The fan is a fixed turn and drop on each
- * reading card's slot, so the slots still never move. Inside its slot each
+ * them away from their own slot. Each reading card's slot has a small fixed
+ * turn and raise (hand-layout.ts), so the slots still never move. Inside its slot each
  * card floats, bobbing and swaying out of step with its neighbours, so the
  * table never looks frozen. Each row
  * sets its cards' height as a share of the window's height
@@ -41,7 +41,7 @@ import { playSound } from '../sound/sfx.ts';
 import CardDeck from './CardDeck.vue';
 import ComboMeter from './ComboMeter.vue';
 import PlayCard from './PlayCard.vue';
-import { fanStyle, floatStyle, SLOT_SIZE } from './hand-layout.ts';
+import { floatStyle, handStyle, SLOT_SIZE } from './hand-layout.ts';
 import PixelButton from './PixelButton.vue';
 import type { Point } from './throw-geometry.ts';
 
@@ -180,7 +180,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
           :ref="registerReading(index)"
           class="relative aspect-[3/4] w-[calc(var(--card-height)*0.75)] shrink-0 hover:z-20"
           :class="orderOf(index) !== undefined ? 'z-10' : ''"
-          :style="fanStyle(index, state.set.readings.length)"
+          :style="handStyle(index)"
         >
           <div class="animate-float" :style="floatStyle('reading', index)">
             <PlayCard

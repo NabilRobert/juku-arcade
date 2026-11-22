@@ -69,10 +69,10 @@ flowchart LR
 ```
 
 1. The player **lays out a hand**: a reading card for each word card. The
-   reading cards are held in a fan under the word cards, which are
+   reading cards are laid out in an overlapping row under the word cards, which are
    numbered 1 to 5. Clicking a reading card (or pressing Enter on it)
    lays it for the first word card still open, from the left
-   (**`hand.ts: layReading`**): it shifts up out of the fan with an aqua
+   (**`hand.ts: layReading`**): it shifts up out of the row with an aqua
    tag showing that word's number. Dragging it onto a word card, or
    flinging it at one, lays it for that word instead: while it's dragged
    the word card under it lights up (**`useThrows: trackDrag`**), and on
@@ -124,7 +124,7 @@ flowchart LR
 2. **`dealKanjiRound`** picks a kanji not shown recently, more often if it
    has several readings, and deals 8 cards: all its readings, plus readings
    of other kanji that the dictionary doesn't list for it.
-3. **`KanjiBoard.vue`** shows the kanji and its meanings over a fan of the 8
+3. **`KanjiBoard.vue`** shows the kanji and its meanings over an overlapping row of the 8
    readings. Clicking one picks it (it lifts) or puts it back.
 4. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
    in turn. A right one hits and dissolves, the kanji jolts, and the combo
@@ -247,7 +247,7 @@ detected at each class size.
   each card moves: a new set comes off the deck face down, one card after
   another, turning face up as it flies; pausing turns every card over in
   a wave (each card draws a front and a back, `PlayCard.vue`); a held
-  card lifts, a laid card shifts up out of the fan, and a matched
+  card lifts, a laid card shifts up out of the row, and a matched
   reading card flies on, spinning, to its word card and hits it, and
   both then vanish block by block in a curved front sweeping from the
   top-left corner to the bottom-right, like dust blowing away (the pixel snap,
@@ -256,9 +256,9 @@ detected at each class size.
   (`composables/useTableSlots.ts`), so the slots can be measured before
   any card is drawn: `useDeal.ts` measures where the deck is from each
   slot, and `useThrows.ts` how far a thrown card flies (before the board
-  redraws). A card moves by being drawn away from its own slot. The fan
-  is a fixed turn and drop on each reading card's slot (`fanStyle` in
-  `GameBoard.vue`). Inside its slot every card floats: a CSS animation
+  redraws). A card moves by being drawn away from its own slot. Each reading
+  card's slot has a small fixed turn and raise (`handStyle` in
+  `hand-layout.ts`). Inside its slot every card floats: a CSS animation
   (`float` in `style.css`) bobs and sways it, each card out of step with
   the next (`floatStyle`).
   Every card also tilts in 3D toward the mouse while it's over the card
@@ -306,7 +306,7 @@ detected at each class size.
 - **Layout (desktop only):** the school plays on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
   `ScoreBreakdown`) beside the table: 5 numbered word cards, the combo
-  and the Play button, then the hand of 6 reading cards held in a fan,
+  and the Play button, then the hand of 6 reading cards in an overlapping row,
   next to the deck. The game fills the window: the root font size grows with the
   window's width (`html` in `style.css`), and each card row in
   `GameBoard.vue` sets its cards' height as a share of the window's
@@ -355,7 +355,7 @@ fields. They stay in memory until slice 3 stores them.
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
-| **Hand / laid card** | The 6 reading cards held in a fan. A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
+| **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
 | **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both snap away block by block. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
@@ -429,7 +429,8 @@ fields. They stay in memory until slice 3 stores them.
   `components/throw-geometry.ts`.
 - **Change how big the game is:** the `html` font size in `style.css`, and
   `--card-height` on each row in `GameBoard.vue` (word cards, hand, deck);
-  the fan is `FAN_TURN_DEG`, `FAN_DROP_PX` and `HAND_OVERLAP` there, and
+  the hand's row is `HAND_TILTS_DEG`, `HAND_RAISES_PX` and `HAND_OVERLAP` in
+  `hand-layout.ts`, and
   the float is `FLOAT` and `FLOAT_*_S`. The table's swirl: its colours
   (`DARK_RGB`, `LIGHT_RGB`), loop length (`SWIRL_LOOP_MS`) and band shapes
   are in `background/swirl-shader.ts`; its resolution and frame rate are
