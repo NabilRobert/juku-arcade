@@ -33,6 +33,7 @@ async function mountBoard() {
       combo: 0,
       impacts: 0,
       canPlay: false,
+      crestMarks: new Map(),
     },
   });
   await nextTick();

@@ -31,7 +31,7 @@ import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../deck/types.ts';
 import { useCardTilt } from '../composables/useCardTilt.ts';
 import { usePixelSnap } from '../composables/usePixelSnap.ts';
-import type { BackMark } from './back-mark.ts';
+import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from './PixelSeal.vue';
 import type { Offset, Placement, Point } from './throw-geometry.ts';
@@ -56,8 +56,8 @@ const props = defineProps<{
   level: JlptLevel;
   /** Where the deck is, so the card is dealt off it. */
   dealFrom?: Placement;
-  /** SPIKE: a mark on the card's back (a bank run crest), shown while face down. */
-  backMark?: BackMark;
+  /** SPIKE: a scouted crest: its symbol on the back, its colour on both frames and the back. */
+  crestMark?: CrestMark;
   /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
   order?: number;
 }>();
@@ -209,7 +209,7 @@ function onClick(): void {
   >
     <span ref="snapLayer" class="absolute inset-0 [transform-style:preserve-3d]" :style="tiltStyle">
       <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
-        <CardFrame :frame="frame" :is-face-down="false" />
+        <CardFrame :frame="frame" :is-face-down="false" :tint="crestMark?.tint" />
         <span
           class="absolute top-[9cqw] left-[9cqw] text-[7cqw] leading-none"
           :class="suitClass"
@@ -251,14 +251,15 @@ function onClick(): void {
         >
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
-        <CardFrame frame="crimson" :is-face-down="true" />
-        <span
-          v-if="backMark"
-          class="relative flex size-[42cqw] items-center justify-center text-[24cqw] shadow-[0_3px_0_rgb(0_0_0/0.5)]"
-          :class="backMark.colour"
-          data-testid="back-mark"
-          >{{ backMark.symbol }}</span
-        >
+        <CardFrame frame="crimson" :is-face-down="true" :tint="crestMark?.tint" />
+        <PixelSeal
+          v-if="crestMark"
+          class="w-[42cqw]"
+          :mark="crestMark.symbol"
+          :ink="crestMark.ink"
+          :label="crestMark.symbol"
+          data-testid="crest-mark"
+        />
         <PixelSeal v-else class="w-[42cqw]" />
       </span>
     </span>

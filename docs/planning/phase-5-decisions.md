@@ -549,3 +549,32 @@ draws.
   (complex kanji like 塾 blur at card size); the package's full stylesheet
   (89 KB gzipped for weights the game never uses).
 
+### D42: Crests in kanji mode, and crest colours on the cards (settled: Arthur's choice, 2026-11-22)
+
+Arthur asked for the bank run's crests (koban, omikuji, curse) in kanji
+mode too. Kanji mode has no pause and no coins, so the crests pay in
+points and come with their own Scout button:
+
+- Each round may hide one good crest on a right reading and one curse
+  on a wrong reading (`kanji/kanji-crests.ts`). The good crests only sit
+  on right answers so they reward knowing the reading, and the curse is
+  always a decoy, so it punishes a guess.
+- A koban doubles that card's points, an omikuji adds 5 to 15, and a
+  curse takes 10. The score never drops below 0.
+- Scout flips the hand over and uses one of the run's scouts (2 to start,
+  1 more per perfect round, up to 3). Turning the hand back is free.
+  Play waits until the hand is turned back.
+
+Arthur then asked for crests to colour the cards, not just a small tile:
+a scouted card's whole back (frame and lattice) and its front frame take
+the crest's colour (`tint` in `specials.ts`, drawn by `CardFrame.vue`),
+in both modes. The crest's symbol sits on the back in the same round
+pixel seal as 塾 (a light disc in a ring), in the crest's colour, so
+every back reads as one family. The marks stay until the set or round ends, so the player
+remembers which face-up card was gold. They appear only after a scout;
+an always-coloured front would make scouting pointless. A status colour
+(picked, wrong, right) still wins on the front.
+
+- **Beat:** reusing the pause (kanji mode has none); coins in kanji mode
+  (it has no wallet or shop); colouring fronts without a scout (gives
+  the crests away).

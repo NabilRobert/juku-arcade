@@ -32,8 +32,11 @@ type Notify = (text: string, isGood: boolean) => void;
 /** Scouting: a limited pause that shows the crests (the caller pauses the game). */
 export function useScouting(state: () => RunState, run: Ref<BankRun>) {
   const isScouting = ref(false);
+  /** True from a scout until the next set: the scouted crests stay marked on the cards. */
+  const isRevealed = ref(false);
   return {
     isScouting,
+    isRevealed,
     /** Starts a scout if one is left this round and the set is in play; returns whether it did. */
     scout: (): boolean => {
       const now = state();
@@ -42,6 +45,7 @@ export function useScouting(state: () => RunState, run: Ref<BankRun>) {
       if (!canScout) return false;
       run.value = useScout(run.value);
       isScouting.value = true;
+      isRevealed.value = true;
       return true;
     },
   };
@@ -59,6 +63,7 @@ export function useCrests(
   function deal(now: RunState): void {
     const missedBefore = new Set(now.missedTray.map((word) => word.id));
     crests.value = dealCrests(now.set.words, missedBefore, random);
+    scouting.isRevealed.value = false;
   }
   deal(state());
 
@@ -85,9 +90,9 @@ export function useCrests(
     multiplierFor,
     onMiss,
     ...scouting,
-    /** The crests to draw: only while scouting. */
+    /** The crests to draw: from a scout until the set ends. */
     shownCrests: computed(() =>
-      scouting.isScouting.value ? crests.value : new Map<string, CrestKind>(),
+      scouting.isRevealed.value ? crests.value : new Map<string, CrestKind>(),
     ),
   };
 }
