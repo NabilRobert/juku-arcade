@@ -135,26 +135,20 @@ describe('a run', () => {
     });
   });
 
-  it('scores a cleared set with the stacked tags of clean matches only', () => {
+  it('clears a set, and logs a word matched after a miss as not clean', () => {
     const { state, context } = start();
     const missedWord = wordIdAt(state, 0);
     const cleared = clearSet(tapPair(state, context, missedWord, decoyIndex(state)), context);
-    const cleanTags = cleared.set.words
-      .filter((word) => word.id !== missedWord)
-      .map((word) => context.tags.get(word.id) ?? 0);
     expect(cleared.phase).toBe('cleared');
-    expect(cleared.cleanMatchTags).toEqual(cleanTags);
     expect(
       cleared.events.find((event) => event.kind === 'match' && event.word_id === missedWord)
         ?.outcome,
     ).toBe('after_miss');
   });
 
-  it('keeps the best combo and best set score', () => {
+  it('keeps the best combo', () => {
     const { state, context } = start();
-    const cleared = clearSet(state, context);
-    expect(cleared.bestCombo).toBe(5);
-    expect(cleared.bestSetScore).toBe(cleared.lastSetScore?.total);
+    expect(clearSet(state, context).bestCombo).toBe(5);
   });
 
   it('does nothing when the timer still has time left', () => {

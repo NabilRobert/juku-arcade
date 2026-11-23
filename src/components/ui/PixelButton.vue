@@ -5,7 +5,8 @@
  * Classes, attributes and listeners the parent puts on it pass through to
  * the <button>.
  *
- * Each click plays a colour wipe that sweeps in from both edges and meets
+ * Each click plays an 8-bit select blip (sfx.ts) and a colour wipe that sweeps
+ * in from both edges and meets
  * in the middle. A plain click wipes in a contrasting colour, then fades.
  * When the click changes the button's colour (Pause turning red, Resume
  * turning blue), the wipe is the new colour and the button stays that
@@ -13,6 +14,7 @@
  */
 import { useReducedMotion } from 'motion-v';
 import { ref, watch } from 'vue';
+import { playSound } from '../../sound/sfx.ts';
 
 export type ButtonColour = 'crimson' | 'steel' | 'aqua' | 'paper';
 
@@ -69,6 +71,7 @@ const isReducedMotion = useReducedMotion();
 let wipes = 0;
 
 function flash(): void {
+  playSound('click');
   wipes += 1;
   wipe.value = { key: wipes, fill: FLASHES[shownColour.value], isChange: false };
 }

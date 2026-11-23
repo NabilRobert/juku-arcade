@@ -1,6 +1,7 @@
 // Laying out a hand: a reading under each word card, then playing them left to right.
 import { describe, expect, it } from 'vitest';
 import {
+  clearForThrow,
   emptyHand,
   isHandReady,
   layReading,
@@ -57,5 +58,14 @@ describe('laying out a hand', () => {
       { readingIndex: readingIndexOf(state, first), wordId: first },
       { readingIndex: readingIndexOf(state, second), wordId: second },
     ]);
+  });
+
+  it('frees a dragged card and the word it is thrown at before the throw', () => {
+    const { state } = start();
+    // Reading 0 is laid for word 1 and reading 1 for word 2; reading 0 is then dragged onto word 2.
+    const laid = layReading(state, layReading(state, emptyHand(state), 0), 1);
+    const cleared = clearForThrow(laid, 0, 1);
+    expect(positionOf(cleared, 0)).toBeNull();
+    expect(positionOf(cleared, 1)).toBeNull();
   });
 });

@@ -3,7 +3,8 @@
  * in any order, then plays the hand. Each laid reading is then thrown at
  * the word above it, left to right (useHand drives that; taps.ts scores
  * each throw). Until then nothing is checked, so the player can take a
- * card back or move it while they think.
+ * card back or move it while they think. Dragging a card onto a word card
+ * instead throws it at once (clearForThrow frees its place in the hand).
  *
  * A hand says which reading card is laid for each word card, by the word's
  * position in the set: hand[0] is the reading laid for the first word card.
@@ -48,6 +49,14 @@ export function positionOf(hand: Hand, readingIndex: number): number | null {
 
 export function takeBack(hand: Hand, readingIndex: number): Hand {
   return hand.map((laid) => (laid === readingIndex ? null : laid));
+}
+
+/**
+ * Before a dragged card is thrown straight at a word card: it leaves the
+ * hand if it was laid, and a card laid for that word goes back down.
+ */
+export function clearForThrow(hand: Hand, readingIndex: number, position: number): Hand {
+  return takeBack(hand, readingIndex).map((laid, index) => (index === position ? null : laid));
 }
 
 /**

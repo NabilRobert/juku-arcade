@@ -148,7 +148,6 @@ describe('the export', () => {
       level: 'N5' as const,
       classCode: 'N5-SAT',
       bestCombo: 0,
-      bestSetScore: 0,
       playDay: null,
       playMsToday: 0,
       checkUpOfferedDay: null,

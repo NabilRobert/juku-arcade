@@ -8,6 +8,10 @@
  * stops while the tab is hidden (the browser pauses animation frames),
  * and draws a single still frame when the system asks for reduced motion.
  * Without WebGL the plain navy table shows.
+ *
+ * A local copy can show a private picture instead (VITE_TABLE_IMAGE, D54),
+ * pixel-sharp and darkened a little so the cards stand out; the swirl then
+ * isn't drawn at all. Public builds leave it unset.
  */
 import { useReducedMotion } from 'motion-v';
 import { onMounted, onUnmounted, ref } from 'vue';
@@ -17,6 +21,11 @@ import { createSwirl, swirlPhase, type Swirl } from '../background/swirl-shader.
 const SHRINK = 6;
 /** Redraw at most this often: the bands move slowly, so 30 a second looks smooth. */
 const FRAME_MS = 1000 / 30;
+
+/** The private picture's address, when this copy has one. */
+const tableImage = import.meta.env.VITE_TABLE_IMAGE
+  ? `${import.meta.env.BASE_URL}${import.meta.env.VITE_TABLE_IMAGE}`
+  : null;
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 const isReducedMotion = useReducedMotion();
@@ -55,7 +64,11 @@ onUnmounted(() => cancelAnimationFrame(frame));
 
 <template>
   <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
-    <canvas ref="canvas" class="size-full" />
+    <template v-if="tableImage">
+      <img :src="tableImage" alt="" class="size-full object-cover [image-rendering:pixelated]" />
+      <div class="absolute inset-0 bg-lacquer/40" />
+    </template>
+    <canvas v-else ref="canvas" class="size-full" />
     <!-- A faint glow from the centre of the table, over the swirl. -->
     <div
       class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgb(69_123_157/0.18),transparent_70%)]"

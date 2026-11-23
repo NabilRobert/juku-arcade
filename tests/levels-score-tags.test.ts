@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { levelAfterMatch, levelAfterMiss, setDurationMs } from '../src/game/levels.ts';
-import { scoreSet } from '../src/game/score.ts';
 import { tagsByRank } from '../src/game/tags.ts';
 import { deckWord } from './helpers/fixtures.ts';
 
@@ -33,24 +32,6 @@ describe('levels', () => {
   it('gives 40 seconds at level 1 and 12 seconds at level 5', () => {
     expect(setDurationMs(1)).toBe(40_000);
     expect(setDurationMs(5)).toBe(12_000);
-  });
-});
-
-describe('set score', () => {
-  it('matches the worked example in requirement L7', () => {
-    expect(scoreSet([0.1, 0.2, 0.1, 0.5, 0.3], 8.7, 3)).toEqual({
-      chips: 58,
-      multiplier: 6.6,
-      total: 383,
-    });
-  });
-
-  it('counts only whole seconds left', () => {
-    expect(scoreSet([], 4.99, 1).chips).toBe(4);
-  });
-
-  it('scores a set with no clean matches at chips × level', () => {
-    expect(scoreSet([], 10, 2)).toEqual({ chips: 10, multiplier: 2, total: 20 });
   });
 });
 

@@ -2,13 +2,13 @@
 /**
  * One run on screen, laid out as a card table (D30) for a laptop or
  * desktop screen, the only kind the game supports: a side panel (today's
- * progress, the run's numbers, the set score) beside the table. The
+ * progress, the run's numbers, the bank run) beside the table. The
  * table shows the board,
  * or a flipped card's back while paused, then the missed tray. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
 import { computed } from 'vue';
-import type { Deck } from '../../deck/types.ts';
+import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
@@ -19,13 +19,12 @@ import DailyBar from './DailyBar.vue';
 import GameBoard from './GameBoard.vue';
 import GameHud from './GameHud.vue';
 import MissedTray from './MissedTray.vue';
-import ScoreBreakdown from './ScoreBreakdown.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
-import RunOver from '../bank-run/RunOver.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
 import { useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
+import { playSound } from '../../sound/sfx.ts';
 
 const props = defineProps<{
   deck: Deck;
@@ -38,12 +37,16 @@ const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
-  // The bank run holds the next set while its shop or end screen is open.
-  isHoldingNextDeal: () => bankRun.isHolding.value,
 });
-const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
-const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause });
-const { run: bank, notice, bestRound, shownCrests } = bankRun;
+const { state, nowMs, progress, throwReading, pause, resume } = run;
+
+/** Turning a card over to read its back, or back again, while paused: the card's flick (D53). */
+function inspect(word: DeckWord): void {
+  playSound('pickUp');
+  run.flip(word);
+}
+const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause, resume });
+const { run: bank, notice, shownCrests } = bankRun;
 /** The scouted crests, marked on the word cards until the set ends. */
 const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
@@ -75,11 +78,7 @@ usePauseKey({
         :can-scout="state.phase === 'playing' && state.pausedAtMs === null"
         @bank="bankRun.bank"
         @scout="bankRun.scout"
-      />
-      <ScoreBreakdown
-        :score="state.lastSetScore"
-        :is-showing="state.phase === 'cleared'"
-        :best-set-score="state.bestSetScore"
+        @open-shop="bankRun.openShop"
       />
     </aside>
     <div class="flex flex-col gap-5">
@@ -88,32 +87,30 @@ usePauseKey({
           v-if="state.flippedWord"
           :word="state.flippedWord"
           :kanji="deck.kanji"
-          @close="flip(state.flippedWord)"
+          @close="inspect(state.flippedWord)"
         />
+        <!-- Hidden, not removed, while a card's back shows: rebuilding it would re-deal the set. -->
         <GameBoard
-          v-else
+          v-show="!state.flippedWord"
           :state="state"
           :now-ms="nowMs"
-          :tags="tags"
           :level="deck.level"
           :crest-marks="crestMarks"
           @throw="throwReading"
-          @flip="flip"
+          @flip="inspect"
         />
       </WellbeingGate>
-      <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
+      <MissedTray
+        :words="state.missedTray"
+        :is-paused="state.pausedAtMs !== null"
+        @flip="inspect"
+      />
     </div>
     <ShopOffer
-      v-if="bank.offer !== null"
+      v-if="bank.shop === 'open'"
       :run="bank"
       @buy="bankRun.buy"
-      @leave="bankRun.leaveShop"
-    />
-    <RunOver
-      v-else-if="bank.isOver"
-      :run="bank"
-      :best-round="bestRound"
-      @new-run="bankRun.newRun"
+      @leave="bankRun.closeShop"
     />
   </div>
 </template>

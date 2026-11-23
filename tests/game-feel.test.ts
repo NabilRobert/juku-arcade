@@ -75,13 +75,6 @@ describe('the game answering a match', () => {
     expect(playSound).toHaveBeenCalledWith('chime', comboPitch(1));
   });
 
-  it('shuffles when a new set is dealt', async () => {
-    const { state } = feelFor(start().state);
-    state.value = { ...state.value, setIndex: state.value.setIndex + 1 };
-    await nextTick();
-    expect(playSound).toHaveBeenCalledWith('deal');
-  });
-
   it('ends a banked combo quietly: no miss sound and no lost streak', async () => {
     const { state, feel } = feelFor({ ...start().state, combo: 7 });
     state.value = { ...state.value, combo: 0 };

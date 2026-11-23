@@ -1,6 +1,6 @@
 // Crests on the bank run's cards: a few per set, good ones on words missed before.
 import { describe, expect, it } from 'vitest';
-import { addMatch, startBankRun, takeCoins } from '../src/bank-run/bank-run.ts';
+import { addMatch, COINS_PER_MATCH, startBankRun, takeCoins } from '../src/bank-run/bank-run.ts';
 import { dealCrests, drawOmikuji } from '../src/bank-run/crests.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
 
@@ -22,9 +22,9 @@ describe('crests on the cards', () => {
     }
   });
 
-  it('pays a koban double, an omikuji a gift, and a curse from the wallet', () => {
-    expect(addMatch(startBankRun(), 3, 2).pot).toBe(6);
-    expect(drawOmikuji(() => 0)).toEqual({ to: 'pot', coins: 10 });
-    expect(takeCoins({ ...startBankRun(), wallet: 3 }, 5).wallet).toBe(0);
+  it('pays a koban double, an omikuji a gift, and takes a curse from your banked coins', () => {
+    expect(addMatch(startBankRun(), 3, 2).pot).toBe(2 * COINS_PER_MATCH);
+    expect(drawOmikuji(() => 0)).toEqual({ to: 'pot', coins: 50 });
+    expect(takeCoins({ ...startBankRun(), coins: 3 }, 5).coins).toBe(0);
   });
 });

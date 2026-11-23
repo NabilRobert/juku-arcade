@@ -45,7 +45,7 @@ export const CRESTS: Record<CrestKind, Crest> = {
     name: 'Cursed',
     ink: '#2a0d14',
     tint: '#2a0d14',
-    effect: 'Missed: lose the pot and 5 coins from your wallet.',
+    effect: 'Missed: lose the pot and 30 of your banked coins.',
   },
 };
 
@@ -54,8 +54,8 @@ const CREST_CHANCE = 1 / 6;
 const MISSED_BEFORE_CHANCE = 1 / 3;
 /** At most this many crests in one set, so scouting stays a quick look. */
 const MAX_CRESTS_PER_SET = 2;
-/** A cursed card costs this many coins from the wallet when missed. */
-export const CURSE_COST = 5;
+/** A cursed card costs this many banked coins when missed. */
+export const CURSE_COST = 30;
 
 /** A crest for a word: missed-before words only get good ones. */
 function crestFor(isMissedBefore: boolean, random: RandomSource): CrestKind {
@@ -81,9 +81,9 @@ export function dealCrests(
   return crests;
 }
 
-/** An omikuji's gift: coins into the pot, or straight into the wallet. */
-export type OmikujiGift = { to: 'pot' | 'wallet'; coins: number };
+/** An omikuji's gift: coins into the pot, or straight into your banked coins. */
+export type OmikujiGift = { to: 'pot' | 'coins'; coins: number };
 
 export function drawOmikuji(random: RandomSource): OmikujiGift {
-  return random() < 0.5 ? { to: 'pot', coins: 10 } : { to: 'wallet', coins: 6 };
+  return random() < 0.5 ? { to: 'pot', coins: 50 } : { to: 'coins', coins: 30 };
 }

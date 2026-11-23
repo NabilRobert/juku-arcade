@@ -11,7 +11,6 @@ import { levelAfterMatch, levelAfterMiss } from './levels.ts';
 import type { CardRef, RunContext, RunState } from './run.ts';
 import { secondsLeft, wordFields } from './run.ts';
 import { withComeback, withTrayWord } from './comebacks.ts';
-import { scoreSet } from './score.ts';
 import { WRONG_FLASH_MS } from './tuning.ts';
 
 interface Pair {
@@ -64,53 +63,40 @@ function tapEvent(
   });
 }
 
-function withSetEnd(state: RunState, nowMs: number): RunState {
+/** A set is cleared once every word card is matched. */
+function withSetEnd(state: RunState): RunState {
   if (state.matchedWordIds.length < state.set.words.length) return state;
-  const score = scoreSet(state.cleanMatchTags, secondsLeft(state, nowMs), state.level);
-  return {
-    ...state,
-    phase: 'cleared',
-    lastSetScore: score,
-    bestSetScore: Math.max(state.bestSetScore, score.total),
-  };
+  return { ...state, phase: 'cleared' };
 }
 
 /**
  * Matching a word you peeked at (L9): it leaves the board, but scores no
- * chips, tag or combo point, and doesn't break the combo either.
+ * combo point, and doesn't break the combo either.
  */
 function peekedMatch(state: RunState, context: RunContext, nowMs: number, pair: Pair): RunState {
   const event = tapEvent(state, context, nowMs, pair, { outcome: 'peeked' });
-  return withSetEnd(
-    {
-      ...state,
-      matchedWordIds: [...state.matchedWordIds, pair.wordId],
-      events: [...state.events, event],
-    },
-    nowMs,
-  );
+  return withSetEnd({
+    ...state,
+    matchedWordIds: [...state.matchedWordIds, pair.wordId],
+    events: [...state.events, event],
+  });
 }
 
 function match(state: RunState, context: RunContext, nowMs: number, pair: Pair): RunState {
   if (state.peekedWordIds.includes(pair.wordId)) return peekedMatch(state, context, nowMs, pair);
   const isClean = !state.missedWordIds.includes(pair.wordId);
-  const tag = context.tags.get(pair.wordId) ?? 0;
   const combo = state.combo + 1;
   const event = tapEvent(state, context, nowMs, pair, {
     outcome: isClean ? 'clean' : 'after_miss',
   });
-  return withSetEnd(
-    {
-      ...state,
-      combo,
-      bestCombo: Math.max(state.bestCombo, combo),
-      level: levelAfterMatch(state.level, combo),
-      matchedWordIds: [...state.matchedWordIds, pair.wordId],
-      cleanMatchTags: isClean ? [...state.cleanMatchTags, tag] : state.cleanMatchTags,
-      events: [...state.events, event],
-    },
-    nowMs,
-  );
+  return withSetEnd({
+    ...state,
+    combo,
+    bestCombo: Math.max(state.bestCombo, combo),
+    level: levelAfterMatch(state.level, combo),
+    matchedWordIds: [...state.matchedWordIds, pair.wordId],
+    events: [...state.events, event],
+  });
 }
 
 function miss(state: RunState, context: RunContext, nowMs: number, pair: Pair): RunState {

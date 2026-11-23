@@ -62,7 +62,10 @@ not recorded as forgotten.
   reviews with words the player knows); nothing happens on a timeout (the
   timer stops mattering).
 
-### D5: Set score with stacking card tags (settled)
+### D5: Set score with stacking card tags (settled; replaced by D46, 2026-11-23)
+
+**Replaced (2026-11-23):** the set score is gone; banked coins are the
+only score (D46). The text below is kept as the record.
 
 `chips × multiplier`. Chips are 10 per clean match plus 1 per second
 left. The multiplier is `level × (1 + the sum of the clean matches'
@@ -610,7 +613,10 @@ from the palette throws rather than leaving a hole.
   match the pixel style, and look different on every system); an icon
   font (a dependency for three icons).
 
-### D44: Word mode plays as a bank run (settled, 2026-11-22)
+### D44: Word mode plays as a bank run (settled, 2026-11-22; rounds replaced by D46)
+
+**Updated (2026-11-23):** the rounds, targets and game over below are
+gone; the run is endless and its coins are the score (D46).
 
 The idea: the
 combo is money. Every match adds coins to a pot, more the longer the
@@ -629,3 +635,208 @@ so it now ships as word mode's run (`src/bank-run/`). Crests and scouting
 - **Beat:** a charm run with rounds, targets and upgrades (a second spike,
   `spike/roguelike-charms`, kept as a local branch); no run at all (less
   reason to keep a combo going).
+
+### D45: Three wrong picks per kanji (settled, 2026-11-23)
+
+From the playtest: one play ended a kanji round, so a single wrong guess
+gave no chance to try again. Now each play throws the picks; right ones
+are found, wrong ones stay marked and out of play, and the player picks
+and plays again until every right reading is found or three picks were
+wrong (`MAX_WRONG_PICKS` in `kanji/kanji-round.ts`). The round is scored
+on all the picks, as before. Three squares by the Play button count the
+wrong picks left.
+
+- **Beat:** three plays per kanji, however many picks were wrong (lets a
+  player pick everything at once); one play per kanji (too harsh).
+
+### D46: An endless bank run, with flat coins as the only score (settled, 2026-11-23)
+
+From the playtest and a reviewer's pushback:
+
+- **Rounds cut runs short.** A run of 3-set rounds ended players' runs
+  before they could build a big combo, even when they matched every card.
+- **The multiplier ran away.** The set score's multiplier (level × card
+  tags) and the bank run's coins (as many as the combo) could reach
+  millions in a long run.
+- **The shop had no point.** Its items only made more coins, and coins
+  only bought items.
+
+So:
+
+- **Endless:** no rounds, targets or game over; the run goes on until the
+  player leaves.
+- **Flat coins:** every match pays 10 coins (`COINS_PER_MATCH`) whatever
+  the combo. Banked coins are the only score: the set score, its box
+  and best set, and the "+0.1×" badges are gone. Each word's tag is still
+  worked out and logged for the reports.
+- **A shop you choose to open:** after a set, the shop may turn up for
+  the next one (a 1 in 3 chance, never two sets running). Its button shows
+  in the side panel; opening it pauses the game. Buying spends coins, so
+  an item lowers the score now for faster coins later, an investment.
+- **Tuning:** item prices (80 to 180), the curse (30) and omikuji gifts
+  (50 to the pot, 30 banked) are first guesses for flat coins, to be
+  tuned in play. The crane saves one pot and flies off, and scouts refill
+  when the shop comes.
+
+- **Beat:** capping the multiplier (still two scores); combo-scaled coins
+  with a cap (asked about, flat chosen); items that help play directly,
+  such as more time (kept for a later mode); removing the shop.
+
+### D47: A leaderboard with sample players (settled, 2026-11-23)
+
+The start screen shows a top-five leaderboard on its left, ranked by
+score (banked coins). Until there's a server to share scores, the other
+players are ten made-up names, labelled as samples, and your best from
+this browser is ranked among them (`leaderboard/leaderboard.ts`). Real
+scores come with per-student profiles, which are planned: the school's
+database would be read-only for us, so profiles and scores need a store
+of our own.
+
+- **Beat:** a panel inside the game screen (crowds the side panel); no
+  board until real data exists (nothing to see in a demo).
+
+**D47 update (2026-11-23):** the board fills the left of the start screen
+and looks like an arcade high-score table: a steel-blue pixel box with
+LEADERBOARD in yellow inside it, numbered rows with each player's coins,
+and BACK and NEXT to page through 23 sample players and you, 8 to a page
+(`ROWS_PER_PAGE`).
+
+### D48: Drag throws at once; clicking lays out a hand (settled, 2026-11-23)
+
+From the playtest: a player kept dragging readings onto their words.
+That already queued them for Play, but the card sprang back into the
+hand with only a small tag, so it looked like nothing happened. Now a
+card dragged or flung onto a word card is thrown at once, with no Play,
+and clicking still lays a hand out in order for Play. A word card with a
+reading laid for it shows the same number tag, and its label shows the
+reading. A press that moves under 10 px (`TAP_SLOP_PX`) counts as a
+click: Motion started a drag on the smallest wobble, which swallowed
+some clicks.
+
+- **Beat:** dragging queues too (what the playtest found confusing);
+  removing the click path (slower, and harder on a trackpad).
+
+### D49: Buttons play an 8-bit select blip (settled, 2026-11-23)
+
+Every pixel button plays a sound when pressed. The first try, clicks from
+Kenney's UI Audio pack (CC0), sounded too unnatural for the game, and
+the wish was something like the menu sounds of handheld monster-catching
+games. Those belong to their makers, so the game makes its own in that
+style with ZzFX: four short square- and triangle-wave candidates were
+tried by ear. A soft pip (a rounded 988 Hz note) was chosen first, then,
+after trying both in the game, the two-note "select" blip (`click` in
+`sound/sfx.ts`: a square wave at 880 Hz jumping to 1320 Hz after 30 ms,
+50 ms in all). Being made in code, it needs no audio file.
+
+- **Beat:** the Kenney clicks (too plain); the soft pip and a harder
+  square pip (the other candidates); copying a commercial game's sounds
+  (not ours to ship).
+
+### D50: Looping background music with a volume slider (settled, 2026-11-23)
+
+The game plays "You're Not There" by MagiaZ on a loop, the track chosen
+for it, from Pixabay under the Pixabay Content License: free to use in a
+game, no credit needed (it's credited in the README anyway). The licence
+bars passing the file on by itself, unchanged; shipping it inside the
+game is its normal use.
+
+- **Lighter file:** the 7.7 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
+  (`public/music/youre-not-there.m4a`, 2.9 MB, the full 4 minutes) with
+  macOS's own `afconvert`, so the first load stays reasonable. Every
+  major browser plays AAC.
+- **Playback:** one looping `<audio>` element (`sound/music.ts`). It
+  starts on the first press anywhere, as browsers block sound before
+  that, and pauses while the tab is hidden.
+- **Volume:** a Music slider and an Effects slider (0 to 100%, 0 is off),
+  in both side panels and in Settings, each remembered in this browser
+  (`sound/volume.ts`). Music starts at 30%, under the card sounds; effects
+  start at full. The sound switch silences the music too, so one press
+  quiets everything.
+- **Effects over the music:** under the music the effects were hard to
+  hear (measured: the track averages about 0.045 at 30%, while a chime
+  peaked at 0.16 and a button sound at 0.07). So the effects play louder:
+  ZzFX's master volume is 0.6 instead of its default 0.3, and the card
+  recordings play at 0.9 instead of 0.5 (`SYNTH_VOLUME`,
+  `RECORDING_VOLUME` in `sound/sfx.ts`). The music keeps its volume.
+
+- **Beat:** Web Audio buffer looping (gapless, but decodes the whole
+  4-minute track into memory); shipping the original MP3 (2.6 times the
+  size); a separate music on/off button (the slider's 0 does that).
+
+### D51: Cards brush with a soft sound on hover (settled, 2026-11-23)
+
+Moving the mouse onto a card plays a short slice (0.12 s) of the card
+shuffle recording at about a third of its usual volume: the same paper
+sound as picking a card up, as a brush. Each card along the board plays
+half a semitone higher than the one before, so a sweep along the hand
+plays a little run. At most one tick plays every 60 ms
+(`HOVER_GAP_MS`), as a sweep crosses several overlapping cards at once.
+There's none on touch screens, while a mouse button is held (a drag),
+or on face-down or matched cards. It follows the Effects slider and the
+sound switch.
+
+- **Beat:** an 8-bit tick like the buttons (asked for a card sound
+  instead); a sound on every pointer move (a buzz); a per-card sound
+  file (none needed).
+
+### D52: Deal one card at a time, each with its own sound (settled, 2026-11-23)
+
+The cards were dealt 0.07 s apart, so a whole set landed in under a
+second and looked like one drop. Now they leave the deck one at a time,
+150 ms apart (`DEAL_STAGGER_MS` in `cards/card-motion.ts`), left to right
+with the top row first, and each plays a short flick (0.15 s) of the card
+shuffle recording as it goes, instead of one riffle for the whole deal.
+A word-mode set takes about 1.6 s to deal and a kanji round about 1.3 s.
+
+- **Watch:** the set timer runs during the deal, so at level 5 (12 s a
+  set) the deal uses a bigger share of the time. If that feels unfair,
+  the timer can start once the last card lands.
+- **Beat:** one riffle for the whole deal (didn't match each card
+  landing); a slower step (too long between sets).
+
+**Fix (2026-11-23):** the shuffle recording's first 0.17 s is the card
+barely moving (peaks under 0.03), so the short deal and hover slices
+(D51) were nearly silent. Both now start at the flick, 0.17 s in
+(`RECORDING_STARTS_S` in `sound/sfx.ts`); the deal plays at 0.6 of the
+usual recording volume.
+
+**Update (2026-11-23):** picked by ear from the hover test page, each
+dealt card now plays a soft, high tap instead of the flick: 0.07 s of
+the card landing recording (`card-place-1.ogg`, from its hit at 0.12 s),
+at 1.4 times its speed and 0.3 of the volume. The taps rise half a
+semitone per card along each row, starting again for the reading row
+(`rowPlace` on `PlayCard.vue`), so the second row doesn't end too high.
+
+### D53: Inspecting a card makes a card sound, and keeps the board (settled, 2026-11-23)
+
+While paused, turning a word card over to read its back (and back again)
+now plays the card's flick, like picking a card up, and a face-down word
+card ticks on hover (D51), as it can be turned over. The pick-up sound
+now starts just before the flick (0.15 s into the recording) instead of
+at the recording's quiet start, so it no longer sounds late.
+
+A bug from the playtest: after reading a card's back, cards already
+matched came back. The back replaced the board, so closing it rebuilt
+the board: every card was dealt again, and a card already matched never
+saw the change that starts its snap, so it stayed. The board is now only
+hidden while a back shows (`v-show`), and a card drawn already matched
+starts hidden (`usePixelSnap`), in case the board is ever rebuilt.
+
+- **Beat:** showing the back as an overlay on the board (more layout
+  work for the same result).
+
+### D54: A private table picture for a local copy (settled, 2026-11-23)
+
+A local copy can show a picture as the table instead of the swirl. The
+picture chosen for it is someone else's pixel art, so it must never be
+committed or deployed: it lives in `public/local/`, which git ignores,
+and `.env.local` (also ignored) names it in `VITE_TABLE_IMAGE`. The code
+is a small, general option in `TableBackground.vue`: with the setting,
+it shows the picture (a still image or an animated GIF, which plays on
+its own) pixel-sharp, darkened by a 40% navy wash so the
+cards stand out, and skips the swirl's shader; without it, as in every
+public build (GitHub Pages has neither file), nothing changes.
+
+- **Beat:** committing the picture (not ours to publish); keeping the
+  change as uncommitted edits (in the way of every later commit).
+

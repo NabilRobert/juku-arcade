@@ -73,14 +73,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
     </PixelButton>
     <SoundToggle />
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
-    <p v-if="isPaused" class="text-center text-sm text-aqua" role="status">
-      Paused. Tap a word card to flip it. A card you peek at won't score.
-    </p>
-    <p
-      v-else-if="state.phase === 'timedOut'"
-      class="text-center text-sm text-crimson"
-      role="status"
-    >
+    <p v-if="state.phase === 'timedOut'" class="text-center text-sm text-crimson" role="status">
       Time's up: here are the answers
     </p>
   </section>

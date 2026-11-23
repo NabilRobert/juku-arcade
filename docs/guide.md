@@ -44,7 +44,8 @@ flowchart TD
 7. **`src/game/run.ts: startRun`** builds the first state. It calls
    **`deal.ts: dealSet`**, which picks 5 words that share no spelling and
    no valid reading, and one decoy of the error type shown least so far.
-   **`tags.ts: tagsByRank`** gives each word its +0.1× to +0.5× tag.
+   **`tags.ts: tagsByRank`** gives each word a difficulty tag, logged with
+   its events for the reports (it no longer changes the score, D46).
 8. **`GameHud.vue`** shows the level, combo and timer, and
    **`GameBoard.vue`** shows the cards, each one a **`PlayCard.vue`**,
    styled by **`card-status.ts`**.
@@ -55,31 +56,37 @@ flowchart TD
 flowchart LR
     A["PlayCard click"] --> L["useHand: lay → hand.ts: layReading<br/>(first open word card)"]
     T["PlayCard drag ends"] --> U["useThrows: release →<br/>throw-geometry.ts: aimedWord"]
-    U -->|"aimed at a word card"| L2["useHand: lay → hand.ts: layReading<br/>(that word card)"]
+    U -->|"aimed at a word card"| N["useHand: throwNow<br/>(thrown at once, no Play)"]
+    N --> V
     P["Play button"] --> Q["useHand: play → hand.ts: playOrder"]
     Q -->|"one card every PLAY_STEP_MS"| V["GameBoard emits throw"]
     V --> W["useRun: throwReading → taps.ts: throwReading"]
     W --> D["taps.ts: tapCard"]
     D -->|"right pair"| E["match: combo +1, levels.ts: levelAfterMatch,<br/>event 'match'"]
     D -->|"wrong pair"| F["miss: combo 0, levels.ts: levelAfterMiss,<br/>flash, event 'miss' with error type"]
-    E -->|"last card"| G["score.ts: scoreSet → phase 'cleared'"]
+    E -->|"last card"| G["taps.ts: withSetEnd → phase 'cleared'"]
     H["useRun: tick, every 100 ms"] --> I["run.ts: timeUp → phase 'timedOut',<br/>events 'timeout'"]
     G --> J["run.ts: nextSet, after a short pause"]
     I --> J
 ```
 
-1. The player **lays out a hand**: a reading card for each word card. The
-   reading cards are laid out in an overlapping row under the word cards, which are
-   numbered 1 to 5. Clicking a reading card (or pressing Enter on it)
-   lays it for the first word card still open, from the left
-   (**`hand.ts: layReading`**): it shifts up out of the row with an aqua
-   tag showing that word's number. Dragging it onto a word card, or
-   flinging it at one, lays it for that word instead: while it's dragged
-   the word card under it lights up (**`useThrows: trackDrag`**), and on
-   release **`throw-geometry.ts: aimedWord`** picks the word card it was
-   dropped on, or else the one it was heading for 0.15 s ahead. A card
-   already laid for that word goes back down. Clicking a laid card takes
-   it back. Nothing is checked yet.
+1. The player plays a reading card in one of two ways (D48):
+   - **Click to lay out a hand.** Clicking a reading card (or pressing
+     Enter on it) lays it for the first word card still open, from the
+     left (**`hand.ts: layReading`**): it shifts up out of the row with an
+     aqua tag showing that word's number, and the word card shows the same
+     tag, with the reading in its label underneath. Clicking a laid card
+     takes it back. Nothing is checked until Play. A press that moves less
+     than `TAP_SLOP_PX` still counts as a click (**`throw-geometry.ts:
+     isDrag`**), so a wobbly click isn't lost.
+   - **Drag to throw at once.** Dragging a card onto a word card, or
+     flinging it at one, throws it straight away, with no Play: while
+     it's dragged the word card under it lights up (**`useThrows:
+     trackDrag`**), and on release **`throw-geometry.ts: aimedWord`**
+     picks the word card it was dropped on, or else the one it was
+     heading for 0.15 s ahead. **`useHand: throwNow`** takes the card out
+     of the hand (and a card laid for that word goes back down) and
+     throws it.
 2. Once every word card has a reading under it, **Play** lights up
    (**`hand.ts: isHandReady`**). Pressing it throws the laid cards at
    their words, left to right, one every `PLAY_STEP_MS`
@@ -87,15 +94,15 @@ flowchart LR
    **`taps.ts: throwReading`**, so it scores exactly like a pair of taps.
    If the game pauses or the set ends mid-hand, the rest stay laid out.
 3. A right pair is a **match**. The combo goes up, and every 10 combo the
-   level goes up (**`levels.ts: levelAfterMatch`**). If the word wasn't
-   missed in this set, its tag joins the set's multiplier.
+   level goes up (**`levels.ts: levelAfterMatch`**), and the bank run adds
+   coins to its pot (part 2c).
 4. A wrong pair is a **miss**, counted against the word card in it. The
    combo resets, the level drops (from 5 straight to 1), and the right
    reading flashes. The wrong card springs back to the hand, to be laid
    again. The event records whether the wrong reading was the
    decoy (and its error type) or another word's reading (a mix-up).
-5. Matching the last word clears the set. **`score.ts: scoreSet`** works
-   out chips × multiplier.
+5. Matching the last word clears the set (**`taps.ts: withSetEnd`**).
+   There's no set score any more: banked coins are the score (D46).
 6. **`useRun`** ticks every 100 ms. When time runs out,
    **`run.ts: timeUp`** logs a timeout for each unmatched word (never a
    miss), resets the combo, drops the level, and shows the answers.
@@ -106,7 +113,11 @@ flowchart LR
 
 Each time the game opens (after the daily check-up), and from "Change
 mode", **`ModePicker.vue`** offers Words or Kanji (D37). Kanji mode is
-practice: it logs nothing and changes no reviews.
+practice: it logs nothing and changes no reviews. Beside the choice, a
+leaderboard (**`LeaderboardPanel.vue`**, **`leaderboard/leaderboard.ts`**),
+drawn like an arcade high-score table, ranks your best score among
+sample players until real scores can be shared (D47), 8 to a page, with
+Back and Next to see the rest.
 
 ```mermaid
 flowchart LR
@@ -114,6 +125,7 @@ flowchart LR
     B --> C["kanji-round.ts: kanjiPool → dealKanjiRound"]
     C --> D["readings.ts: readingsUsedByKanji<br/>(right) and allReadingsOf (never a decoy)"]
     B -->|"Play"| E["throw each picked card in turn"]
+    E -->|"readings left, wrong picks to spare"| B
     B --> H["useKanjiCrests.ts: deal crests,<br/>Scout flips the hand"]
     E -->|"crested card"| H
     E --> F["reveal: scoreRound + crest points → next kanji"]
@@ -138,10 +150,14 @@ flowchart LR
    per perfect round, up to 3.
 5. **Play** (**`useKanjiRun: play`**) throws the picked cards at the kanji
    in turn. A right one hits and dissolves, the kanji jolts, and the combo
-   builds; a wrong one shakes and its frame goes dark. A crested card
+   builds; a wrong one shakes, its frame goes dark, and it stays on the
+   table, out of play. The player picks and plays again until every right
+   reading is found or they've made three wrong picks (**`kanji-round.ts:
+   isRoundOver`**, `MAX_WRONG_PICKS`, D45); three squares by the Play
+   button count the wrong picks left. A crested card
    pays as it lands (**`crestBonus`**): a koban doubles that card's
    points, an omikuji adds 5 to 15, a curse takes 10.
-6. Then the right readings left in the hand light up aqua (✓),
+6. When the round is over, the right readings left in the hand light up aqua (✓),
    **`scoreRound`** adds the points (a bonus for a perfect round) and the
    crests' points (the score never drops below 0), and a new kanji is
    dealt off the deck.
@@ -151,45 +167,45 @@ flowchart LR
 
 ## The flow, part 2c: the bank run (word mode)
 
-Word mode plays as a push-your-luck run (D44). Every match adds coins to
-an unbanked **pot**; banking it moves the coins to the **wallet** and ends
-the combo, and a miss or a timeout loses it.
+Word mode plays as an endless push-your-luck run (D44, D46). Every match
+adds the same coins to an unbanked **pot**; banking it moves the coins to
+your **coins**, which are your score, and ends the combo; a miss or a
+timeout loses the pot. There are no rounds and no game over.
 
 ```mermaid
 flowchart LR
     A["words/GameScreen.vue"] --> B["bank-run/useBankRun.ts<br/>(watches the run)"]
-    B -->|"match"| C["bank-run.ts: addMatch<br/>(pot grows with the combo)"]
+    B -->|"match"| C["bank-run.ts: addMatch<br/>(10 coins, plus items)"]
     B -->|"miss / timeout"| D["losePot"]
-    A -->|"Bank"| E["bankPot → wallet"]
-    B -->|"set ends"| F["endSet: next set, the shop, or run over"]
-    F --> G["ShopOffer.vue: buyItem"]
+    A -->|"Bank"| E["bankPot → coins (the score)"]
+    B -->|"set ends"| F["endSet: the shop may turn up"]
+    F -->|"player opens it"| G["ShopOffer.vue: buyItem<br/>(game paused)"]
     B --> H["useCrests.ts: crests and scouting"]
 ```
 
 1. **`words/GameScreen.vue`** starts **`useBankRun`** beside the word run
    (`useRun`). It watches the run's state: a new match calls
-   **`bank-run.ts: addMatch`**, which adds the combo's length in coins to
-   the pot (**`coinsForMatch`**; items can add more), and a broken combo
-   calls **`losePot`**.
+   **`bank-run.ts: addMatch`**, which adds `COINS_PER_MATCH` to the pot
+   whatever the combo (**`coinsForMatch`**; items can add more), and a
+   broken combo calls **`losePot`**.
 2. **Bank** (**`components/bank-run/BankPanel.vue`**) calls **`bankPot`**:
-   the pot goes to the wallet and counts toward this round's target, and
-   `useRun: endCombo` ends the combo.
-3. A round is 3 sets (**`SETS_PER_ROUND`**). After each set,
-   **`endSet`** moves on, or after the third opens the shop if the round's
-   target was banked, else ends the run (**`RunOver.vue`**). If the pot
-   alone would reach the target on the last set, it's banked at the bell
-   (**`shouldBankAtBell`**).
-4. In the shop (**`ShopOffer.vue`**), the wallet buys items
-   (**`items.ts`**, **`buyItem`**) that bend the risk: more coins per
-   match, half the pot kept on a miss, a bonus for banking, interest on
-   savings. `useRun` holds the next set while the shop or end screen is
-   open (`useBankRun: isHolding`, passed as `isHoldingNextDeal`).
+   the pot goes to your coins, the score, and `useRun: endCombo` ends the
+   combo. The panel shows the pot at the top and the score at the bottom.
+3. After each set, **`endSet`** may bring the shop for the next set
+   (`SHOP_CHANCE`, a 1 in 3 roll; never two sets running). Its button
+   appears in the panel; the shop never opens by itself.
+4. Opening it (**`useBankRun: openShop`**) pauses the game. In the shop
+   (**`ShopOffer.vue`**), your coins buy items (**`items.ts`**,
+   **`buyItem`**) that bend the risk: more coins per match, half the pot
+   kept on a miss, a bonus for banking, interest on savings. Buying
+   lowers your score now for faster coins later. Leaving it, or resuming
+   with Esc, closes it until a later set brings it back.
 5. **Crests** (**`useCrests.ts`**, **`crests.ts: dealCrests`**) hide on a
    few word cards each set; **Scout** pauses the game to show them. A
    koban doubles a match's coins, an omikuji gives a gift, and a curse
-   costs wallet coins when missed.
-6. The best round reached is kept in this browser (`useBankRun:
-   useBestRound`).
+   costs banked coins when missed. Scouts refill when the shop turns up.
+6. The best score reached is kept in this browser (`useBankRun:
+   readBestScore`), for the stats page and the leaderboard.
 
 ## The flow, part 3: pause and flip
 
@@ -200,7 +216,10 @@ flowchart LR
    **`CardBack.vue`** shows the word's reading, meanings, an example with
    furigana (**`FuriganaText.vue`**, parsing `{学校|がっこう}` markup), and
    each kanji's readings from the deck's kanji table, with the readings
-   this word uses highlighted.
+   this word uses highlighted. Turning a card over, and back, plays the
+   card's flick (`GameScreen.vue: inspect`, D53). The board is only hidden
+   while a back shows, not removed, so closing it doesn't re-deal the set
+   or bring back cards already matched.
 3. Flipping an unmatched card on the board is a **peek**. The word gets a 👁,
    scores nothing when matched (**`taps.ts: peekedMatch`**), and joins the
    comeback queue. Cards in **`MissedTray.vue`** are past misses, so flipping
@@ -332,15 +351,13 @@ detected at each class size.
   (`composables/useCardTilt.ts`, maths in `components/cards/card-tilt.ts`), on
   a layer inside the card so it adds to whatever Motion is doing.
   `GameHud.vue` pops the combo and level.
-  The score total counts up with a short `requestAnimationFrame` loop in
-  `ScoreBreakdown.vue`, which is lighter than Motion's full engine.
 - **The logo** (D40) is red 塾 in a red pixel ring on white, like a hanko
   seal: `PixelSeal.vue`, its circle worked out on a pixel grid in
   `pixel-seal.ts`. It sits beside the title, on every card back and on the
   deck.
 - **Icons** (D43) are pixel art drawn for the game: a magnifying glass on
   Scout, a speaker on the sound switch (with sound, or crossed out), and
-  a gold coin for the bank run's pot, wallet and prices.
+  a gold coin for the bank run's pot, score and prices.
   Each is a grid of letters in `pixel-icons.ts`, one letter per pixel,
   drawn by `PixelIcon.vue`. To change one, edit its grid; a new colour
   needs a letter in `PALETTE`.
@@ -365,8 +382,20 @@ detected at each class size.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
-  shuffle when a set is dealt, the shuffle's first flick when a card is
-  picked, and a slap when it lands. The rest are made in code with ZzFX (a tiny MIT
+  soft tap of a card landing as each card comes off the deck, one card
+  every 150 ms, left to right and the top row first, rising along each
+  row (D52), the shuffle's
+  first flick when a card is
+  picked, and a slap when it lands. Moving the mouse onto a card brushes
+  it with a softer, shorter slice of the same flick, a little higher for
+  each card along the board, at most once every 60 ms (`playHoverSound`,
+  D51). Every pixel button plays an 8-bit select blip, two quick notes, when
+  pressed (`click` in `sfx.ts`, D49). Background music loops
+  under the whole game (`sound/music.ts`, D50): it starts on the first
+  press, and the sound switch silences it too. The effects and the music
+  each have a volume slider (`SoundSliders.vue`, one `VolumeSlider.vue`
+  each, in the side panels and Settings), remembered in this browser
+  (`sound/volume.ts`). The rest are made in code with ZzFX (a tiny MIT
   synth): a click when a held card is over a word card, a swish when
   it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo
@@ -385,10 +414,11 @@ detected at each class size.
   player has touched the page.
 - **Layout (desktop only):** the game is played on laptops and desktops, so
   `GameScreen.vue` always puts a side panel (`DailyBar`, `GameHud`,
-  `ScoreBreakdown`) beside the table: 5 numbered word cards, the combo
+  `BankPanel`) beside the table: 5 numbered word cards, the combo
   and the Play button, then the hand of 6 reading cards in an overlapping row,
-  next to the deck. The game fills the window: the root font size grows with the
-  window's width (`html` in `style.css`), and each card row in
+  next to the deck. The game fills the window with no zooming: the root
+  font size follows the window's width or height, whichever is tighter
+  (`html` in `style.css`), and each card row in
   `GameBoard.vue` sets its cards' height as a share of the window's
   height (`--card-height`), so a set fits without scrolling.
 - **Wellbeing:** `useRun` counts play time while the game isn't paused.
@@ -417,8 +447,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Miss-chance guess** | The starting guess at how likely a word is to be missed, 0 to 1, before any play data | `missChanceGuess` |
 | **Combo / level** | Correct matches in a row; every 10 raises the level (1–5), which shortens the set timer | `levels.ts` |
 | **Clean match** | A match of a word that wasn't missed earlier in the same set. Only clean matches add their tag | `taps.ts: match` |
-| **Tag** | A card's difficulty bonus (+0.1× to +0.5×), from its rank within the deck | `tags.ts` |
-| **Chips × multiplier** | The set score: chips for clean matches and seconds left, times level × (1 + the tags added up) | `score.ts` |
+| **Tag** | A word's difficulty (0.1 to 0.5), from its rank within the deck; logged with its events for the reports, not shown or scored | `tags.ts` |
 | **Event** | One logged action with every R6 field, the raw material for the reports | `events.ts` |
 | **Pause / flip** | Pausing stops the clock and turns cards face down; flipping shows a card's back | `pause.ts`, `CardBack.vue` |
 | **Peek** | Flipping an unmatched card on the board: the word then scores nothing and comes back soon | `pause.ts: withPeek` |
@@ -434,14 +463,16 @@ fields. They stay in memory until slice 3 stores them.
 | **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
 | **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
-| **Pot / bank / wallet** | The bank run's coins: the pot grows with each match and is lost on a miss; banking moves it to the wallet, which buys items (D44) | `bank-run/bank-run.ts` |
-| **Round target** | Coins to bank in a round's 3 sets to reach the shop; it grows each round | `bank-run.ts: targetFor` |
+| **Pot / bank / score** | The bank run's coins: the pot gains 10 per match and is lost on a miss; banking moves it to your coins, the only score, which also buy items (D46) | `bank-run/bank-run.ts` |
+| **Shop** | Turns up at random for one set (its button shows in the side panel); opening it pauses the game | `bank-run.ts: endSet`, `ShopOffer.vue` |
+| **Wrong picks** | Kanji mode allows three per kanji before the answers show (D45) | `kanji-round.ts: MAX_WRONG_PICKS` |
+| **Leaderboard** | The start screen's top scores, with sample players for now (D47) | `leaderboard/leaderboard.ts` |
 | **Item** | A charm bought in the shop that changes the bank run's odds (lucky cat, koi, omamori, crane, fan, bamboo) | `bank-run/items.ts` |
 | **Crest / scout** | A mark hidden on a card's back: gold koban, purple omikuji, black curse. Scouting flips the cards over to see them; a scouted card keeps the crest's colour on its frames until the set or round ends (D42) | `bank-run/crests.ts: CRESTS`, `kanji/kanji-crests.ts`, `CardFrame.vue` |
 | **Readings used** | A kanji's readings that appear in the level's words: the right answers in kanji mode | `kanji/readings.ts: readingsUsedByKanji` |
 | **Hand / laid card** | The 6 reading cards in an overlapping row (8 in kanji mode). A laid card is one the player picked for a word card: it shifts up with that word's number (1 to 5) until Play | `game/hand.ts`, `useHand.ts` |
 | **Play** | Throwing the laid-out hand at the word cards, left to right, one card at a time | `useHand.ts: play` |
-| **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both snap away block by block. Dragging or flinging a card at a word card lays it there | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
+| **Throw** | A laid reading card flying at its word card; a right pair spins on, hits it, and both snap away block by block. Dragging or flinging a card at a word card throws it at once (D48) | `throw-geometry.ts`, `useThrows.ts`, `card-motion.ts` |
 | **Deck / deal** | The face-down stack beside the hand; each set's cards fly off it one after another | `CardDeck.vue`, `useDeal.ts`, `card-motion.ts: dealtFrom` |
 | **Slot** | The fixed place a card sits in; cards move by being drawn away from it | `useTableSlots.ts` |
 | **Washi / hanko** | Japanese paper (the card face) and a seal stamp (the crimson difficulty tag) | `style.css`, `PlayCard.vue` |
@@ -472,16 +503,21 @@ fields. They stay in memory until slice 3 stores them.
   `src/game/tuning.ts`. Every number the playtest may change is there.
 - **Change what happens on a tap:** edit `src/game/taps.ts`; timeouts and
   dealing are in `src/game/run.ts`. Specs: `tests/run.test.ts`.
+- **Change the leaderboard's sample players or page size:** `SAMPLE_PLAYERS`
+  and `ROWS_PER_PAGE` in
+  `leaderboard/leaderboard.ts` (specs: `tests/leaderboard.test.ts`).
 - **Change kanji mode:** the hand size and points are at the top of
   `kanji/kanji-round.ts` (`CARDS_PER_ROUND`, `POINTS_PER_HIT`,
   `PERFECT_ROUND_BONUS`, `MAX_PICK_WEIGHT`); how long the answers show is
-  `REVEAL_MS` in `kanji/useKanjiRun.ts`. Specs: `tests/kanji-round.test.ts`
+  `REVEAL_MS` in `kanji/useKanjiRun.ts`, and the wrong picks allowed is
+  `MAX_WRONG_PICKS`. Specs: `tests/kanji-round.test.ts`
   and `tests/kanji-run.test.ts`. Crests' chances, points and scouts are
   at the top of `kanji/kanji-crests.ts` (specs:
   `tests/kanji-crests.test.ts`); their colours are `tint` in
   `bank-run/crests.ts`.
-- **Change the bank run:** targets, items allowed, scouts and item
-  bonuses are at the top of `bank-run/bank-run.ts`; item prices and
+- **Change the bank run:** coins per match, the shop's chance, items
+  allowed, scouts and item bonuses are at the top of
+  `bank-run/bank-run.ts`; item prices and
   effects in `bank-run/items.ts`; crest chances in `bank-run/crests.ts`.
   Specs: `tests/bank-run.test.ts`, `tests/use-bank-run.test.ts` and
   `tests/crests.test.ts`.
@@ -506,7 +542,7 @@ fields. They stay in memory until slice 3 stores them.
   `@keyframes wipe` in `style.css`).
 - **Change an animation:** card motion is in `components/cards/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
-  `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
+  `DEAL_STAGGER_MS` the time between dealt cards, `FLIP_SPRING` and
   `FLIP_STAGGER_S` the pause flip, `MAX_TILT_DEG` in `card-tilt.ts` how far a
   card leans toward the mouse, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
@@ -514,6 +550,13 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
+- **Show a private picture as the table (a local copy only):** put it in
+  `public/local/` (git ignores that folder) and set `VITE_TABLE_IMAGE` in
+  `.env.local` to its path under `public/`, such as `local/table.webp`
+  (D54). Public builds leave it unset and show the swirl.
+- **Change the music:** put the track in `public/music/` and point
+  `MUSIC_FILE` in `sound/music.ts` at it; its starting volume is
+  `DEFAULT_MUSIC_VOLUME`. Specs: `tests/music.test.ts`.
 - **Change how the combo builds:** the ranks, their thresholds, praise and
   colours are `COMBO_RANKS` in `components/ui/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.

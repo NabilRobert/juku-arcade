@@ -31,7 +31,6 @@ import { readingCardStatus, wordCardStatus } from '../../game/card-status.ts';
 import type { PlayedPair } from '../../game/hand.ts';
 import type { RunState } from '../../game/run.ts';
 import type { DeckWord, JlptLevel } from '../../deck/types.ts';
-import type { TagTable } from '../../game/tags.ts';
 import { useDeal } from '../../composables/useDeal.ts';
 import { useGameFeel } from '../../composables/useGameFeel.ts';
 import { useHand } from '../../composables/useHand.ts';
@@ -49,7 +48,6 @@ import type { CrestMark } from '../cards/crest-mark.ts';
 const props = defineProps<{
   state: RunState;
   nowMs: number;
-  tags: TagTable;
   /** The deck's JLPT level, marked on every card. */
   level: JlptLevel;
   /** Scouted crests on the word cards, by word id (the bank run's crests, D42). */
@@ -92,6 +90,13 @@ watch(targetWordId, (wordId) => {
   if (wordId !== null) playSound('aim');
 });
 
+/** The reading laid for a word card, by its position, or undefined while none is. */
+function queuedReadingAt(position: number): string | undefined {
+  const readingIndex = hand.hand.value[position];
+  if (readingIndex === null || readingIndex === undefined) return undefined;
+  return props.state.set.readings[readingIndex]?.text;
+}
+
 function isMatched(wordId: string): boolean {
   return props.state.matchedWordIds.includes(wordId);
 }
@@ -111,11 +116,11 @@ function onReadingTap(index: number): void {
   else hand.lay(index);
 }
 
+/** A card dropped or flung onto a word card is thrown at it straight away. */
 function onRelease(readingIndex: number, point: Point, velocity: Point): void {
   const wordId = release(point, velocity);
   if (wordId === null) return;
-  playSound('slap');
-  hand.lay(
+  hand.throwNow(
     readingIndex,
     props.state.set.words.findIndex((word) => word.id === wordId),
   );
@@ -148,27 +153,47 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               kind="word"
               :level="level"
               :index="position"
+              :row-place="position"
               :status="wordCardStatus(state, word.id, nowMs)"
-              :tag="tags.get(word.id)"
               :hint="state.phase === 'timedOut' ? word.reading : undefined"
               :is-peeked="state.peekedWordIds.includes(word.id)"
               :is-targeted="targetWordId === word.id"
               :deal-from="dealFrom.words[position]"
               :crest-mark="crestMarks?.get(word.id)"
+              :queued-as="queuedReadingAt(position) === undefined ? undefined : position + 1"
               @tap="onWordTap(word)"
             />
           </div>
         </div>
+        <!-- The word card's number; once a reading is laid for it, the reading too, on a pixel tag. -->
         <span
-          class="font-sans text-sm font-bold"
-          :class="isMatched(word.id) ? 'invisible' : 'text-aqua/80'"
+          class="px-2 py-0.5 font-sans text-sm font-bold"
+          :class="[
+            isMatched(word.id) ? 'invisible' : 'text-aqua/80',
+            queuedReadingAt(position) === undefined ? '' : 'pixel-panel bg-aqua text-sumi',
+          ]"
+          :data-testid="`word-label-${position + 1}`"
           aria-hidden="true"
-          >{{ position + 1 }}</span
+          >{{ position + 1
+          }}<template v-if="queuedReadingAt(position) !== undefined">
+            · <span lang="ja">{{ queuedReadingAt(position) }}</span></template
+          ></span
         >
       </div>
     </div>
     <div class="relative">
-      <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
+      <!-- While paused the hint floats here, between the rows, so nothing on the board moves. -->
+      <div :class="{ invisible: state.pausedAtMs !== null }">
+        <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
+      </div>
+      <p
+        v-if="state.pausedAtMs !== null"
+        class="pixel-panel absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-wood/90 px-4 py-2 text-sm whitespace-nowrap text-aqua"
+        role="status"
+        data-testid="pause-hint"
+      >
+        Paused. Tap a word card to flip it. A card you peek at won't score.
+      </p>
       <PixelButton
         colour="crimson"
         class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 px-8 py-2 text-xl font-bold disabled:bg-washi/15 disabled:text-washi/40"
@@ -200,6 +225,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               kind="reading"
               :level="level"
               :index="state.set.words.length + index"
+              :row-place="index"
               :status="readingCardStatus(state, index, nowMs)"
               :throw-to="throws.get(index)"
               :deal-from="dealFrom.readings[index]"

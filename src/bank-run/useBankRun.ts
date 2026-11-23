@@ -1,11 +1,11 @@
 /**
- * Runs the bank run (bank-run.ts) alongside a word-mode run. It
- * watches the run: each match adds to the pot, a combo that breaks (a miss
- * or a timeout) loses it, and each set that ends counts toward the round.
- * Banking ends the run's combo through `endCombo`. While the shop or the
- * end screen is open, `isHolding` asks useRun to hold the next set.
+ * Runs the bank run (bank-run.ts) alongside a word-mode run. It watches
+ * the run: each match adds to the pot, a combo that breaks (a miss or a
+ * timeout) loses it, and each set that ends may bring the shop. Banking
+ * ends the run's combo through `endCombo`. Opening the shop pauses the
+ * game, and leaving it resumes play.
  */
-import { computed, ref, shallowRef, watch, type Ref } from 'vue';
+import { ref, shallowRef, watch, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import type { RunState } from '../game/run.ts';
 import { playSound } from '../sound/sfx.ts';
@@ -13,10 +13,10 @@ import {
   addMatch,
   bankPot,
   buyItem,
+  closeShop,
   endSet,
   losePot,
-  nextRound,
-  shouldBankAtBell,
+  openShop,
   startBankRun,
   type BankRun,
 } from './bank-run.ts';
@@ -24,70 +24,74 @@ import type { ItemId } from './items.ts';
 import { useNotice } from '../composables/useNotice.ts';
 import { useCrests } from './useCrests.ts';
 
-const BEST_ROUND_KEY = 'juku-arcade:best-bank-round';
+const BEST_SCORE_KEY = 'juku-arcade:best-bank-score';
 
-function readBestRound(): number {
+/** The best score (banked coins) reached in this browser, for the stats and the leaderboard. */
+export function readBestScore(): number {
   try {
-    return Number(localStorage.getItem(BEST_ROUND_KEY) ?? 0);
+    return Number(localStorage.getItem(BEST_SCORE_KEY) ?? 0);
   } catch {
     return 0;
   }
 }
 
-function saveBestRound(round: number): void {
+function saveBestScore(score: number): void {
   try {
-    localStorage.setItem(BEST_ROUND_KEY, String(round));
+    localStorage.setItem(BEST_SCORE_KEY, String(score));
   } catch {
-    // Storage can be blocked (a private window); the best round then lasts this visit.
+    // Storage can be blocked (a private window); the best score then lasts this visit.
   }
 }
 
-/** The best round any bank run reached in this browser. */
-function useBestRound() {
-  const bestRound = ref(readBestRound());
+function useBestScore() {
+  const bestScore = ref(readBestScore());
   return {
-    bestRound,
-    record: (round: number) => {
-      if (round <= bestRound.value) return;
-      bestRound.value = round;
-      saveBestRound(round);
+    bestScore,
+    record: (score: number) => {
+      if (score <= bestScore.value) return;
+      bestScore.value = score;
+      saveBestScore(score);
     },
   };
 }
 
-/** The shop and end screens' actions. */
-function shopActions(run: Ref<BankRun>, reset: () => void) {
+/** What the bank run needs from the word run: ending the combo (banking), and pausing (scouting, the shop). */
+export interface BankRunActions {
+  endCombo: () => void;
+  pause: () => void;
+  resume: () => void;
+}
+
+/** The shop's actions: opening it pauses the game, leaving it resumes play. */
+function shopActions(run: Ref<BankRun>, actions: BankRunActions) {
   return {
+    openShop: () => {
+      if (run.value.shop !== 'here') return;
+      run.value = openShop(run.value);
+      actions.pause();
+    },
     buy: (id: ItemId) => {
       run.value = buyItem(run.value, id);
       playSound('pickUp');
     },
-    leaveShop: () => {
-      run.value = nextRound(run.value);
-    },
-    newRun: () => {
-      run.value = startBankRun();
-      reset();
+    closeShop: () => {
+      if (run.value.shop !== 'open') return;
+      run.value = closeShop(run.value);
+      actions.resume();
     },
   };
-}
-
-/** What the bank run needs from the word run: ending the combo (banking) and pausing (scouting). */
-export interface BankRunActions {
-  endCombo: () => void;
-  pause: () => void;
 }
 
 type Crests = ReturnType<typeof useCrests>;
 type Notify = (text: string, isGood: boolean) => void;
 
-/** The pot: banking it, losing it on a miss, filling it on a match, and closing a set's books. */
+/** The pot: banking it, losing it on a miss, and filling it on a match. */
 function usePot(
   state: () => RunState,
   run: Ref<BankRun>,
-  setup: { endCombo: () => void; crests: Crests; notify: Notify; random: RandomSource },
+  setup: { endCombo: () => void; crests: Crests; notify: Notify },
 ) {
-  const { endCombo, crests, notify, random } = setup;
+  const { endCombo, crests, notify } = setup;
   /** Set while our own bank ends the combo, so that isn't taken for a miss. */
   let isBanking = false;
 
@@ -115,13 +119,7 @@ function usePot(
     if (now.flash !== null && now.flash !== before.flash) crests.onMiss(now.flash.wordId);
   }
 
-  /** The end of a set counts toward the round, banking at the bell if that reaches the target. */
-  function onSetEnd(): void {
-    if (shouldBankAtBell(run.value)) bank();
-    run.value = endSet(run.value, random);
-  }
-
-  return { bank, onPlay, onSetEnd };
+  return { bank, onPlay };
 }
 
 export function useBankRun(
@@ -131,29 +129,30 @@ export function useBankRun(
 ) {
   const run = shallowRef<BankRun>(startBankRun());
   const { notice, notify } = useNotice();
-  const best = useBestRound();
+  const best = useBestScore();
   const crests = useCrests(state, run, random, notify);
-  const pot = usePot(state, run, { endCombo: actions.endCombo, crests, notify, random });
+  const pot = usePot(state, run, { endCombo: actions.endCombo, crests, notify });
 
   watch(state, (now, before) => {
     if (now.setIndex !== before.setIndex) crests.deal(now);
     if (now.pausedAtMs === null) crests.isScouting.value = false;
+    // Resuming with Esc while the shop is open leaves the shop too.
+    if (now.pausedAtMs === null && run.value.shop === 'open') run.value = closeShop(run.value);
     pot.onPlay(now, before);
-    if (now.phase === 'playing' || before.phase !== 'playing') return;
-    pot.onSetEnd();
-    if (run.value.isOver) best.record(run.value.round);
+    if (now.phase !== 'playing' && before.phase === 'playing')
+      run.value = endSet(run.value, random);
   });
+  watch(() => run.value.coins, best.record);
 
   return {
     run,
     notice,
-    bestRound: best.bestRound,
+    bestScore: best.bestScore,
     bank: pot.bank,
     shownCrests: crests.shownCrests,
     scout: () => {
       if (crests.scout()) actions.pause();
     },
-    isHolding: computed(() => run.value.offer !== null || run.value.isOver),
-    ...shopActions(run, () => (notice.value = null)),
+    ...shopActions(run, actions),
   };
 }

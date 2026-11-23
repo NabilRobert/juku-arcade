@@ -15,7 +15,6 @@ import {
 import { makeEvent, type GameEvent, type SessionIdentity } from './events.ts';
 import { FIRST_LEVEL, levelAfterMiss, setDurationMs } from './levels.ts';
 import { MAX_COMEBACKS_PER_SET } from './tuning.ts';
-import type { SetScore } from './score.ts';
 import type { TagTable } from './tags.ts';
 
 export type CardRef = { kind: 'word'; wordId: string } | { kind: 'reading'; index: number };
@@ -42,12 +41,9 @@ export interface RunState {
   matchedWordIds: readonly string[];
   /** Words missed in this set: matching them later isn't clean (L3). */
   missedWordIds: readonly string[];
-  cleanMatchTags: readonly number[];
   combo: number;
   level: number;
   bestCombo: number;
-  bestSetScore: number;
-  lastSetScore: SetScore | null;
   flash: WrongFlash | null;
   decoyExposure: DecoyExposure;
   events: readonly GameEvent[];
@@ -148,7 +144,6 @@ function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunS
     selected: null,
     matchedWordIds: [],
     missedWordIds: [],
-    cleanMatchTags: [],
     flash: null,
     decoyExposure: withExposure(state.decoyExposure, set),
     flippedWord: null,
@@ -159,13 +154,12 @@ function withDealtSet(state: RunState, context: RunContext, nowMs: number): RunS
 
 export interface Bests {
   bestCombo: number;
-  bestSetScore: number;
 }
 
 export function startRun(
   context: RunContext,
   nowMs: number,
-  bests: Bests = { bestCombo: 0, bestSetScore: 0 },
+  bests: Bests = { bestCombo: 0 },
 ): RunState {
   const empty: RunState = {
     set: { words: [], readings: [] },
@@ -177,12 +171,9 @@ export function startRun(
     selected: null,
     matchedWordIds: [],
     missedWordIds: [],
-    cleanMatchTags: [],
     combo: 0,
     level: FIRST_LEVEL,
     bestCombo: bests.bestCombo,
-    bestSetScore: bests.bestSetScore,
-    lastSetScore: null,
     flash: null,
     decoyExposure: NO_EXPOSURE,
     pausedAtMs: null,
