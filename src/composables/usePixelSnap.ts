@@ -4,10 +4,11 @@
  * corner, starting when the throw hits. Each card gets its own random
  * edge. When the snap ends, or is interrupted, the card is hidden outright.
  * Under reduced motion, or where the browser can't run Web Animations or
- * the card has no size yet, it's hidden at once instead.
+ * the card has no size yet, it's hidden at once instead. A card that's
+ * already matched when it's drawn (the board was rebuilt) starts hidden.
  */
 import { useReducedMotion } from 'motion-v';
-import { useTemplateRef, watch } from 'vue';
+import { onMounted, useTemplateRef, watch } from 'vue';
 import { snapFrames, snapOrder, toClipPath } from '../components/cards/pixel-snap.ts';
 
 /** How long the snap takes, from the first block to the last. */
@@ -44,5 +45,8 @@ export function usePixelSnap(refName: string, isMatched: () => boolean, delayMs:
 
   watch(isMatched, (matched) => {
     if (matched && layer.value !== null) snap(layer.value);
+  });
+  onMounted(() => {
+    if (isMatched() && layer.value !== null) hide(layer.value);
   });
 }

@@ -42,12 +42,15 @@ describe('hovering a card', () => {
     expect(playHoverSound).toHaveBeenCalledWith(CARD.index);
   });
 
-  it('stays quiet on touch, while dragging, and on face-down or matched cards', () => {
+  it('stays quiet on touch, while dragging, and on matched cards', () => {
     hover('idle', { pointerType: 'touch' });
     hover('idle', { buttons: 1 });
-    // A face-down word card can still be clicked (to flip it), so it gets hover events.
-    hover('hidden', {}, 'word');
-    hover('matched');
+    hover('matched', {}, 'word');
     expect(playHoverSound).not.toHaveBeenCalled();
+  });
+
+  it('brushes a face-down word card while paused, as it can be turned over to read', () => {
+    hover('hidden', {}, 'word');
+    expect(playHoverSound).toHaveBeenCalledOnce();
   });
 });

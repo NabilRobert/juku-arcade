@@ -179,10 +179,11 @@ function onRelease(info: PanInfo): void {
 /**
  * A mouse moving onto the card brushes it with a sound: not on touch (no
  * hover there), not while a button is held (a drag), and not on a card
- * that's face down or already matched.
+ * already matched. A face-down word card ticks too, as it can be turned
+ * over to read; a face-down reading card is disabled and gets no events.
  */
 function onHover(event: PointerEvent): void {
-  const isUsable = !isFaceDown.value && props.status !== 'matched';
+  const isUsable = props.status !== 'matched';
   if (event.pointerType === 'mouse' && event.buttons === 0 && isUsable) playHoverSound(props.index);
 }
 

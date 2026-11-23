@@ -8,7 +8,7 @@
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
 import { computed } from 'vue';
-import type { Deck } from '../../deck/types.ts';
+import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
@@ -24,6 +24,7 @@ import BankPanel from '../bank-run/BankPanel.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
 import { useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
+import { playSound } from '../../sound/sfx.ts';
 
 const props = defineProps<{
   deck: Deck;
@@ -37,7 +38,13 @@ const run = useRun({
   settings: props.settings,
   pastEvents: props.pastEvents,
 });
-const { state, nowMs, progress, throwReading, pause, resume, flip } = run;
+const { state, nowMs, progress, throwReading, pause, resume } = run;
+
+/** Turning a card over to read its back, or back again, while paused: the card's flick (D53). */
+function inspect(word: DeckWord): void {
+  playSound('pickUp');
+  run.flip(word);
+}
 const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause, resume });
 const { run: bank, notice, shownCrests } = bankRun;
 /** The scouted crests, marked on the word cards until the set ends. */
@@ -80,19 +87,24 @@ usePauseKey({
           v-if="state.flippedWord"
           :word="state.flippedWord"
           :kanji="deck.kanji"
-          @close="flip(state.flippedWord)"
+          @close="inspect(state.flippedWord)"
         />
+        <!-- Hidden, not removed, while a card's back shows: rebuilding it would re-deal the set. -->
         <GameBoard
-          v-else
+          v-show="!state.flippedWord"
           :state="state"
           :now-ms="nowMs"
           :level="deck.level"
           :crest-marks="crestMarks"
           @throw="throwReading"
-          @flip="flip"
+          @flip="inspect"
         />
       </WellbeingGate>
-      <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
+      <MissedTray
+        :words="state.missedTray"
+        :is-paused="state.pausedAtMs !== null"
+        @flip="inspect"
+      />
     </div>
     <ShopOffer
       v-if="bank.shop === 'open'"

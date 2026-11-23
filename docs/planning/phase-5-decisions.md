@@ -798,3 +798,21 @@ barely moving (peaks under 0.03), so the short deal and hover slices
 (`RECORDING_STARTS_S` in `sound/sfx.ts`); the deal plays at 0.6 of the
 usual recording volume.
 
+### D53: Inspecting a card makes a card sound, and keeps the board (settled, 2026-11-23)
+
+While paused, turning a word card over to read its back (and back again)
+now plays the card's flick, like picking a card up, and a face-down word
+card ticks on hover (D51), as it can be turned over. The pick-up sound
+now starts just before the flick (0.15 s into the recording) instead of
+at the recording's quiet start, so it no longer sounds late.
+
+A bug from the playtest: after reading a card's back, cards already
+matched came back. The back replaced the board, so closing it rebuilt
+the board: every card was dealt again, and a card already matched never
+saw the change that starts its snap, so it stayed. The board is now only
+hidden while a back shows (`v-show`), and a card drawn already matched
+starts hidden (`usePixelSnap`), in case the board is ever rebuilt.
+
+- **Beat:** showing the back as an overlay on the board (more layout
+  work for the same result).
+

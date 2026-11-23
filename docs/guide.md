@@ -216,7 +216,10 @@ flowchart LR
    **`CardBack.vue`** shows the word's reading, meanings, an example with
    furigana (**`FuriganaText.vue`**, parsing `{学校|がっこう}` markup), and
    each kanji's readings from the deck's kanji table, with the readings
-   this word uses highlighted.
+   this word uses highlighted. Turning a card over, and back, plays the
+   card's flick (`GameScreen.vue: inspect`, D53). The board is only hidden
+   while a back shows, not removed, so closing it doesn't re-deal the set
+   or bring back cards already matched.
 3. Flipping an unmatched card on the board is a **peek**. The word gets a 👁,
    scores nothing when matched (**`taps.ts: peekedMatch`**), and joins the
    comeback queue. Cards in **`MissedTray.vue`** are past misses, so flipping

@@ -83,7 +83,7 @@ export const setEffectsVolume = effects.set;
  */
 const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
   deal: 0.15,
-  pickUp: 0.4,
+  pickUp: 0.25,
   hover: 0.12,
 };
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
@@ -91,9 +91,14 @@ const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35, deal:
 /**
  * Where a short slice starts in its recording, in seconds. The shuffle's
  * first 0.17 s is the card barely moving (peaks under 0.03); its flick
- * comes right after, so a short slice from the start would be silent.
+ * comes right after, so a short slice from the start would be silent, and
+ * a longer one would sound late. A pick-up starts just before the flick.
  */
-const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = { deal: 0.17, hover: 0.17 };
+const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = {
+  deal: 0.17,
+  hover: 0.17,
+  pickUp: 0.15,
+};
 const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
 
