@@ -3,6 +3,10 @@
  * One volume slider (D50), for the music or the sound effects: 0 to 100%,
  * where 0 turns that sound off. It reports the new volume (0 to 1) as it's
  * dragged; the caller keeps and remembers it (sound/volume.ts).
+ *
+ * The slider is min-w-0: a range input won't shrink below the browser's
+ * default width (about 129px) otherwise, which pushed "100%" out of the
+ * narrow side panel.
  */
 import { computed } from 'vue';
 
@@ -18,7 +22,7 @@ function onInput(event: Event): void {
 </script>
 
 <template>
-  <label class="flex items-center gap-3 text-base">
+  <label class="flex items-center gap-3 pr-1 text-base">
     <span class="w-16 shrink-0">{{ label }}</span>
     <input
       type="range"
@@ -26,7 +30,7 @@ function onInput(event: Event): void {
       max="100"
       step="5"
       :value="percent"
-      class="h-3 flex-1 cursor-pointer accent-aqua"
+      class="h-3 min-w-0 flex-1 cursor-pointer accent-aqua"
       :aria-label="`${label} volume`"
       :data-testid="testId"
       @input="onInput"
