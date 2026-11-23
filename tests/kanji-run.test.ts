@@ -165,3 +165,34 @@ describe('scouting in a kanji round', () => {
     expect(run.lastResult.value?.crestPoints).toBe(-CURSE_POINTS);
   });
 });
+
+describe('three wrong picks per kanji', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const wrongIndexes = (run: ReturnType<typeof useKanjiRun>) =>
+    run.round.value.cards.flatMap((card, index) => (card.isRight ? [] : [index]));
+
+  it('lets the player pick again after a wrong pick, and keeps the wrong card out of play', () => {
+    const run = runFor();
+    const wrong = wrongIndexes(run)[0] ?? 0;
+    run.toggle(wrong);
+    run.play();
+    vi.advanceTimersByTime(10_000);
+    expect(run.phase.value).toBe('picking');
+    expect(run.roundNumber.value).toBe(1);
+    expect(run.wrongPicksLeft.value).toBe(2);
+    expect(run.statusOf(wrong)).toBe('wrong');
+    run.toggle(wrong);
+    expect(run.picked.value).toEqual([]);
+  });
+
+  it('shows the answers after the third wrong pick', () => {
+    const run = runFor();
+    for (const index of wrongIndexes(run).slice(0, 3)) run.toggle(index);
+    run.play();
+    vi.advanceTimersByTime(PLAY_STEP_MS * 3 + THROW_MS);
+    expect(run.phase.value).toBe('revealed');
+    expect(run.wrongPicksLeft.value).toBe(0);
+  });
+});

@@ -4,10 +4,13 @@ import type { Deck, KanjiNote } from '../src/deck/types.ts';
 import {
   CARDS_PER_ROUND,
   dealKanjiRound,
+  isRoundOver,
   kanjiPool,
+  MAX_WRONG_PICKS,
   PERFECT_ROUND_BONUS,
   POINTS_PER_HIT,
   scoreRound,
+  wrongPicksLeft,
   type KanjiRound,
 } from '../src/kanji/kanji-round.ts';
 import { readingsUsedByKanji, toKanjiReading } from '../src/kanji/readings.ts';
@@ -126,5 +129,37 @@ describe('scoring a kanji round', () => {
       isPerfect: false,
       points: POINTS_PER_HIT,
     });
+  });
+});
+
+describe('wrong picks in a kanji round', () => {
+  const round: KanjiRound = {
+    kanji: '生',
+    meanings: [],
+    cards: [
+      { text: 'セイ', isRight: true },
+      { text: 'ガク', isRight: false },
+      { text: 'う(まれる)', isRight: true },
+      { text: 'やま', isRight: false },
+      { text: 'みず', isRight: false },
+    ],
+  };
+
+  it('allows three wrong picks per kanji, counting down', () => {
+    expect(wrongPicksLeft(round, [])).toBe(MAX_WRONG_PICKS);
+    expect(wrongPicksLeft(round, [0, 1])).toBe(MAX_WRONG_PICKS - 1);
+  });
+
+  it('keeps the round going after a play that missed readings with picks to spare', () => {
+    expect(isRoundOver(round, [0, 1])).toBe(false);
+  });
+
+  it('ends the round once every right reading is found', () => {
+    expect(isRoundOver(round, [0, 2])).toBe(true);
+  });
+
+  it('ends the round on the third wrong pick', () => {
+    expect(isRoundOver(round, [1, 3])).toBe(false);
+    expect(isRoundOver(round, [1, 3, 4])).toBe(true);
   });
 });

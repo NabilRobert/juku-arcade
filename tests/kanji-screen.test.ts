@@ -34,6 +34,7 @@ async function mountBoard() {
       impacts: 0,
       canPlay: false,
       crestMarks: new Map(),
+      wrongPicksLeft: 3,
     },
   });
   await nextTick();

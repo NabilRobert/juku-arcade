@@ -2,9 +2,10 @@
  * One round of kanji mode (D37): a kanji, and a hand of reading cards.
  * Every reading the kanji has in this level's words is right (up to a
  * whole hand of them); the other cards are readings of other kanji. The
- * player picks every reading they think is right, and the round is scored
- * on the picks: a hit for each right pick, a wrong pick for each other,
- * and a miss for each right reading left in the hand.
+ * player picks readings and plays them, as often as they like, until
+ * they've found every right one or made three wrong picks (D45). The round
+ * is then scored on all the picks: a hit for each right pick, a wrong pick
+ * for each other, and a miss for each right reading left in the hand.
  */
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import type { Deck } from '../deck/types.ts';
@@ -15,6 +16,8 @@ export const CARDS_PER_ROUND = 8;
 /** Points for each right reading picked, and a bonus for a round with no wrong picks or misses. */
 export const POINTS_PER_HIT = 10;
 export const PERFECT_ROUND_BONUS = 20;
+/** Wrong picks allowed per kanji before the answers show (D45). */
+export const MAX_WRONG_PICKS = 3;
 
 export interface KanjiCard {
   text: string;
@@ -106,6 +109,19 @@ export function dealKanjiRound(
 }
 
 /** Scores the cards the player picked, by their place in the hand. */
+/** How many more wrong picks the player can make on this kanji. */
+export function wrongPicksLeft(round: KanjiRound, played: readonly number[]): number {
+  const wrongPicks = played.filter((index) => round.cards[index]?.isRight === false).length;
+  return Math.max(0, MAX_WRONG_PICKS - wrongPicks);
+}
+
+/** A round ends once every right reading is found, or the wrong picks run out. */
+export function isRoundOver(round: KanjiRound, played: readonly number[]): boolean {
+  const rights = round.cards.filter((card) => card.isRight).length;
+  const found = played.filter((index) => round.cards[index]?.isRight === true).length;
+  return found === rights || wrongPicksLeft(round, played) === 0;
+}
+
 export function scoreRound(round: KanjiRound, picked: readonly number[]): RoundResult {
   const hits = picked.filter((index) => round.cards[index]?.isRight === true).length;
   const wrongPicks = picked.length - hits;

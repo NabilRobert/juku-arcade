@@ -3,8 +3,10 @@
  * the cards the player has picked, and playing them. Playing throws the
  * picked cards at the kanji one after another, left to right, as word mode
  * plays a hand (useHand.ts). A right card hits and builds the combo; a
- * wrong one breaks it. Then the right readings left in the hand light up,
- * the round is scored (kanji-round.ts), and a new kanji is dealt.
+ * wrong one breaks it and stays on the table, marked. The player picks
+ * and plays again until every right reading is found or three picks were
+ * wrong (D45). Then the right readings left in the hand light up, the
+ * round is scored (kanji-round.ts), and a new kanji is dealt.
  *
  * Crests (D42, useKanjiCrests.ts) may hide on the cards: scouting flips the
  * hand over to show them, and a crested card adds or takes points when
@@ -22,8 +24,10 @@ import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import {
   dealKanjiRound,
+  isRoundOver,
   kanjiPool,
   scoreRound,
+  wrongPicksLeft,
   type KanjiRound,
   type RoundResult,
 } from './kanji-round.ts';
@@ -100,7 +104,7 @@ function useTable(firstRound: KanjiRound, isScouting: () => boolean) {
   }
 
   function toggle(index: number): void {
-    if (phase.value !== 'picking') return;
+    if (phase.value !== 'picking' || thrown.value.includes(index)) return;
     const isPicked = picked.value.includes(index);
     picked.value = isPicked ? picked.value.filter((i) => i !== index) : [...picked.value, index];
     playSound('pickUp');
@@ -121,31 +125,46 @@ type Table = ReturnType<typeof useTable>;
 type Tally = ReturnType<typeof useTally>;
 type Crests = ReturnType<typeof useKanjiCrests>;
 
-/** Playing the picked cards: throws them in turn, then reveals and scores the round. */
+type Later = ReturnType<typeof useLater>;
+
+/** Throwing one card at the kanji, and what this round's thrown crests have added or taken. */
+function useThrower(table: Table, tally: Tally, crests: Crests, later: Later) {
+  let crestPoints = 0;
+  return {
+    crestPoints: () => crestPoints,
+    resetCrestPoints: () => {
+      crestPoints = 0;
+    },
+    throwCard: (index: number) => {
+      table.thrown.value = [...table.thrown.value, index];
+      playSound('whoosh');
+      later(() => {
+        const isRight = table.round.value.cards[index]?.isRight === true;
+        crestPoints += crests.pointsFor(index, isRight);
+        tally.land(isRight);
+      }, THROW_MS);
+    },
+  };
+}
+
+/** Playing the picked cards: throws them in turn, then picks again or reveals and scores the round. */
 function usePlayback(table: Table, tally: Tally, crests: Crests, deal: () => KanjiRound) {
   const lastResult = shallowRef<PlayedRound | null>(null);
-  /** What this round's thrown crests have added or taken so far. */
-  let crestPoints = 0;
   const later = useLater();
-
-  function throwCard(index: number): void {
-    table.thrown.value = [...table.thrown.value, index];
-    playSound('whoosh');
-    later(() => {
-      const isRight = table.round.value.cards[index]?.isRight === true;
-      crestPoints += crests.pointsFor(index, isRight);
-      tally.land(isRight);
-    }, THROW_MS);
-  }
+  const { throwCard, crestPoints, resetCrestPoints } = useThrower(table, tally, crests, later);
 
   function dealNext(): void {
     const next = deal();
     table.newRound(next);
     crests.deal(next);
+    resetCrestPoints();
   }
 
   function reveal(): void {
-    const result = { ...scoreRound(table.round.value, table.picked.value), crestPoints };
+    const result = {
+      ...scoreRound(table.round.value, table.thrown.value),
+      crestPoints: crestPoints(),
+    };
     lastResult.value = result;
     tally.finish(result);
     if (result.isPerfect) crests.earnScout();
@@ -153,14 +172,20 @@ function usePlayback(table: Table, tally: Tally, crests: Crests, deal: () => Kan
     later(dealNext, REVEAL_MS);
   }
 
+  /** After a play: the answers show if the round is over, else the player picks again. */
+  function afterPlay(): void {
+    table.picked.value = [];
+    if (isRoundOver(table.round.value, table.thrown.value)) reveal();
+    else table.phase.value = 'picking';
+  }
+
   function play(): void {
     if (table.phase.value !== 'picking' || table.picked.value.length === 0) return;
     crests.isScouting.value = false;
     table.phase.value = 'playing';
-    crestPoints = 0;
     const order = [...table.picked.value].sort((a, b) => a - b);
     order.forEach((index, step) => later(() => throwCard(index), step * PLAY_STEP_MS));
-    later(reveal, (order.length - 1) * PLAY_STEP_MS + THROW_MS);
+    later(afterPlay, (order.length - 1) * PLAY_STEP_MS + THROW_MS);
   }
 
   return { lastResult, play };
@@ -187,6 +212,7 @@ export function useKanjiRun(deck: Deck, random: RandomSource = Math.random) {
     combo: tally.combo,
     bestCombo: tally.bestCombo,
     impacts: tally.impacts,
+    wrongPicksLeft: computed(() => wrongPicksLeft(table.round.value, table.thrown.value)),
     canPlay: computed(
       () =>
         table.phase.value === 'picking' &&

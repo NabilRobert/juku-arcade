@@ -33,6 +33,7 @@ const emit = defineEmits<{ leave: [] }>();
 
 const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
+const { wrongPicksLeft } = run;
 const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -84,8 +85,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. Practice only: it doesn't change your
-        reviews.
+        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji.
+        Practice only: it doesn't change your reviews.
       </p>
     </aside>
     <div class="flex flex-col gap-5">
@@ -99,6 +100,7 @@ function dismiss(isStopping: boolean): void {
           :combo="combo"
           :impacts="impacts"
           :can-play="canPlay"
+          :wrong-picks-left="wrongPicksLeft"
           :crest-marks="crestMarks"
           @toggle="run.toggle"
           @play="run.play"

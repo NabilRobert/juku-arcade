@@ -11,7 +11,7 @@ import { useAnimate, useReducedMotion } from 'motion-v';
 import { reactive, watch } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { CardStatus } from '../../game/card-status.ts';
-import type { KanjiRound } from '../../kanji/kanji-round.ts';
+import { MAX_WRONG_PICKS, type KanjiRound } from '../../kanji/kanji-round.ts';
 import type { CrestMark } from '../cards/crest-mark.ts';
 import { boxOf, useTableSlots } from '../../composables/useTableSlots.ts';
 import { useDeal } from '../../composables/useDeal.ts';
@@ -34,6 +34,8 @@ const props = defineProps<{
   combo: number;
   impacts: number;
   canPlay: boolean;
+  /** Wrong picks the player can still make on this kanji (D45). */
+  wrongPicksLeft: number;
   /** Scouted crests (D42), by reading card index. */
   crestMarks: ReadonlyMap<number, CrestMark>;
 }>();
@@ -98,6 +100,21 @@ watch(
       </p>
     </div>
     <div class="relative">
+      <!-- One square per wrong pick allowed, crossed out from the left as they're used. -->
+      <p
+        class="absolute top-1/2 left-0 flex -translate-y-1/2 gap-1.5"
+        role="img"
+        :aria-label="`${wrongPicksLeft} of ${MAX_WRONG_PICKS} wrong picks left`"
+        data-testid="wrong-picks"
+      >
+        <span
+          v-for="pick in MAX_WRONG_PICKS"
+          :key="pick"
+          class="pixel-panel flex size-8 items-center justify-center font-sans text-base"
+          :class="pick <= MAX_WRONG_PICKS - wrongPicksLeft ? 'bg-crimson text-washi' : 'bg-wood/80'"
+          >{{ pick <= MAX_WRONG_PICKS - wrongPicksLeft ? '✗' : '' }}</span
+        >
+      </p>
       <ComboMeter :combo="combo" :broken-combo="null" />
       <PixelButton
         colour="crimson"
