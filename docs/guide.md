@@ -114,9 +114,10 @@ flowchart LR
 Each time the game opens (after the daily check-up), and from "Change
 mode", **`ModePicker.vue`** offers Words or Kanji (D37). Kanji mode is
 practice: it logs nothing and changes no reviews. Beside the choice, a
-leaderboard (**`LeaderboardPanel.vue`**, **`leaderboard/leaderboard.ts`**)
-ranks your best score among sample players until real scores can be
-shared (D47).
+leaderboard (**`LeaderboardPanel.vue`**, **`leaderboard/leaderboard.ts`**),
+drawn like an arcade high-score table, ranks your best score among
+sample players until real scores can be shared (D47), 8 to a page, with
+Back and Next to see the rest.
 
 ```mermaid
 flowchart LR
@@ -493,7 +494,8 @@ fields. They stay in memory until slice 3 stores them.
   `src/game/tuning.ts`. Every number the playtest may change is there.
 - **Change what happens on a tap:** edit `src/game/taps.ts`; timeouts and
   dealing are in `src/game/run.ts`. Specs: `tests/run.test.ts`.
-- **Change the leaderboard's sample players:** `SAMPLE_PLAYERS` in
+- **Change the leaderboard's sample players or page size:** `SAMPLE_PLAYERS`
+  and `ROWS_PER_PAGE` in
   `leaderboard/leaderboard.ts` (specs: `tests/leaderboard.test.ts`).
 - **Change kanji mode:** the hand size and points are at the top of
   `kanji/kanji-round.ts` (`CARDS_PER_ROUND`, `POINTS_PER_HIT`,

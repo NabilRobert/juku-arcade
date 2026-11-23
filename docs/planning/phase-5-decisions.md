@@ -695,6 +695,12 @@ of our own.
 - **Beat:** a panel inside the game screen (crowds the side panel); no
   board until real data exists (nothing to see in a demo).
 
+**D47 update (2026-11-23):** the board fills the left of the start screen
+and looks like an arcade high-score table: a steel-blue pixel box with
+LEADERBOARD in yellow inside it, numbered rows with each player's coins,
+and BACK and NEXT to page through 23 sample players and you, 8 to a page
+(`ROWS_PER_PAGE`).
+
 ### D48: Drag throws at once; clicking lays out a hand (settled, 2026-11-23)
 
 From the playtest: a player kept dragging readings onto their words.
