@@ -62,7 +62,10 @@ not recorded as forgotten.
   reviews with words the player knows); nothing happens on a timeout (the
   timer stops mattering).
 
-### D5: Set score with stacking card tags (settled)
+### D5: Set score with stacking card tags (settled; replaced by D46, 2026-11-23)
+
+**Replaced (2026-11-23):** the set score is gone; banked coins are the
+only score (D46). The text below is kept as the record.
 
 `chips × multiplier`. Chips are 10 per clean match plus 1 per second
 left. The multiplier is `level × (1 + the sum of the clean matches'
@@ -610,7 +613,10 @@ from the palette throws rather than leaving a hole.
   match the pixel style, and look different on every system); an icon
   font (a dependency for three icons).
 
-### D44: Word mode plays as a bank run (settled, 2026-11-22)
+### D44: Word mode plays as a bank run (settled, 2026-11-22; rounds replaced by D46)
+
+**Updated (2026-11-23):** the rounds, targets and game over below are
+gone; the run is endless and its coins are the score (D46).
 
 The idea: the
 combo is money. Every match adds coins to a pot, more the longer the
@@ -629,3 +635,78 @@ so it now ships as word mode's run (`src/bank-run/`). Crests and scouting
 - **Beat:** a charm run with rounds, targets and upgrades (a second spike,
   `spike/roguelike-charms`, kept as a local branch); no run at all (less
   reason to keep a combo going).
+
+### D45: Three wrong picks per kanji (settled, 2026-11-23)
+
+From the playtest: one play ended a kanji round, so a single wrong guess
+gave no chance to try again. Now each play throws the picks; right ones
+are found, wrong ones stay marked and out of play, and the player picks
+and plays again until every right reading is found or three picks were
+wrong (`MAX_WRONG_PICKS` in `kanji/kanji-round.ts`). The round is scored
+on all the picks, as before. Three squares by the Play button count the
+wrong picks left.
+
+- **Beat:** three plays per kanji, however many picks were wrong (lets a
+  player pick everything at once); one play per kanji (too harsh).
+
+### D46: An endless bank run, with flat coins as the only score (settled, 2026-11-23)
+
+From the playtest and a reviewer's pushback:
+
+- **Rounds cut runs short.** A run of 3-set rounds ended players' runs
+  before they could build a big combo, even when they matched every card.
+- **The multiplier ran away.** The set score's multiplier (level × card
+  tags) and the bank run's coins (as many as the combo) could reach
+  millions in a long run.
+- **The shop had no point.** Its items only made more coins, and coins
+  only bought items.
+
+So:
+
+- **Endless:** no rounds, targets or game over; the run goes on until the
+  player leaves.
+- **Flat coins:** every match pays 10 coins (`COINS_PER_MATCH`) whatever
+  the combo. Banked coins are the only score: the set score, its box
+  and best set, and the "+0.1×" badges are gone. Each word's tag is still
+  worked out and logged for the reports.
+- **A shop you choose to open:** after a set, the shop may turn up for
+  the next one (a 1 in 3 chance, never two sets running). Its button shows
+  in the side panel; opening it pauses the game. Buying spends coins, so
+  an item lowers the score now for faster coins later, an investment.
+- **Tuning:** item prices (80 to 180), the curse (30) and omikuji gifts
+  (50 to the pot, 30 banked) are first guesses for flat coins, to be
+  tuned in play. The crane saves one pot and flies off, and scouts refill
+  when the shop comes.
+
+- **Beat:** capping the multiplier (still two scores); combo-scaled coins
+  with a cap (asked about, flat chosen); items that help play directly,
+  such as more time (kept for a later mode); removing the shop.
+
+### D47: A leaderboard with sample players (settled, 2026-11-23)
+
+The start screen shows a top-five leaderboard on its left, ranked by
+score (banked coins). Until there's a server to share scores, the other
+players are ten made-up names, labelled as samples, and your best from
+this browser is ranked among them (`leaderboard/leaderboard.ts`). Real
+scores come with per-student profiles, which are planned: the school's
+database would be read-only for us, so profiles and scores need a store
+of our own.
+
+- **Beat:** a panel inside the game screen (crowds the side panel); no
+  board until real data exists (nothing to see in a demo).
+
+### D48: Drag throws at once; clicking lays out a hand (settled, 2026-11-23)
+
+From the playtest: a player kept dragging readings onto their words.
+That already queued them for Play, but the card sprang back into the
+hand with only a small tag, so it looked like nothing happened. Now a
+card dragged or flung onto a word card is thrown at once, with no Play,
+and clicking still lays a hand out in order for Play. A word card with a
+reading laid for it shows the same number tag, and its label shows the
+reading. A press that moves under 10 px (`TAP_SLOP_PX`) counts as a
+click: Motion started a drag on the smallest wobble, which swallowed
+some clicks.
+
+- **Beat:** dragging queues too (what the playtest found confusing);
+  removing the click path (slower, and harder on a trackpad).
+
