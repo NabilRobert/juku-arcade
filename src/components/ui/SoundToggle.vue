@@ -3,13 +3,12 @@
  * The sound switch, in both modes' side panels: blue while sound is on, red
  * while it's off. It sits in its own panel, sized like the Scout button's.
  */
-import { isMuted, playSound, setMuted } from '../../sound/sfx.ts';
+import { isMuted, setMuted } from '../../sound/sfx.ts';
 import PixelButton from './PixelButton.vue';
 import PixelIcon from './PixelIcon.vue';
 
 function toggleSound(): void {
   setMuted(!isMuted.value);
-  playSound('pickUp');
 }
 </script>
 
