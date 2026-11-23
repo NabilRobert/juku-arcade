@@ -24,10 +24,7 @@ function turn(by: number): void {
 </script>
 
 <template>
-  <section
-    class="pixel-panel flex flex-col gap-4 border-4 border-sumi bg-steel p-6 uppercase"
-    aria-label="Leaderboard"
-  >
+  <section class="pixel-panel flex flex-col gap-4 bg-steel p-6 uppercase" aria-label="Leaderboard">
     <h2
       class="text-center text-3xl tracking-widest text-[#ffd84a] drop-shadow-[0_3px_0_var(--color-sumi)]"
     >
