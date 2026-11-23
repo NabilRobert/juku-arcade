@@ -121,4 +121,15 @@ describe('GameBoard', () => {
     const board = await mountBoard({ ...state, phase: 'timedOut' });
     expect(board.find('[data-testid="word-row"]').text()).toContain(state.set.words[0]?.reading);
   });
+
+  it('floats the pause hint between the rows, so pausing moves no card', async () => {
+    const { state } = start();
+    const playing = await mountBoard(state);
+    expect(playing.find('[data-testid="pause-hint"]').exists()).toBe(false);
+    const paused = await mountBoard({ ...state, pausedAtMs: START_MS });
+    const hint = paused.find('[data-testid="pause-hint"]');
+    expect(hint.classes()).toContain('absolute');
+    // The combo meter keeps its space (invisible, not removed), so the rows below stay put.
+    expect(hint.element.previousElementSibling?.classList.contains('invisible')).toBe(true);
+  });
 });

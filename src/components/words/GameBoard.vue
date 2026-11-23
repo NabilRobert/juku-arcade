@@ -182,7 +182,18 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       </div>
     </div>
     <div class="relative">
-      <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
+      <!-- While paused the hint floats here, between the rows, so nothing on the board moves. -->
+      <div :class="{ invisible: state.pausedAtMs !== null }">
+        <ComboMeter :combo="shownCombo" :broken-combo="brokenCombo" @broken-shown="clearBroken" />
+      </div>
+      <p
+        v-if="state.pausedAtMs !== null"
+        class="pixel-panel absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-wood/90 px-4 py-2 text-sm whitespace-nowrap text-aqua"
+        role="status"
+        data-testid="pause-hint"
+      >
+        Paused. Tap a word card to flip it. A card you peek at won't score.
+      </p>
       <PixelButton
         colour="crimson"
         class="absolute top-1/2 right-0 min-h-11 -translate-y-1/2 px-8 py-2 text-xl font-bold disabled:bg-washi/15 disabled:text-washi/40"

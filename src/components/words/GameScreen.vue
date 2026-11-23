@@ -82,14 +82,6 @@ usePauseKey({
       />
     </aside>
     <div class="flex flex-col gap-5">
-      <!-- Over the board, where the player is looking, rather than in the taller side panel. -->
-      <p
-        v-if="state.pausedAtMs !== null"
-        class="pixel-panel bg-wood/80 px-4 py-2 text-center text-sm text-aqua"
-        role="status"
-      >
-        Paused. Tap a word card to flip it. A card you peek at won't score.
-      </p>
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
         <CardBack
           v-if="state.flippedWord"
