@@ -380,7 +380,10 @@ detected at each class size.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   shuffle when a set is dealt, the shuffle's first flick when a card is
-  picked, and a slap when it lands. Every pixel button plays a soft 8-bit
+  picked, and a slap when it lands. Moving the mouse onto a card brushes
+  it with a softer, shorter slice of the same flick, a little higher for
+  each card along the board, at most once every 60 ms (`playHoverSound`,
+  D51). Every pixel button plays a soft 8-bit
   pip when pressed (`click` in `sfx.ts`, D49). Background music loops
   under the whole game (`sound/music.ts`, D50): it starts on the first
   press, and the sound switch silences it too. The effects and the music

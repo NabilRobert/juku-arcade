@@ -29,6 +29,8 @@ const SOUNDS = {
   deal: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
   /** Picking a card up (recorded; this is the fallback): a short papery tick. */
   pickUp: [0.5, 0.05, 1400, , 0.005, 0.03, 4, 2],
+  /** The pointer moving onto a card (recorded; this is the fallback): a faint papery brush. */
+  hover: [0.15, 0.05, 1600, , 0.003, 0.02, 4, 2],
   /** A held card over a word card: a soft click. */
   aim: [0.25, 0, 1800, , , 0.02, 1],
   /**
@@ -57,6 +59,7 @@ export type SoundName = keyof typeof SOUNDS;
 export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   deal: ['card-shuffle.ogg'],
   pickUp: ['card-shuffle.ogg'],
+  hover: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
 };
 /**
@@ -77,7 +80,9 @@ export const setEffectsVolume = effects.set;
  * card plays just its first flick, so it's over before the next pick.
  * Each fades out over its last FADE_OUT_S (or half its length, if shorter).
  */
-const RECORDING_MAX_S: Partial<Record<SoundName, number>> = { deal: 1.2, pickUp: 0.4 };
+const RECORDING_MAX_S: Partial<Record<SoundName, number>> = { deal: 1.2, pickUp: 0.4, hover: 0.12 };
+/** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
+const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35 };
 const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
 
@@ -133,7 +138,15 @@ function recordingLoader(context: AudioContext): (file: string) => Promise<Audio
   };
 }
 
-function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number, maxS: number): void {
+interface Playback {
+  pitch: number;
+  maxS: number;
+  /** A share of the usual recording volume (RECORDING_GAINS). */
+  gain: number;
+}
+
+function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playback): void {
+  const { pitch, maxS } = playback;
   const source = context.createBufferSource();
   const gain = context.createGain();
   source.buffer = buffer;
@@ -141,7 +154,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number, m
   const length = Math.min(buffer.duration, maxS);
   const fade = Math.min(FADE_OUT_S, length / 2);
   const now = context.currentTime;
-  const volume = RECORDING_VOLUME * effectsVolume.value;
+  const volume = RECORDING_VOLUME * playback.gain * effectsVolume.value;
   gain.gain.setValueAtTime(volume, now);
   gain.gain.setValueAtTime(volume, now + length - fade);
   gain.gain.linearRampToValueAtTime(0, now + length);
@@ -168,7 +181,8 @@ async function loadPlayer(): Promise<Player> {
     if (file === undefined) return playSynth(name, pitch);
     try {
       const maxS = RECORDING_MAX_S[name] ?? DEFAULT_RECORDING_MAX_S;
-      playBuffer(ZZFX.audioContext, await loadRecording(file), pitch, maxS);
+      const gain = RECORDING_GAINS[name] ?? 1;
+      playBuffer(ZZFX.audioContext, await loadRecording(file), { pitch, maxS, gain });
     } catch {
       playSynth(name, pitch);
     }
@@ -182,4 +196,30 @@ export function playSound(name: SoundName, pitch = 1): void {
   player
     .then((play) => play(name, pitch))
     .catch((error: unknown) => console.warn('Sound could not play:', error));
+}
+
+/**
+ * Sweeping the mouse along an overlapping row crosses several cards in a
+ * moment; at most one hover tick plays in this many milliseconds.
+ */
+export const HOVER_GAP_MS = 60;
+/** Each card in a row ticks this share of an octave above the one before (half a semitone). */
+const HOVER_STEPS_PER_OCTAVE = 24;
+let lastHoverMs = Number.NEGATIVE_INFINITY;
+
+/** The playback speed for a card's hover tick: a card further along the board ticks a little higher. */
+export function hoverPitch(step: number): number {
+  return 2 ** (step / HOVER_STEPS_PER_OCTAVE);
+}
+
+/** Whether a hover tick may play now, at most one per HOVER_GAP_MS; a yes counts as the latest tick. */
+export function takeHoverTurn(nowMs: number): boolean {
+  if (nowMs - lastHoverMs < HOVER_GAP_MS) return false;
+  lastHoverMs = nowMs;
+  return true;
+}
+
+/** The pointer moved onto a card (D51): a soft brush, so a sweep along a row plays a run. */
+export function playHoverSound(step: number, nowMs = performance.now()): void {
+  if (takeHoverTurn(nowMs)) playSound('hover', hoverPitch(step));
 }

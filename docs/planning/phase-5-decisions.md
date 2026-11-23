@@ -761,3 +761,19 @@ game is its normal use.
   4-minute track into memory); shipping the original MP3 (2.6 times the
   size); a separate music on/off button (the slider's 0 does that).
 
+### D51: Cards brush with a soft sound on hover (settled, 2026-11-23)
+
+Moving the mouse onto a card plays a short slice (0.12 s) of the card
+shuffle recording at about a third of its usual volume: the same paper
+sound as picking a card up, as a brush. Each card along the board plays
+half a semitone higher than the one before, so a sweep along the hand
+plays a little run. At most one tick plays every 60 ms
+(`HOVER_GAP_MS`), as a sweep crosses several overlapping cards at once.
+There's none on touch screens, while a mouse button is held (a drag),
+or on face-down or matched cards. It follows the Effects slider and the
+sound switch.
+
+- **Beat:** an 8-bit tick like the buttons (asked for a card sound
+  instead); a sound on every pointer move (a buzz); a per-card sound
+  file (none needed).
+

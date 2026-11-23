@@ -8,7 +8,8 @@
  * as karuta's grab cards are. How the card moves lives in card-motion.ts.
  *
  * Every card tilts toward the mouse while it's over the card
- * (useCardTilt.ts), as a held card turns to the light.
+ * (useCardTilt.ts), as a held card turns to the light, and brushes with a
+ * soft card sound as the mouse moves onto it (playHoverSound).
  *
  * Reading cards can be picked up and dropped on a word card (Motion's
  * drag), which throws them at it at once: the card reports where it is
@@ -31,6 +32,7 @@ import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../../deck/types.ts';
 import { useCardTilt } from '../../composables/useCardTilt.ts';
 import { usePixelSnap } from '../../composables/usePixelSnap.ts';
+import { playHoverSound } from '../../sound/sfx.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
@@ -169,6 +171,16 @@ function onRelease(info: PanInfo): void {
   if (isDrag({ x: 0, y: 0 }, info.offset)) emit('release', info.point, info.velocity);
 }
 
+/**
+ * A mouse moving onto the card brushes it with a sound: not on touch (no
+ * hover there), not while a button is held (a drag), and not on a card
+ * that's face down or already matched.
+ */
+function onHover(event: PointerEvent): void {
+  const isUsable = !isFaceDown.value && props.status !== 'matched';
+  if (event.pointerType === 'mouse' && event.buttons === 0 && isUsable) playHoverSound(props.index);
+}
+
 function onPickUp(): void {
   settle();
   emit('pickUp');
@@ -207,6 +219,7 @@ function onClick(event: MouseEvent): void {
     drag-snap-to-origin
     :while-drag="HELD_POSE"
     @pointerdown="onPress"
+    @pointerenter="onHover"
     @pointermove="follow"
     @pointerleave="settle"
     @drag-start="onPickUp"
