@@ -78,7 +78,7 @@ describe('throwing a reading card', () => {
     );
   });
 
-  it('lays a reading card let go on a word card for that word, without throwing it yet', async () => {
+  it('throws a reading card let go on a word card at that word straight away, without Play', async () => {
     const { state, context } = start();
     const board = await mountBoard(state, context.tags);
     const wordSlot = board.find('[data-testid="word-row"] > div > div').element;
@@ -88,7 +88,7 @@ describe('throwing a reading card', () => {
       .find((card) => card.props('kind') === 'reading');
     reading?.vm.$emit('release', { x: 50, y: 50 }, STILL);
     await board.vm.$nextTick();
-    expect(reading?.props('order')).toBe(1);
-    expect(board.emitted('throw')).toBeUndefined();
+    expect(board.emitted('throw')?.[0]).toEqual([0, wordIdAt(state, 0)]);
+    expect(reading?.props('order')).toBeUndefined();
   });
 });

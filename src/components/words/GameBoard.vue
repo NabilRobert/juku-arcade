@@ -92,6 +92,13 @@ watch(targetWordId, (wordId) => {
   if (wordId !== null) playSound('aim');
 });
 
+/** The reading laid for a word card, by its position, or undefined while none is. */
+function queuedReadingAt(position: number): string | undefined {
+  const readingIndex = hand.hand.value[position];
+  if (readingIndex === null || readingIndex === undefined) return undefined;
+  return props.state.set.readings[readingIndex]?.text;
+}
+
 function isMatched(wordId: string): boolean {
   return props.state.matchedWordIds.includes(wordId);
 }
@@ -111,11 +118,11 @@ function onReadingTap(index: number): void {
   else hand.lay(index);
 }
 
+/** A card dropped or flung onto a word card is thrown at it straight away. */
 function onRelease(readingIndex: number, point: Point, velocity: Point): void {
   const wordId = release(point, velocity);
   if (wordId === null) return;
-  playSound('slap');
-  hand.lay(
+  hand.throwNow(
     readingIndex,
     props.state.set.words.findIndex((word) => word.id === wordId),
   );
@@ -155,15 +162,24 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               :is-targeted="targetWordId === word.id"
               :deal-from="dealFrom.words[position]"
               :crest-mark="crestMarks?.get(word.id)"
+              :queued-as="queuedReadingAt(position) === undefined ? undefined : position + 1"
               @tap="onWordTap(word)"
             />
           </div>
         </div>
+        <!-- The word card's number; once a reading is laid for it, the reading too. -->
         <span
-          class="font-sans text-sm font-bold"
-          :class="isMatched(word.id) ? 'invisible' : 'text-aqua/80'"
+          class="px-1.5 font-sans text-sm font-bold"
+          :class="[
+            isMatched(word.id) ? 'invisible' : 'text-aqua/80',
+            queuedReadingAt(position) === undefined ? '' : 'bg-aqua text-sumi',
+          ]"
+          :data-testid="`word-label-${position + 1}`"
           aria-hidden="true"
-          >{{ position + 1 }}</span
+          >{{ position + 1
+          }}<template v-if="queuedReadingAt(position) !== undefined">
+            · <span lang="ja">{{ queuedReadingAt(position) }}</span></template
+          ></span
         >
       </div>
     </div>

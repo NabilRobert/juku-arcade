@@ -11,11 +11,12 @@
  * Every card tilts toward the mouse while it's over the card
  * (useCardTilt.ts), as a held card turns to the light.
  *
- * Reading cards can be picked up and dropped under a word card (Motion's
- * drag): the card reports where it is while dragged and where and how fast
- * it was let go, and the board decides which word card it was aimed at.
- * A laid card shifts up with a tag naming its word card (1 to 5) until
- * the hand is played; a match then sends it flying on to its word card.
+ * Reading cards can be picked up and dropped on a word card (Motion's
+ * drag), which throws them at it at once: the card reports where it is
+ * while dragged and where and how fast it was let go, and the board
+ * decides which word card it was aimed at. Tapping a reading card lays it
+ * instead: it shifts up with a tag naming its word card (1 to 5) until the
+ * hand is played. A match then sends it flying on to its word card.
  *
  * The frame's colour shows the card's state: white when aimed at, dark
  * when wrong, aqua when it's the right answer.
@@ -34,7 +35,7 @@ import { usePixelSnap } from '../../composables/usePixelSnap.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
-import type { Offset, Placement, Point } from './throw-geometry.ts';
+import { isDrag, type Offset, type Placement, type Point } from './throw-geometry.ts';
 
 const props = defineProps<{
   text: string;
@@ -60,6 +61,8 @@ const props = defineProps<{
   crestMark?: CrestMark;
   /** For a laid reading card: the number of the word card it's laid for (1 to 5). */
   order?: number;
+  /** For a word card with a reading laid for it: its number, shown with the same tag. */
+  queuedAs?: number;
 }>();
 
 const emit = defineEmits<{
@@ -118,10 +121,11 @@ const STATUS_MARKS: Partial<Record<CardStatus, string>> = { wrong: '✗', correc
 /** Becomes true once the first deal lands, so later moves aren't staggered. */
 const isDealt = ref(false);
 /**
- * True from picking the card up until the click that follows letting go.
- * Reset on the next press too, as no click follows a release off the card.
+ * Where the pointer went down on the card, so the click that follows can
+ * tell a press from a drag (isDrag), whatever order the drag and click
+ * events arrive in.
  */
-const wasDragged = ref(false);
+let pressPoint: Point | null = null;
 
 const isFaceDown = computed(() => props.status === 'hidden');
 
@@ -155,10 +159,7 @@ const isDisabled = computed(
 );
 
 const isThrowable = computed(
-  () =>
-    props.kind === 'reading' &&
-    props.order === undefined &&
-    (props.status === 'idle' || props.status === 'selected'),
+  () => props.kind === 'reading' && (props.status === 'idle' || props.status === 'selected'),
 );
 /** Read once, when the card is dealt. */
 const dealtPose = dealtFrom(props.dealFrom);
@@ -166,20 +167,30 @@ const dealtPose = dealtFrom(props.dealFrom);
 const pose = computed(() => cardPose({ ...props, isLaid: props.order !== undefined }));
 const transition = computed(() => cardTransition(props.status, props.index, isDealt.value));
 
+/** A real drag reports where it was let go; a wobble during a click doesn't. */
 function onRelease(info: PanInfo): void {
-  emit('release', info.point, info.velocity);
+  if (isDrag({ x: 0, y: 0 }, info.offset)) emit('release', info.point, info.velocity);
 }
 
 function onPickUp(): void {
-  wasDragged.value = true;
   settle();
   emit('pickUp');
 }
 
-/** Letting go of a dragged card also fires a click; it isn't a tap. */
-function onClick(): void {
-  if (wasDragged.value) wasDragged.value = false;
-  else emit('tap');
+function onPress(event: PointerEvent): void {
+  pressPoint = { x: event.clientX, y: event.clientY };
+}
+
+/**
+ * Letting go of a dragged card also fires a click; that isn't a tap. A
+ * keyboard click (detail 0) always is.
+ */
+function onClick(event: MouseEvent): void {
+  const from = pressPoint;
+  pressPoint = null;
+  const wasDragged =
+    event.detail !== 0 && from !== null && isDrag(from, { x: event.clientX, y: event.clientY });
+  if (!wasDragged) emit('tap');
 }
 </script>
 
@@ -198,7 +209,7 @@ function onClick(): void {
     :drag="isThrowable"
     drag-snap-to-origin
     :while-drag="HELD_POSE"
-    @pointerdown="wasDragged = false"
+    @pointerdown="onPress"
     @pointermove="follow"
     @pointerleave="settle"
     @drag-start="onPickUp"
@@ -243,11 +254,11 @@ function onClick(): void {
           >+{{ tag.toFixed(1) }}×</span
         >
         <span
-          v-if="order !== undefined"
+          v-if="(order ?? queuedAs) !== undefined"
           class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
           lang="en"
-          data-testid="order-tag"
-          >{{ order }}</span
+          :data-testid="kind === 'word' ? 'queued-tag' : 'order-tag'"
+          >{{ order ?? queuedAs }}</span
         >
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">

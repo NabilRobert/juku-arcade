@@ -5,9 +5,12 @@
  * right, each through the same throw a dragged card makes (taps.ts), so
  * every hit lands, dissolves with its word and builds the combo in turn.
  * A wrong card springs back to the player's hand to be laid again.
+ * Dragging a card onto a word card throws it at once (throwNow), without
+ * laying it or pressing Play.
  */
 import { computed, onUnmounted, ref, shallowRef, watch, type ShallowRef } from 'vue';
 import {
+  clearForThrow,
   emptyHand,
   isHandReady,
   layReading,
@@ -89,6 +92,13 @@ export function useHand(state: () => RunState, throwCard: (pair: PlayedPair) => 
     lay: (readingIndex: number, position?: number) => {
       if (isPlaying.value || !isInPlay(state())) return;
       hand.value = layReading(state(), hand.value, readingIndex, position);
+    },
+    /** Throws a dragged card straight at the word card it was dropped on. */
+    throwNow: (readingIndex: number, position: number) => {
+      const wordId = state().set.words[position]?.id;
+      if (wordId === undefined || isPlaying.value || !isInPlay(state())) return;
+      hand.value = clearForThrow(hand.value, readingIndex, position);
+      throwCard({ readingIndex, wordId });
     },
     takeBack: (readingIndex: number) => {
       if (!isPlaying.value) hand.value = takeBack(hand.value, readingIndex);

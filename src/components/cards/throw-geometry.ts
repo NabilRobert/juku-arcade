@@ -40,6 +40,17 @@ function contains(box: Box, point: Point): boolean {
   return isInsideX && point.y >= box.top && point.y <= box.top + box.height;
 }
 
+/**
+ * A press that moves less than this (px) is a click, not a drag. Hands
+ * wobble: counting a tiny move as a drag swallowed clicks in the playtest.
+ */
+export const TAP_SLOP_PX = 10;
+
+/** Whether a press that started at one point and ended at another was a drag. */
+export function isDrag(from: Point, to: Point): boolean {
+  return Math.hypot(to.x - from.x, to.y - from.y) >= TAP_SLOP_PX;
+}
+
 /** How far the centre of one box is from the centre of another, in pixels. */
 export function centreOffset(from: Box, to: Box): Offset {
   const start = centre(from);
