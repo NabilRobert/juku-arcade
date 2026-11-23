@@ -18,20 +18,20 @@ function onInput(event: Event): void {
 </script>
 
 <template>
-  <label class="flex items-center gap-3 text-sm">
-    <span class="w-14 shrink-0">{{ label }}</span>
+  <label class="flex items-center gap-3 text-base">
+    <span class="w-16 shrink-0">{{ label }}</span>
     <input
       type="range"
       min="0"
       max="100"
       step="5"
       :value="percent"
-      class="h-2 flex-1 cursor-pointer accent-aqua"
+      class="h-3 flex-1 cursor-pointer accent-aqua"
       :aria-label="`${label} volume`"
       :data-testid="testId"
       @input="onInput"
     />
-    <span class="w-10 shrink-0 text-right text-washi/70">{{
+    <span class="w-12 shrink-0 text-right text-washi/70">{{
       percent === 0 ? 'off' : `${percent}%`
     }}</span>
   </label>

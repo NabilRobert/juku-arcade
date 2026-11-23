@@ -112,11 +112,11 @@
    * zooming: every size in rem follows the window's width or its height,
    * whichever is tighter, and the cards' heights follow the window's
    * height (GameBoard.vue), so the side panel and a set fit without
-   * scrolling. 1.75vh keeps the tallest screen (word mode with the shop's
-   * button and items showing, about 56rem) inside the window.
+   * scrolling. 1.72vh keeps the tallest screen (word mode, paused, with the
+   * shop's button, items and both volume sliders showing) inside the window.
    */
   html {
-    font-size: clamp(12px, min(1.25vw, 1.75vh), 24px);
+    font-size: clamp(12px, min(1.25vw, 1.72vh), 24px);
     /* Both fonts have one weight; a faked bold would smear the pixels. */
     font-synthesis-weight: none;
   }

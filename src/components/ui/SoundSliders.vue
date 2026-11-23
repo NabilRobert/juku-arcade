@@ -10,7 +10,7 @@ import VolumeSlider from './VolumeSlider.vue';
 </script>
 
 <template>
-  <div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-2.5 py-1">
     <VolumeSlider
       label="Effects"
       :volume="effectsVolume"
