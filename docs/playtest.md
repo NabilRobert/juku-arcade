@@ -14,7 +14,28 @@ tune it, and read what the data says. The plan is in
 | Who collects the export files, and how often? | Exports are the only way data leaves a browser (D18). Weekly works; the report drops duplicates, so sending a file twice is harmless. |
 | A class code? | Optional (R9). Lets one report folder hold several classes and still tell them apart. |
 
-## 2. Deploy to Cloudflare Pages (D20)
+## 2. Deploy (D20)
+
+### The public build: GitHub Pages
+
+Every push to `main` that passes the checks deploys to
+<https://nabilrobert.github.io/juku-arcade/> (`.github/workflows/deploy.yml`;
+the repo's Pages source is set to GitHub Actions). To re-run it by hand:
+**Actions → Deploy → Run workflow**.
+
+For a daily play limit there, add it to the workflow's build step:
+
+```yaml
+      - run: npm run build -- --base=/juku-arcade/
+        env:
+          VITE_DAILY_CAP_MINUTES: 60
+```
+
+GitHub Pages ignores `public/_headers`, so this build has no content
+security policy, and branches get no preview. For a class, use Cloudflare
+Pages below.
+
+### For a class: Cloudflare Pages
 
 The repo is ready: `.node-version` pins Node 24 (Pages ignores
 `engines` in package.json and would build with Node 22), and
@@ -34,10 +55,10 @@ The build downloads the pinned OpenJLPT file and builds the decks itself,
 so nothing else is needed. Every other branch gets its own preview URL:
 use one to try a tuning change before it reaches the class.
 
-**Check after the first deploy:** open the site on a phone, play a set,
-pause and flip a card, and use **Settings → Export my data**. Then run
-`curl -sI <site>` and check the `content-security-policy` header is
-there.
+**Check after the first deploy:** open the site on a laptop (the layout
+isn't made for phones yet), play a set, pause and flip a card, and use
+**Settings → Export my data**. On Cloudflare, also run `curl -sI <site>`
+and check the `content-security-policy` header is there.
 
 ## 3. During: watch two or three learners play
 

@@ -6,6 +6,9 @@ Japanese learners. Match 5 kanji word cards (学校) to their readings
 you can bank or lose. A second mode asks for every reading of one kanji.
 It's a static web app with no server: progress stays in the browser.
 
+**Play it:** <https://nabilrobert.github.io/juku-arcade/> (on a laptop or
+desktop; the layout isn't made for phones yet).
+
 An optional daily check-up is designed to measure whether playing improves
 recall. No learners have been measured yet, so there's no result to report.
 
@@ -19,7 +22,8 @@ The first run downloads the pinned OpenJLPT file (about 6 MB) and builds
 the word decks.
 
 Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
-`npm run build`.
+`npm run build`. Every push to `main` that passes them deploys to GitHub
+Pages (`.github/workflows/deploy.yml`).
 
 ## Layout
 

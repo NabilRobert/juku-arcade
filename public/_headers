@@ -1,6 +1,7 @@
-# Cloudflare Pages response headers (D20). Everything the game loads comes
-# from this site and it sends nothing anywhere, so the policy allows only
-# 'self'. Styles allow inline because Vue and Motion set style attributes.
+# Cloudflare Pages response headers (D20); GitHub Pages ignores this file.
+# Everything the game loads comes from this site and it sends nothing
+# anywhere, so the policy allows only 'self'. Styles allow inline because
+# Vue and Motion set style attributes.
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
