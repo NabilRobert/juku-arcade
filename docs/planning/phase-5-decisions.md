@@ -743,6 +743,12 @@ game is its normal use.
   and in Settings, remembered in this browser; it starts at 30%, under
   the card sounds. The sound switch silences the music too, so one press
   quiets everything.
+- **Effects over the music:** under the music the effects were hard to
+  hear (measured: the track averages about 0.045 at 30%, while a chime
+  peaked at 0.16 and a button sound at 0.07). So the effects play louder:
+  ZzFX's master volume is 0.6 instead of its default 0.3, and the card
+  recordings play at 0.9 instead of 0.5 (`SYNTH_VOLUME`,
+  `RECORDING_VOLUME` in `sound/sfx.ts`). The music keeps its volume.
 
 - **Beat:** Web Audio buffer looping (gapless, but decodes the whole
   4-minute track into memory); shipping the original MP3 (2.6 times the

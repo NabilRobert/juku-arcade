@@ -58,8 +58,14 @@ export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   pickUp: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
 };
-/** Recordings are louder than the synth sounds; this evens them out. */
-const RECORDING_VOLUME = 0.5;
+/**
+ * How loud the effects play. They must sit clearly above the background
+ * music (music.ts, D50), so ZzFX's master volume is doubled from its 0.3
+ * default, and the recordings, which are louder than the synth sounds,
+ * are evened out with them.
+ */
+export const SYNTH_VOLUME = 0.6;
+export const RECORDING_VOLUME = 0.9;
 /**
  * The shuffle recording runs 3 s. A deal plays its first riffle; picking a
  * card plays just its first flick, so it's over before the next pick.
@@ -138,6 +144,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number, m
 
 async function loadPlayer(): Promise<Player> {
   const { ZZFX, ZZFXSound } = await import('zzfx');
+  ZZFX.volume = SYNTH_VOLUME;
   const built = new Map<SoundName, InstanceType<typeof ZZFXSound>>();
   const loadRecording = recordingLoader(ZZFX.audioContext);
   const playSynth = (name: SoundName, pitch: number): void => {

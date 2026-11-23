@@ -52,6 +52,7 @@ describe('the music track', () => {
     expect(played).toHaveLength(1);
     expect(played[0]?.loop).toBe(true);
     expect(played[0]?.src).toContain('music/youre-not-there.m4a');
+    expect(played[0]?.volume).toBeCloseTo(DEFAULT_MUSIC_VOLUME);
     setMuted(true);
     await nextTick();
     expect(pause).toHaveBeenCalled();
