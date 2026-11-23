@@ -13,17 +13,17 @@ const rows = computed(() => leaderboard(readBestScore()));
 </script>
 
 <template>
-  <section class="pixel-panel flex flex-col gap-2 bg-wood/80 p-4" aria-label="Leaderboard">
-    <h2 class="text-center text-sm tracking-widest text-aqua/80 uppercase">Leaderboard</h2>
-    <ol class="flex flex-col gap-1">
+  <section class="pixel-panel flex flex-col gap-4 bg-wood/80 p-6" aria-label="Leaderboard">
+    <h2 class="text-center text-2xl tracking-widest text-aqua uppercase">Leaderboard</h2>
+    <ol class="flex flex-1 flex-col justify-around gap-1 text-xl">
       <li
         v-for="row in rows"
         :key="row.name"
-        class="flex items-center gap-2 px-2 py-1"
+        class="flex items-center gap-3 px-3 py-2"
         :class="row.isYou ? 'bg-aqua text-sumi' : ''"
         :data-testid="row.isYou ? 'leaderboard-you' : undefined"
       >
-        <span class="w-6 text-right text-washi/60" :class="row.isYou ? 'text-sumi/70' : ''">
+        <span class="w-8 text-right text-washi/60" :class="row.isYou ? 'text-sumi/70' : ''">
           {{ row.rank }}
         </span>
         <span class="flex-1">{{ row.name }}</span>
@@ -32,6 +32,6 @@ const rows = computed(() => leaderboard(readBestScore()));
         </span>
       </li>
     </ol>
-    <p class="text-center text-xs text-washi/60">Sample players for now.</p>
+    <p class="text-center text-sm text-washi/60">Sample players for now.</p>
   </section>
 </template>

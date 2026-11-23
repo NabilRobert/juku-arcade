@@ -16,9 +16,10 @@ defineEmits<{ choose: [mode: GameMode] }>();
 </script>
 
 <template>
-  <div class="mx-auto my-auto grid w-full max-w-5xl grid-cols-[16rem_1fr] items-center gap-8">
+  <!-- The leaderboard fills the left of the screen; the two modes sit centred on the right. -->
+  <div class="grid w-full flex-1 grid-cols-[minmax(20rem,30%)_1fr] gap-10">
     <LeaderboardPanel />
-    <section class="grid grid-cols-2 gap-6" aria-label="Choose a mode">
+    <section class="grid grid-cols-2 gap-6 self-center" aria-label="Choose a mode">
       <PixelButton
         colour="crimson"
         class="flex flex-col gap-2 p-6 text-left"

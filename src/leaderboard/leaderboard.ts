@@ -26,7 +26,7 @@ export const SAMPLE_PLAYERS: readonly { name: string; score: number }[] = [
 ];
 
 /** How many rows the panel shows; your own row is added below them if you're further down. */
-export const TOP_ROWS = 5;
+export const TOP_ROWS = 10;
 
 /**
  * The top rows, with you ranked among the sample players. If your best
