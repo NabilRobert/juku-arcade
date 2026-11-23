@@ -34,10 +34,10 @@ const SOUNDS = {
   /** A held card over a word card: a soft click. */
   aim: [0.25, 0, 1800, , , 0.02, 1],
   /**
-   * Pressing a button: a short, soft 8-bit pip, in the style of handheld
-   * game menus (chosen by ear from four candidates, D49).
+   * Pressing a button: two quick 8-bit square notes stepping up, in the
+   * style of handheld game menus (chosen by ear from four candidates, D49).
    */
-  click: [0.3, 0, 988, 0, 0.03, 0.05, 1, 1],
+  click: [0.22, 0, 880, 0, 0.02, 0.03, 0, 0, 0, 0, 440, 0.03],
   /** Letting a thrown card fly: a swish of air. */
   whoosh: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
   /** The thrown card hitting its word card (recorded; this is the fallback): a slap. */

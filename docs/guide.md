@@ -389,8 +389,8 @@ detected at each class size.
   picked, and a slap when it lands. Moving the mouse onto a card brushes
   it with a softer, shorter slice of the same flick, a little higher for
   each card along the board, at most once every 60 ms (`playHoverSound`,
-  D51). Every pixel button plays a soft 8-bit
-  pip when pressed (`click` in `sfx.ts`, D49). Background music loops
+  D51). Every pixel button plays an 8-bit select blip, two quick notes, when
+  pressed (`click` in `sfx.ts`, D49). Background music loops
   under the whole game (`sound/music.ts`, D50): it starts on the first
   press, and the sound switch silences it too. The effects and the music
   each have a volume slider (`SoundSliders.vue`, one `VolumeSlider.vue`
