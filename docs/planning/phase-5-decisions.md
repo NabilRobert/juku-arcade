@@ -798,6 +798,13 @@ barely moving (peaks under 0.03), so the short deal and hover slices
 (`RECORDING_STARTS_S` in `sound/sfx.ts`); the deal plays at 0.6 of the
 usual recording volume.
 
+**Update (2026-11-23):** picked by ear from the hover test page, each
+dealt card now plays a soft, high tap instead of the flick: 0.07 s of
+the card landing recording (`card-place-1.ogg`, from its hit at 0.12 s),
+at 1.4 times its speed and 0.3 of the volume. The taps rise half a
+semitone per card along each row, starting again for the reading row
+(`rowPlace` on `PlayCard.vue`), so the second row doesn't end too high.
+
 ### D53: Inspecting a card makes a card sound, and keeps the board (settled, 2026-11-23)
 
 While paused, turning a word card over to read its back (and back again)

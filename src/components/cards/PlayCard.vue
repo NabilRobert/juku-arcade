@@ -33,7 +33,7 @@ import type { JlptLevel } from '../../deck/types.ts';
 import { useCardTilt } from '../../composables/useCardTilt.ts';
 import { usePixelSnap } from '../../composables/usePixelSnap.ts';
 import { useLater } from '../../composables/useLater.ts';
-import { playHoverSound, playSound } from '../../sound/sfx.ts';
+import { hoverPitch, playHoverSound, playSound } from '../../sound/sfx.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
@@ -45,6 +45,8 @@ const props = defineProps<{
   status: CardStatus;
   /** Position on the board, so cards deal in one after another. */
   index: number;
+  /** Place in its own row (0 is the leftmost), so each row's deal taps rise from the same note. */
+  rowPlace?: number;
   /** Shown under the text when a timed-out set reveals its answers (L6). */
   hint?: string;
   /** Peeked at this set: matching it won't score (L9). */
@@ -164,9 +166,10 @@ const isThrowable = computed(
 /** Read once, when the card is dealt. */
 const dealtPose = dealtFrom(props.dealFrom);
 
-// Each card makes its own sound as it comes off the deck, in turn (D52).
+// Each card taps down as it comes off the deck, in turn, a little higher along its row (D52).
 const later = useLater();
-onMounted(() => later(() => playSound('deal'), dealDelayMs(props.index)));
+const dealPitch = hoverPitch(props.rowPlace ?? props.index);
+onMounted(() => later(() => playSound('deal', dealPitch), dealDelayMs(props.index)));
 
 const pose = computed(() => cardPose({ ...props, isLaid: props.order !== undefined }));
 const transition = computed(() => cardTransition(props.status, props.index, isDealt.value));

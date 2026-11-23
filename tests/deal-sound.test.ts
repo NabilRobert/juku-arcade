@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import PlayCard from '../src/components/cards/PlayCard.vue';
 import { dealDelayMs } from '../src/components/cards/card-motion.ts';
-import { playSound } from '../src/sound/sfx.ts';
+import { hoverPitch, playSound } from '../src/sound/sfx.ts';
 
 vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/sound/sfx.ts')>()),
@@ -23,13 +23,21 @@ describe('dealing a set', () => {
     expect(dealDelayMs(6) - dealDelayMs(5)).toBe(dealDelayMs(1));
   });
 
-  it('plays a card sound as each card comes off the deck, not before its turn', () => {
+  it('taps each card down as it comes off the deck, a little higher each turn, not before', () => {
     mount(PlayCard, {
       props: { text: 'ほん', kind: 'reading', status: 'idle', index: 3, level: 'N5' },
     });
     vi.advanceTimersByTime(dealDelayMs(3) - 1);
-    expect(playSound).not.toHaveBeenCalledWith('deal');
+    expect(playSound).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
-    expect(playSound).toHaveBeenCalledWith('deal');
+    expect(playSound).toHaveBeenCalledWith('deal', hoverPitch(3));
+  });
+
+  it("starts each row's rise afresh: the first reading card taps like the first word card", () => {
+    mount(PlayCard, {
+      props: { text: 'ほん', kind: 'reading', status: 'idle', index: 5, rowPlace: 0, level: 'N5' },
+    });
+    vi.advanceTimersByTime(dealDelayMs(5));
+    expect(playSound).toHaveBeenCalledWith('deal', hoverPitch(0));
   });
 });

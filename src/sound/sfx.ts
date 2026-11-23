@@ -57,7 +57,7 @@ export type SoundName = keyof typeof SOUNDS;
 
 /** Recorded sounds, by the sound they replace; one variant is picked at random each time. */
 export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
-  deal: ['card-shuffle.ogg'],
+  deal: ['card-place-1.ogg'],
   pickUp: ['card-shuffle.ogg'],
   hover: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
@@ -76,26 +76,29 @@ const effects = storedVolume('juku-arcade:effects-volume', 1);
 export const effectsVolume = effects.volume;
 export const setEffectsVolume = effects.set;
 /**
- * The shuffle recording runs 3 s. Each card dealt plays a short flick of
- * it, over before the next card comes (D52); picking a card plays its
- * first flick, so it's over before the next pick.
+ * The shuffle recording runs 3 s; picking a card plays its first flick, so
+ * it's over before the next pick. Each card dealt plays a short, high tap
+ * of a card landing, over before the next card comes (D52).
  * Each fades out over its last FADE_OUT_S (or half its length, if shorter).
  */
 const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
-  deal: 0.15,
+  deal: 0.07,
   pickUp: 0.25,
   hover: 0.12,
 };
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
-const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35, deal: 0.6 };
+const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35, deal: 0.3 };
+/** Recordings played higher than they were made: a dealt card's landing becomes a light tap. */
+const RECORDING_PITCHES: Partial<Record<SoundName, number>> = { deal: 1.4 };
 /**
  * Where a short slice starts in its recording, in seconds. The shuffle's
  * first 0.17 s is the card barely moving (peaks under 0.03); its flick
  * comes right after, so a short slice from the start would be silent, and
  * a longer one would sound late. A pick-up starts just before the flick.
+ * The card landing (card-place) hits about 0.13 s in.
  */
 const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = {
-  deal: 0.17,
+  deal: 0.12,
   hover: 0.17,
   pickUp: 0.15,
 };
@@ -201,7 +204,9 @@ async function loadPlayer(): Promise<Player> {
       const maxS = RECORDING_MAX_S[name] ?? DEFAULT_RECORDING_MAX_S;
       const gain = RECORDING_GAINS[name] ?? 1;
       const startS = RECORDING_STARTS_S[name] ?? 0;
-      playBuffer(ZZFX.audioContext, await loadRecording(file), { pitch, maxS, gain, startS });
+      const playbackPitch = pitch * (RECORDING_PITCHES[name] ?? 1);
+      const playback = { pitch: playbackPitch, maxS, gain, startS };
+      playBuffer(ZZFX.audioContext, await loadRecording(file), playback);
     } catch {
       playSynth(name, pitch);
     }

@@ -382,8 +382,9 @@ detected at each class size.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
-  short flick of the shuffle as each card comes off the deck, one card
-  every 150 ms, left to right and the top row first (D52), the shuffle's
+  soft tap of a card landing as each card comes off the deck, one card
+  every 150 ms, left to right and the top row first, rising along each
+  row (D52), the shuffle's
   first flick when a card is
   picked, and a slap when it lands. Moving the mouse onto a card brushes
   it with a softer, shorter slice of the same flick, a little higher for

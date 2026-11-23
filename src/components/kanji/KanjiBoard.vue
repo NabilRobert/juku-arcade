@@ -146,6 +146,7 @@ watch(
               :text="card.text"
               kind="reading"
               :index="index + 1"
+              :row-place="index"
               :status="statusOf(index)"
               :level="level"
               :throw-to="throws.get(index)"
