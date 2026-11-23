@@ -379,9 +379,8 @@ detected at each class size.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   shuffle when a set is dealt, the shuffle's first flick when a card is
-  picked, and a slap when it lands. Every pixel button clicks when
-  pressed, with a recording from Kenney's UI Audio pack (CC0, licence
-  beside it). The rest are made in code with ZzFX (a tiny MIT
+  picked, and a slap when it lands. Every pixel button plays a soft 8-bit
+  pip when pressed (`click` in `sfx.ts`, D49). The rest are made in code with ZzFX (a tiny MIT
   synth): a click when a held card is over a word card, a swish when
   it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo

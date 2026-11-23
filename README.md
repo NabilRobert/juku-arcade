@@ -31,7 +31,7 @@ Pages (`.github/workflows/deploy.yml`).
 | ---------- | --------------------------------------------------------------------------------------------------------- |
 | `src/`     | The game: rules in plain TypeScript (`game/`, `kanji/`, `bank-run/`, `memory/`), screens in `components/` |
 | `scripts/` | The deck and font builds, and the reports made from exported play data                                    |
-| `public/`  | Fonts, card and button sounds, and hosting headers                                                        |
+| `public/`  | Fonts, card sounds and hosting headers                                                                    |
 | `tests/`   | Vitest specs, one behaviour each                                                                          |
 | `docs/`    | The guides and planning documents below                                                                   |
 
@@ -49,5 +49,5 @@ Pages (`.github/workflows/deploy.yml`).
 Word data comes from [OpenJLPT](https://github.com/evanclan/OpenJLPT)
 (CC BY-SA 4.0), which uses JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's
 JLPT lists, and Tatoeba; the generated decks are CC BY-SA 4.0 too. The
-fonts are balatro and Kuronuri (both OFL), and the sounds are from Kenney's
-Casino Audio and UI Audio packs (CC0). No licence yet for the code.
+fonts are balatro and Kuronuri (both OFL), and the card sounds are from
+Kenney's Casino Audio pack (CC0). No licence yet for the code.

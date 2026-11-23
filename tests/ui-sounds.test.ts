@@ -1,4 +1,4 @@
-// Button clicks and recorded sounds: every press clicks, and every recording the game names is shipped.
+// Button sounds and recordings: every press pips, and every recording the game names is shipped.
 import { existsSync } from 'node:fs';
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -13,14 +13,13 @@ vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
 describe('button sounds', () => {
   afterEach(() => vi.mocked(playSound).mockClear());
 
-  it('clicks when a pixel button is pressed', async () => {
+  it('pips when a pixel button is pressed', async () => {
     await mount(PixelButton, { slots: { default: 'Bank' } }).trigger('click');
     expect(playSound).toHaveBeenCalledWith('click');
   });
 
   it('ships every recording the game plays, in public/sounds', () => {
     const files = Object.values(RECORDINGS).flat();
-    expect(files).toContain('ui-click-1.ogg');
     for (const file of files) expect(existsSync(`public/sounds/${file}`), file).toBe(true);
   });
 });

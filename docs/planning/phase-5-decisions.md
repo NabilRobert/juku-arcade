@@ -710,3 +710,17 @@ some clicks.
 - **Beat:** dragging queues too (what the playtest found confusing);
   removing the click path (slower, and harder on a trackpad).
 
+### D49: Buttons play a soft 8-bit pip (settled, 2026-11-23)
+
+Every pixel button plays a sound when pressed. The first try, clicks from
+Kenney's UI Audio pack (CC0), sounded too unnatural for the game, and
+the wish was something like the menu sounds of handheld monster-catching
+games. Those belong to their makers, so the game makes its own in that
+style with ZzFX: four short square- and triangle-wave candidates were
+tried by ear, and the soft pip won (`click` in `sound/sfx.ts`: a rounded
+988 Hz note, 80 ms). Being made in code, it needs no audio file.
+
+- **Beat:** the Kenney clicks (too plain); a two-note "select" blip and a
+  harder square pip (the other candidates); copying a commercial game's
+  sounds (not ours to ship).
+

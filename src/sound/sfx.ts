@@ -3,10 +3,9 @@
  * of ZzFX's synth settings, shaped by ear. The card sounds (a shuffle when
  * a set is dealt, a short flick of it when a card is picked, a slap when
  * it lands)
- * are recordings from Kenney's Casino Audio pack, and a button's click is
- * from Kenney's UI Audio pack (both CC0, public/sounds/), because paper and
- * plastic are hard to fake; if a recording can't load or play, its synth
- * sound plays instead.
+ * are recordings from Kenney's Casino Audio pack (CC0, public/sounds/),
+ * because paper is hard to fake; if a recording can't load or play, its
+ * synth sound plays instead.
  *
  * ZzFX opens an AudioContext as soon as it loads, and browsers only allow
  * sound after the player has touched the page, so it's loaded on the first
@@ -31,8 +30,11 @@ const SOUNDS = {
   pickUp: [0.5, 0.05, 1400, , 0.005, 0.03, 4, 2],
   /** A held card over a word card: a soft click. */
   aim: [0.25, 0, 1800, , , 0.02, 1],
-  /** Pressing a button (recorded; this is the fallback): a short, bright click. */
-  click: [0.3, 0, 1200, , , 0.015, 1],
+  /**
+   * Pressing a button: a short, soft 8-bit pip, in the style of handheld
+   * game menus (chosen by ear from four candidates, D49).
+   */
+  click: [0.3, 0, 988, 0, 0.03, 0.05, 1, 1],
   /** Letting a thrown card fly: a swish of air. */
   whoosh: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
   /** The thrown card hitting its word card (recorded; this is the fallback): a slap. */
@@ -55,7 +57,6 @@ export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   deal: ['card-shuffle.ogg'],
   pickUp: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
-  click: ['ui-click-1.ogg', 'ui-click-2.ogg'],
 };
 /** Recordings are louder than the synth sounds; this evens them out. */
 const RECORDING_VOLUME = 0.5;

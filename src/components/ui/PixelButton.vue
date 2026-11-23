@@ -5,7 +5,7 @@
  * Classes, attributes and listeners the parent puts on it pass through to
  * the <button>.
  *
- * Each click plays a button click (sfx.ts) and a colour wipe that sweeps
+ * Each click plays a soft 8-bit pip (sfx.ts) and a colour wipe that sweeps
  * in from both edges and meets
  * in the middle. A plain click wipes in a contrasting colour, then fades.
  * When the click changes the button's colour (Pause turning red, Resume
