@@ -25,7 +25,7 @@ type SoundSettings = (number | undefined)[];
 
 /* eslint-disable no-sparse-arrays -- ZzFX's own format leaves settings it doesn't need empty. */
 const SOUNDS = {
-  /** A new set dealt (recorded; this is the fallback): a swish. */
+  /** A card coming off the deck (recorded; this is the fallback): a swish. */
   deal: [0.35, 0.05, 320, 0.03, 0.05, 0.16, 4, 1, -3],
   /** Picking a card up (recorded; this is the fallback): a short papery tick. */
   pickUp: [0.5, 0.05, 1400, , 0.005, 0.03, 4, 2],
@@ -76,11 +76,16 @@ const effects = storedVolume('juku-arcade:effects-volume', 1);
 export const effectsVolume = effects.volume;
 export const setEffectsVolume = effects.set;
 /**
- * The shuffle recording runs 3 s. A deal plays its first riffle; picking a
- * card plays just its first flick, so it's over before the next pick.
+ * The shuffle recording runs 3 s. Each card dealt plays a short flick of
+ * it, over before the next card comes (D52); picking a card plays its
+ * first flick, so it's over before the next pick.
  * Each fades out over its last FADE_OUT_S (or half its length, if shorter).
  */
-const RECORDING_MAX_S: Partial<Record<SoundName, number>> = { deal: 1.2, pickUp: 0.4, hover: 0.12 };
+const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
+  deal: 0.15,
+  pickUp: 0.4,
+  hover: 0.12,
+};
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
 const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35 };
 const DEFAULT_RECORDING_MAX_S = 1.2;

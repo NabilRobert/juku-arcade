@@ -777,3 +777,18 @@ sound switch.
   instead); a sound on every pointer move (a buzz); a per-card sound
   file (none needed).
 
+### D52: Deal one card at a time, each with its own sound (settled, 2026-11-23)
+
+The cards were dealt 0.07 s apart, so a whole set landed in under a
+second and looked like one drop. Now they leave the deck one at a time,
+150 ms apart (`DEAL_STAGGER_MS` in `cards/card-motion.ts`), left to right
+with the top row first, and each plays a short flick (0.15 s) of the card
+shuffle recording as it goes, instead of one riffle for the whole deal.
+A word-mode set takes about 1.6 s to deal and a kanji round about 1.3 s.
+
+- **Watch:** the set timer runs during the deal, so at level 5 (12 s a
+  set) the deal uses a bigger share of the time. If that feels unfair,
+  the timer can start once the last card lands.
+- **Beat:** one riffle for the whole deal (didn't match each card
+  landing); a slower step (too long between sets).
+

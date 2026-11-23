@@ -21,8 +21,11 @@ export const FALL_S = 0.34;
 const THROW_TURNS = 2;
 /** Depth for 3D turns (the flip); smaller looks more dramatic. */
 const KNOCK_PERSPECTIVE_PX = 500;
-/** Seconds between one card coming off the deck and the next: slow enough to see each one dealt. */
-const DEAL_STAGGER_S = 0.07;
+/**
+ * Milliseconds between one card coming off the deck and the next: slow
+ * enough to see each one dealt, left to right, the top row first (D52).
+ */
+const DEAL_STAGGER_MS = 150;
 /** A card coming off the deck starts turned a little, as a dealt card is. */
 const DEAL_TURN_DEG = -8;
 
@@ -115,6 +118,11 @@ export function cardPose(input: CardMotionInput): Pose {
 const FLIP_SPRING: Transition = { type: 'spring', stiffness: 260, damping: 22 };
 
 /** The deal and the pause flip are staggered; otherwise a card answers a click at once. */
+/** When a card leaves the deck, in milliseconds after the deal starts: its place on the board decides. */
+export function dealDelayMs(index: number): number {
+  return index * DEAL_STAGGER_MS;
+}
+
 export function cardTransition(status: CardStatus, index: number, isDealt: boolean): Transition {
   if (status === 'matched') {
     return {
@@ -124,7 +132,7 @@ export function cardTransition(status: CardStatus, index: number, isDealt: boole
     };
   }
   if (status === 'hidden') return { ...FLIP_SPRING, delay: index * FLIP_STAGGER_S };
-  const delay = isDealt ? 0 : index * DEAL_STAGGER_S;
+  const delay = isDealt ? 0 : dealDelayMs(index) / 1000;
   // Turning over keeps its softer spring, whichever way the card turns.
   return { type: 'spring', stiffness: 380, damping: 26, delay, rotateY: { ...FLIP_SPRING, delay } };
 }

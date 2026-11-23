@@ -26,13 +26,14 @@
  * flip them, reading cards can't.
  */
 import { m, type PanInfo } from 'motion-v';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import type { CardStatus } from '../../game/card-status.ts';
-import { cardPose, cardTransition, dealtFrom, THROW_S } from './card-motion.ts';
+import { cardPose, cardTransition, dealDelayMs, dealtFrom, THROW_S } from './card-motion.ts';
 import type { JlptLevel } from '../../deck/types.ts';
 import { useCardTilt } from '../../composables/useCardTilt.ts';
 import { usePixelSnap } from '../../composables/usePixelSnap.ts';
-import { playHoverSound } from '../../sound/sfx.ts';
+import { useLater } from '../../composables/useLater.ts';
+import { playHoverSound, playSound } from '../../sound/sfx.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
@@ -162,6 +163,10 @@ const isThrowable = computed(
 );
 /** Read once, when the card is dealt. */
 const dealtPose = dealtFrom(props.dealFrom);
+
+// Each card makes its own sound as it comes off the deck, in turn (D52).
+const later = useLater();
+onMounted(() => later(() => playSound('deal'), dealDelayMs(props.index)));
 
 const pose = computed(() => cardPose({ ...props, isLaid: props.order !== undefined }));
 const transition = computed(() => cardTransition(props.status, props.index, isDealt.value));

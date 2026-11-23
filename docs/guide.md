@@ -379,7 +379,9 @@ detected at each class size.
 - **Sound and the combo (feeling involved):** every move gets an answer.
   `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
-  shuffle when a set is dealt, the shuffle's first flick when a card is
+  short flick of the shuffle as each card comes off the deck, one card
+  every 150 ms, left to right and the top row first (D52), the shuffle's
+  first flick when a card is
   picked, and a slap when it lands. Moving the mouse onto a card brushes
   it with a softer, shorter slice of the same flick, a little higher for
   each card along the board, at most once every 60 ms (`playHoverSound`,
@@ -536,7 +538,7 @@ fields. They stay in memory until slice 3 stores them.
   `@keyframes wipe` in `style.css`).
 - **Change an animation:** card motion is in `components/cards/card-motion.ts`
   (`THROW_S` and `FALL_S` time the throw, `THROW_TURNS` its spin,
-  `DEAL_STAGGER_S` the time between dealt cards, `FLIP_SPRING` and
+  `DEAL_STAGGER_MS` the time between dealt cards, `FLIP_SPRING` and
   `FLIP_STAGGER_S` the pause flip, `MAX_TILT_DEG` in `card-tilt.ts` how far a
   card leans toward the mouse, `HELD_POSE` in `PlayCard.vue` a held card);
   the combo and level pops are in `GameHud.vue`.
