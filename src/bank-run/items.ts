@@ -2,7 +2,9 @@
  * The items a bank run's shop sells (our own, as omamori-style
  * charms; no other game's items). Each bends the risk of riding a combo:
  * more coins per match, a safety net on a miss, a bonus for banking, or
- * interest on what you save. bank-run.ts applies them.
+ * interest on what you save. bank-run.ts applies them. Prices are set
+ * against the flat 10 coins a match pays (D46), so an item costs a few
+ * sets' play.
  */
 export type ItemId = 'maneki' | 'koi' | 'omamori' | 'tsuru' | 'sensu' | 'take';
 
@@ -15,29 +17,29 @@ export interface Item {
 }
 
 export const ITEMS: readonly Item[] = [
-  { id: 'maneki', kanji: '招', name: 'Lucky cat', price: 8, effect: '+1 coin for every match.' },
+  { id: 'maneki', kanji: '招', name: 'Lucky cat', price: 80, effect: '+3 coins for every match.' },
   {
     id: 'koi',
     kanji: '鯉',
     name: 'Koi',
-    price: 18,
+    price: 180,
     effect: 'Matches from 10 combo up earn double.',
   },
-  { id: 'omamori', kanji: '守', name: 'Omamori', price: 14, effect: 'A miss keeps half the pot.' },
+  { id: 'omamori', kanji: '守', name: 'Omamori', price: 140, effect: 'A miss keeps half the pot.' },
   {
     id: 'tsuru',
     kanji: '鶴',
     name: 'Crane',
-    price: 20,
-    effect: 'Once a round, a miss keeps the whole pot.',
+    price: 120,
+    effect: 'Once, a miss keeps the whole pot. Then it flies off.',
   },
-  { id: 'sensu', kanji: '扇', name: 'Fan', price: 12, effect: 'Banking adds 20% to the pot.' },
+  { id: 'sensu', kanji: '扇', name: 'Fan', price: 120, effect: 'Banking adds 20% to the pot.' },
   {
     id: 'take',
     kanji: '竹',
     name: 'Bamboo',
-    price: 10,
-    effect: 'After each round, +1 coin per 5 saved (up to 6).',
+    price: 100,
+    effect: 'When the shop comes, +1 coin per 10 saved (up to 50).',
   },
 ];
 

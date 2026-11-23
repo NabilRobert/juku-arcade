@@ -22,7 +22,6 @@ import MissedTray from './MissedTray.vue';
 import ScoreBreakdown from './ScoreBreakdown.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
-import RunOver from '../bank-run/RunOver.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
 import { useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
@@ -38,12 +37,10 @@ const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
-  // The bank run holds the next set while its shop or end screen is open.
-  isHoldingNextDeal: () => bankRun.isHolding.value,
 });
 const { state, nowMs, tags, progress, throwReading, pause, resume, flip } = run;
-const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause });
-const { run: bank, notice, bestRound, shownCrests } = bankRun;
+const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause, resume });
+const { run: bank, notice, shownCrests } = bankRun;
 /** The scouted crests, marked on the word cards until the set ends. */
 const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
@@ -75,6 +72,7 @@ usePauseKey({
         :can-scout="state.phase === 'playing' && state.pausedAtMs === null"
         @bank="bankRun.bank"
         @scout="bankRun.scout"
+        @open-shop="bankRun.openShop"
       />
       <ScoreBreakdown
         :score="state.lastSetScore"
@@ -104,16 +102,10 @@ usePauseKey({
       <MissedTray :words="state.missedTray" :is-paused="state.pausedAtMs !== null" @flip="flip" />
     </div>
     <ShopOffer
-      v-if="bank.offer !== null"
+      v-if="bank.shop === 'open'"
       :run="bank"
       @buy="bankRun.buy"
-      @leave="bankRun.leaveShop"
-    />
-    <RunOver
-      v-else-if="bank.isOver"
-      :run="bank"
-      :best-round="bestRound"
-      @new-run="bankRun.newRun"
+      @leave="bankRun.closeShop"
     />
   </div>
 </template>

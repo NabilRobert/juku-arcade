@@ -23,8 +23,6 @@ export interface RunSetup {
   words: readonly DeckWord[];
   settings: Settings;
   pastEvents: readonly GameEvent[];
-  /** While this is true, the next set waits (the bank run's shop and end screens). */
-  isHoldingNextDeal?: () => boolean;
 }
 
 const today = (): string => localDay(new Date());
@@ -74,7 +72,6 @@ interface Driver {
   syncedCount: number;
   setEndedAtMs: number | null;
   clock: PlayClock;
-  isHoldingNextDeal: () => boolean;
 }
 
 /** The Vue state a run shows. */
@@ -110,7 +107,6 @@ function createDriver(setup: RunSetup): Driver {
     syncedCount: 0,
     setEndedAtMs: null,
     clock: { lastTickMs: Date.now(), lastSaveMs: Date.now() },
-    isHoldingNextDeal: setup.isHoldingNextDeal ?? (() => false),
   };
 }
 
@@ -122,7 +118,6 @@ function afterChange(driver: Driver, view: RunView): void {
 
 /** Once a set has ended, waits out its pause, then deals from a fresh pool. */
 function dealNextSetAfterPause(driver: Driver, view: RunView): void {
-  if (driver.isHoldingNextDeal()) return;
   const nowMs = view.nowMs.value;
   driver.setEndedAtMs ??= nowMs;
   const pauseMs = view.state.value.phase === 'timedOut' ? TIMED_OUT_PAUSE_MS : CLEARED_PAUSE_MS;

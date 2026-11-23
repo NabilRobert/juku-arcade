@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
- * The shop after a round is won: up to three items, each with its
- * price; buy any your wallet covers (up to five held), then go on to the
- * next round. The next set waits until the player leaves.
+ * The shop, once the player opens it (D46): up to three items, each with
+ * its price; buy any your coins cover (up to five held), then go back to
+ * the table. Buying lowers your score now, for faster coins later. The
+ * game is paused while it's open.
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
@@ -14,7 +15,7 @@ import { itemById, type ItemId } from '../../bank-run/items.ts';
 const props = defineProps<{ run: BankRun }>();
 defineEmits<{ buy: [id: ItemId]; leave: [] }>();
 
-const offered = computed(() => (props.run.offer ?? []).flatMap((id) => itemById(id) ?? []));
+const offered = computed(() => props.run.offer.flatMap((id) => itemById(id) ?? []));
 const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
 </script>
 
@@ -24,9 +25,9 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
     role="dialog"
     aria-label="Shop"
   >
-    <p class="text-3xl font-bold text-aqua">Round {{ run.round }} cleared!</p>
+    <p class="text-3xl font-bold text-aqua">The shop</p>
     <p class="text-lg">
-      Wallet <PixelIcon name="coin" /> {{ run.wallet
+      Your coins <PixelIcon name="coin" /> {{ run.coins
       }}<span v-if="isFull" class="text-washi/60"> · item slots full</span>
     </p>
     <div class="flex gap-6">
@@ -44,7 +45,7 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
         <PixelButton
           colour="crimson"
           class="mt-1 min-h-10 w-full px-3 disabled:opacity-40"
-          :disabled="run.wallet < item.price || isFull"
+          :disabled="run.coins < item.price || isFull"
           @click="$emit('buy', item.id)"
         >
           Buy <PixelIcon name="coin" /> {{ item.price }}
@@ -53,7 +54,7 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
       <p v-if="offered.length === 0" class="text-washi/70">Sold out.</p>
     </div>
     <PixelButton colour="steel" class="min-h-11 px-8 text-lg" @click="$emit('leave')">
-      Next round ▶
+      Back to the table ▶
     </PixelButton>
   </div>
 </template>

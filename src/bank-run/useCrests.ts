@@ -20,7 +20,7 @@ export function useScouting(state: () => RunState, run: Ref<BankRun>) {
   return {
     isScouting,
     isRevealed,
-    /** Starts a scout if one is left this round and the set is in play; returns whether it did. */
+    /** Starts a scout if one is left and the set is in play; returns whether it did. */
     scout: (): boolean => {
       const now = state();
       const canScout =
@@ -57,11 +57,12 @@ export function useCrests(
     if (crest !== 'omikuji') return crest === 'koban' ? 2 : 1;
     const gift = drawOmikuji(random);
     run.value = addCoins(run.value, gift.to, gift.coins);
-    notify(`${CRESTS.omikuji.symbol} Omikuji: +${gift.coins} to the ${gift.to}`, true);
+    const where = gift.to === 'pot' ? 'to the pot' : 'banked';
+    notify(`${CRESTS.omikuji.symbol} Omikuji: +${gift.coins} ${where}`, true);
     return 1;
   }
 
-  /** A miss on a cursed card also costs coins from the wallet. */
+  /** A miss on a cursed card also costs banked coins. */
   function onMiss(wordId: string): void {
     if (crests.value.get(wordId) !== 'cursed') return;
     run.value = takeCoins(run.value, CURSE_COST);
