@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /**
- * The bank run in the side panel (D46): your score (banked coins), the
- * unbanked pot with the Bank button, the shop's button when it has turned
- * up, the Scout button (a limited pause that shows which cards carry a
- * crest) and the items held. News (a pot lost, a crest paying out) drops
- * away under the pot.
+ * The bank run in the side panel (D46): the unbanked pot with the Bank
+ * button at the top, the shop's button when it has turned up, the Scout
+ * button (a limited pause that shows which cards carry a crest), the items
+ * held, and your score (banked coins) at the bottom. News (a pot lost, a
+ * crest paying out) drops away under the pot.
  */
 import { computed } from 'vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -28,14 +28,6 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
 
 <template>
   <section class="pixel-panel flex flex-col gap-2 bg-wood/80 p-3 text-center" aria-label="Bank run">
-    <div>
-      <p class="text-xs tracking-widest text-aqua/80 uppercase">Score</p>
-      <p class="text-3xl font-bold">
-        <!-- A step smaller than the number, so the coin doesn't outweigh it. -->
-        <span class="text-2xl"><PixelIcon name="coin" /></span>
-        <span data-testid="coins">{{ run.coins }}</span>
-      </p>
-    </div>
     <div class="relative py-1">
       <p class="text-xs tracking-widest text-aqua/80 uppercase">Pot, not yet banked</p>
       <p class="text-2xl font-bold" data-testid="pot">
@@ -78,5 +70,13 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
         item.kanji
       }}</span>
     </p>
+    <div class="border-t-2 border-lacquer pt-2">
+      <p class="text-xs tracking-widest text-aqua/80 uppercase">Score</p>
+      <p class="text-3xl font-bold">
+        <!-- A step smaller than the number, so the coin doesn't outweigh it. -->
+        <span class="text-2xl"><PixelIcon name="coin" /></span>
+        <span data-testid="coins">{{ run.coins }}</span>
+      </p>
+    </div>
   </section>
 </template>
