@@ -380,7 +380,10 @@ detected at each class size.
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   shuffle when a set is dealt, the shuffle's first flick when a card is
   picked, and a slap when it lands. Every pixel button plays a soft 8-bit
-  pip when pressed (`click` in `sfx.ts`, D49). The rest are made in code with ZzFX (a tiny MIT
+  pip when pressed (`click` in `sfx.ts`, D49). Background music loops
+  under the whole game (`sound/music.ts`, D50): it starts on the first
+  press, its volume is the Music slider (`MusicSlider.vue`, in the side
+  panels and Settings), and the sound switch silences it too. The rest are made in code with ZzFX (a tiny MIT
   synth): a click when a held card is over a word card, a swish when
   it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo
@@ -534,6 +537,9 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
+- **Change the music:** put the track in `public/music/` and point
+  `MUSIC_FILE` in `sound/music.ts` at it; its starting volume is
+  `DEFAULT_MUSIC_VOLUME`. Specs: `tests/music.test.ts`.
 - **Change how the combo builds:** the ranks, their thresholds, praise and
   colours are `COMBO_RANKS` in `components/ui/combo-ranks.ts`; the glow's brightest combo is
   `FULL_HEAT_COMBO` and the jolt is `SHAKE_*` in `GameBoard.vue`.

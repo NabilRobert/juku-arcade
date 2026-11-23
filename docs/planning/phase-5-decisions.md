@@ -724,3 +724,27 @@ tried by ear, and the soft pip won (`click` in `sound/sfx.ts`: a rounded
   harder square pip (the other candidates); copying a commercial game's
   sounds (not ours to ship).
 
+### D50: Looping background music with a volume slider (settled, 2026-11-23)
+
+The game plays "You're Not There" by MagiaZ on a loop, the track chosen
+for it, from Pixabay under the Pixabay Content License: free to use in a
+game, no credit needed (it's credited in the README anyway). The licence
+bars passing the file on by itself, unchanged; shipping it inside the
+game is its normal use.
+
+- **Lighter file:** the 7.7 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
+  (`public/music/youre-not-there.m4a`, 2.9 MB, the full 4 minutes) with
+  macOS's own `afconvert`, so the first load stays reasonable. Every
+  major browser plays AAC.
+- **Playback:** one looping `<audio>` element (`sound/music.ts`). It
+  starts on the first press anywhere, as browsers block sound before
+  that, and pauses while the tab is hidden.
+- **Volume:** a Music slider (0 to 100%, 0 is off), in both side panels
+  and in Settings, remembered in this browser; it starts at 30%, under
+  the card sounds. The sound switch silences the music too, so one press
+  quiets everything.
+
+- **Beat:** Web Audio buffer looping (gapless, but decodes the whole
+  4-minute track into memory); shipping the original MP3 (2.6 times the
+  size); a separate music on/off button (the slider's 0 does that).
+
