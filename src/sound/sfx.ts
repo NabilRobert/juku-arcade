@@ -87,7 +87,13 @@ const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
   hover: 0.12,
 };
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
-const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35 };
+const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35, deal: 0.6 };
+/**
+ * Where a short slice starts in its recording, in seconds. The shuffle's
+ * first 0.17 s is the card barely moving (peaks under 0.03); its flick
+ * comes right after, so a short slice from the start would be silent.
+ */
+const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = { deal: 0.17, hover: 0.17 };
 const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
 
@@ -146,17 +152,19 @@ function recordingLoader(context: AudioContext): (file: string) => Promise<Audio
 interface Playback {
   pitch: number;
   maxS: number;
+  /** Where to start in the recording (RECORDING_STARTS_S). */
+  startS: number;
   /** A share of the usual recording volume (RECORDING_GAINS). */
   gain: number;
 }
 
 function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playback): void {
-  const { pitch, maxS } = playback;
+  const { pitch, maxS, startS } = playback;
   const source = context.createBufferSource();
   const gain = context.createGain();
   source.buffer = buffer;
   source.playbackRate.value = pitch;
-  const length = Math.min(buffer.duration, maxS);
+  const length = Math.min(buffer.duration - startS, maxS);
   const fade = Math.min(FADE_OUT_S, length / 2);
   const now = context.currentTime;
   const volume = RECORDING_VOLUME * playback.gain * effectsVolume.value;
@@ -164,7 +172,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playba
   gain.gain.setValueAtTime(volume, now + length - fade);
   gain.gain.linearRampToValueAtTime(0, now + length);
   source.connect(gain).connect(context.destination);
-  source.start(now, 0, length);
+  source.start(now, startS, length);
 }
 
 async function loadPlayer(): Promise<Player> {
@@ -187,7 +195,8 @@ async function loadPlayer(): Promise<Player> {
     try {
       const maxS = RECORDING_MAX_S[name] ?? DEFAULT_RECORDING_MAX_S;
       const gain = RECORDING_GAINS[name] ?? 1;
-      playBuffer(ZZFX.audioContext, await loadRecording(file), { pitch, maxS, gain });
+      const startS = RECORDING_STARTS_S[name] ?? 0;
+      playBuffer(ZZFX.audioContext, await loadRecording(file), { pitch, maxS, gain, startS });
     } catch {
       playSynth(name, pitch);
     }

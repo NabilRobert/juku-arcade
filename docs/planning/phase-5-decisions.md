@@ -792,3 +792,9 @@ A word-mode set takes about 1.6 s to deal and a kanji round about 1.3 s.
 - **Beat:** one riffle for the whole deal (didn't match each card
   landing); a slower step (too long between sets).
 
+**Fix (2026-11-23):** the shuffle recording's first 0.17 s is the card
+barely moving (peaks under 0.03), so the short deal and hover slices
+(D51) were nearly silent. Both now start at the flick, 0.17 s in
+(`RECORDING_STARTS_S` in `sound/sfx.ts`); the deal plays at 0.6 of the
+usual recording volume.
+
