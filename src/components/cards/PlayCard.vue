@@ -5,8 +5,7 @@
  * a crimson frame, with a red back, a suit mark in two opposite corners
  * (言 on word cards, 音 on reading cards), and the deck's JLPT level (N5 to
  * N1) in the bottom-left corner. Reading cards are written top to bottom,
- * as karuta's grab cards are; word cards carry a hanko stamp for their
- * tag. How the card moves lives in card-motion.ts.
+ * as karuta's grab cards are. How the card moves lives in card-motion.ts.
  *
  * Every card tilts toward the mouse while it's over the card
  * (useCardTilt.ts), as a held card turns to the light.
@@ -43,8 +42,6 @@ const props = defineProps<{
   status: CardStatus;
   /** Position on the board, so cards deal in one after another. */
   index: number;
-  /** The difficulty tag on word cards, such as 0.2 for "+0.2×" (L8). */
-  tag?: number;
   /** Shown under the text when a timed-out set reveals its answers (L6). */
   hint?: string;
   /** Peeked at this set: matching it won't score (L9). */
@@ -247,12 +244,6 @@ function onClick(event: MouseEvent): void {
           <span v-for="line in lines" :key="line">{{ line }}</span>
         </span>
         <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
-        <span
-          v-if="tag !== undefined"
-          class="absolute -top-2 -right-2 border-2 border-crimson bg-washi px-1 py-0.5 font-sans text-[0.65rem] text-crimson shadow-[0_2px_0_rgb(0_0_0/0.5)]"
-          lang="en"
-          >+{{ tag.toFixed(1) }}×</span
-        >
         <span
           v-if="(order ?? queuedAs) !== undefined"
           class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"

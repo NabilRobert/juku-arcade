@@ -22,27 +22,27 @@ async function layRightHand(board: Board, state: RunState): Promise<void> {
 describe('GameBoard', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('shows 5 word cards with their tags over 6 reading cards and the deck', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+  it('shows 5 word cards over 6 reading cards and the deck, with no score multiplier', async () => {
+    const { state } = start();
+    const board = await mountBoard(state);
     const wordRow = board.find('[data-testid="word-row"]');
     expect(wordRow.findAll('button')).toHaveLength(5);
-    expect(wordRow.text()).toMatch(/\+0\.\d×/);
+    expect(wordRow.text()).not.toMatch(/×/);
     expect(board.find('[data-testid="reading-row"]').findAll('button')).toHaveLength(6);
     expect(board.find('[data-testid="deck"]').exists()).toBe(true);
   });
 
   it("marks every card with the deck's JLPT level", async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     const marks = board.findAll('[data-testid="level-mark"]').map((mark) => mark.text());
     expect(marks).toHaveLength(state.set.words.length + state.set.readings.length);
     expect(new Set(marks)).toEqual(new Set(['N5']));
   });
 
   it('lays a clicked reading card for the first open word card, tagged 1, and takes it back on a second click', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     const card = readingCards(board)[0];
     await card?.trigger('click');
     expect(card?.find('[data-testid="order-tag"]').text()).toBe('1');
@@ -51,8 +51,8 @@ describe('GameBoard', () => {
   });
 
   it('keeps Play disabled until every word card has a reading under it', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     const play = board.find('[data-testid="play"]');
     await readingCards(board)[0]?.trigger('click');
     expect(play.attributes('disabled')).toBeDefined();
@@ -63,8 +63,8 @@ describe('GameBoard', () => {
 
   it('plays the hand left to right, one throw at a time', async () => {
     vi.useFakeTimers();
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     await layRightHand(board, state);
     await board.find('[data-testid="play"]').trigger('click');
     vi.advanceTimersByTime(0);
@@ -79,8 +79,8 @@ describe('GameBoard', () => {
 
   it('stops throwing when the game is paused mid-hand, leaving the rest laid out', async () => {
     vi.useFakeTimers();
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     await layRightHand(board, state);
     await board.find('[data-testid="play"]').trigger('click');
     vi.advanceTimersByTime(0);
@@ -92,8 +92,8 @@ describe('GameBoard', () => {
   });
 
   it('flips a word card tapped while paused, and does nothing with it otherwise', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     await board.find('[data-testid="word-row"] button').trigger('click');
     expect(board.emitted('flip')).toBeUndefined();
     await board.setProps({ state: { ...state, pausedAtMs: START_MS } });
@@ -111,14 +111,14 @@ describe('GameBoard', () => {
       { kind: 'reading', index: decoyIndex(state) },
       START_MS,
     );
-    const board = await mountBoard(missed, context.tags);
+    const board = await mountBoard(missed);
     expect(board.text()).toContain('✗');
     expect(board.find('[data-testid="reading-row"]').text()).toContain('✓');
   });
 
   it("shows each word's reading when the set times out", async () => {
-    const { state, context } = start();
-    const board = await mountBoard({ ...state, phase: 'timedOut' }, context.tags);
+    const { state } = start();
+    const board = await mountBoard({ ...state, phase: 'timedOut' });
     expect(board.find('[data-testid="word-row"]').text()).toContain(state.set.words[0]?.reading);
   });
 });

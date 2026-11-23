@@ -130,7 +130,7 @@ describe('the throw', () => {
 
   it('gives the matched reading card a target to fly to, and no other card', async () => {
     const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const board = await mountBoard(state);
     const wordId = wordIdAt(state, 0);
     const selected = tapCard(state, context, { kind: 'word', wordId }, START_MS);
     const readingIndex = readingIndexOf(state, wordId);

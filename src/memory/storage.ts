@@ -17,7 +17,6 @@ export interface Settings {
   level: JlptLevel;
   classCode: string | null;
   bestCombo: number;
-  bestSetScore: number;
   /** W2: the local day the play time is for, and today's play so far. */
   playDay: string | null;
   playMsToday: number;

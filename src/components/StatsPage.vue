@@ -13,6 +13,7 @@ import { accuracy, playerStats, type AnswerCounts } from '../memory/stats.ts';
 import type { Settings } from '../memory/storage.ts';
 import PixelButton from './ui/PixelButton.vue';
 import StatPanel from './ui/StatPanel.vue';
+import { readBestScore } from '../bank-run/useBankRun.ts';
 
 const props = defineProps<{ deck: Deck; settings: Settings; events: readonly GameEvent[] }>();
 defineEmits<{ close: [] }>();
@@ -49,7 +50,7 @@ const tiles = computed(() => [
     note: `${stats.value.allTime.right} right`,
   },
   { label: 'Best combo', value: String(props.settings.bestCombo) },
-  { label: 'Best set', value: String(props.settings.bestSetScore) },
+  { label: 'Best score', value: String(readBestScore()) },
   { label: 'Played today', value: `${minutesToday.value} min` },
   { label: 'Sets played', value: String(stats.value.setsPlayed) },
   { label: 'Days played', value: String(stats.value.daysPlayed) },

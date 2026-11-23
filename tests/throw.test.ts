@@ -79,8 +79,8 @@ describe('throwing a reading card', () => {
   });
 
   it('throws a reading card let go on a word card at that word straight away, without Play', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     const wordSlot = board.find('[data-testid="word-row"] > div > div').element;
     wordSlot.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, ...CARD });
     const reading = board

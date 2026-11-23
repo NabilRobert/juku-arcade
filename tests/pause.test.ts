@@ -93,9 +93,7 @@ describe('flip and peek', () => {
       START_MS,
     );
     const matched = tapPair(peeked, context, word, readingIndexOf(state, word), START_MS + 1_000);
-    expect([matched.combo, matched.cleanMatchTags.length, matched.matchedWordIds.length]).toEqual([
-      6, 0, 1,
-    ]);
+    expect([matched.combo, matched.matchedWordIds.length]).toEqual([6, 1]);
     expect(matched.events.at(-1)?.outcome).toBe('peeked');
   });
 

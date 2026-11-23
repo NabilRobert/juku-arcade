@@ -31,7 +31,6 @@ import { readingCardStatus, wordCardStatus } from '../../game/card-status.ts';
 import type { PlayedPair } from '../../game/hand.ts';
 import type { RunState } from '../../game/run.ts';
 import type { DeckWord, JlptLevel } from '../../deck/types.ts';
-import type { TagTable } from '../../game/tags.ts';
 import { useDeal } from '../../composables/useDeal.ts';
 import { useGameFeel } from '../../composables/useGameFeel.ts';
 import { useHand } from '../../composables/useHand.ts';
@@ -49,7 +48,6 @@ import type { CrestMark } from '../cards/crest-mark.ts';
 const props = defineProps<{
   state: RunState;
   nowMs: number;
-  tags: TagTable;
   /** The deck's JLPT level, marked on every card. */
   level: JlptLevel;
   /** Scouted crests on the word cards, by word id (the bank run's crests, D42). */
@@ -156,7 +154,6 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
               :level="level"
               :index="position"
               :status="wordCardStatus(state, word.id, nowMs)"
-              :tag="tags.get(word.id)"
               :hint="state.phase === 'timedOut' ? word.reading : undefined"
               :is-peeked="state.peekedWordIds.includes(word.id)"
               :is-targeted="targetWordId === word.id"

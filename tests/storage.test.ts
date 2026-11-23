@@ -27,7 +27,6 @@ describe('browser storage', () => {
       level: 'N5' as const,
       classCode: 'N5-SAT',
       bestCombo: 3,
-      bestSetScore: 90,
       playDay: '2026-11-21',
       playMsToday: 60_000,
       checkUpOfferedDay: '2026-11-21',
@@ -42,7 +41,6 @@ describe('browser storage', () => {
       level: 'N5' as const,
       classCode: null,
       bestCombo: 0,
-      bestSetScore: 0,
     };
     await saveSettings(older as Parameters<typeof saveSettings>[0]);
     expect(await loadSettings()).toMatchObject({

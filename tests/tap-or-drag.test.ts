@@ -37,8 +37,8 @@ describe('a click or a drag', () => {
 
 describe('a laid reading on the board', () => {
   it('marks the word card it is laid for with its number and the reading', async () => {
-    const { state, context } = start();
-    const board = await mountBoard(state, context.tags);
+    const { state } = start();
+    const board = await mountBoard(state);
     const reading = board
       .findAllComponents(PlayCard)
       .find((card) => card.props('kind') === 'reading');

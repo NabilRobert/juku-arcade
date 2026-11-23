@@ -152,7 +152,6 @@ function finishSetup(level: JlptLevel, classCode: string | null): Promise<void> 
     level,
     classCode,
     bestCombo: 0,
-    bestSetScore: 0,
     playDay: null,
     playMsToday: 0,
     checkUpOfferedDay: null,

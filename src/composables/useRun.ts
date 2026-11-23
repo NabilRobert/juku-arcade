@@ -54,12 +54,10 @@ function syncEvents(state: RunState, syncedCount: number, engine: ReviewEngine):
   return state.events.length;
 }
 
-/** Saves a new best combo or best set score, so they survive the visit (L12). */
+/** Saves a new best combo, so it survives the visit (L12). */
 function saveBests(state: RunState, settings: Settings): Settings {
-  const isBetter =
-    state.bestCombo > settings.bestCombo || state.bestSetScore > settings.bestSetScore;
-  if (!isBetter) return settings;
-  const updated = { ...settings, bestCombo: state.bestCombo, bestSetScore: state.bestSetScore };
+  if (state.bestCombo <= settings.bestCombo) return settings;
+  const updated = { ...settings, bestCombo: state.bestCombo };
   saveSettings(updated).catch((error: unknown) => console.warn('Could not save bests:', error));
   return updated;
 }

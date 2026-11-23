@@ -1,5 +1,7 @@
 // The stats page's numbers, worked out from the event log.
-import { describe, expect, it } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { afterEach, describe, expect, it } from 'vitest';
+import StatsPage from '../src/components/StatsPage.vue';
 import { makeEvent, type GameEvent } from '../src/game/events.ts';
 import { accuracy, countAnswers, playerStats } from '../src/memory/stats.ts';
 import { deckWord } from './helpers/fixtures.ts';
@@ -41,5 +43,27 @@ describe('the stats page', () => {
     expect(stats.mostMissed[0]).toEqual({ word: '先生', reading: 'せんせい', misses: 2 });
     expect(stats.mistakes[0]?.count).toBe(2);
     expect(stats.mistakes[0]?.name).toContain('Long vowels');
+  });
+});
+
+describe('the stats page on screen', () => {
+  afterEach(() => localStorage.clear());
+
+  it('shows the best score: the most banked coins reached in this browser', () => {
+    localStorage.setItem('juku-arcade:best-bank-score', '840');
+    const settings = {
+      playerId: 'p',
+      level: 'N5' as const,
+      classCode: null,
+      bestCombo: 12,
+      playDay: null,
+      playMsToday: 0,
+      checkUpOfferedDay: null,
+    };
+    const deck = { level: 'N5' as const, sourceCommit: 'test', words: WORDS, kanji: {} };
+    const page = mount(StatsPage, { props: { deck, settings, events: EVENTS } });
+    expect(page.text()).toContain('Best score');
+    expect(page.text()).toContain('840');
+    expect(page.text()).not.toContain('Best set');
   });
 });
