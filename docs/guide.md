@@ -540,6 +540,9 @@ fields. They stay in memory until slice 3 stores them.
 - **Change a play report threshold (S3's 5%, S4's 40% and 30%, S6's
   30%):** the constants at the top of `scripts/report/render-play.ts`.
   Specs: `tests/play-report.test.ts`, on hand-built events.
+- **Change how it deploys:** `.github/workflows/deploy.yml` (GitHub Pages,
+  built for the `/juku-arcade/` folder); a class deploy is in
+  `docs/playtest.md`.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.

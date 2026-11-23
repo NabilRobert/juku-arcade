@@ -227,6 +227,16 @@ for a Worker later.
   branch); a self-managed server (a static game needs no server to
   maintain).
 
+**D20 update (2026-11-23):** the public build now deploys to GitHub Pages,
+at <https://nabilrobert.github.io/juku-arcade/>, so anyone can try it.
+`.github/workflows/deploy.yml` runs the CI checks, builds with
+`--base=/juku-arcade/` (Pages serves the game from that folder) and
+deploys on every push to `main`. What that gives up, as above: Pages
+ignores `public/_headers`, so there's no content security policy or cache
+rule, and there's no preview per branch. It also shares browser storage
+with any other site under `nabilrobert.github.io`. Cloudflare Pages stays
+the choice for a class playtest (docs/playtest.md).
+
 ### D21: Licences (open: the code licence)
 
 The data is CC BY-SA 4.0, as OpenJLPT requires, with attribution. The
