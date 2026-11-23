@@ -2,37 +2,21 @@
  * Background music (D50): "You're Not There" by MagiaZ, from Pixabay
  * (Pixabay Content License), looping under the whole game. Browsers only
  * allow sound after the player has touched the page, so it starts on the
- * first press anywhere. Its volume is a setting (0 to 1; 0 is off),
- * remembered in this browser like the mute switch (sfx.ts), which silences
- * the music too. It pauses while the tab is hidden.
+ * first press anywhere. Its volume is its own setting (volume.ts; 0 is
+ * off), and the mute switch (sfx.ts) silences the music too. It pauses while the tab is hidden.
  */
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import { isMuted } from './sfx.ts';
+import { storedVolume } from './volume.ts';
 
 const MUSIC_FILE = 'music/youre-not-there.m4a';
 const VOLUME_KEY = 'juku-arcade:music-volume';
 /** Quiet enough to sit under the card sounds. */
 export const DEFAULT_MUSIC_VOLUME = 0.3;
 
-function readVolume(): number {
-  try {
-    const saved = Number(localStorage.getItem(VOLUME_KEY) ?? Number.NaN);
-    return saved >= 0 && saved <= 1 ? saved : DEFAULT_MUSIC_VOLUME;
-  } catch {
-    return DEFAULT_MUSIC_VOLUME;
-  }
-}
-
-export const musicVolume = ref(readVolume());
-
-export function setMusicVolume(volume: number): void {
-  musicVolume.value = Math.min(1, Math.max(0, volume));
-  try {
-    localStorage.setItem(VOLUME_KEY, String(musicVolume.value));
-  } catch {
-    // Storage can be blocked (a private window); the volume then lasts this visit.
-  }
-}
+const music = storedVolume(VOLUME_KEY, DEFAULT_MUSIC_VOLUME);
+export const musicVolume = music.volume;
+export const setMusicVolume = music.set;
 
 let track: HTMLAudioElement | null = null;
 

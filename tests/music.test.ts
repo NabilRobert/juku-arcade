@@ -2,7 +2,7 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
-import MusicSlider from '../src/components/ui/MusicSlider.vue';
+import SoundSliders from '../src/components/ui/SoundSliders.vue';
 import {
   DEFAULT_MUSIC_VOLUME,
   musicVolume,
@@ -22,12 +22,13 @@ describe('the music volume', () => {
     expect(localStorage.getItem('juku-arcade:music-volume')).toBe('0');
   });
 
-  it('is set by the slider, which shows "off" at zero', async () => {
-    const slider = mount(MusicSlider);
-    await slider.find('input').setValue('40');
+  it('is set by its slider, which shows "off" at zero', async () => {
+    const sliders = mount(SoundSliders);
+    const music = sliders.find('[data-testid="music-volume"]');
+    await music.setValue('40');
     expect(musicVolume.value).toBeCloseTo(0.4);
-    await slider.find('input').setValue('0');
-    expect(slider.text()).toContain('off');
+    await music.setValue('0');
+    expect(sliders.text()).toContain('off');
   });
 });
 

@@ -382,8 +382,10 @@ detected at each class size.
   picked, and a slap when it lands. Every pixel button plays a soft 8-bit
   pip when pressed (`click` in `sfx.ts`, D49). Background music loops
   under the whole game (`sound/music.ts`, D50): it starts on the first
-  press, its volume is the Music slider (`MusicSlider.vue`, in the side
-  panels and Settings), and the sound switch silences it too. The rest are made in code with ZzFX (a tiny MIT
+  press, and the sound switch silences it too. The effects and the music
+  each have a volume slider (`SoundSliders.vue`, one `VolumeSlider.vue`
+  each, in the side panels and Settings), remembered in this browser
+  (`sound/volume.ts`). The rest are made in code with ZzFX (a tiny MIT
   synth): a click when a held card is over a word card, a swish when
   it's thrown, a chime when it hits,
   a buzz on a miss, an arpeggio on a level up. Each match in a combo

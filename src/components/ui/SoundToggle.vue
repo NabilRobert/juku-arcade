@@ -2,12 +2,12 @@
 /**
  * The sound controls, in both modes' side panels: the sound switch, blue
  * while sound is on and red while it's off (it silences the music too), and
- * the music volume slider under it. They sit in their own panel, the button
+ * the effects and music volume sliders under it. They sit in their own panel, the button
  * sized like the Scout button.
  */
 import { isMuted, setMuted } from '../../sound/sfx.ts';
 import PixelButton from './PixelButton.vue';
-import MusicSlider from './MusicSlider.vue';
+import SoundSliders from './SoundSliders.vue';
 import PixelIcon from './PixelIcon.vue';
 
 function toggleSound(): void {
@@ -28,6 +28,6 @@ function toggleSound(): void {
         {{ isMuted ? 'Sound off' : 'Sound on' }}
       </span>
     </PixelButton>
-    <MusicSlider />
+    <SoundSliders />
   </section>
 </template>

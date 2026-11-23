@@ -6,7 +6,7 @@
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
 import PixelButton from './ui/PixelButton.vue';
-import MusicSlider from './ui/MusicSlider.vue';
+import SoundSliders from './ui/SoundSliders.vue';
 
 defineProps<{ settings: Settings }>();
 const emit = defineEmits<{
@@ -47,8 +47,8 @@ function confirmDelete(): void {
       </div>
     </div>
     <div class="max-w-xs space-y-2">
-      <p class="text-sm">Background music</p>
-      <MusicSlider />
+      <p class="text-sm">Volume</p>
+      <SoundSliders />
     </div>
     <div class="space-y-2">
       <PixelButton colour="aqua" class="px-4 py-2" @click="emit('exportData')">

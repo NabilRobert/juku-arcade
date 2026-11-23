@@ -13,6 +13,7 @@
  * this browser only (localStorage): a classroom may need it off.
  */
 import { ref } from 'vue';
+import { storedVolume } from './volume.ts';
 
 /**
  * ZzFX settings, in its order: volume, randomness, frequency, attack,
@@ -66,6 +67,11 @@ export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
  */
 export const SYNTH_VOLUME = 0.6;
 export const RECORDING_VOLUME = 0.9;
+
+/** The effects slider (0 is off), on top of those levels; it starts at full. */
+const effects = storedVolume('juku-arcade:effects-volume', 1);
+export const effectsVolume = effects.volume;
+export const setEffectsVolume = effects.set;
 /**
  * The shuffle recording runs 3 s. A deal plays its first riffle; picking a
  * card plays just its first flick, so it's over before the next pick.
@@ -135,8 +141,9 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, pitch: number, m
   const length = Math.min(buffer.duration, maxS);
   const fade = Math.min(FADE_OUT_S, length / 2);
   const now = context.currentTime;
-  gain.gain.setValueAtTime(RECORDING_VOLUME, now);
-  gain.gain.setValueAtTime(RECORDING_VOLUME, now + length - fade);
+  const volume = RECORDING_VOLUME * effectsVolume.value;
+  gain.gain.setValueAtTime(volume, now);
+  gain.gain.setValueAtTime(volume, now + length - fade);
   gain.gain.linearRampToValueAtTime(0, now + length);
   source.connect(gain).connect(context.destination);
   source.start(now, 0, length);
@@ -153,7 +160,7 @@ async function loadPlayer(): Promise<Player> {
       sound = new ZZFXSound([...SOUNDS[name]]);
       built.set(name, sound);
     }
-    sound.play(1, pitch);
+    sound.play(effectsVolume.value, pitch);
   };
   return async (name, pitch) => {
     const files = RECORDINGS[name];
@@ -168,9 +175,9 @@ async function loadPlayer(): Promise<Player> {
   };
 }
 
-/** Plays a sound unless muted; `pitch` is a playback speed (2 is an octave up). */
+/** Plays a sound unless muted or the effects are off; `pitch` is a playback speed (2 is an octave up). */
 export function playSound(name: SoundName, pitch = 1): void {
-  if (isMuted.value || typeof AudioContext === 'undefined') return;
+  if (isMuted.value || effectsVolume.value === 0 || typeof AudioContext === 'undefined') return;
   player ??= loadPlayer();
   player
     .then((play) => play(name, pitch))

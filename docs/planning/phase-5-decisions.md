@@ -739,9 +739,10 @@ game is its normal use.
 - **Playback:** one looping `<audio>` element (`sound/music.ts`). It
   starts on the first press anywhere, as browsers block sound before
   that, and pauses while the tab is hidden.
-- **Volume:** a Music slider (0 to 100%, 0 is off), in both side panels
-  and in Settings, remembered in this browser; it starts at 30%, under
-  the card sounds. The sound switch silences the music too, so one press
+- **Volume:** a Music slider and an Effects slider (0 to 100%, 0 is off),
+  in both side panels and in Settings, each remembered in this browser
+  (`sound/volume.ts`). Music starts at 30%, under the card sounds; effects
+  start at full. The sound switch silences the music too, so one press
   quiets everything.
 - **Effects over the music:** under the music the effects were hard to
   hear (measured: the track averages about 0.045 at 30%, while a chime
