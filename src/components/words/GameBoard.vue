@@ -164,12 +164,12 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
             />
           </div>
         </div>
-        <!-- The word card's number; once a reading is laid for it, the reading too. -->
+        <!-- The word card's number; once a reading is laid for it, the reading too, on a pixel tag. -->
         <span
-          class="px-1.5 font-sans text-sm font-bold"
+          class="px-2 py-0.5 font-sans text-sm font-bold"
           :class="[
             isMatched(word.id) ? 'invisible' : 'text-aqua/80',
-            queuedReadingAt(position) === undefined ? '' : 'bg-aqua text-sumi',
+            queuedReadingAt(position) === undefined ? '' : 'pixel-panel bg-aqua text-sumi',
           ]"
           :data-testid="`word-label-${position + 1}`"
           aria-hidden="true"

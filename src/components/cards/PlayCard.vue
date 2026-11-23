@@ -246,7 +246,7 @@ function onClick(event: MouseEvent): void {
         <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
         <span
           v-if="(order ?? queuedAs) !== undefined"
-          class="absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi shadow-[0_3px_0_rgb(0_0_0/0.5)]"
+          class="pixel-panel absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi"
           lang="en"
           :data-testid="kind === 'word' ? 'queued-tag' : 'order-tag'"
           >{{ order ?? queuedAs }}</span
