@@ -550,6 +550,10 @@ fields. They stay in memory until slice 3 stores them.
   (the comment there names each one), or point it at a different file in
   `RECORDINGS` (files live in `public/sounds/`). The combo's tune is
   `COMBO_STEPS`.
+- **Show a private picture as the table (a local copy only):** put it in
+  `public/local/` (git ignores that folder) and set `VITE_TABLE_IMAGE` in
+  `.env.local` to its path under `public/`, such as `local/table.webp`
+  (D54). Public builds leave it unset and show the swirl.
 - **Change the music:** put the track in `public/music/` and point
   `MUSIC_FILE` in `sound/music.ts` at it; its starting volume is
   `DEFAULT_MUSIC_VOLUME`. Specs: `tests/music.test.ts`.

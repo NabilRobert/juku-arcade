@@ -823,3 +823,18 @@ starts hidden (`usePixelSnap`), in case the board is ever rebuilt.
 - **Beat:** showing the back as an overlay on the board (more layout
   work for the same result).
 
+### D54: A private table picture for a local copy (settled, 2026-11-23)
+
+A local copy can show a picture as the table instead of the swirl. The
+picture chosen for it is someone else's pixel art, so it must never be
+committed or deployed: it lives in `public/local/`, which git ignores,
+and `.env.local` (also ignored) names it in `VITE_TABLE_IMAGE`. The code
+is a small, general option in `TableBackground.vue`: with the setting,
+it shows the picture (a still image or an animated GIF, which plays on
+its own) pixel-sharp, darkened by a 40% navy wash so the
+cards stand out, and skips the swirl's shader; without it, as in every
+public build (GitHub Pages has neither file), nothing changes.
+
+- **Beat:** committing the picture (not ours to publish); keeping the
+  change as uncommitted edits (in the way of every later commit).
+
