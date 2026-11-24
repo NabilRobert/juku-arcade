@@ -1,7 +1,13 @@
 // The matcher: tales in the shape 起承転結, a different grammar point per line, every line solvable.
 import { describe, expect, it } from 'vitest';
 import { seededRandom } from '../src/game/random.ts';
-import { fillTemplate, fillTile, sentenceText } from '../src/grammar/fill.ts';
+import {
+  fillTemplate,
+  fillTile,
+  markedSentence,
+  markedTile,
+  sentenceText,
+} from '../src/grammar/fill.ts';
 import { isRightOrder } from '../src/grammar/order-check.ts';
 import { makeTale, pickSetting, type Tale } from '../src/grammar/tale.ts';
 import { TEMPLATES, type Template } from '../src/grammar/templates.ts';
@@ -83,6 +89,27 @@ describe('the setting and filling', () => {
       text: '来ませんでした',
       marked: '{来|き}ませんでした',
     });
+  });
+
+  it('gives a tile’s furigana by its text, and the sentence in any tile order', () => {
+    const setting = {
+      ...pickSetting(seededRandom(11)),
+      food: { word: '肉', reading: 'にく', type: 'food' as const },
+    };
+    const eat: Template = {
+      id: 'eat',
+      point: 'o',
+      shelf: 'D',
+      units: [['<food>', 'を'], ['{毎朝|まいあさ}'], ['<食べる:masu>']],
+    };
+    const sentence = fillTemplate(eat, setting);
+    if (sentence === null) throw new Error('the template did not fill');
+    expect(markedTile(sentence, '肉')).toBe('{肉|にく}');
+    expect(markedTile(sentence, 'を')).toBe('を');
+    expect(markedSentence(sentence)).toBe('{肉|にく}を{毎朝|まいあさ}{食|た}べます。');
+    expect(markedSentence(sentence, ['毎朝', '肉', 'を', '食べます'])).toBe(
+      '{毎朝|まいあさ}{肉|にく}を{食|た}べます。',
+    );
   });
 
   it('refuses a filling where two tiles would read the same', () => {

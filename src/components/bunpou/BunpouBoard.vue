@@ -16,7 +16,8 @@
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { BunpouRun } from '../../grammar/bunpou-run.ts';
 import { areHintsShown } from '../../preferences/hints.ts';
-import { POINT_PATTERNS } from '../../grammar/templates.ts';
+import { markedTile } from '../../grammar/fill.ts';
+import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -32,18 +33,14 @@ const emit = defineEmits<{
   resume: [];
 }>();
 
-const PART_NAMES = { S: '起', D: '承', T: '転', P: '結' } as const;
-
 const line = computed(() => props.run.tale.lines[props.run.lineIndex]);
 const isPaused = computed(() => props.run.pausedAtMs !== null);
 const hint = computed(() => (line.value ? POINT_PATTERNS[line.value.point] : undefined));
 const judged = computed(() =>
   props.run.phase === 'judged' ? props.run.results.at(-1) : undefined,
 );
-const markedOf = computed(() => {
-  const marks = new Map(line.value?.tiles.map((tile) => [tile.text, tile.marked]));
-  return (text: string): string => marks.get(text) ?? text;
-});
+const markedOf = (text: string): string =>
+  line.value === undefined ? text : markedTile(line.value, text);
 const canMove = computed(() => props.run.phase === 'building' && !isPaused.value);
 
 /** Tiles placed at least once this line: taken back, they reappear without being dealt again. */
@@ -110,7 +107,7 @@ function dropAt(tile: string, point: Point): void {
   <section class="relative flex flex-col gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
-        line ? PART_NAMES[line.shelf] : ''
+        line ? SHELF_NAMES[line.shelf] : ''
       }}</span>
       <span class="text-sm text-washi/70"
         >{{ run.lineIndex + 1 }} / {{ run.tale.lines.length }}</span

@@ -9,16 +9,14 @@
  */
 import { computed } from 'vue';
 import type { LineResult } from '../../grammar/bunpou-run.ts';
+import { markedSentence, markedTile } from '../../grammar/fill.ts';
 import { POINT_PATTERNS } from '../../grammar/templates.ts';
 import FuriganaText from '../words/FuriganaText.vue';
 
 const props = defineProps<{ result: LineResult }>();
 
-const markedOf = computed(() => {
-  const marks = new Map(props.result.sentence.tiles.map((tile) => [tile.text, tile.marked]));
-  return (text: string): string => marks.get(text) ?? text;
-});
-const fixMarked = computed(() => `${props.result.fix.order.map(markedOf.value).join('')}。`);
+const markedOf = (text: string): string => markedTile(props.result.sentence, text);
+const fixMarked = computed(() => markedSentence(props.result.sentence, props.result.fix.order));
 const isEmpty = computed(() => props.result.answer.every((tile) => tile === null));
 const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point]);
 </script>

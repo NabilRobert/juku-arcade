@@ -28,6 +28,9 @@ import { topicAndObject } from './templates/topic-and-object.ts';
 
 export type Shelf = 'S' | 'D' | 'T' | 'P';
 
+/** Each shelf as the part of the tale it is: 起承転結. */
+export const SHELF_NAMES: Readonly<Record<Shelf, string>> = { S: '起', D: '承', T: '転', P: '結' };
+
 /**
  * Every grammar point with templates, in the order they're taught: a new
  * player's first points are the first ones here (grammar-reviews.ts).

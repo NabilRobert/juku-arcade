@@ -102,3 +102,16 @@ export function fillTemplate(template: Template, setting: Setting): Sentence | n
 export function sentenceText(sentence: Sentence): string {
   return `${sentence.tiles.map((tile) => tile.text).join('')}。`;
 }
+
+/** One of the sentence's tiles, found by its text, with its furigana markup ({先生|せんせい}). */
+export function markedTile(sentence: Sentence, text: string): string {
+  return sentence.tiles.find((tile) => tile.text === text)?.marked ?? text;
+}
+
+/** The sentence with furigana markup, in the template's order or the tile order given, ending 。 */
+export function markedSentence(
+  sentence: Sentence,
+  order: readonly string[] = sentence.tiles.map((tile) => tile.text),
+): string {
+  return `${order.map((text) => markedTile(sentence, text)).join('')}。`;
+}
