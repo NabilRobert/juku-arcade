@@ -99,7 +99,7 @@ describe('the templates’ build check', () => {
       units: [['<who>', 'は'], ['<food>', 'を'], ['<食べる:mashta>']],
     };
     expect(fillProblems([typo])).toEqual([
-      'typo-S: Unknown verb form "mashta" in <食べる:mashta>: use masu, mashita, masen or masenDeshita',
+      'typo-S: Unknown verb form "mashta" in <食べる:mashta>: use masu, mashita, masen, masenDeshita or te',
     ]);
   });
 });
