@@ -25,6 +25,7 @@ import AboutData from './components/AboutData.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
 import KanjiScreen from './components/kanji/KanjiScreen.vue';
+import BunpouScreen from './components/bunpou/BunpouScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import StatsPage from './components/StatsPage.vue';
@@ -40,7 +41,7 @@ const pastEvents = shallowRef<readonly GameEvent[]>([]);
 const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
-/** Word mode or kanji mode (D37), picked on the start screen each time the game opens. */
+/** Word mode, kanji mode (D37) or Bunpou (D56), picked on the start screen each time the game opens. */
 const mode = ref<GameMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
@@ -223,6 +224,16 @@ onMounted(async () => {
             :key="`kanji-${runKey}`"
             class="my-auto"
             :deck="deck"
+            :settings="settings"
+            :is-away="isAway"
+            @leave="page = 'mode'"
+          />
+          <BunpouScreen
+            v-else-if="mode === 'bunpou'"
+            v-show="!isAway"
+            :key="`bunpou-${runKey}`"
+            class="my-auto"
+            :level="deck.level"
             :settings="settings"
             :is-away="isAway"
             @leave="page = 'mode'"
