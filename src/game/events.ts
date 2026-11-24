@@ -71,7 +71,8 @@ export function localDay(at: Date): string {
   return localTimeWithOffset(at).slice(0, 10);
 }
 
-function localTimeWithOffset(at: Date): string {
+/** Local time with its UTC offset, for example 2026-11-21T20:15:03+07:00. */
+export function localTimeWithOffset(at: Date): string {
   const offsetMinutes = -at.getTimezoneOffset();
   const sign = offsetMinutes >= 0 ? '+' : '-';
   const pad = (value: number): string => String(Math.floor(Math.abs(value))).padStart(2, '0');
