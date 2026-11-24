@@ -553,6 +553,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
 | **Tile / strip** | A word or particle the player places; the strip is where placed tiles go | `BunpouTile.vue`, `BunpouBoard.vue` |
+| **Hint** | The line's grammar pattern (人＋と), shown beside 起承転結 unless the player turns hints off | `grammar/hints.ts`, `HintToggle.vue` |
 | **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
 | **Template / slot** | A grammar sentence with gaps (`<who>`, `<place>`, `<食べる:mashita>`) that a tale's setting fills; it tests one grammar point | `grammar/templates.ts`, `fill.ts` |
 | **Shelf / 起承転結** | The four parts of a tale (setup, development, twist, punchline), coded S, D, T, P; each template sits on one shelf, as the shelf map allows | `templates.ts: Shelf`, `bunpou-n5-shelf-map.csv` |
@@ -674,5 +675,9 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Change Bunpou's hint:** what it shows is `hint` in
+  `components/bunpou/BunpouBoard.vue` (the patterns are `POINT_PATTERNS`
+  in `src/grammar/templates.ts`); whether it starts on is
+  `readHintsShown` in `src/grammar/hints.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
   is one.

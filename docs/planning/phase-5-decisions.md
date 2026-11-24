@@ -924,6 +924,13 @@ its time runs out, and the tale is revealed after its last line.
   they lie (the card back, as word mode does, so the table doesn't move),
   and floats the run's last 8 misses with their fixes below it, over
   the page rather than in the layout, with the hint over the combo meter.
+- **Grammar hint** (added 2026-11-24, after playtesting): the line's
+  pattern (人＋と) shows beside 起承転結, as building blind was too hard.
+  It's free and on by default; a switch in the side panel and in
+  Settings turns it off, remembered in this browser (`grammar/hints.ts`).
+  - **Beat:** a paid hint like word mode's Scout (the point is learning
+    the pattern, not saving coins); showing the first tile (gives away
+    the order, which is the exercise).
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.

@@ -2,7 +2,7 @@
 /**
  * Bunpou's table (D56): which part of the tale this line is (起承転結),
  * the line's timer, the strip the tiles are placed on, the combo meter,
- * and the offered tiles. Tap an offered tile to place it at the end, or
+ * the grammar hint (hints.ts) and the offered tiles. Tap an offered tile to place it at the end, or
  * drag it onto the strip where it should go; tap a placed tile to take it
  * back. A missed line shows its fix for a moment.
  *
@@ -13,6 +13,8 @@
  */
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { BunpouRun } from '../../grammar/bunpou-run.ts';
+import { areHintsShown } from '../../grammar/hints.ts';
+import { POINT_PATTERNS } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -31,6 +33,7 @@ const PART_NAMES = { S: '起', D: '承', T: '転', P: '結' } as const;
 
 const line = computed(() => props.run.tale.lines[props.run.lineIndex]);
 const isPaused = computed(() => props.run.pausedAtMs !== null);
+const hint = computed(() => (line.value ? POINT_PATTERNS[line.value.point] : undefined));
 const judged = computed(() =>
   props.run.phase === 'judged' ? props.run.results.at(-1) : undefined,
 );
@@ -73,6 +76,13 @@ function dropAt(tile: string, point: Point): void {
       }}</span>
       <span class="text-sm text-washi/70"
         >{{ run.lineIndex + 1 }} / {{ run.tale.lines.length }}</span
+      >
+      <span
+        v-if="areHintsShown && hint"
+        class="pixel-panel bg-wood/80 px-3 py-1 text-lg text-aqua"
+        lang="ja"
+        data-testid="hint"
+        >{{ hint }}</span
       >
       <span class="pixel-panel h-3 flex-1 bg-lacquer" aria-hidden="true">
         <span class="block h-full bg-aqua" :style="{ width: `${timeLeft * 100}%` }" />

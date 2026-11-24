@@ -17,6 +17,7 @@ import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
+import HintToggle from './HintToggle.vue';
 import TaleReveal from './TaleReveal.vue';
 
 const props = defineProps<{
@@ -73,6 +74,7 @@ function dismiss(isStopping: boolean): void {
           }}</span>
         </StatPanel>
       </div>
+      <HintToggle />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">

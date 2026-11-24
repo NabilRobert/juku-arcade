@@ -4,10 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import BunpouBoard from '../src/components/bunpou/BunpouBoard.vue';
 import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
+import HintToggle from '../src/components/bunpou/HintToggle.vue';
 import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
+import { areHintsShown, setHintsShown } from '../src/grammar/hints.ts';
 import { makeTale } from '../src/grammar/tale.ts';
 import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
 import { useBunpouRun } from '../src/grammar/useBunpouRun.ts';
@@ -94,6 +96,25 @@ describe('Bunpou on screen', () => {
     expect(
       board.find('[data-testid="paused"]').findAll('[data-testid="sentence-fix"]'),
     ).toHaveLength(1);
+  });
+
+  it('hints at the line’s grammar point by its pattern', () => {
+    setHintsShown(true);
+    const run = freshRun();
+    const board = mountBoard(run);
+    expect(board.find('[data-testid="hint"]').text()).toBe(
+      POINT_PATTERNS[rules.currentLine(run).point],
+    );
+  });
+
+  it('hides the hint once the switch turns it off, and remembers that', async () => {
+    setHintsShown(true);
+    const board = mountBoard(freshRun());
+    await mount(HintToggle).trigger('click');
+    expect(areHintsShown.value).toBe(false);
+    expect(localStorage.getItem('juku-arcade:bunpou-hints')).toBe('false');
+    expect(board.find('[data-testid="hint"]').exists()).toBe(false);
+    setHintsShown(true);
   });
 
   it('reveals every line of the tale and asks for the next one', async () => {

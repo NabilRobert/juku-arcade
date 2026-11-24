@@ -1,10 +1,11 @@
 <script setup lang="ts">
 /**
  * Settings (N5, L15): the anonymous player ID (to tell a teacher, if the
- * school asks), the level, and "Delete my data".
+ * school asks), the level, sound, Bunpou's hint, and "Delete my data".
  */
 import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
+import HintToggle from './bunpou/HintToggle.vue';
 import PixelButton from './ui/PixelButton.vue';
 import SoundSliders from './ui/SoundSliders.vue';
 
@@ -49,6 +50,10 @@ function confirmDelete(): void {
     <div class="max-w-xs space-y-2">
       <p class="text-sm">Volume</p>
       <SoundSliders />
+    </div>
+    <div class="space-y-2">
+      <p class="text-sm">Bunpou hint: shows each sentence's grammar point, like 人＋と</p>
+      <HintToggle />
     </div>
     <div class="space-y-2">
       <PixelButton colour="aqua" class="px-4 py-2" @click="emit('exportData')">
