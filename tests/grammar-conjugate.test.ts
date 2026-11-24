@@ -1,6 +1,6 @@
-// Polite verb forms from OpenJLPT's verb classes, for the written word and its reading alike.
+// Polite and て-forms from OpenJLPT's verb classes, for the written word and its reading alike.
 import { describe, expect, it } from 'vitest';
-import { conjugatePolite, type Verb } from '../src/grammar/conjugate.ts';
+import { conjugatePolite, conjugateTe, type Verb } from '../src/grammar/conjugate.ts';
 
 const verb = (word: string, reading: string, verbClass: string): Verb => ({
   word,
@@ -40,5 +40,37 @@ describe('polite forms', () => {
     expect(() => conjugatePolite(verb('勉強する', 'べんきょうする', 'vs-i'), 'masu')).toThrow(
       /conjugate\.ts/,
     );
+  });
+});
+
+describe('the て-form', () => {
+  it('adds て to an ichidan verb’s stem', () => {
+    expect(conjugateTe(verb('食べる', 'たべる', 'v1'))).toEqual({
+      word: '食べて',
+      reading: 'たべて',
+    });
+  });
+
+  it('follows each godan ending', () => {
+    const forms = [
+      verb('買う', 'かう', 'v5u'),
+      verb('待つ', 'まつ', 'v5t'),
+      verb('帰る', 'かえる', 'v5r'),
+      verb('遊ぶ', 'あそぶ', 'v5b'),
+      verb('歩く', 'あるく', 'v5k'),
+      verb('話す', 'はなす', 'v5s'),
+    ].map((each) => conjugateTe(each).word);
+    expect(forms).toEqual(['買って', '待って', '帰って', '遊んで', '歩いて', '話して']);
+  });
+
+  it('makes 行く 行って, not 行いて', () => {
+    expect(conjugateTe(verb('行く', 'いく', 'v5k-s'))).toEqual({
+      word: '行って',
+      reading: 'いって',
+    });
+  });
+
+  it('keeps 来 but reads it き', () => {
+    expect(conjugateTe(verb('来る', 'くる', 'vk'))).toEqual({ word: '来て', reading: 'きて' });
   });
 });

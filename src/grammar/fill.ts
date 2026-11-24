@@ -3,7 +3,7 @@
  * in the setting's words, conjugates the verb, adds furigana on the kanji
  * and keeps the template's tiles and units for the order checker.
  */
-import { conjugatePolite, isPoliteForm } from './conjugate.ts';
+import { conjugate, isVerbForm } from './conjugate.ts';
 import { kanjiFurigana } from './kanji-furigana.ts';
 import { verbByWord, type Noun } from './lexicon.ts';
 import type { OrderRules } from './order-check.ts';
@@ -53,12 +53,12 @@ function tokenWord(match: RegExpMatchArray, setting: Setting): { word: string; r
   if (fixedText !== undefined) return { word: fixedText, reading: fixedReading ?? '' };
   if (name === undefined) throw new Error(`Unreadable template token ${match[0]}`);
   if (form !== undefined) {
-    if (!isPoliteForm(form)) {
+    if (!isVerbForm(form)) {
       throw new Error(
-        `Unknown verb form "${form}" in ${match[0]}: use masu, mashita, masen or masenDeshita`,
+        `Unknown verb form "${form}" in ${match[0]}: use masu, mashita, masen, masenDeshita or te`,
       );
     }
-    return conjugatePolite(verbByWord(name), form);
+    return conjugate(verbByWord(name), form);
   }
   if (!isSlot(name)) {
     throw new Error(`Unknown template slot <${name}>: use one of fill.ts SLOT_TYPES`);

@@ -4,8 +4,9 @@
  * - with a shelf map: every point is in it, and every template sits on a
  *   shelf it allows for its point (the only rules that need the map);
  * - every point with templates has at least 3, on at least 2 shelves;
- * - every template has at least 2 noun+particle units, 3–5 tiles, a
- *   one-tile predicate last, and no two tiles written the same;
+ * - every template has 3–5 tiles, no two written the same; a particle
+ *   point's has at least 2 noun+particle units and a one-tile predicate,
+ *   a pattern point's splits its pattern into pieces (kindProblems);
  * - every tile fills (fillProblems): its verb, verb form and slots exist.
  *
  * scripts/grammar-check.ts runs it on the real templates, and the shelf
@@ -14,13 +15,15 @@
 import { seededRandom } from '../game/random.ts';
 import { fillTile } from './fill.ts';
 import { pickSetting } from './tale.ts';
-import type { Shelf, Template } from './templates.ts';
+import { PATTERN_POINTS, type Shelf, type Template } from './templates.ts';
 
 export const MIN_TEMPLATES_PER_POINT = 3;
 export const MIN_SHELVES_PER_POINT = 2;
 export const MIN_PARTICLE_UNITS = 2;
 export const MIN_TILES = 3;
 export const MAX_TILES = 5;
+/** A pattern point's predicate can carry one pattern piece: 待って｜います, 行きません｜か. */
+export const MAX_PATTERN_PREDICATE_TILES = 2;
 
 /** A grammar id and the shelves the shelf map allows it on. */
 export type ShelfMap = ReadonlyMap<string, readonly Shelf[]>;
@@ -43,22 +46,47 @@ export function parseShelfMap(csv: string): ShelfMap {
   return map;
 }
 
-/** Problems with one template's tiles and units. */
-function shapeProblems(template: Template): string[] {
+/**
+ * The rule that depends on the point's kind (D60): a particle point needs
+ * at least 2 loose noun+particle units and a one-tile predicate; a pattern
+ * point needs at least 2 units, one of them split into pattern pieces, and
+ * a predicate of at most MAX_PATTERN_PREDICATE_TILES.
+ */
+function kindProblems(template: Template): string[] {
   const { id, units } = template;
-  const problems: string[] = [];
-  const tiles = units.flat();
+  const predicateTiles = units[units.length - 1]?.length ?? 0;
+  if (PATTERN_POINTS.has(template.point)) {
+    const problems: string[] = [];
+    if (units.length < 2) problems.push(`${id}: has ${units.length} unit, needs 2`);
+    if (!units.some((unit) => unit.length > 1)) {
+      problems.push(`${id}: splits no unit into pattern pieces`);
+    }
+    if (predicateTiles > MAX_PATTERN_PREDICATE_TILES) {
+      problems.push(
+        `${id}: its predicate has ${predicateTiles} tiles, at most ${MAX_PATTERN_PREDICATE_TILES}`,
+      );
+    }
+    return problems;
+  }
   const particleUnits = units.filter((unit) => unit.length === 2).length;
+  const problems: string[] = [];
   if (particleUnits < MIN_PARTICLE_UNITS) {
     problems.push(`${id}: has ${particleUnits} noun+particle units, needs ${MIN_PARTICLE_UNITS}`);
   }
+  if (predicateTiles !== 1) problems.push(`${id}: its last unit (the predicate) must be one tile`);
+  return problems;
+}
+
+/** Problems with one template's tiles and units. */
+function shapeProblems(template: Template): string[] {
+  const tiles = template.units.flat();
+  const problems = kindProblems(template);
   if (tiles.length < MIN_TILES || tiles.length > MAX_TILES) {
-    problems.push(`${id}: has ${tiles.length} tiles, needs ${MIN_TILES}–${MAX_TILES}`);
+    problems.push(`${template.id}: has ${tiles.length} tiles, needs ${MIN_TILES}–${MAX_TILES}`);
   }
-  if (units[units.length - 1]?.length !== 1) {
-    problems.push(`${id}: its last unit (the predicate) must be one tile`);
+  if (new Set(tiles).size < tiles.length) {
+    problems.push(`${template.id}: two tiles are written the same`);
   }
-  if (new Set(tiles).size < tiles.length) problems.push(`${id}: two tiles are written the same`);
   return [...problems, ...swapProblems(template)];
 }
 

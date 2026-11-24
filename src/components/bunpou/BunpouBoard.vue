@@ -144,8 +144,8 @@ function dropAt(tile: string, point: Point): void {
         <div
           v-for="(tile, index) in run.boxes"
           :key="index"
-          class="flex min-h-16 min-w-20 items-center justify-center border-2 border-dashed"
-          :class="tile === null ? 'border-washi/30' : 'border-transparent'"
+          class="flex h-24 w-48 items-center justify-center outline-2 -outline-offset-2"
+          :class="tile === null ? 'outline-washi/30 outline-dashed' : 'outline-transparent'"
           data-box
         >
           <BunpouTile

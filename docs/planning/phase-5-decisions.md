@@ -1069,3 +1069,39 @@ plan says.
   collection has much in it); haiku picked at random (the plan asks for
   one that fits the tale); modern haiku (copyrighted).
 
+### D60: The first slice's 20 grammar points (G5 content, 2026-11-24)
+
+Bunpou now teaches all 20 first-slice points the shelf map marks: the
+first 10, plus に (destination), ている, て, てから, が (but), から
+(because), なにも・だれも＋ない, てください, ませんか and よ. That's 62
+templates (3–4 a point, on the shelves the map allows), short of the
+plan's "about 70"; a fourth template for the thinner points can follow
+the native check.
+
+- **Pattern points:** the plan says only the tested grammar is split into
+  tiles and everything else comes as ready-made phrases. For the 9
+  points that test a pattern rather than a particle (`PATTERN_POINTS`),
+  only the pattern's pieces are loose: 待って｜います, 食べて｜から、,
+  行きません｜か, 駅に行きました｜が、. Their tile rule (`kindProblems`):
+  3–5 tiles, at least 2 units, one split into pattern pieces, and a
+  predicate of at most 2 tiles. Particle points keep D55's rule (2 loose
+  noun+particle pairs, a one-tile predicate).
+- **The て-form:** the conjugator gains it (`conjugate.ts: conjugateTe`),
+  with 行く's 行って and 来る's 来て; ている, てから and てください are the
+  て-form plus a fixed tile, so no other forms were needed.
+- **Fixed openings:** a が or でも、 clause that must open its line is a
+  fixed unit, so the order checker doesn't accept a reading that turns
+  the meaning around.
+- **Order:** the 10 new points follow the first 10 in the curriculum, in
+  the plan's order, so they arrive through the daily reviews, 3 a day.
+- **Checked:** the grammar check passes against the local shelf map; 50
+  generated tales were read for this decision, and every new template
+  reads as natural Japanese, if the stories are odd (as the plan
+  accepts). The native-speaker check the plan asks for is still to come
+  (arranged outside the code); the tales for it are in
+  `report-output/bunpou-tales-g5.txt` (not committed).
+- **Beat:** quoting speech in 「」 (sentenceText ends every line with 。,
+  which reads oddly after 」); kanji for 何も・誰も (N5 learners usually
+  meet them in kana); plain-form から clauses (one politeness level per
+  tale, as the plan says).
+

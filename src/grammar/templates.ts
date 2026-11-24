@@ -1,6 +1,6 @@
 /**
- * The sentence templates' format and the grammar points (D55, D56): 10
- * points × 3 templates. The templates themselves sit in templates/, one
+ * The sentence templates' format and the grammar points (D55, D56, D60):
+ * the first slice's 20 points, 3–4 templates each. The templates themselves sit in templates/, one
  * file per group of points, so each file stays small as points are added.
  *
  * How a template is written:
@@ -23,8 +23,10 @@
  * point in a pool must be allowed on T.
  */
 import { companyAndBeing } from './templates/company-and-being.ts';
+import { stateAndSequence } from './templates/state-and-sequence.ts';
 import { timeAndPlace } from './templates/time-and-place.ts';
 import { topicAndObject } from './templates/topic-and-object.ts';
+import { turnsAndSpeech } from './templates/turns-and-speech.ts';
 
 export type Shelf = 'S' | 'D' | 'T' | 'P';
 
@@ -47,8 +49,37 @@ export const CURRICULUM = [
   'kara-from',
   'ga-subject',
   'ga-aru-ga-iru',
+  'ni-destination',
+  'te-iru',
+  'te',
+  'te-kara',
+  'ga-but',
+  'kara-reason',
+  'nani-mo-nai-dare-mo-nai',
+  'te-kudasai',
+  'masen-ka',
+  'yo',
 ] as const;
 export type PointId = (typeof CURRICULUM)[number];
+
+/**
+ * Points whose tested grammar is a pattern rather than a particle after
+ * its noun (D60): ている, て, から and so on. Their templates split only
+ * the pattern's pieces into loose tiles (待って｜います, 食べて｜から、)
+ * and give everything else as ready-made phrases, so their tile rules
+ * differ (template-check.ts).
+ */
+export const PATTERN_POINTS: ReadonlySet<PointId> = new Set<PointId>([
+  'te-iru',
+  'te',
+  'te-kara',
+  'ga-but',
+  'kara-reason',
+  'nani-mo-nai-dare-mo-nai',
+  'te-kudasai',
+  'masen-ka',
+  'yo',
+]);
 
 export interface Template {
   id: string;
@@ -65,6 +96,8 @@ export const TEMPLATES: readonly Template[] = [
   ...topicAndObject,
   ...timeAndPlace,
   ...companyAndBeing,
+  ...stateAndSequence,
+  ...turnsAndSpeech,
 ];
 
 /**
@@ -83,4 +116,14 @@ export const POINT_PATTERNS: Readonly<Record<PointId, string>> = {
   'kara-from': '{名詞|めいし}＋から',
   'ga-subject': '{名詞|めいし}＋が',
   'ga-aru-ga-iru': '{場所|ばしょ}＋に＋{名詞|めいし}＋が＋ある・いる',
+  'ni-destination': '{場所|ばしょ}＋に＋{行|い}く・{来|く}る・{帰|かえ}る',
+  'te-iru': '{動詞|どうし}て＋いる',
+  te: '{動詞|どうし}て、～',
+  'te-kara': '{動詞|どうし}て＋から',
+  'ga-but': '～が、～',
+  'kara-reason': '～から、～',
+  'nani-mo-nai-dare-mo-nai': 'なにも・だれも＋ない',
+  'te-kudasai': '{動詞|どうし}て＋ください',
+  'masen-ka': '{動詞|どうし}ませんか',
+  yo: '～よ',
 };

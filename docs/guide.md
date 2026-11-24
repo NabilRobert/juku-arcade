@@ -321,7 +321,7 @@ flowchart LR
   B --> D[rollPlan]
   B --> E[pickTemplates]
   E --> F[fill.ts: fillTemplate]
-  F --> G[conjugate.ts: conjugatePolite]
+  F --> G[conjugate.ts: conjugate]
   F --> H[kanji-furigana.ts: kanjiFurigana]
   F --> I[Sentence: tiles and units]
   I --> J[order-check.ts: isRightOrder]
@@ -338,7 +338,7 @@ flowchart LR
    the tale, and a follow-on template for a second line. If the roll
    doesn't fit, `makeTale` rolls again.
 5. **`fill.ts: fillTemplate`** fills each template's slots, conjugates its
-   verb (**`conjugate.ts: conjugatePolite`**), adds furigana on the kanji
+   verb (**`conjugate.ts: conjugate`**: a polite form or the て-form), adds furigana on the kanji
    only (**`kanji-furigana.ts: kanjiFurigana`**), and keeps its units.
    It refuses a filling where two tiles read the same.
 6. In play, **`order-check.ts: isRightOrder`** judges the player's tile
@@ -605,7 +605,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Shelf / 起承転結** | The four parts of a tale (setup, development, twist, punchline), coded S, D, T, P; each template sits on one shelf, as the shelf map allows | `templates.ts: Shelf`, `bunpou-n5-shelf-map.csv` |
 | **Follow-on** | A template used only as a part's second line, never to open it | `Template.followOn`, `tale.ts: pickTemplates` |
 | **Unit** | Tiles that move together: a noun and its particle, a fixed phrase, or the predicate (last). Units may swap places; inside one, the order is fixed | `order-check.ts` |
-| **Polite form** | ます, ました, ません, ませんでした: the four verb endings N5 sentences use | `grammar/conjugate.ts` |
+| **Polite form / て-form** | ます, ました, ません, ませんでした, and the て-form (食べて) that ている, てから and てください build on: the verb forms templates ask for | `grammar/conjugate.ts` |
+| **Particle point / pattern point** | A particle point tests a particle after its noun (two loose noun+particle pairs); a pattern point tests a pattern like ている or ませんか, with only its pieces loose | `templates.ts: PATTERN_POINTS`, `template-check.ts: kindProblems` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
