@@ -33,10 +33,10 @@ const marked = (result: LineResult): string =>
         <span class="text-2xl text-aqua" lang="ja">{{ PART_NAMES[result.sentence.shelf] }}</span>
         <p
           v-if="result.isRight"
-          class="text-2xl leading-loose [&_ruby]:[ruby-position:under]"
+          class="text-2xl leading-loose"
           :aria-label="sentenceText(result.sentence)"
         >
-          <FuriganaText :marked="marked(result)" />
+          <FuriganaText :marked="marked(result)" is-reading-below />
         </p>
         <SentenceFix v-else :result="result" />
       </li>

@@ -1,6 +1,6 @@
 /**
  * Writes src/fonts/kuronuri.css: the @font-face rules for the Japanese
- * font (Kuronuri, pixel level 70, from @lihbr/kuronuri, OFL; decision D41),
+ * font (Kuronuri, pixel level 35, from @lihbr/kuronuri, OFL; decision D41),
  * keeping only the regular weight the game uses. The package's own
  * stylesheet also carries italic and bold, which makes it three times the
  * size (89 KB against 29 KB gzipped). Each rule covers a range of
@@ -12,8 +12,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-/** How pixelated the font is, from 0 (smooth) to 100 (blockiest); 70 was chosen (D41). */
-const PIXEL_LEVEL = 70;
+/** How pixelated the font is, from 0 (smooth) to 100 (blockiest); 35 since playtest feedback found 70 hard to read (D41). */
+const PIXEL_LEVEL = 35;
 const OUTPUT = 'src/fonts/kuronuri.css';
 
 const packageCss = fileURLToPath(

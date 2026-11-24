@@ -52,7 +52,7 @@ describe('the music track', () => {
     window.dispatchEvent(new Event('pointerdown'));
     expect(played).toHaveLength(1);
     expect(played[0]?.loop).toBe(true);
-    expect(played[0]?.src).toContain('music/youre-not-there.m4a');
+    expect(played[0]?.src).toContain('music/france-instrumental.m4a');
     expect(played[0]?.volume).toBeCloseTo(DEFAULT_MUSIC_VOLUME);
     setMuted(true);
     await nextTick();

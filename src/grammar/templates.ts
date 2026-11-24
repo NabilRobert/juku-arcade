@@ -238,18 +238,19 @@ export const TEMPLATES: readonly Template[] = [
 ];
 
 /**
- * Each point's pattern, shown with a fix. Japanese only (D56):
- * OpenJLPT's patterns carry English, so they're written here.
+ * Each point's pattern, shown as the hint and with a fix. Japanese only
+ * (D56): OpenJLPT's patterns carry English, so they're written here, with
+ * furigana on the kanji in the same {漢字|かんじ} markup as the tiles.
  */
 export const POINT_PATTERNS: Readonly<Record<string, string>> = {
-  wa: '名詞＋は',
-  o: '名詞＋を',
-  'ni-time': '時間＋に',
-  'de-place': '場所＋で',
-  mo: '名詞＋も',
-  made: '名詞＋まで',
-  'to-with': '人＋と',
-  'kara-from': '名詞＋から',
-  'ga-subject': '名詞＋が',
-  'ga-aru-ga-iru': '場所＋に＋名詞＋が＋ある・いる',
+  wa: '{名詞|めいし}＋は',
+  o: '{名詞|めいし}＋を',
+  'ni-time': '{時間|じかん}＋に',
+  'de-place': '{場所|ばしょ}＋で',
+  mo: '{名詞|めいし}＋も',
+  made: '{名詞|めいし}＋まで',
+  'to-with': '{人|ひと}＋と',
+  'kara-from': '{名詞|めいし}＋から',
+  'ga-subject': '{名詞|めいし}＋が',
+  'ga-aru-ga-iru': '{場所|ばしょ}＋に＋{名詞|めいし}＋が＋ある・いる',
 };

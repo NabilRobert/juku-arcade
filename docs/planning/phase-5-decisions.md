@@ -544,8 +544,10 @@ beside the title, on every card back (both kinds) and on the deck.
 
 The Japanese font is Kuronuri (黒塗り, by lihbr, SIL OFL 1.1).
 It's drawn in Redaction's photocopied style and comes in seven
-pixel levels; 70 was chosen, clearly pixelated but easy to read, which
-matters for learners. It covers JIS levels 1 to 4, so it replaces
+pixel levels. 70 was chosen first, clearly pixelated. Playtest
+feedback (2026-11-24) found it hard to read, and its thin serif strokes
+break up worst in small furigana, so the game now uses 35: still
+pixelated at the edges, but each stroke stays whole. It covers JIS levels 1 to 4, so it replaces
 DotGothic16 (D31) and that package is removed.
 
 The npm package (@lihbr/kuronuri) splits the font into character slices,
@@ -557,7 +559,9 @@ draws.
 
 - **Watch:** the package is new (0.0.3, one author). If it breaks, switch
   the font stacks in `style.css` back to DotGothic16.
-- **Beat:** DotGothic16 (D31; Kuronuri's look won); level 100
+- **Beat:** DotGothic16 (D31; Kuronuri's look won); level 70 (hard to
+  read, see above); Fusion Pixel and Stick (compared side by side,
+  2026-11-24); level 100
   (complex kanji like 塾 blur at card size); the package's full stylesheet
   (89 KB gzipped for weights the game never uses).
 
@@ -734,14 +738,15 @@ after trying both in the game, the two-note "select" blip (`click` in
 
 ### D50: Looping background music with a volume slider (settled, 2026-11-23)
 
-The game plays "You're Not There" by MagiaZ on a loop, the track chosen
-for it, from Pixabay under the Pixabay Content License: free to use in a
+The game plays "France Instrumental" by Sub_Clair on a loop (from
+2026-11-24; it replaced "You're Not There" by MagiaZ), from Pixabay under
+the Pixabay Content License: free to use in a
 game, no credit needed (it's credited in the README anyway). The licence
 bars passing the file on by itself, unchanged; shipping it inside the
 game is its normal use.
 
-- **Lighter file:** the 7.7 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
-  (`public/music/youre-not-there.m4a`, 2.9 MB, the full 4 minutes) with
+- **Lighter file:** the 4.2 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
+  (`public/music/france-instrumental.m4a`, 1.6 MB, the full 2:11) with
   macOS's own `afconvert`, so the first load stays reasonable. Every
   major browser plays AAC.
 - **Playback:** one looping `<audio>` element (`sound/music.ts`). It
@@ -760,7 +765,7 @@ game is its normal use.
   `RECORDING_VOLUME` in `sound/sfx.ts`). The music keeps its volume.
 
 - **Beat:** Web Audio buffer looping (gapless, but decodes the whole
-  4-minute track into memory); shipping the original MP3 (2.6 times the
+  track into memory); shipping the original MP3 (2.6 times the
   size); a separate music on/off button (the slider's 0 does that).
 
 ### D51: Cards brush with a soft sound on hover (settled, 2026-11-23)
@@ -889,8 +894,8 @@ tales for a native speaker to read.
 
 The grammar mode, named Bunpou for now, is the start screen's third mode.
 A run offers each line of a generated tale (D55) as shuffled tiles; the
-player places them, the line is judged when the last tile is placed or
-its time runs out, and the tale is revealed after its last line.
+player puts them in the strip's boxes, the line is judged when the last
+box is filled or its time runs out, and the tale is revealed after its last line.
 
 - **Rules as pure functions** (`src/grammar/bunpou-run.ts`), like word
   mode's (D12), with a thin composable (`useBunpouRun.ts`) for the clock,
@@ -905,9 +910,12 @@ its time runs out, and the tale is revealed after its last line.
   `ComboMeter`, `WellbeingGate` and `SoundToggle` as they are. Furigana
   sits under the kanji by styling around `FuriganaText`, which is
   unchanged.
-- **Input:** tap to place at the end, drag to place where the tile is let
-  go, tap a placed tile or press Backspace to take it back, keys 1–5 to
-  place. Dragging uses Motion for Vue, which already throws the cards, and
+- **Input:** tap to put a tile in the first empty box, drag it onto any
+  box (even past empty ones, added 2026-11-24 after playtesting), drag a
+  placed tile to another box to move it (swapping with a tile there) or
+  off the strip to take it back, tap a placed tile or press Backspace to
+  take it back, keys 1–5 to place. A timed-out line's empty boxes stay
+  empty in its fix and are never marked wrong. Dragging uses Motion for Vue, which already throws the cards, and
   the cards' tap-or-drag check (`isDrag`). Beat: a sortable-list library
   (SortableJS or vue-draggable-plus, both MIT), a second drag system for
   one strip; plain pointer events, which would rebuild what Motion does.
@@ -915,8 +923,23 @@ its time runs out, and the tale is revealed after its last line.
   wrong ones marked against the closest right order (`closestFix`), the
   right sentence, and the point's pattern in Japanese only
   (`POINT_PATTERNS`). A timeout with nothing placed shows えーと….
-- **Pause** freezes the line's clock, hides the tiles, and lists the run's
-  last 8 misses with their fixes.
+- **Pause** freezes the line's clock, turns the tiles face down where
+  they lie (the card back, as word mode does, so the table doesn't move),
+  and floats the run's last 8 misses with their fixes below it, over
+  the page rather than in the layout, with the hint over the combo meter.
+- **Grammar hint** (added 2026-11-24, after playtesting): the line's
+  pattern (人＋と) shows beside 起承転結, as building blind was too hard.
+  It's free and on by default; a switch in the side panel and in
+  Settings turns it off, remembered in this browser (`preferences/hints.ts`).
+  - **Beat:** a paid hint like word mode's Scout (the point is learning
+    the pattern, not saving coins); showing the first tile (gives away
+    the order, which is the exercise).
+- **Furigana switch** (added 2026-11-24): Settings can turn furigana off
+  everywhere it shows (Bunpou, and word cards' example sentences), for
+  players who want to read without it. On by default; Kanji mode never
+  shows furigana. It and the hint, like the mute switch, are small on/off
+  choices kept in this browser by one helper (`preferences/stored-flag.ts`),
+  not in the saved settings.
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.

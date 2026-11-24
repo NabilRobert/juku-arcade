@@ -13,6 +13,8 @@ import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
+import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
+import OnOffButton from '../ui/OnOffButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
@@ -73,11 +75,17 @@ function dismiss(isStopping: boolean): void {
           }}</span>
         </StatPanel>
       </div>
+      <OnOffButton
+        label="Hints"
+        :is-on="areHintsShown"
+        data-testid="hint-toggle"
+        @change="setHintsShown"
+      />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Tap the tiles in order, or drag them into place. Tap a placed tile, or press Backspace, to
-        take it back. Keys 1–5 place a tile; Esc pauses.
+        Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
+        tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
     </aside>
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">

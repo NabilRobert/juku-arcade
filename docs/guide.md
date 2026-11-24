@@ -358,12 +358,15 @@ pinned OpenJLPT build.
    (`makeTale`) and starts the run (**`bunpou-run.ts: startBunpouRun`**),
    which offers the first line's tiles shuffled, with a time set by the
    level and the tile count (`sentenceDurationMs`).
-3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the strip
-   and the offered tiles (**`BunpouTile.vue`**). A tap places a tile at the
-   end; a drag drops it where it's let go (`dropAt`); a tap on a placed
-   tile, or Backspace, takes it back. Keys 1–5 place a tile.
-4. **`bunpou-run.ts: placeTile`** judges the line when its last tile is
-   placed; **`checkTime`**, ticked by `useLineClock`, judges it as a miss
+3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the
+   strip of boxes (one per tile, `run.slots`) and the offered tiles
+   (**`BunpouTile.vue`**). A tap puts a tile in the first empty box; a
+   drag drops it in the box it's let go over (`dropAt`, `slotIndexAt`),
+   even past empty ones. A placed tile can be dragged to another box (a
+   tile there swaps places) or off the strip; a tap on it, or Backspace,
+   takes it back. Keys 1–5 place a tile.
+4. **`bunpou-run.ts: placeTile`** judges the line when its last box is
+   filled; **`checkTime`**, ticked by `useLineClock`, judges it as a miss
    when time runs out. A right line adds to the combo and scores
    `pointsFor(combo)`: 100 times the combo rank's multiplier. A miss resets
    the combo and joins the pause list. Levels are word mode's (`levels.ts`).
@@ -384,7 +387,7 @@ pinned OpenJLPT build.
   the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and Kuronuri for
-  Japanese at pixel level 70, from the `@lihbr/kuronuri` package; decisions
+  Japanese at pixel level 35, from the `@lihbr/kuronuri` package; decisions
   D31, D41: `npm run fonts` (`scripts/build-font-css.ts`) keeps its regular
   weight in `src/fonts/kuronuri.css`, which `main.ts` loads after the page
   draws), and
@@ -552,7 +555,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Bootstrap interval** | The range the play effect would likely fall in, found by resampling players 10,000 times | `bootstrapInterval` |
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
-| **Tile / strip** | A word or particle the player places; the strip is where placed tiles go | `BunpouTile.vue`, `BunpouBoard.vue` |
+| **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.slots` |
+| **Hint** | The line's grammar pattern (人＋と), shown beside 起承転結 unless the player turns hints off | `preferences/hints.ts`, `BunpouBoard.vue` |
+| **Preference** | A small on/off choice kept in this browser: sound muted, Bunpou's hint, furigana. Set by an `OnOffButton` | `src/preferences/`, `ui/OnOffButton.vue` |
 | **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
 | **Template / slot** | A grammar sentence with gaps (`<who>`, `<place>`, `<食べる:mashita>`) that a tale's setting fills; it tests one grammar point | `grammar/templates.ts`, `fill.ts` |
 | **Shelf / 起承転結** | The four parts of a tale (setup, development, twist, punchline), coded S, D, T, P; each template sits on one shelf, as the shelf map allows | `templates.ts: Shelf`, `bunpou-n5-shelf-map.csv` |
@@ -674,5 +679,10 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Change Bunpou's hint:** what it shows is `hint` in
+  `components/bunpou/BunpouBoard.vue` (the patterns are `POINT_PATTERNS`
+  in `src/grammar/templates.ts`); whether it starts on is
+  the `storedFlag` fallback in `src/preferences/hints.ts`. Furigana's
+  switch is `src/preferences/furigana.ts`, read by `FuriganaText.vue`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
   is one.

@@ -65,11 +65,14 @@ export function rightOrders(rules: OrderRules): string[][] {
   return bindings.flatMap((units) => unitOrders(units, rules.fixedUnits));
 }
 
-function tilesInPlace(answer: readonly string[], order: readonly string[]): number {
+/** An answer as boxes: a timed-out line can leave some empty (null). */
+type Answer = readonly (string | null)[];
+
+function tilesInPlace(answer: Answer, order: readonly string[]): number {
   return answer.filter((tile, index) => order[index] === tile).length;
 }
 
-export function isRightOrder(answer: readonly string[], rules: OrderRules): boolean {
+export function isRightOrder(answer: Answer, rules: OrderRules): boolean {
   return rightOrders(rules).some(
     (order) => order.length === answer.length && tilesInPlace(answer, order) === order.length,
   );
@@ -78,17 +81,19 @@ export function isRightOrder(answer: readonly string[], rules: OrderRules): bool
 export interface Fix {
   /** The right order closest to the answer: the one with the most tiles already in place. */
   order: string[];
-  /** Positions in the answer whose tile isn't where that right order has it. */
+  /** Positions in the answer whose tile isn't where that right order has it (empty boxes aren't wrong). */
   wrongAt: number[];
 }
 
 /** The fix to show for an answer, even a half-built one (a timeout). */
-export function closestFix(answer: readonly string[], rules: OrderRules): Fix {
+export function closestFix(answer: Answer, rules: OrderRules): Fix {
   const orders = rightOrders(rules);
   let order = orders[0] ?? [];
   for (const candidate of orders) {
     if (tilesInPlace(answer, candidate) > tilesInPlace(answer, order)) order = candidate;
   }
-  const wrongAt = answer.flatMap((tile, index) => (order[index] === tile ? [] : [index]));
+  const wrongAt = answer.flatMap((tile, index) =>
+    tile === null || order[index] === tile ? [] : [index],
+  );
   return { order, wrongAt };
 }

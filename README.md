@@ -29,13 +29,13 @@ Pages (`.github/workflows/deploy.yml`).
 
 ## Layout
 
-| Folder     | What it holds                                                                                                         |
-| ---------- | --------------------------------------------------------------------------------------------------------------------- |
-| `src/`     | The game: rules in plain TypeScript (`game/`, `kanji/`, `bank-run/`, `memory/`, `grammar/`), screens in `components/` |
-| `scripts/` | The deck and font builds, and the reports made from exported play data                                                |
-| `public/`  | Fonts, card sounds, music and hosting headers                                                                         |
-| `tests/`   | Vitest specs, one behaviour each                                                                                      |
-| `docs/`    | The guides and planning documents below                                                                               |
+| Folder     | What it holds                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`     | The game: rules in plain TypeScript (`game/`, `kanji/`, `bank-run/`, `memory/`, `grammar/`, `preferences/`), screens in `components/` |
+| `scripts/` | The deck and font builds, and the reports made from exported play data                                                                |
+| `public/`  | Fonts, card sounds, music and hosting headers                                                                                         |
+| `tests/`   | Vitest specs, one behaviour each                                                                                                      |
+| `docs/`    | The guides and planning documents below                                                                                               |
 
 ## Read more
 
@@ -52,6 +52,6 @@ Word data comes from [OpenJLPT](https://github.com/evanclan/OpenJLPT)
 (CC BY-SA 4.0), which uses JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's
 JLPT lists, and Tatoeba; the generated decks are CC BY-SA 4.0 too. The
 fonts are balatro and Kuronuri (both OFL), and the card sounds are from
-Kenney's Casino Audio pack (CC0). The music is "You're Not There" by
-MagiaZ, from [Pixabay](https://pixabay.com/music/rock-youx27re-not-there-320953/)
+Kenney's Casino Audio pack (CC0). The music is "France Instrumental" by
+Sub_Clair, from [Pixabay](https://pixabay.com/music/france-france-instrumental-633138/)
 (Pixabay Content License). No licence yet for the code.

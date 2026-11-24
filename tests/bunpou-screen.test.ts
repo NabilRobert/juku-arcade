@@ -6,8 +6,10 @@ import BunpouBoard from '../src/components/bunpou/BunpouBoard.vue';
 import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
 import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
+import { parseFurigana } from '../src/deck/furigana.ts';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
+import { setHintsShown } from '../src/preferences/hints.ts';
 import { makeTale } from '../src/grammar/tale.ts';
 import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
 import { useBunpouRun } from '../src/grammar/useBunpouRun.ts';
@@ -29,6 +31,14 @@ function missedRun(): rules.BunpouRun {
   return [second, first, ...rest].reduce((built, tile) => rules.placeTile(built, tile), run);
 }
 
+/** The line's grammar pattern as it reads, without its furigana markup. */
+function patternOf(run: rules.BunpouRun): string {
+  const marked = POINT_PATTERNS[rules.currentLine(run).point] ?? '';
+  return parseFurigana(marked)
+    .map((piece) => piece.text)
+    .join('');
+}
+
 /** An element's text without its furigana (the <rt> readings). */
 function withoutFurigana(element: Element): string {
   const copy = element.cloneNode(true) as Element;
@@ -38,7 +48,7 @@ function withoutFurigana(element: Element): string {
 
 const mountBoard = (run: rules.BunpouRun) =>
   mount(BunpouBoard, {
-    props: { run, unplaced: run.offered.filter((tile) => !run.placed.includes(tile)), timeLeft: 1 },
+    props: { run, unplaced: run.offered.filter((tile) => !run.slots.includes(tile)), timeLeft: 1 },
   });
 
 afterEach(() => {
@@ -69,7 +79,27 @@ describe('Bunpou on screen', () => {
     expect(withoutFurigana(fix.find('[data-testid="fix"]').element)).toContain(
       rightOrder(run).join(''),
     );
-    expect(fix.text()).toContain(POINT_PATTERNS[rules.currentLine(run).point]);
+    expect(withoutFurigana(fix.element)).toContain(patternOf(run));
+  });
+
+  it('shows one box per tile, empty until a tile is put in it', () => {
+    const run = freshRun();
+    const last = run.offered[0] ?? '';
+    const board = mountBoard(rules.placeTile(run, last, run.slots.length - 1));
+    const boxes = board.findAll('[data-slot]');
+    expect(boxes).toHaveLength(run.offered.length);
+    expect(boxes.at(-1)?.find('button').exists()).toBe(true);
+    expect(boxes[0]?.find('button').exists()).toBe(false);
+  });
+
+  it('keeps a timed-out line’s empty boxes empty in its fix', () => {
+    const run = freshRun();
+    const half = rules.placeTile(run, rightOrder(run)[0] ?? '');
+    const result = rules.checkTime(half, half.deadlineMs).results[0];
+    if (result === undefined) throw new Error('the line did not time out');
+    const fix = mount(SentenceFix, { props: { result } });
+    expect(fix.findAll('[data-empty]')).toHaveLength(run.offered.length - 1);
+    expect(fix.findAll('[data-wrong]')).toHaveLength(0);
   });
 
   it('shows えーと… for a line that timed out with nothing placed', () => {
@@ -79,15 +109,38 @@ describe('Bunpou on screen', () => {
     expect(mount(SentenceFix, { props: { result } }).text()).toContain('えーと…');
   });
 
-  it('hides the tiles while paused and lists the run’s misses', () => {
+  it('turns the tiles face down in place while paused and lists the run’s misses', () => {
     const judged = missedRun();
     const paused = rules.pause(rules.nextLine(judged, 0, seededRandom(1)), 0);
     const board = mountBoard(paused);
-    expect(board.find('[data-testid="offered"]').exists()).toBe(false);
-    expect(board.find('[data-testid="strip"]').exists()).toBe(false);
+    const offered = board.find('[data-testid="offered"]').findAll('button');
+    expect(offered.length).toBeGreaterThan(0);
+    for (const tile of offered) {
+      expect(tile.attributes('aria-label')).toBe('Face-down tile');
+      expect(tile.attributes('disabled')).toBeDefined();
+    }
+    expect(board.find('[data-testid="strip"]').exists()).toBe(true);
+    expect(board.find('[data-testid="pause-hint"]').exists()).toBe(true);
     expect(
       board.find('[data-testid="paused"]').findAll('[data-testid="sentence-fix"]'),
     ).toHaveLength(1);
+  });
+
+  it('hints at the line’s grammar point by its pattern', () => {
+    setHintsShown(true);
+    const run = freshRun();
+    const board = mountBoard(run);
+    expect(withoutFurigana(board.find('[data-testid="hint"]').element)).toBe(patternOf(run));
+  });
+
+  it('hides the hint once hints are turned off, and remembers that', async () => {
+    setHintsShown(true);
+    const board = mountBoard(freshRun());
+    setHintsShown(false);
+    await nextTick();
+    expect(localStorage.getItem('juku-arcade:bunpou-hints')).toBe('false');
+    expect(board.find('[data-testid="hint"]').exists()).toBe(false);
+    setHintsShown(true);
   });
 
   it('reveals every line of the tale and asks for the next one', async () => {
@@ -118,9 +171,9 @@ describe('Bunpou’s keys and pacing', () => {
     const { host, game } = mountRun();
     const first = game.unplaced.value[0];
     window.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
-    expect(game.run.value.placed).toEqual([first]);
+    expect(rules.placedTiles(game.run.value)).toEqual([first]);
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
-    expect(game.run.value.placed).toEqual([]);
+    expect(rules.placedTiles(game.run.value)).toEqual([]);
     host.unmount();
   });
 

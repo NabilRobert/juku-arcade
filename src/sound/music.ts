@@ -1,6 +1,6 @@
 /**
- * Background music (D50): "You're Not There" by MagiaZ, from Pixabay
- * (Pixabay Content License), looping under the whole game. Browsers only
+ * Background music (D50): "France Instrumental" by Sub_Clair, from
+ * Pixabay (Pixabay Content License), looping under the whole game. Browsers only
  * allow sound after the player has touched the page, so it starts on the
  * first press anywhere. Its volume is its own setting (volume.ts; 0 is
  * off), and the mute switch (sfx.ts) silences the music too. It pauses while the tab is hidden.
@@ -9,7 +9,7 @@ import { watch } from 'vue';
 import { isMuted } from './sfx.ts';
 import { storedVolume } from './volume.ts';
 
-const MUSIC_FILE = 'music/youre-not-there.m4a';
+const MUSIC_FILE = 'music/france-instrumental.m4a';
 const VOLUME_KEY = 'juku-arcade:music-volume';
 /** Quiet enough to sit under the card sounds. */
 export const DEFAULT_MUSIC_VOLUME = 0.3;

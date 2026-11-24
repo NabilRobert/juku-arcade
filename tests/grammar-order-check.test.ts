@@ -72,4 +72,9 @@ describe('the fix for a wrong order', () => {
       wrongAt: [0, 1],
     });
   });
+
+  it('never marks an empty box as wrong', () => {
+    const fix = closestFix(['来ます', null, null, null, null], wakeUp);
+    expect(fix.wrongAt).toEqual([0]);
+  });
 });
