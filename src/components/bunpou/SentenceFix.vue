@@ -22,11 +22,7 @@ const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point] ?? ''
 </script>
 
 <template>
-  <div
-    class="flex flex-col gap-1 [&_ruby]:[ruby-position:under]"
-    lang="ja"
-    data-testid="sentence-fix"
-  >
+  <div class="flex flex-col gap-1" lang="ja" data-testid="sentence-fix">
     <p class="flex flex-wrap items-center gap-2 text-2xl leading-loose">
       <span v-if="result.answer.length === 0" class="text-washi/70">えーと…</span>
       <span
@@ -35,11 +31,11 @@ const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point] ?? ''
         class="px-1"
         :class="result.fix.wrongAt.includes(index) ? 'bg-crimson text-washi' : 'text-washi/80'"
         :data-wrong="result.fix.wrongAt.includes(index) ? '' : undefined"
-        ><FuriganaText :marked="markedOf(tile)"
+        ><FuriganaText :marked="markedOf(tile)" is-reading-below
       /></span>
     </p>
     <p class="text-2xl leading-loose text-aqua" data-testid="fix">
-      → <FuriganaText :marked="fixMarked" />
+      → <FuriganaText :marked="fixMarked" is-reading-below />
     </p>
     <p class="text-base text-washi/70">{{ pattern }}</p>
   </div>

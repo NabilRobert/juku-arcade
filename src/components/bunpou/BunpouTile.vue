@@ -50,13 +50,13 @@ function onRelease(info: PanInfo): void {
   >
     <button
       type="button"
-      class="pixel-button min-w-20 px-5 pt-3 pb-5 text-4xl text-sumi [&_ruby]:[ruby-position:under]"
+      class="pixel-button min-w-20 px-5 pt-3 pb-[1.1em] text-4xl text-sumi"
       :class="isWrong ? 'bg-crimson text-washi' : 'washi'"
       :data-wrong="isWrong === true ? '' : undefined"
       @pointerdown="onPress"
       @click="onClick"
     >
-      <FuriganaText :marked="marked" />
+      <FuriganaText :marked="marked" is-reading-below />
     </button>
     <span v-if="number !== undefined" class="absolute -top-2 -left-2 text-xs text-aqua">{{
       number
