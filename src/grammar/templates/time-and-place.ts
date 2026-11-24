@@ -1,5 +1,6 @@
 /**
- * Bunpou sentence templates (D55): When and where: に for a time, で for a place, まで and から.
+ * Bunpou sentence templates (D55, D60): When and where: に for a time and for a destination,
+ * で for a place, まで and から.
  * The format is in ../templates.ts; TEMPLATES there joins every group.
  */
 import type { Template } from '../templates.ts';
@@ -85,5 +86,30 @@ export const timeAndPlace: readonly Template[] = [
     point: 'kara-from',
     shelf: 'P',
     units: [['<who2>', 'が'], ['<place>', 'から'], ['<来る:mashita>']],
+  },
+  // に (destination)
+  {
+    id: 'nidest-D-go',
+    point: 'ni-destination',
+    shelf: 'D',
+    units: [['<who>', 'は'], ['<place>', 'に'], ['<行く:mashita>']],
+  },
+  {
+    id: 'nidest-D-together',
+    point: 'ni-destination',
+    shelf: 'D',
+    units: [['<who2>', 'と'], ['<place>', 'に'], ['<行く:masu>']],
+  },
+  {
+    id: 'nidest-P-home',
+    point: 'ni-destination',
+    shelf: 'P',
+    units: [['<who>', 'は'], ['{家|いえ}', 'に'], ['<帰る:mashita>']],
+  },
+  {
+    id: 'nidest-P-stayed-away',
+    point: 'ni-destination',
+    shelf: 'P',
+    units: [['<who2>', 'も'], ['<place>', 'に'], ['<来る:masenDeshita>']],
   },
 ];

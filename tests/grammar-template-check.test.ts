@@ -17,6 +17,16 @@ const SHELF_MAP = parseShelfMap(
     'kara-from,Core particles,setting,D;P,yes',
     'ga-subject,Core particles,setting,S;T,yes',
     'ga-aru-ga-iru,Description and state,setting,S;T,yes',
+    'ni-destination,Core particles,setting,D;P,yes',
+    'te-iru,Description and state,setting,S;T,yes',
+    'te,Time and sequence,action,D;T,yes',
+    'te-kara,Time and sequence,action,D;T,yes',
+    'ga-but,Contrast and reason,turn,T;P,yes',
+    'kara-reason,Contrast and reason,turn,T;P,yes',
+    'nani-mo-nai-dare-mo-nai,Negation and degree,turn,T;P,yes',
+    'te-kudasai,Requests and speech,speech,D;P,yes',
+    'masen-ka,Requests and speech,speech,D;P,yes',
+    'yo,Requests and speech,speech,D;P,yes',
   ].join('\n'),
 );
 
@@ -101,5 +111,32 @@ describe('the templates’ build check', () => {
     expect(fillProblems([typo])).toEqual([
       'typo-S: Unknown verb form "mashta" in <食べる:mashta>: use masu, mashita, masen, masenDeshita or te',
     ]);
+  });
+
+  it('lets a pattern point split its pattern instead of having noun+particle pairs', () => {
+    const waiting: Template = {
+      id: 'teiru-x',
+      point: 'te-iru',
+      shelf: 'S',
+      units: [['<who>は'], ['<place>', 'で'], ['<待つ:te>', 'います']],
+    };
+    expect(templateProblems([waiting], null)).not.toContain(
+      'teiru-x: has 1 noun+particle units, needs 2',
+    );
+    expect(templateProblems([waiting], null)).not.toContain(
+      'teiru-x: its last unit (the predicate) must be one tile',
+    );
+  });
+
+  it('fails a pattern template that splits nothing', () => {
+    const whole: Template = {
+      id: 'teiru-y',
+      point: 'te-iru',
+      shelf: 'S',
+      units: [['<who>は'], ['<place>で'], ['<待つ:te>います']],
+    };
+    expect(templateProblems([whole], null)).toContain(
+      'teiru-y: splits no unit into pattern pieces',
+    );
   });
 });
