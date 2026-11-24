@@ -14,7 +14,7 @@
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import { FIRST_LEVEL, levelAfterMatch, levelAfterMiss } from '../game/levels.ts';
 import { MISSED_TRAY_SIZE } from '../game/tuning.ts';
-import { rankFor } from '../components/ui/combo-ranks.ts';
+import { rankFor, type RankLetter } from '../components/ui/combo-ranks.ts';
 import type { Sentence } from './fill.ts';
 import { closestFix, isRightOrder, type Fix } from './order-check.ts';
 import type { Tale } from './tale.ts';
@@ -24,7 +24,7 @@ export const SECONDS_PER_TILE_BY_LEVEL = [8, 6, 4.4, 3.4, 2.4] as const;
 /** Points for a right sentence, before the rank multiplier. */
 export const POINTS_PER_SENTENCE = 100;
 /** The score multiplier at each combo rank (combo-ranks.ts); below F, ×1. */
-export const RANK_MULTIPLIERS: Readonly<Record<string, number>> = {
+export const RANK_MULTIPLIERS: Readonly<Record<RankLetter, number>> = {
   F: 1,
   E: 1.25,
   D: 1.5,
@@ -88,7 +88,7 @@ export function currentLine(run: BunpouRun): Sentence {
 /** Points for a right sentence that took the combo to `combo`. */
 export function pointsFor(combo: number): number {
   const letter = rankFor(combo).rank?.letter;
-  const multiplier = letter === undefined ? 1 : (RANK_MULTIPLIERS[letter] ?? 1);
+  const multiplier = letter === undefined ? 1 : RANK_MULTIPLIERS[letter];
   return Math.round(POINTS_PER_SENTENCE * multiplier);
 }
 

@@ -16,7 +16,7 @@ import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import * as rules from './bunpou-run.ts';
 import { makeTaleFromRanking } from './tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from './templates.ts';
+import { CURRICULUM, TEMPLATES } from './templates.ts';
 
 /** How long a right line shows before the next one. */
 const RIGHT_SHOWN_MS = 700;
@@ -24,8 +24,6 @@ const RIGHT_SHOWN_MS = 700;
 const WRONG_SHOWN_MS = 3000;
 /** Often enough for a smooth timer bar and a prompt timeout. */
 const TICK_MS = 100;
-/** Every grammar point with templates, in curriculum order (the order they're introduced). */
-export const BUNPOU_POINTS: readonly string[] = Object.keys(POINT_PATTERNS);
 
 export interface BunpouRunOptions {
   random?: RandomSource;
@@ -91,7 +89,7 @@ function useJudgedLines(run: RunRef, options: Required<BunpouRunOptions>): void 
 export function useBunpouRun(options: BunpouRunOptions = {}) {
   const settled: Required<BunpouRunOptions> = {
     random: options.random ?? Math.random,
-    pointsByPriority: options.pointsByPriority ?? (() => BUNPOU_POINTS),
+    pointsByPriority: options.pointsByPriority ?? (() => CURRICULUM),
     onJudged: options.onJudged ?? (() => undefined),
   };
   const { random } = settled;

@@ -4,7 +4,7 @@ import { seededRandom } from '../src/game/random.ts';
 import { fillTemplate, fillTile, sentenceText } from '../src/grammar/fill.ts';
 import { isRightOrder } from '../src/grammar/order-check.ts';
 import { makeTale, pickSetting, type Tale } from '../src/grammar/tale.ts';
-import { TEMPLATES } from '../src/grammar/templates.ts';
+import { TEMPLATES, type Template } from '../src/grammar/templates.ts';
 
 const G0_POINTS = ['wa', 'o', 'ni-time', 'de-place', 'mo'];
 const TALES_TO_CHECK = 100;
@@ -90,10 +90,10 @@ describe('the setting and filling', () => {
       ...pickSetting(seededRandom(11)),
       food: { word: 'パン', reading: 'パン', type: 'food' as const },
     };
-    const clash = {
+    const clash: Template = {
       id: 'clash',
       point: 'mo',
-      shelf: 'T' as const,
+      shelf: 'T',
       units: [['<food>', 'も'], ['パン', 'を'], ['<買う:masu>']],
     };
     expect(fillTemplate(clash, setting)).toBeNull();

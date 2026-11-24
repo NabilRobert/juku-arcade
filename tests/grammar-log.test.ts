@@ -7,8 +7,7 @@ import BunpouScreen from '../src/components/bunpou/BunpouScreen.vue';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { TEMPLATES } from '../src/grammar/templates.ts';
-import { BUNPOU_POINTS } from '../src/grammar/useBunpouRun.ts';
+import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 import { useGrammarReviews } from '../src/grammar/useGrammarReviews.ts';
 import { deleteAllData, loadGrammarEvents, type Settings } from '../src/memory/storage.ts';
 
@@ -24,7 +23,7 @@ const SETTINGS: Settings = {
 
 function judgedLine(isRightOrder: boolean): rules.LineResult {
   const random = seededRandom(4);
-  const run = rules.startBunpouRun(makeTale(BUNPOU_POINTS, TEMPLATES, random), 0, random);
+  const run = rules.startBunpouRun(makeTale(CURRICULUM, TEMPLATES, random), 0, random);
   const right = rules.currentLine(run).tiles.map((tile) => tile.text);
   const [first = '', second = '', ...rest] = right;
   const order = isRightOrder ? right : [second, first, ...rest];
@@ -37,7 +36,7 @@ function judgedLine(isRightOrder: boolean): rules.LineResult {
 describe('the grammar log', () => {
   it('logs a wrong line with its point, outcome, broken rule and answer, and saves it', async () => {
     await deleteAllData();
-    const reviews = useGrammarReviews(BUNPOU_POINTS, SETTINGS, []);
+    const reviews = useGrammarReviews(CURRICULUM, SETTINGS, []);
     const result = judgedLine(false);
     reviews.logJudged(result, 5200);
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -56,7 +55,7 @@ describe('the grammar log', () => {
   });
 
   it('updates today’s grammar and the run’s lines as soon as a line is judged', () => {
-    const reviews = useGrammarReviews(BUNPOU_POINTS, SETTINGS, []);
+    const reviews = useGrammarReviews(CURRICULUM, SETTINGS, []);
     reviews.logJudged(judgedLine(true), 3000);
     reviews.logJudged(judgedLine(false), 3000);
     expect(reviews.progress.value.pointsSeen).toBe(1);

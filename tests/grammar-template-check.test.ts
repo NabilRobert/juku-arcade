@@ -1,7 +1,7 @@
 // The templates' build check: shelves the shelf map allows, enough templates, the agreed tile shape.
 import { describe, expect, it } from 'vitest';
 import { fillProblems, parseShelfMap, templateProblems } from '../src/grammar/template-check.ts';
-import { POINT_PATTERNS, TEMPLATES, type Template } from '../src/grammar/templates.ts';
+import { CURRICULUM, TEMPLATES, type Template } from '../src/grammar/templates.ts';
 
 // The rows of the points with templates, as they are in bunpou-n5-shelf-map.csv.
 const SHELF_MAP = parseShelfMap(
@@ -37,9 +37,9 @@ describe('the templates’ build check', () => {
     expect(templateProblems(TEMPLATES, SHELF_MAP)).toEqual([]);
   });
 
-  it('has a Japanese pattern for every point a template tests', () => {
-    const missing = TEMPLATES.filter((template) => POINT_PATTERNS[template.point] === undefined);
-    expect(missing.map((template) => template.point)).toEqual([]);
+  it('has templates for every point in the curriculum', () => {
+    const taught = new Set(TEMPLATES.map((template) => template.point));
+    expect(CURRICULUM.filter((point) => !taught.has(point))).toEqual([]);
   });
 
   it('fails a template on a shelf its point isn’t mapped to', () => {
@@ -72,8 +72,11 @@ describe('the templates’ build check', () => {
   });
 
   it('fails a point the shelf map doesn’t have', () => {
-    expect(templateProblems(threeGood({ point: 'ya' }), SHELF_MAP)).toContain(
-      "ya: isn't in the shelf map",
+    const onlyWa = parseShelfMap(
+      'grammar_id,group,kind,shelves,in_first_slice\nwa,Core particles,setting,S;D;P,yes',
+    );
+    expect(templateProblems(threeGood({ point: 'o' }), onlyWa)).toContain(
+      "o: isn't in the shelf map",
     );
   });
 

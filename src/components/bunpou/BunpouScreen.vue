@@ -18,7 +18,8 @@ import { endsChapter, TALES_PER_CHAPTER } from '../../grammar/performance.ts';
 import { FORGOT_LINE } from '../../grammar/usePerformance.ts';
 import { playSound } from '../../sound/sfx.ts';
 import type { GrammarEvent } from '../../grammar/grammar-events.ts';
-import { BUNPOU_POINTS, useBunpouRun } from '../../grammar/useBunpouRun.ts';
+import { CURRICULUM } from '../../grammar/templates.ts';
+import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
 import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
@@ -47,7 +48,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
 
-const reviews = useGrammarReviews(BUNPOU_POINTS, props.settings, props.pastGrammarEvents);
+const reviews = useGrammarReviews(CURRICULUM, props.settings, props.pastGrammarEvents);
 const game = useBunpouRun({
   pointsByPriority: reviews.pointsByPriority,
   onJudged: reviews.logJudged,

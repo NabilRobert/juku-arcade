@@ -16,9 +16,9 @@ import {
   poseFor,
 } from '../src/grammar/performance.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 
-const POINTS = Object.keys(POINT_PATTERNS);
+const POINTS = CURRICULUM;
 
 /** A tale's results: each line built right, wrong (first two tiles swapped) or left to time out. */
 function taleResults(plan: readonly ('right' | 'wrong' | 'timeout')[]): rules.LineResult[] {

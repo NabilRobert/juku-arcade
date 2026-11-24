@@ -7,7 +7,7 @@ import { conjugatePolite, isPoliteForm } from './conjugate.ts';
 import { kanjiFurigana } from './kanji-furigana.ts';
 import { verbByWord, type Noun } from './lexicon.ts';
 import type { OrderRules } from './order-check.ts';
-import type { Shelf, Template } from './templates.ts';
+import type { PointId, Shelf, Template } from './templates.ts';
 
 /** The slots a template can use, and the noun type that fills each. */
 export const SLOT_TYPES = {
@@ -34,7 +34,7 @@ export interface Tile {
 
 export interface Sentence extends OrderRules {
   templateId: string;
-  point: string;
+  point: PointId;
   shelf: Shelf;
   /** The tiles in the template's own (right) order. */
   tiles: Tile[];

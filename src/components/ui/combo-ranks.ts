@@ -5,10 +5,12 @@
  * action games; the words and thresholds here are our own.
  */
 
+export type RankLetter = 'F' | 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS' | 'SSS';
+
 export interface ComboRank {
   /** The combo this rank starts at. */
   from: number;
-  letter: string;
+  letter: RankLetter;
   praise: string;
   /** What the praise means, for the card's title. */
   meaning: string;

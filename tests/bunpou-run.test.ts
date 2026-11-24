@@ -17,9 +17,9 @@ import {
   type BunpouRun,
 } from '../src/grammar/bunpou-run.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 
-const POINTS = Object.keys(POINT_PATTERNS);
+const POINTS = CURRICULUM;
 const random = seededRandom(5);
 const START_MS = 1000;
 

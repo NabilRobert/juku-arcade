@@ -10,10 +10,10 @@ import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
 import { setHintsShown } from '../src/preferences/hints.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
 import { useBunpouRun } from '../src/grammar/useBunpouRun.ts';
 
-const POINTS = Object.keys(POINT_PATTERNS);
+const POINTS = CURRICULUM;
 
 function freshRun(): rules.BunpouRun {
   const random = seededRandom(9);
@@ -32,7 +32,7 @@ function missedRun(): rules.BunpouRun {
 
 /** The line's grammar pattern as it reads, without its furigana markup. */
 function patternOf(run: rules.BunpouRun): string {
-  const marked = POINT_PATTERNS[rules.currentLine(run).point] ?? '';
+  const marked = POINT_PATTERNS[rules.currentLine(run).point];
   return parseFurigana(marked)
     .map((piece) => piece.text)
     .join('');

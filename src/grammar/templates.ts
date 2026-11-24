@@ -23,10 +23,29 @@
 
 export type Shelf = 'S' | 'D' | 'T' | 'P';
 
+/**
+ * Every grammar point with templates, in the order they're taught: a new
+ * player's first points are the first ones here (grammar-reviews.ts).
+ * The ids are OpenJLPT's, as in the shelf map.
+ */
+export const CURRICULUM = [
+  'wa',
+  'o',
+  'ni-time',
+  'de-place',
+  'mo',
+  'made',
+  'to-with',
+  'kara-from',
+  'ga-subject',
+  'ga-aru-ga-iru',
+] as const;
+export type PointId = (typeof CURRICULUM)[number];
+
 export interface Template {
   id: string;
-  /** The OpenJLPT grammar id the template tests, as in the shelf map. */
-  point: string;
+  /** The grammar point the template tests. */
+  point: PointId;
   shelf: Shelf;
   units: readonly (readonly string[])[];
   followOn?: boolean;
@@ -242,7 +261,7 @@ export const TEMPLATES: readonly Template[] = [
  * (D56): OpenJLPT's patterns carry English, so they're written here, with
  * furigana on the kanji in the same {漢字|かんじ} markup as the tiles.
  */
-export const POINT_PATTERNS: Readonly<Record<string, string>> = {
+export const POINT_PATTERNS: Readonly<Record<PointId, string>> = {
   wa: '{名詞|めいし}＋は',
   o: '{名詞|めいし}＋を',
   'ni-time': '{時間|じかん}＋に',

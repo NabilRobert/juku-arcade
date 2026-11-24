@@ -20,7 +20,7 @@ const markedOf = computed(() => {
 });
 const fixMarked = computed(() => `${props.result.fix.order.map(markedOf.value).join('')}。`);
 const isEmpty = computed(() => props.result.answer.every((tile) => tile === null));
-const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point] ?? '');
+const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point]);
 </script>
 
 <template>

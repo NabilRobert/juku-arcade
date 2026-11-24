@@ -3,12 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { seededRandom } from '../src/game/random.ts';
 import { createGrammarReviews, NEW_POINTS_PER_DAY } from '../src/grammar/grammar-reviews.ts';
 import { makeTaleFromRanking, MIN_TALE_POINTS } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 import { sentence } from './helpers/grammar-events.ts';
 
 const DAY_1 = '2026-11-24';
 const DAY_2 = '2026-11-25';
-const BUNPOU_POINTS = Object.keys(POINT_PATTERNS);
 const POINTS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
 
 describe('grammar reviews', () => {
@@ -40,7 +39,7 @@ describe('grammar reviews', () => {
   });
 
   it('builds a first day’s tales from the first points in the curriculum', () => {
-    const ranked = createGrammarReviews(BUNPOU_POINTS, []).pointsByPriority(DAY_1);
+    const ranked = createGrammarReviews(CURRICULUM, []).pointsByPriority(DAY_1);
     const starter = ranked.slice(0, MIN_TALE_POINTS);
     const random = seededRandom(3);
     for (let tale = 0; tale < 20; tale++) {
