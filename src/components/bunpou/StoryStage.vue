@@ -11,7 +11,7 @@
  */
 import { computed } from 'vue';
 import PixelSprite from '../ui/PixelSprite.vue';
-import { CROWD_PALETTES, crowdStrip } from './crowd-strip.ts';
+import { CROWD_PALETTES, crowdStrip, type CrowdLayer } from './crowd-strip.ts';
 import { SLIP, STAGE_PALETTE, STORYTELLER, type StorytellerPose } from './stage-sprites.ts';
 
 const props = defineProps<{
@@ -27,20 +27,20 @@ const props = defineProps<{
   isShoutLoud?: boolean;
 }>();
 
-/** The front row hops a beat after the back, so the cheering ripples. */
-const FRONT_HOP_DELAY_MS = 220;
+/** Each nearer layer hops a beat after the one behind it, so the cheering ripples forward. */
+const HOP_STEP_MS = 150;
+const LAYERS: readonly CrowdLayer[] = ['far', 'middle', 'near'];
 
-const crowdRows = computed(() => {
-  const isCheering = props.isCrowdLaughing === true;
-  return [
-    { key: 'back', grid: crowdStrip('back', { isCheering, hasPhone: false }), delay: '0ms' },
-    {
-      key: 'front',
-      grid: crowdStrip('front', { isCheering, hasPhone: props.isPhoneOut === true }),
-      delay: `${FRONT_HOP_DELAY_MS}ms`,
-    },
-  ] as const;
-});
+const crowdLayers = computed(() =>
+  LAYERS.map((layer, depth) => ({
+    layer,
+    grid: crowdStrip(layer, {
+      isCheering: props.isCrowdLaughing === true,
+      hasPhone: layer === 'near' && props.isPhoneOut === true,
+    }),
+    delay: `${depth * HOP_STEP_MS}ms`,
+  })),
+);
 </script>
 
 <template>
@@ -90,18 +90,18 @@ const crowdRows = computed(() => {
       {{ bubble }}
     </p>
     <div
-      v-for="row in crowdRows"
-      :key="row.key"
-      class="absolute inset-x-0 -bottom-3 h-28"
+      v-for="crowd in crowdLayers"
+      :key="crowd.layer"
+      class="absolute inset-x-0 -bottom-2 h-[calc(100%+0.5rem)]"
       :class="isCrowdLaughing ? 'motion-safe:animate-hop' : ''"
-      :style="{ animationDelay: row.delay }"
+      :style="{ animationDelay: crowd.delay }"
       aria-hidden="true"
-      :data-testid="`crowd-${row.key}`"
+      :data-testid="`crowd-${crowd.layer}`"
     >
       <PixelSprite
-        :grid="row.grid"
-        :palette="CROWD_PALETTES[row.key]"
-        :name="`crowd-${row.key}`"
+        :grid="crowd.grid"
+        :palette="CROWD_PALETTES[crowd.layer]"
+        :name="`crowd-${crowd.layer}`"
         is-cover
       />
     </div>

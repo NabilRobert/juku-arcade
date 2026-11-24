@@ -1001,20 +1001,19 @@ approach and synth sounds, since there's no art or audio for it yet.
 
 - **The stage** sits above the table: the storyteller kneeling on his
   cushion in a warm spotlight, one sealed slip per line built (the player
-  sees how far the tale has got, not the story), and a packed house
-  across the stage's full width: two rows of dark silhouettes seen from
-  behind, heads of different shapes at different heights merging into
-  one mass like a concert crowd, rising towards the sides so it wraps
-  round the stage (after playtest feedback: a few detailed audience
-  members looked sparse, and a straight row didn't feel like a crowd
-  round a storyteller). The storyteller is a chibi rakugo performer in
+  sees how far the tale has got, not the story), and a packed house of
+  dark silhouettes seen from behind: tiers of heads in three shades (far,
+  middle, near) that fill the stage to the top at the sides and part in a
+  U around him, like raked seating round a stage (after playtest
+  feedback: a few detailed audience members looked sparse, and a
+  straight row didn't feel like a crowd round a storyteller). The storyteller is a chibi rakugo performer in
   haori and hakama, the closed fan held upright, drawn in the game's
   palette in the style of a reference picture from playtesting, not copied from it. The storyteller and slip are
   letter grids like the icons (D43), drawn for this game, with
   `pixel-icons.ts: gridPaths` now serving both; the crowd is built from
   six head shapes by a seeded generator (`crowd-strip.ts`), so it's the
-  same every time, and drawn as one wide strip that covers any stage
-  width without stretching its pixels. The stage is taller than the
+  same every time, and drawn as three layers the stage's own shape,
+  covering it without stretching its pixels. The stage is taller than the
   first draft, as allowed, to fit the crowd and the light.
 - **Forgetting a line:** when a line times out, the storyteller
   scratches his head and says えーと…, as the plan's item 8 asks.

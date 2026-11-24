@@ -1,22 +1,51 @@
 /**
- * The Bunpou audience as one packed strip of silhouettes (D58), seen from
- * behind like a concert crowd gathered round the storyteller: heads of
- * different shapes at different heights, rising towards the sides and
- * dipping in the middle so the crowd wraps round the stage, overlapping
- * so their bodies merge into one dark mass, with a
- * few arms thrown up when the crowd cheers and, when a tale falls flat,
- * one phone screen glowing in the dark.
+ * The Bunpou audience as packed silhouettes (D58), seen from behind like a
+ * crowd gathered round the storyteller: tiers of heads of different
+ * shapes, filling the stage to the top at the sides and parting in a U in
+ * the middle so he sits in the gap. The tiers make three layers (far,
+ * middle, near), each its own shade, so the rows read as raked seating.
+ * A few arms go up when the crowd cheers, and when a tale falls flat one
+ * phone screen glows in the near layer.
  *
- * The strip is built from a handful of head shapes with a seeded random
- * generator, so it's the same every time, and drawn as one sprite about
- * the stage's shape that covers its full width.
+ * Each layer is built from a handful of head shapes with a seeded random
+ * generator, so it's the same every time, and drawn as one sprite the
+ * stage's own shape, covering it.
  */
 import { seededRandom } from '../../game/random.ts';
 
-/** The strip's size in pixels: about the stage's own shape, so its curved ends stay in view. */
-export const CROWD_WIDTH = 150;
-export const CROWD_HEIGHT = 28;
+/** The strip's size in pixels: the stage's own shape (about 5.4 wide to 1 high). */
+export const CROWD_WIDTH = 300;
+export const CROWD_HEIGHT = 56;
 const BODY = 'z';
+
+/**
+ * The crowd sits in tiers, like raked seating: tier 0 at the top, each
+ * next one TIER_STEP lower, give or take TIER_JITTER. A layer's lift
+ * raises all its heads, so the middle layer peeks higher over the near one.
+ */
+const TIER_STEP = 6;
+const TIER_JITTER = 3;
+export const CROWD_LAYERS = {
+  far: { seed: 11, tiers: [0, 1, 2], lift: 0 },
+  middle: { seed: 17, tiers: [3, 4, 5], lift: 4 },
+  near: { seed: 23, tiers: [6, 7], lift: 0 },
+} as const;
+export type CrowdLayer = keyof typeof CROWD_LAYERS;
+
+/** The layers' shades: the far one catches a little of the stage light, the near one is darkest. */
+export const CROWD_PALETTES: Record<CrowdLayer, Readonly<Record<string, string>>> = {
+  far: { z: '#2b4366', p: '#a8dadc' },
+  middle: { z: '#141f36', p: '#a8dadc' },
+  near: { z: '#05080f', p: '#a8dadc' },
+};
+
+/**
+ * The crowd parts round the storyteller in a U: at the sides it fills the
+ * stage to the top; across the middle (U_HALF_WIDTH of each half) it
+ * drops away, deepest, by U_DEPTH, right under his cushion.
+ */
+const U_HALF_WIDTH = 0.5;
+const U_DEPTH = 35;
 
 /** Heads and shoulders; the body under each is filled down to the strip's bottom. */
 const HEADS: readonly (readonly string[])[] = [
@@ -93,8 +122,12 @@ const ARM_UP: readonly string[] = [
   'zz....',
   'zz....',
 ];
-/** A phone held up: the hand, then the glowing screen above it. */
+/** A phone held up: the glowing screen, then the hand under it. */
 const PHONE_UP: readonly string[] = ['pp', 'pp', 'pp', 'zz', 'zz', 'zz', 'zz'];
+/** How many of the crowd throw an arm up when it cheers. */
+const ARM_SHARE = 0.4;
+/** The phone is held up this far along the strip, right of the storyteller. */
+const PHONE_PLACE = 0.85;
 
 /** One audience member's place in the strip, fixed by the seed. */
 interface Member {
@@ -110,32 +143,17 @@ export interface CrowdLook {
   hasPhone: boolean;
 }
 
-/** The rows' colours: the back row a shade lighter, so the two read as depth. */
-export const CROWD_PALETTES = {
-  back: { z: '#0e1526', p: '#a8dadc' },
-  front: { z: '#05080f', p: '#a8dadc' },
-} as const;
-
-/** How far the middle of the crowd sits below its sides, in pixels: the arc round the stage. */
-const ARC_DEPTH = 11;
-
-/** How far below its row's top a head at `x` sits: none at the sides, ARC_DEPTH in the middle. */
-function arcDrop(x: number): number {
-  const fromMiddle = (2 * x) / CROWD_WIDTH - 1;
-  return Math.round(ARC_DEPTH * (1 - fromMiddle * fromMiddle));
+/** How far below its tier a head at `x` sits: none at the sides, U_DEPTH in the middle. */
+function uDrop(x: number): number {
+  const fromMiddle = ((2 * x) / CROWD_WIDTH - 1) / U_HALF_WIDTH;
+  return Math.max(0, Math.round(U_DEPTH * (1 - fromMiddle * fromMiddle)));
 }
 
-/** How many of the crowd throw an arm up when it cheers. */
-const ARM_SHARE = 0.4;
-/** The member holding the phone sits this far along the strip. */
-const PHONE_PLACE = 0.62;
-
-function seatMembers(seed: number, lowestTop: number, highestTop: number): Member[] {
-  const random = seededRandom(seed);
+function seatTier(random: () => number, tier: number, lift: number): Member[] {
   const members: Member[] = [];
   for (let x = -4; x < CROWD_WIDTH;) {
     const head = HEADS[Math.floor(random() * HEADS.length)] ?? HEADS[0] ?? [];
-    const wanted = highestTop + Math.floor(random() * (lowestTop - highestTop + 1)) + arcDrop(x);
+    const wanted = 1 + tier * TIER_STEP - lift + Math.floor(random() * TIER_JITTER) + uDrop(x);
     // Shoulders always inside the strip: a head pushed lower would leave a gap in the crowd.
     const y = Math.min(wanted, CROWD_HEIGHT - head.length);
     const raisesArm = random() < ARM_SHARE;
@@ -150,14 +168,8 @@ function stamp(canvas: string[][], grid: readonly string[], left: number, top: n
   grid.forEach((line, row) => {
     [...line].forEach((letter, column) => {
       const cells = canvas[top + row];
-      if (
-        letter !== '.' &&
-        cells !== undefined &&
-        left + column >= 0 &&
-        left + column < CROWD_WIDTH
-      ) {
-        cells[left + column] = letter;
-      }
+      const x = left + column;
+      if (letter !== '.' && cells !== undefined && x >= 0 && x < CROWD_WIDTH) cells[x] = letter;
     });
   });
 }
@@ -177,7 +189,7 @@ function raiseArm(canvas: string[][], member: Member): void {
   stamp(canvas, arm, left, member.y + member.head.length - 1 - arm.length);
 }
 
-/** The crowd is one solid mass: below the first silhouette pixel in each column, everything is dark. */
+/** Each layer is one solid mass: below the first silhouette pixel in each column, everything is dark. */
 function fillGaps(canvas: string[][]): void {
   for (let column = 0; column < CROWD_WIDTH; column++) {
     let isInside = false;
@@ -188,26 +200,30 @@ function fillGaps(canvas: string[][]): void {
   }
 }
 
-/** Where heads sit in each of the two rows (top rows, from the strip's top), leaving room for raised arms. */
-export const CROWD_ROWS = {
-  back: { seed: 11, highestTop: 3, lowestTop: 7 },
-  front: { seed: 23, highestTop: 9, lowestTop: 13 },
-} as const;
+/** The member nearest PHONE_PLACE along the strip, among the last seated (the frontmost tier). */
+function phoneHolder(members: readonly Member[]): Member | undefined {
+  const target = CROWD_WIDTH * PHONE_PLACE;
+  let best: Member | undefined;
+  for (const member of members.slice(-Math.ceil(CROWD_WIDTH / 8))) {
+    if (best === undefined || Math.abs(member.x - target) < Math.abs(best.x - target))
+      best = member;
+  }
+  return best;
+}
 
-/** The strip as a letter grid: z is a silhouette, p the phone screen, '.' see-through. */
-export function crowdStrip(row: keyof typeof CROWD_ROWS, look: CrowdLook): string[] {
-  const { seed, highestTop, lowestTop } = CROWD_ROWS[row];
+/** A layer as a letter grid: z is a silhouette, p the phone screen, '.' see-through. */
+export function crowdStrip(layer: CrowdLayer, look: CrowdLook): string[] {
+  const { seed, tiers, lift } = CROWD_LAYERS[layer];
+  const random = seededRandom(seed);
+  const members = tiers.flatMap((tier) => seatTier(random, tier, lift));
   const canvas = Array.from({ length: CROWD_HEIGHT }, () => Array<string>(CROWD_WIDTH).fill('.'));
-  const members = seatMembers(seed, lowestTop, highestTop);
   for (const member of members) {
     stamp(canvas, member.head, member.x, member.y);
     fillBody(canvas, member);
     if (look.isCheering && member.arm !== 0) raiseArm(canvas, member);
   }
   fillGaps(canvas);
-  if (look.hasPhone) {
-    const holder = members[Math.floor(members.length * PHONE_PLACE)];
-    if (holder !== undefined) stamp(canvas, PHONE_UP, holder.x + 7, holder.y - 5);
-  }
+  const holder = look.hasPhone ? phoneHolder(members) : undefined;
+  if (holder !== undefined) stamp(canvas, PHONE_UP, holder.x + 7, holder.y - 5);
   return canvas.map((cells) => cells.join(''));
 }

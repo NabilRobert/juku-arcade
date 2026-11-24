@@ -75,14 +75,14 @@ describe('the storyteller', () => {
   it('puts a phone in the crowd when a tale falls flat', () => {
     const phoneScreen = '#a8dadc';
     const flat = mount(StoryStage, { props: { pose: 'idle', slips: 0, isPhoneOut: true } });
-    expect(flat.find('[data-testid="crowd-front"]').html()).toContain(phoneScreen);
+    expect(flat.find('[data-testid="crowd-near"]').html()).toContain(phoneScreen);
     const calm = mount(StoryStage, { props: { pose: 'idle', slips: 0 } });
-    expect(calm.find('[data-testid="crowd-front"]').html()).not.toContain(phoneScreen);
+    expect(calm.find('[data-testid="crowd-near"]').html()).not.toContain(phoneScreen);
   });
 
   it('packs the crowd in, with arms thrown up only when it cheers', () => {
-    const still = crowdStrip('front', { isCheering: false, hasPhone: false });
-    const cheering = crowdStrip('front', { isCheering: true, hasPhone: false });
+    const still = crowdStrip('near', { isCheering: false, hasPhone: false });
+    const cheering = crowdStrip('near', { isCheering: true, hasPhone: false });
     const bottomRow = still.at(-1) ?? '';
     expect(bottomRow).not.toContain('.');
     const darkPixels = (grid: readonly string[]): number => grid.join('').split('z').length - 1;
