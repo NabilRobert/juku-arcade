@@ -2,12 +2,15 @@ import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import {
   appendEvents,
+  appendGrammarEvents,
   deleteAllData,
   loadEvents,
+  loadGrammarEvents,
   loadSettings,
   saveSettings,
 } from '../src/memory/storage.ts';
 import { answer } from './helpers/events.ts';
+import { sentence } from './helpers/grammar-events.ts';
 
 describe('browser storage', () => {
   it('keeps events in the order they were added', async () => {
@@ -50,8 +53,21 @@ describe('browser storage', () => {
     });
   });
 
-  it('deletes every event and setting', async () => {
+  it('keeps grammar answers in their own log, never in the word log', async () => {
     await deleteAllData();
-    expect([await loadEvents(), await loadSettings()]).toEqual([[], null]);
+    const grammar = sentence('wa', '2026-11-24', 'right');
+    await appendGrammarEvents([grammar]);
+    expect(await loadGrammarEvents()).toEqual([grammar]);
+    expect(await loadEvents()).toEqual([]);
+  });
+
+  it('deletes every event and setting', async () => {
+    await appendGrammarEvents([sentence('o', '2026-11-24', 'wrong')]);
+    await deleteAllData();
+    expect([await loadEvents(), await loadGrammarEvents(), await loadSettings()]).toEqual([
+      [],
+      [],
+      null,
+    ]);
   });
 });

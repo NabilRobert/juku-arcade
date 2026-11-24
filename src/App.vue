@@ -9,6 +9,7 @@ import { domMax, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
 import type { Deck, JlptLevel } from './deck/types.ts';
 import { localDay, type GameEvent } from './game/events.ts';
+import type { GrammarEvent } from './grammar/grammar-events.ts';
 import { pickQuestions } from './memory/check-up-questions.ts';
 import type { Question } from './memory/check-up.ts';
 import { buildExport, downloadExport } from './memory/export.ts';
@@ -17,6 +18,7 @@ import {
   appendEvents,
   deleteAllData,
   loadEvents,
+  loadGrammarEvents,
   loadSettings,
   saveSettings,
   type Settings,
@@ -38,6 +40,8 @@ type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode' | 'stats';
 const settings = shallowRef<Settings | null>(null);
 const deck = shallowRef<Deck | null>(null);
 const pastEvents = shallowRef<readonly GameEvent[]>([]);
+/** The grammar log (D57), read again each time Bunpou starts so it sees the last run's answers. */
+const grammarEvents = shallowRef<readonly GrammarEvent[]>([]);
 const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
@@ -77,6 +81,7 @@ async function loadDeck(level: JlptLevel): Promise<Deck> {
 async function startGame(current: Settings): Promise<void> {
   try {
     pastEvents.value = await orFallback(loadEvents, []);
+    grammarEvents.value = await orFallback(loadGrammarEvents, []);
     deck.value = await loadDeck(current.level);
     settings.value = current;
     offerCheckUp(current, deck.value);
@@ -129,6 +134,7 @@ async function openStats(): Promise<void> {
 async function chooseMode(next: GameMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
+  if (next === 'bunpou') grammarEvents.value = await orFallback(loadGrammarEvents, []);
   mode.value = next;
   page.value = 'game';
   runKey.value += 1;
@@ -235,8 +241,10 @@ onMounted(async () => {
             class="my-auto"
             :level="deck.level"
             :settings="settings"
+            :past-grammar-events="grammarEvents"
             :is-away="isAway"
             @leave="page = 'mode'"
+            @again="chooseMode('bunpou')"
           />
           <GameScreen
             v-else

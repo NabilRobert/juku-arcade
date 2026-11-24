@@ -25,7 +25,7 @@ export interface OrderRules {
   swaps: readonly (readonly [string, string])[];
 }
 
-type Units = readonly (readonly string[])[];
+export type Units = readonly (readonly string[])[];
 
 /** The units with two tiles traded wherever they appear. */
 function swapTiles(units: Units, [first, second]: readonly [string, string]): Units {
@@ -59,10 +59,14 @@ function unitOrders(units: Units, fixedUnits: readonly number[]): string[][] {
   });
 }
 
+/** The template's units, and the same units with each allowed particle swap made. */
+export function unitBindings(rules: OrderRules): Units[] {
+  return [rules.units, ...rules.swaps.map((pair) => swapTiles(rules.units, pair))];
+}
+
 /** Every right order of the tiles. */
 export function rightOrders(rules: OrderRules): string[][] {
-  const bindings = [rules.units, ...rules.swaps.map((pair) => swapTiles(rules.units, pair))];
-  return bindings.flatMap((units) => unitOrders(units, rules.fixedUnits));
+  return unitBindings(rules).flatMap((units) => unitOrders(units, rules.fixedUnits));
 }
 
 /** An answer as boxes: a timed-out line can leave some empty (null). */

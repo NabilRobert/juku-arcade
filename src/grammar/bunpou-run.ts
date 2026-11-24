@@ -46,6 +46,9 @@ export interface LineResult {
   isRight: boolean;
   isTimedOut: boolean;
   fix: Fix;
+  /** The level and combo the line was played at, before its result changed them (for the log). */
+  level: number;
+  comboBefore: number;
 }
 
 export interface BunpouRun {
@@ -66,6 +69,8 @@ export interface BunpouRun {
   score: number;
   /** When this line's time runs out (ms); pausing moves it on. */
   deadlineMs: number;
+  /** The time this line was given, for the timer bar and the log's ms_taken. */
+  lineDurationMs: number;
   pausedAtMs: number | null;
 }
 
@@ -95,13 +100,15 @@ function offerLine(
 ): BunpouRun {
   const line = run.tale.lines[lineIndex];
   const tiles = line?.tiles.map((tile) => tile.text) ?? [];
+  const lineDurationMs = sentenceDurationMs(run.level, tiles.length);
   return {
     ...run,
     lineIndex,
     offered: shuffled(tiles, random),
     slots: tiles.map(() => null),
     phase: 'building',
-    deadlineMs: nowMs + sentenceDurationMs(run.level, tiles.length),
+    deadlineMs: nowMs + lineDurationMs,
+    lineDurationMs,
   };
 }
 
@@ -119,6 +126,7 @@ export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource):
     level: FIRST_LEVEL,
     score: 0,
     deadlineMs: nowMs,
+    lineDurationMs: 0,
     pausedAtMs: null,
   };
   return offerLine(empty, 0, nowMs, random);
@@ -129,7 +137,16 @@ function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
   const answer = run.slots;
   const isFull = answer.every((tile) => tile !== null);
   const isRight = !isTimedOut && isFull && isRightOrder(answer, sentence);
-  const result = { sentence, answer, isRight, isTimedOut, fix: closestFix(answer, sentence) };
+  const fix = closestFix(answer, sentence);
+  const result = {
+    sentence,
+    answer,
+    isRight,
+    isTimedOut,
+    fix,
+    level: run.level,
+    comboBefore: run.combo,
+  };
   const judged = { ...run, phase: 'judged' as const, results: [...run.results, result] };
   if (!isRight) {
     const missed = [result, ...run.missed].slice(0, MISSED_TRAY_SIZE);

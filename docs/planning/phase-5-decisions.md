@@ -943,9 +943,54 @@ box is filled or its time runs out, and the tale is revealed after its last line
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.
-- **Not yet:** reviews and logging (G2), so the mode card leaves out
-  "Counts toward your grammar reviews" for now; the stage (G3); the haiku
-  and the leaderboard (G4). The side panel and buttons use English
+- **Not yet:** reviews and logging (G2, now D57); the stage (G3); the
+  haiku and the leaderboard (G4). The side panel and buttons use English
   labels like the other modes; the sentences, fixes and patterns have no
   English.
+
+### D57: Grammar reviews and the grammar log (G2, 2026-11-24)
+
+Each grammar point has its own spaced reviews, and every judged Bunpou
+line is logged.
+
+- **A separate grammar log:** a second table in the browser database
+  (`grammarEvents`, database version 2), never the word log. Word memory
+  reads any answer in the word log as a word answer, so grammar answers
+  there would corrupt it. One event per judged line: the point, the
+  template, the outcome (right, wrong or timeout), the rule a wrong order
+  broke, the answer, the time taken, the level, the combo before and the
+  review box before (`grammar/grammar-events.ts`). "Delete my data"
+  clears it too; the upgrade keeps the word log and settings.
+- **The broken rule** is the most basic one the answer broke: the verb
+  not last, then a particle after the wrong word, then pieces in the
+  wrong order (`grammar/broken-rule.ts`).
+- **The schedule is the words' own:** each point's record is updated by
+  the same function as a word's (`word-memory.ts: recordAnswer`, over
+  `leitner.ts: afterAnswer`, unchanged). A right sentence is a right
+  answer, a wrong order a wrong one. A timeout isn't an answer, as in
+  word mode (D4): it measures speed more than memory.
+- **Today's grammar:** the points due today, then up to 3 new points a
+  day (`NEW_POINTS_PER_DAY`, the plan's proposal: fewer than words' 10
+  since each point is a bigger idea), in curriculum order.
+- **Tales from today's grammar:** a tale needs a different point on each
+  line and every part of 起承転結 covered, so reviews rank every point
+  (today's grammar, then the weakest seen, then new ones) and the tale
+  takes the top 6, or more if those can't fill every part
+  (`tale.ts: makeTaleFromRanking`). Checked: 7 of the 210 possible
+  six-point sets have no twist (転) template. A first day starts on the
+  first 6 points in the curriculum; only 3 of them count as the day's new
+  points.
+- **On screen:** the side panel shows today's grammar and points known
+  (the word mode's `DailyBar`, now shared). "End run" shows the results:
+  score, best combo, lines right, grammar seen and known, and today's
+  progress, then Play again or Change mode. The mode card now says
+  "Counts toward your grammar reviews".
+- **Not yet:** grammar on the stats page, in the export and in the
+  daily check-up (each touches shared screens, so each is its own
+  decision); the haiku close and the leaderboard (G4).
+- **Beat:** grammar events in the word log with a kind field (word
+  memory would need to filter them everywhere, and one missed filter
+  corrupts word reviews); a copy of the Leitner code for grammar (two
+  schedules that could drift apart); counting timeouts as misses (would
+  punish slow readers, unlike word mode).
 
