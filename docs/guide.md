@@ -308,11 +308,11 @@ specs use them to check the reports find what's there and don't invent what
 isn't, and `npm run power` uses them to show how often a real effect is
 detected at each class size.
 
-## The flow, part 7: generated grammar tales (G0 spike, no screen yet)
+## The flow, part 7: generated grammar tales
 
 The grammar mode's content is generated, not written: sentence templates
-are filled from one setting per tale. G0 builds only the content and its
-rules; `npm run grammar:preview` prints tales for a person to read.
+are filled from one setting per tale. `npm run grammar:preview` prints
+tales for a person to read; part 7b plays them.
 
 ```mermaid
 flowchart LR
@@ -341,13 +341,40 @@ flowchart LR
    verb (**`conjugate.ts: conjugatePolite`**), adds furigana on the kanji
    only (**`kanji-furigana.ts: kanjiFurigana`**), and keeps its units.
    It refuses a filling where two tiles read the same.
-6. In play (G1), **`order-check.ts: isRightOrder`** will judge the
-   player's tile order against those units.
+6. In play, **`order-check.ts: isRightOrder`** judges the player's tile
+   order against those units, and **`closestFix`** finds the right order
+   nearest a wrong one, to mark the tiles out of place.
 
 **`npm run grammar:check`** (**`scripts/grammar-check.ts`**) is the build
 check: **`template-check.ts: templateProblems`** checks the templates
 against the shelf map, and every lexicon word is checked against the
 pinned OpenJLPT build.
+
+## The flow, part 7b: Bunpou, the grammar mode on screen
+
+1. **`ModePicker.vue`** offers Bunpou as the third mode; **`App.vue`**
+   shows **`components/bunpou/BunpouScreen.vue`**.
+2. **`src/grammar/useBunpouRun.ts: useBunpouRun`** makes a tale
+   (`makeTale`) and starts the run (**`bunpou-run.ts: startBunpouRun`**),
+   which offers the first line's tiles shuffled, with a time set by the
+   level and the tile count (`sentenceDurationMs`).
+3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the strip
+   and the offered tiles (**`BunpouTile.vue`**). A tap places a tile at the
+   end; a drag drops it where it's let go (`dropAt`); a tap on a placed
+   tile, or Backspace, takes it back. Keys 1–5 place a tile.
+4. **`bunpou-run.ts: placeTile`** judges the line when its last tile is
+   placed; **`checkTime`**, ticked by `useLineClock`, judges it as a miss
+   when time runs out. A right line adds to the combo and scores
+   `pointsFor(combo)`: 100 times the combo rank's multiplier. A miss resets
+   the combo and joins the pause list. Levels are word mode's (`levels.ts`).
+5. A missed line shows **`SentenceFix.vue`** for 3 seconds: the player's
+   tiles with the wrong ones marked, the fix, and the point's pattern in
+   Japanese (`POINT_PATTERNS`). Then **`nextLine`** offers the next line.
+6. After a tale's last line, **`TaleReveal.vue`** lists every line; "Next
+   tale" calls **`nextTale`** with a new tale.
+7. Pausing (the button or Esc) freezes the line's clock and hides the
+   tiles, and lists the run's misses. Play time counts toward the
+   wellbeing nudges, as in kanji mode (`usePlayClock`).
 
 ## The look and wellbeing
 
@@ -524,6 +551,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Play effect** | After-accuracy minus held-back accuracy, in percentage points: the headline | `report/measurement.ts` |
 | **Bootstrap interval** | The range the play effect would likely fall in, found by resampling players 10,000 times | `bootstrapInterval` |
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
+| **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
+| **Tile / strip** | A word or particle the player places; the strip is where placed tiles go | `BunpouTile.vue`, `BunpouBoard.vue` |
+| **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
 | **Template / slot** | A grammar sentence with gaps (`<who>`, `<place>`, `<食べる:mashita>`) that a tale's setting fills; it tests one grammar point | `grammar/templates.ts`, `fill.ts` |
 | **Shelf / 起承転結** | The four parts of a tale (setup, development, twist, punchline), coded S, D, T, P; each template sits on one shelf, as the shelf map allows | `templates.ts: Shelf`, `bunpou-n5-shelf-map.csv` |
 | **Follow-on** | A template used only as a part's second line, never to open it | `Template.followOn`, `tale.ts: pickTemplates` |
@@ -640,5 +670,9 @@ fields. They stay in memory until slice 3 stores them.
   run `npm run grammar:check` and `npm run grammar:preview`. A new word for
   its slots goes in `src/grammar/lexicon.ts`; a new verb class needs rules
   in `src/grammar/conjugate.ts`.
+- **Tune Bunpou's pace or score:** `SECONDS_PER_TILE_BY_LEVEL`,
+  `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
+  `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
+  of `src/grammar/useBunpouRun.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
   is one.

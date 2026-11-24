@@ -884,3 +884,45 @@ tales for a native speaker to read.
   6-line tales need a sixth point (G1). も's follow-on template never
   appears yet, because も is the only twist point and is always used on
   the twist line.
+
+### D56: Bunpou, the grammar mode's playable loop (G1, 2026-11-24)
+
+The grammar mode, named Bunpou for now, is the start screen's third mode.
+A run offers each line of a generated tale (D55) as shuffled tiles; the
+player places them, the line is judged when the last tile is placed or
+its time runs out, and the tale is revealed after its last line.
+
+- **Rules as pure functions** (`src/grammar/bunpou-run.ts`), like word
+  mode's (D12), with a thin composable (`useBunpouRun.ts`) for the clock,
+  sounds and keys.
+- **Word mode's rules, unchanged:** a miss or timeout resets the combo to
+  0, with no speed bonus and no idle decay; levels come from `levels.ts`.
+  The time is per tile: 8, 6, 4.4, 3.4 and 2.4 seconds at levels 1 to 5.
+  A right line scores 100 times the combo rank's multiplier (F ×1, E
+  ×1.25, D ×1.5, C ×2, B ×2.5, A ×3, S ×4, SS ×5, SSS ×6; ×1 below F).
+- **The screen is built from the existing UI**, as asked: tiles use the
+  pixel-button style on washi paper, with `PixelButton`, `StatPanel`,
+  `ComboMeter`, `WellbeingGate` and `SoundToggle` as they are. Furigana
+  sits under the kanji by styling around `FuriganaText`, which is
+  unchanged.
+- **Input:** tap to place at the end, drag to place where the tile is let
+  go, tap a placed tile or press Backspace to take it back, keys 1–5 to
+  place. Dragging uses Motion for Vue, which already throws the cards, and
+  the cards' tap-or-drag check (`isDrag`). Beat: a sortable-list library
+  (SortableJS or vue-draggable-plus, both MIT), a second drag system for
+  one strip; plain pointer events, which would rebuild what Motion does.
+- **A miss shows its fix** for 3 seconds: the player's tiles with the
+  wrong ones marked against the closest right order (`closestFix`), the
+  right sentence, and the point's pattern in Japanese only
+  (`POINT_PATTERNS`). A timeout with nothing placed shows えーと….
+- **Pause** freezes the line's clock, hides the tiles, and lists the run's
+  last 8 misses with their fixes.
+- **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
+  templates each, for 30 templates on 10 points. With three points on the
+  twist shelf, tales now reach 6 lines.
+- **Not yet:** reviews and logging (G2), so the mode card leaves out
+  "Counts toward your grammar reviews" for now; the stage (G3); the haiku
+  and the leaderboard (G4). The side panel and buttons use English
+  labels like the other modes; the sentences, fixes and patterns have no
+  English.
+

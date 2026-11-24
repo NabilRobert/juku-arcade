@@ -3,7 +3,9 @@
 An arcade card game for learning the readings of Japanese words, built for
 Japanese learners. Match 5 kanji word cards (学校) to their readings
 (がっこう), with a decoy in the mix; combos raise the level and fill a pot
-you can bank or lose. A second mode asks for every reading of one kanji.
+you can bank or lose. A second mode asks for every reading of one kanji,
+and a third, Bunpou, has you put grammar tiles in order to build a short
+generated tale.
 It's a static web app with no server: progress stays in the browser.
 
 **Play it:** <https://nabilrobert.github.io/juku-arcade/> (on a laptop or
