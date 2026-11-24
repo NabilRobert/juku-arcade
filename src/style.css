@@ -22,7 +22,7 @@
 @theme {
   /* English in the pixel font, Japanese in Kuronuri, then system fonts if a webfont fails (D31, D41). */
   --font-sans:
-    'balatro', 'Kuronuri 70', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+    'balatro', 'Kuronuri 35', system-ui, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
 
   /* The palette (D33): a navy table, steel blue, pale aqua highlights, off-white paper and a dark crimson accent. */
   --color-lacquer: #1b3a57;

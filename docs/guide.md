@@ -384,7 +384,7 @@ pinned OpenJLPT build.
   the palette (D33: `lacquer` navy table, `steel` blue, `aqua`
   highlights, `washi` paper, `crimson` accent, `sumi` ink), two fonts (a
   pixel font for English, `public/fonts/balatro/`, and Kuronuri for
-  Japanese at pixel level 70, from the `@lihbr/kuronuri` package; decisions
+  Japanese at pixel level 35, from the `@lihbr/kuronuri` package; decisions
   D31, D41: `npm run fonts` (`scripts/build-font-css.ts`) keeps its regular
   weight in `src/fonts/kuronuri.css`, which `main.ts` loads after the page
   draws), and

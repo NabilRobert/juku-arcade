@@ -41,7 +41,6 @@ const KANJI_SIZE = 12;
         dominant-baseline="central"
         :font-size="KANJI_SIZE"
         :fill="ink"
-        font-family="'Kuronuri 70', sans-serif"
         lang="ja"
       >
         {{ mark }}

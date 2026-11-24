@@ -544,8 +544,10 @@ beside the title, on every card back (both kinds) and on the deck.
 
 The Japanese font is Kuronuri (黒塗り, by lihbr, SIL OFL 1.1).
 It's drawn in Redaction's photocopied style and comes in seven
-pixel levels; 70 was chosen, clearly pixelated but easy to read, which
-matters for learners. It covers JIS levels 1 to 4, so it replaces
+pixel levels. 70 was chosen first, clearly pixelated. Playtest
+feedback (2026-11-24) found it hard to read, and its thin serif strokes
+break up worst in small furigana, so the game now uses 35: still
+pixelated at the edges, but each stroke stays whole. It covers JIS levels 1 to 4, so it replaces
 DotGothic16 (D31) and that package is removed.
 
 The npm package (@lihbr/kuronuri) splits the font into character slices,
@@ -557,7 +559,9 @@ draws.
 
 - **Watch:** the package is new (0.0.3, one author). If it breaks, switch
   the font stacks in `style.css` back to DotGothic16.
-- **Beat:** DotGothic16 (D31; Kuronuri's look won); level 100
+- **Beat:** DotGothic16 (D31; Kuronuri's look won); level 70 (hard to
+  read, see above); Fusion Pixel and Stick (compared side by side,
+  2026-11-24); level 100
   (complex kanji like 塾 blur at card size); the package's full stylesheet
   (89 KB gzipped for weights the game never uses).
 
