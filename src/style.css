@@ -34,6 +34,10 @@
   --color-crimson: #9b1b30;
   --color-aqua: #a8dadc;
   --color-steel: #457b9d;
+  /* Cedar wood, for Bunpou's chapter scroll rods (D58). */
+  --color-cedar: #7a5230;
+  /* Warm stage light, for the spotlight on Bunpou's storyteller (D58). */
+  --color-lamp: #f4c86a;
 
   /* A wrong tap shakes both cards (L4). */
   --animate-shake: shake 0.35s ease-in-out;
@@ -44,6 +48,10 @@
   /* A click's colour wipe (PixelButton.vue): in from both edges, then fading; or in and staying. */
   --animate-wipe: wipe 0.3s forwards;
   --animate-wipe-change: wipe-change 0.18s steps(10, end) forwards;
+  /* Bunpou's audience laughing (D58): a hop in two steps, like a two-frame sprite. */
+  --animate-hop: hop 0.45s steps(2, jump-none) infinite;
+  /* A story slip dropping into the storyteller's sleeve. */
+  --animate-drop-in: drop-in 0.35s ease-in;
 
   @keyframes shake {
     0%,
@@ -93,6 +101,26 @@
     100% {
       transform: scaleX(1);
       opacity: 0;
+    }
+  }
+
+  @keyframes hop {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-18%);
+    }
+  }
+
+  @keyframes drop-in {
+    from {
+      transform: translateY(-160%) rotate(-25deg);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) rotate(0);
+      opacity: 1;
     }
   }
 
