@@ -354,8 +354,13 @@ pinned OpenJLPT build.
 
 1. **`ModePicker.vue`** offers Bunpou as the third mode; **`App.vue`**
    shows **`components/bunpou/BunpouScreen.vue`**.
-2. **`src/grammar/useBunpouRun.ts: useBunpouRun`** makes a tale
-   (`makeTale`) and starts the run (**`bunpou-run.ts: startBunpouRun`**),
+2. **`src/grammar/useGrammarReviews.ts: useGrammarReviews`** rebuilds
+   grammar memory from the grammar log (**`grammar-reviews.ts:
+   createGrammarReviews`**, from the events `App.vue` loaded with
+   `storage.ts: loadGrammarEvents`) and ranks the points for the next tale:
+   today's grammar (due points, then up to 3 new ones) first.
+   **`src/grammar/useBunpouRun.ts: useBunpouRun`** makes a tale from the
+   top of that ranking (`tale.ts: makeTaleFromRanking`) and starts the run (**`bunpou-run.ts: startBunpouRun`**),
    which offers the first line's tiles shuffled, with a time set by the
    level and the tile count (`sentenceDurationMs`).
 3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the
@@ -373,10 +378,19 @@ pinned OpenJLPT build.
 5. A missed line shows **`SentenceFix.vue`** for 3 seconds: the player's
    tiles with the wrong ones marked, the fix, and the point's pattern in
    Japanese (`POINT_PATTERNS`). Then **`nextLine`** offers the next line.
-6. After a tale's last line, **`TaleReveal.vue`** lists every line; "Next
-   tale" calls **`nextTale`** with a new tale.
-7. Pausing (the button or Esc) freezes the line's clock and hides the
-   tiles, and lists the run's misses. Play time counts toward the
+6. Every judged line goes to **`useGrammarReviews: logJudged`**: it builds
+   a grammar log event (`grammar-events.ts: makeGrammarEvent`, with
+   `broken-rule.ts: brokenRule` for a wrong order), updates the point's
+   review record (`word-memory.ts: recordAnswer`, the words' own Leitner
+   schedule) and today's progress in the side panel (`DailyBar.vue`), and
+   saves it (`storage.ts: appendGrammarEvents`, the `grammarEvents`
+   table, never the word log).
+7. After a tale's last line, **`TaleReveal.vue`** lists every line; "Next
+   tale" calls **`nextTale`** with a new tale. "End run" shows
+   **`BunpouResults.vue`**: the run's score and lines, grammar seen and
+   known, and today's progress.
+8. Pausing (the button or Esc) freezes the line's clock and turns the
+   tiles face down where they lie, with the run's misses floating below. Play time counts toward the
    wellbeing nudges, as in kanji mode (`usePlayClock`).
 
 ## The look and wellbeing
@@ -556,6 +570,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
 | **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.slots` |
+| **Grammar log** | The browser table of judged Bunpou lines, one event each, kept apart from the word log | `grammar-events.ts`, `storage.ts: grammarEvents` |
+| **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
+| **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
 | **Hint** | The line's grammar pattern (人＋と), shown beside 起承転結 unless the player turns hints off | `preferences/hints.ts`, `BunpouBoard.vue` |
 | **Preference** | A small on/off choice kept in this browser: sound muted, Bunpou's hint, furigana. Set by an `OnOffButton` | `src/preferences/`, `ui/OnOffButton.vue` |
 | **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
@@ -679,6 +696,9 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Change how many grammar points are new each day:**
+  `NEW_POINTS_PER_DAY` in `src/grammar/grammar-reviews.ts`; how many points
+  a tale starts from is `MIN_TALE_POINTS` in `src/grammar/tale.ts`.
 - **Change Bunpou's hint:** what it shows is `hint` in
   `components/bunpou/BunpouBoard.vue` (the patterns are `POINT_PATTERNS`
   in `src/grammar/templates.ts`); whether it starts on is
