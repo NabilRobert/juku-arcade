@@ -840,3 +840,47 @@ public build (GitHub Pages has neither file), nothing changes.
 - **Beat:** committing the picture (not ours to publish); keeping the
   change as uncommitted edits (in the way of every later commit).
 
+
+### D55: Grammar content G0: generated tales from typed templates (spike, 2026-11-24)
+
+The first slice of the grammar mode (its design agreed on 2026-11-24)
+is a content spike with no screen: can templates and a matcher make
+Japanese good enough to build on? `npm run grammar:preview` prints 50
+tales for a native speaker to read.
+
+- **Content:** 5 grammar points × 3 templates (`src/grammar/templates.ts`)
+  and 47 N5 nouns tagged person, place, food, thing or time, plus the 9
+  verbs the templates use (`lexicon.ts`). The design suggested は, を,
+  に (time), で (place) and まで. まで was swapped for も, because the shelf
+  map allows none of the other four on the twist shelf, and every tale
+  needs a twist.
+- **Templates are TypeScript data,** checked by the type checker, with
+  slots written `<who>` and verbs `<食べる:mashita>`. The build check
+  (`npm run grammar:check`) joins them with the shelf map (at least 3
+  templates on at least 2 shelves per point, only on allowed shelves),
+  checks the agreed tile shape (at least 2 noun+particle units, 3–5
+  tiles, no two alike), and checks every word against the pinned
+  OpenJLPT build.
+- **The order checker** works from each template's units, as agreed:
+  units may swap, except that the predicate stays last and fixed units
+  keep their place, and a template can list particle swaps that are also
+  right.
+- **Conjugation is plain code** (`conjugate.ts`, about 30 lines): N5
+  needs only 4 polite forms, from OpenJLPT's verb classes.
+- **Beat:** jv-conjugator (ISC, one maintainer, last release December
+  2024) and kamiya-codec (Unlicense, one maintainer, May 2025). Both are
+  allowed and maintained, but each covers far more forms than N5 needs,
+  so a dependency would be heavier than the problem. Revisit at N4, when
+  て, た, ない and potential forms arrive.
+- **Beat:** a YAML or JSON template file with a loader, which would mean
+  more code and lose the type check.
+- **Two agreed rules didn't fit G0, and are reported rather than bent.**
+  "Drop a repeated subject": with at least 2 loose noun+particle pairs
+  in 3–5 tiles, a sentence has no room for a third, glued-on subject, so
+  dropping a loose subject pair would leave one pair. Names repeat for
+  now. "One politeness level per tale": every template is
+  polite, so this holds without any code.
+- **Tale lengths:** one point per line and 5 points cap tales at 5 lines;
+  6-line tales need a sixth point (G1). も's follow-on template never
+  appears yet, because も is the only twist point and is always used on
+  the twist line.
