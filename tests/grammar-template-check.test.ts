@@ -55,6 +55,13 @@ describe('the templates’ build check', () => {
     ]);
   });
 
+  it('still counts templates and shelves per point with no shelf map', () => {
+    expect(templateProblems([good, { ...good, id: 'x-S2' }], null)).toEqual([
+      'wa: has 2 templates, needs 3',
+      'wa: is on 1 shelf, needs 2',
+    ]);
+  });
+
   it('fails a template with only one loose noun+particle', () => {
     const oneParticle = threeGood({ units: [['<who>', 'は'], ['毎朝'], ['<来る:masu>']] });
     expect(templateProblems(oneParticle, SHELF_MAP)).toEqual([

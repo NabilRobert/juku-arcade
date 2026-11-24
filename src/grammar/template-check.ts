@@ -1,13 +1,15 @@
 /**
  * The build check for the templates (D55),
  * as pure functions so the specs can run it without files:
- * - every template sits on a shelf the shelf map allows for its point;
+ * - with a shelf map: every point is in it, and every template sits on a
+ *   shelf it allows for its point (the only rules that need the map);
  * - every point with templates has at least 3, on at least 2 shelves;
  * - every template has at least 2 noun+particle units, 3–5 tiles, a
  *   one-tile predicate last, and no two tiles written the same;
  * - every tile fills (fillProblems): its verb, verb form and slots exist.
  *
- * scripts/grammar-check.ts runs it on the real templates and shelf map.
+ * scripts/grammar-check.ts runs it on the real templates, and the shelf
+ * map when there's a local copy.
  */
 import { seededRandom } from '../game/random.ts';
 import { fillTile } from './fill.ts';
@@ -86,6 +88,15 @@ function shelfProblems(templates: readonly Template[], shelfMap: ShelfMap): stri
         `${template.id}: shelf ${template.shelf} isn't allowed for ${point} (${allowed.join(';')})`,
       );
     }
+  }
+  return problems;
+}
+
+/** Enough templates for each point, on enough shelves: rules that need no shelf map. */
+function pointCountProblems(templates: readonly Template[]): string[] {
+  const problems: string[] = [];
+  for (const point of new Set(templates.map((template) => template.point))) {
+    const own = templates.filter((template) => template.point === point);
     if (own.length < MIN_TEMPLATES_PER_POINT) {
       problems.push(`${point}: has ${own.length} templates, needs ${MIN_TEMPLATES_PER_POINT}`);
     }
@@ -97,13 +108,22 @@ function shelfProblems(templates: readonly Template[], shelfMap: ShelfMap): stri
   return problems;
 }
 
-/** Every problem with the templates; with no shelf map (a fresh clone, or CI), all but the shelf rules. */
+/**
+ * Every problem with the templates. With no shelf map (a fresh clone, or
+ * CI), all but the two shelf-map rules: whether a point is in the map,
+ * and whether a template's shelf is one the map allows for its point.
+ */
 export function templateProblems(
   templates: readonly Template[],
   shelfMap: ShelfMap | null,
 ): string[] {
   const shelves = shelfMap === null ? [] : shelfProblems(templates, shelfMap);
-  return [...templates.flatMap(shapeProblems), ...shelves, ...fillProblems(templates)];
+  return [
+    ...templates.flatMap(shapeProblems),
+    ...shelves,
+    ...pointCountProblems(templates),
+    ...fillProblems(templates),
+  ];
 }
 
 /**
