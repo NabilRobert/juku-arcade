@@ -8,6 +8,8 @@ import Dexie, { type Table } from 'dexie';
 import type { JlptLevel } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
+import { HAIKU_KEY } from '../grammar/haiku.ts';
+import { BUNPOU_BEST_KEY } from '../leaderboard/leaderboard.ts';
 
 const DATABASE_NAME = 'juku-arcade';
 
@@ -85,10 +87,21 @@ export async function saveSettings(settings: Settings): Promise<void> {
   await database.settings.put({ key: 'settings', value: settings });
 }
 
-/** "Delete my data" (N5): removes every event, word or grammar, and every setting from this browser. */
+/** Progress kept outside the database: Bunpou's haiku collection and best run (D59). */
+const PROGRESS_KEYS = [HAIKU_KEY, BUNPOU_BEST_KEY];
+
+/**
+ * "Delete my data" (N5): removes every event, word or grammar, every
+ * setting, and Bunpou's haiku collection and best run from this browser.
+ */
 export async function deleteAllData(): Promise<void> {
   const tables = [database.events, database.grammarEvents, database.settings];
   await database.transaction('rw', tables, async () => {
     await Promise.all(tables.map((table) => table.clear()));
   });
+  try {
+    for (const key of PROGRESS_KEYS) localStorage.removeItem(key);
+  } catch {
+    // Storage can be blocked (a private window); then nothing was kept there.
+  }
 }

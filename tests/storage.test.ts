@@ -62,6 +62,8 @@ describe('browser storage', () => {
   });
 
   it('deletes every event and setting', async () => {
+    localStorage.setItem('juku-arcade:haiku', '{"collected":["park"],"round":[]}');
+    localStorage.setItem('juku-arcade:best-bunpou-score', '900');
     await appendGrammarEvents([sentence('o', '2026-11-24', 'wrong')]);
     await deleteAllData();
     expect([await loadEvents(), await loadGrammarEvents(), await loadSettings()]).toEqual([
@@ -69,5 +71,7 @@ describe('browser storage', () => {
       [],
       null,
     ]);
+    expect(localStorage.getItem('juku-arcade:haiku')).toBeNull();
+    expect(localStorage.getItem('juku-arcade:best-bunpou-score')).toBeNull();
   });
 });
