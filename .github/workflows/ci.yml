@@ -19,3 +19,5 @@ jobs:
       - run: npm test
       # Downloads the pinned OpenJLPT file, checks its checksum, builds the decks.
       - run: npm run build
+      # The grammar content against that file (the shelf rules need a local shelf map, so they're skipped here).
+      - run: npm run grammar:check
