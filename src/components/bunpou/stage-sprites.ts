@@ -1,6 +1,6 @@
 /**
  * The Bunpou stage's pixel art (D58): the storyteller, a chibi rakugo
- * performer in haori and hakama on his cushion, in four poses, and a
+ * performer in haori and hakama on his cushion, in five poses, and a
  * sealed story slip. Each is a grid of letters, one per pixel, like the
  * game's icons (ui/pixel-icons.ts), drawn by PixelSprite.vue, in the
  * game's palette (D33). The audience is built separately
@@ -28,7 +28,7 @@ export const STAGE_PALETTE: Readonly<Record<string, string>> = {
   x: '#a8dadc', // sweat drop
 };
 
-export type StorytellerPose = 'idle' | 'perform' | 'trip' | 'forgot';
+export type StorytellerPose = 'idle' | 'perform' | 'trip' | 'forgot' | 'bow';
 
 export const STORYTELLER: Record<StorytellerPose, readonly string[]> = {
   /** Kneeling on the cushion, smiling, the closed fan held upright. */
@@ -166,6 +166,41 @@ export const STORYTELLER: Record<StorytellerPose, readonly string[]> = {
     '....kRrqqqqRqqRqqRqqqqrRk...',
     '....kRrqqqqRqqRqqRqqqqrRk...',
     '...kkRrqqqqqqqqqqqqqqqrRk...',
+    '..kcccccccccccccccccccccck..',
+    '..kcccccccccccccccccccccck..',
+    '..kCCCCCCCCCCCCCCCCCCCCCCk..',
+    '...kkkkkkkkkkkkkkkkkkkkkk...',
+  ],
+  /** Bowing low at the end of the show: the head down, both hands flat in front. */
+  bow: [
+    '............................',
+    '............................',
+    '............................',
+    '............................',
+    '............................',
+    '............................',
+    '............................',
+    '............................',
+    '..........k..k..k...........',
+    '.........khkkhkkhk..........',
+    '.........khhhhhhhhk.........',
+    '........khhhhhhhhhhk........',
+    '.......khhhhhhhhhhhhk.......',
+    '.......khhhhhhhhhhhhk.......',
+    '.......khhhhhhhhhhhhk.......',
+    '........khhhhhhhhhhk........',
+    '........kksssssssskk........',
+    '.......krrrrrrrrrrrrk.......',
+    '......krrrrrrrrrrrrrrk......',
+    '.....krrrrrrrrrrrrrrrrk.....',
+    '....kRrrrrrrrrrrrrrrrrRk....',
+    '....kRrrrrrrrrrrrrrrrrRk....',
+    '....kRrrrrrrrrrrrrrrrrRk....',
+    '....kRrrqqqqqqqqqqqqrrRk....',
+    '....kRrqqqqqqqRqqqqqqrRk....',
+    '....kRrqqqqqqqRqqqqqqrRk....',
+    '....kRrsssqqqqRqqqsssrRk....',
+    '...kkRrsssqqqqqqqqsssrRkk...',
     '..kcccccccccccccccccccccck..',
     '..kcccccccccccccccccccccck..',
     '..kCCCCCCCCCCCCCCCCCCCCCCk..',

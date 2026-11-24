@@ -1,8 +1,9 @@
 /**
- * The start screen's leaderboard (D47), with sample players until there's
- * a server to share real scores. It ranks scores (banked coins, D46), puts
- * your best from this browser among them, and splits the ranking into
- * pages the panel flips through with Back and Next.
+ * The start screen's leaderboards (D47), with sample players until there's
+ * a server to share real scores: word mode's (banked coins, D46) and
+ * Bunpou's (total run score, D59). Each ranks your best from this browser
+ * among its samples and splits the ranking into pages the panel flips
+ * through with Back and Next.
  */
 
 export interface LeaderboardRow {
@@ -39,6 +40,47 @@ export const SAMPLE_PLAYERS: readonly { name: string; score: number }[] = [
   { name: 'Tako', score: 40 },
 ];
 
+/** Bunpou's sample players: a run scores 100 a line times the combo rank, so its scores run higher. */
+export const BUNPOU_SAMPLE_PLAYERS: readonly { name: string; score: number }[] = [
+  { name: 'Kitsune', score: 9600 },
+  { name: 'Fukurou', score: 8150 },
+  { name: 'Tanuki', score: 7300 },
+  { name: 'Tsuru', score: 6400 },
+  { name: 'Usagi', score: 5525 },
+  { name: 'Koi', score: 4800 },
+  { name: 'Neko', score: 4100 },
+  { name: 'Kame', score: 3450 },
+  { name: 'Shika', score: 2900 },
+  { name: 'Risu', score: 2350 },
+  { name: 'Kuma', score: 1900 },
+  { name: 'Hachi', score: 1500 },
+  { name: 'Tori', score: 1150 },
+  { name: 'Kaeru', score: 800 },
+  { name: 'Tako', score: 450 },
+];
+
+export const BUNPOU_BEST_KEY = 'juku-arcade:best-bunpou-score';
+
+/** Your best Bunpou run in this browser, for its leaderboard. */
+export function readBunpouBest(): number {
+  try {
+    return Number(localStorage.getItem(BUNPOU_BEST_KEY) ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
+/** Keeps a run's score if it beats your best; true when it did. */
+export function recordBunpouBest(score: number): boolean {
+  if (score <= readBunpouBest()) return false;
+  try {
+    localStorage.setItem(BUNPOU_BEST_KEY, String(score));
+  } catch {
+    // Storage can be blocked (a private window); the best then lasts this visit.
+  }
+  return true;
+}
+
 /** Rows on one page of the panel. */
 export const ROWS_PER_PAGE = 8;
 
@@ -46,8 +88,11 @@ export const ROWS_PER_PAGE = 8;
  * Every player ranked by score, with you among them. A tie goes to the
  * sample player, so you have to beat a score to pass it.
  */
-export function rankedPlayers(yourBest: number): LeaderboardRow[] {
-  const players = SAMPLE_PLAYERS.map((player) => ({ ...player, isYou: false }));
+export function rankedPlayers(
+  yourBest: number,
+  samples: readonly { name: string; score: number }[] = SAMPLE_PLAYERS,
+): LeaderboardRow[] {
+  const players = samples.map((player) => ({ ...player, isYou: false }));
   const yourPlace = players.filter((player) => player.score >= yourBest).length;
   players.splice(yourPlace, 0, { name: 'You', score: yourBest, isYou: true });
   return players.map((player, index) => ({ ...player, rank: index + 1 }));

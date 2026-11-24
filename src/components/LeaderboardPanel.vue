@@ -2,20 +2,44 @@
 /**
  * The leaderboard on the start screen (D47), drawn like an arcade high
  * score table: a blue pixel box with LEADERBOARD inside it, numbered
- * rows with each player's coins, and Back and Next to page through the
- * ranking. Your best from this browser is ranked among sample players
- * until there's a server to share real scores, and the panel says so.
+ * rows with each player's score, and Back and Next to page through the
+ * ranking. Words and Bunpou (D59) have a board each, switched at the
+ * top: words by banked coins, Bunpou by total run score. Your best from
+ * this browser is ranked among sample players until there's a server to
+ * share real scores, and the panel says so.
  */
 import { computed, ref } from 'vue';
 import { readBestScore } from '../bank-run/useBankRun.ts';
-import { pageCount, pageOf, rankedPlayers } from '../leaderboard/leaderboard.ts';
+import {
+  BUNPOU_SAMPLE_PLAYERS,
+  pageCount,
+  pageOf,
+  rankedPlayers,
+  readBunpouBest,
+} from '../leaderboard/leaderboard.ts';
 import PixelButton from './ui/PixelButton.vue';
 import PixelIcon from './ui/PixelIcon.vue';
 
-const ranked = rankedPlayers(readBestScore());
-const pages = pageCount(ranked);
+type Board = 'words' | 'bunpou';
+const BOARDS: readonly { board: Board; label: string }[] = [
+  { board: 'words', label: 'Words' },
+  { board: 'bunpou', label: 'Bunpou' },
+];
+
+const board = ref<Board>('words');
 const page = ref(0);
-const rows = computed(() => pageOf(ranked, page.value));
+const ranked = computed(() =>
+  board.value === 'words'
+    ? rankedPlayers(readBestScore())
+    : rankedPlayers(readBunpouBest(), BUNPOU_SAMPLE_PLAYERS),
+);
+const pages = computed(() => pageCount(ranked.value));
+const rows = computed(() => pageOf(ranked.value, page.value));
+
+function show(next: Board): void {
+  board.value = next;
+  page.value = 0;
+}
 
 /** BACK and NEXT are disabled at the first and last pages, so a turn always lands on a page. */
 function turn(by: number): void {
@@ -30,6 +54,19 @@ function turn(by: number): void {
     >
       Leaderboard
     </h2>
+    <div class="flex justify-center gap-2" role="group" aria-label="Which board">
+      <PixelButton
+        v-for="choice in BOARDS"
+        :key="choice.board"
+        :colour="board === choice.board ? 'aqua' : 'steel'"
+        class="min-h-9 px-4 text-sm font-bold uppercase"
+        :aria-pressed="board === choice.board"
+        :data-testid="`board-${choice.board}`"
+        @click="show(choice.board)"
+      >
+        {{ choice.label }}
+      </PixelButton>
+    </div>
     <ol class="flex flex-1 flex-col justify-around gap-1 text-xl" data-testid="leaderboard-rows">
       <li
         v-for="row in rows"
@@ -40,7 +77,7 @@ function turn(by: number): void {
       >
         <span class="w-10 shrink-0 text-right">{{ row.rank }}.</span>
         <span class="flex-1 truncate">{{ row.name }}</span>
-        <PixelIcon name="coin" />
+        <PixelIcon v-if="board === 'words'" name="coin" />
         <span class="w-16 text-right font-bold">{{ row.score }}</span>
       </li>
     </ol>

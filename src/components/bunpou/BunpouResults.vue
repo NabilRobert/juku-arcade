@@ -2,8 +2,9 @@
 /**
  * Bunpou's results, when the player ends the run (D57; the player ends a
  * run, the plan says): the score, the best combo, the lines right, and the
- * grammar reviews so far (points seen and known, today's progress). The
- * haiku card that closes the show and the leaderboard come in G4.
+ * grammar reviews so far (points seen and known, today's progress), with
+ * your best run and its place on the Bunpou leaderboard (D59; ★ when this
+ * run is the new best). The curtain call and haiku come before it.
  */
 import { computed } from 'vue';
 import type { GrammarProgress } from '../../grammar/grammar-reviews.ts';
@@ -15,11 +16,17 @@ const props = defineProps<{
   bestCombo: number;
   lines: { played: number; right: number };
   progress: GrammarProgress;
+  /** Your best run in this browser, and its place on the Bunpou leaderboard. */
+  best: number;
+  isNewBest: boolean;
+  rank: number;
 }>();
 defineEmits<{ again: []; leave: [] }>();
 
 const panels = computed(() => [
   { label: 'Score', value: String(props.score) },
+  { label: 'Best run', value: props.isNewBest ? `${props.best} ★` : String(props.best) },
+  { label: 'Board rank', value: `#${props.rank}` },
   { label: 'Best combo', value: String(props.bestCombo) },
   { label: 'Lines right', value: `${props.lines.right} / ${props.lines.played}` },
   {
@@ -46,7 +53,7 @@ const panels = computed(() => [
     data-testid="results"
   >
     <h2 class="text-2xl font-bold text-aqua">Run results</h2>
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-4 gap-3">
       <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
         <span class="text-2xl font-bold" :data-testid="`result-${panel.label}`">{{
           panel.value

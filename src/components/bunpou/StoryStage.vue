@@ -6,7 +6,9 @@
  * bubble, and a packed house across the whole width in front: two rows of
  * dark silhouettes (crowd-strip.ts) that sit still, cheer and hop, or
  * show one phone glowing when a tale falls flat. The crowd's shout floats
- * over the stage. The board and the performance drive it with props; it
+ * over the stage, and at the end of the show the curtains close on it
+ * from both sides. A cedar frame with a dark inner edge, drawn over the
+ * curtains, makes the stage's opening. The board and the performance drive it with props; it
  * has no state of its own.
  */
 import { computed } from 'vue';
@@ -25,11 +27,19 @@ const props = defineProps<{
   /** The crowd's shout, or null. */
   shout?: string | null;
   isShoutLoud?: boolean;
+  /** The curtains drawn across the stage from both sides, at the end of the show. */
+  isCurtainClosed?: boolean;
 }>();
 
 /** Each nearer layer hops a beat after the one behind it, so the cheering ripples forward. */
 const HOP_STEP_MS = 150;
 const LAYERS: readonly CrowdLayer[] = ['far', 'middle', 'near'];
+
+/** The two curtains: each starts off its own side of the stage and slides in to meet in the middle. */
+const CURTAIN_SIDES = [
+  { side: 'left', place: 'left-0 border-r-4', open: '-translate-x-full' },
+  { side: 'right', place: 'right-0 border-l-4', open: 'translate-x-full' },
+] as const;
 
 const crowdLayers = computed(() =>
   LAYERS.map((layer, depth) => ({
@@ -45,7 +55,7 @@ const crowdLayers = computed(() =>
 
 <template>
   <section
-    class="pixel-panel relative h-60 overflow-hidden bg-wood/90"
+    class="pixel-panel relative h-66 overflow-hidden border-9 border-cedar bg-wood/90"
     aria-label="The stage"
     data-testid="stage"
     :data-pose="pose"
@@ -83,7 +93,7 @@ const crowdLayers = computed(() =>
     </div>
     <p
       v-if="bubble"
-      class="absolute top-4 left-[calc(50%+4.5rem)] bg-washi px-3 py-1 text-xl text-sumi"
+      class="absolute top-4 left-[calc(50%+4.5rem)] z-10 bg-washi px-3 py-1 text-xl whitespace-nowrap text-sumi"
       lang="ja"
       data-testid="bubble"
     >
@@ -93,7 +103,7 @@ const crowdLayers = computed(() =>
       v-for="crowd in crowdLayers"
       :key="crowd.layer"
       class="absolute inset-x-0 -bottom-2 h-[calc(100%+0.5rem)]"
-      :class="isCrowdLaughing ? 'motion-safe:animate-hop' : ''"
+      :class="isCrowdLaughing ? 'motion-safe:animate-cheer' : ''"
       :style="{ animationDelay: crowd.delay }"
       aria-hidden="true"
       :data-testid="`crowd-${crowd.layer}`"
@@ -107,7 +117,7 @@ const crowdLayers = computed(() =>
     </div>
     <p
       v-if="shout"
-      class="absolute top-4 left-6 font-bold"
+      class="absolute top-4 left-6 z-10 font-bold"
       :class="isShoutLoud ? 'text-5xl text-washi' : 'text-3xl text-aqua'"
       lang="ja"
       role="status"
@@ -115,5 +125,18 @@ const crowdLayers = computed(() =>
     >
       {{ shout }}
     </p>
+    <div
+      v-for="side in CURTAIN_SIDES"
+      :key="side.side"
+      class="curtain absolute inset-y-0 z-20 w-1/2 border-sumi motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-in-out"
+      :class="[side.place, isCurtainClosed ? 'translate-x-0' : side.open]"
+      aria-hidden="true"
+      :data-testid="`curtain-${side.side}`"
+      :data-closed="isCurtainClosed === true ? '' : undefined"
+    />
+    <div
+      class="pointer-events-none absolute inset-0 z-30 border-3 border-sumi/80"
+      aria-hidden="true"
+    />
   </section>
 </template>

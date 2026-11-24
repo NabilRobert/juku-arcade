@@ -21,6 +21,7 @@ import type { GrammarEvent } from '../../grammar/grammar-events.ts';
 import { CURRICULUM } from '../../grammar/templates.ts';
 import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
 import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
+import { useRunEnd } from '../../grammar/useRunEnd.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
@@ -35,6 +36,7 @@ import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
 import BunpouResults from './BunpouResults.vue';
 import ChapterScroll from './ChapterScroll.vue';
+import CurtainCall from './CurtainCall.vue';
 import StoryStage from './StoryStage.vue';
 import TalePerformance from './TalePerformance.vue';
 
@@ -55,12 +57,13 @@ const game = useBunpouRun({
 });
 const { run, unplaced, timeLeft } = game;
 const isPaused = (): boolean => run.value.pausedAtMs !== null;
-const isEnded = ref(false);
+const runEnd = useRunEnd();
+const isEnded = computed(() => runEnd.step.value !== 'playing');
 
-/** Ends the run: the line's clock stops for good and the results show. */
+/** Ends the run: the line's clock stops for good, the storyteller bows, then the haiku and results. */
 function endRun(): void {
   game.pause();
-  isEnded.value = true;
+  runEnd.end(run.value);
 }
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -166,12 +169,23 @@ function dismiss(isStopping: boolean): void {
       </p>
     </aside>
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
+      <CurtainCall
+        v-if="runEnd.step.value === 'curtain' && runEnd.pick.value"
+        :haiku="runEnd.pick.value.haiku"
+        :is-new="runEnd.pick.value.isNew"
+        :collected="runEnd.pick.value.shelf.collected.length"
+        :total="runEnd.haikuTotal"
+        @results="runEnd.showResults"
+      />
       <BunpouResults
-        v-if="isEnded"
+        v-else-if="runEnd.step.value === 'results'"
         :score="run.score"
         :best-combo="run.bestCombo"
         :lines="reviews.lines.value"
         :progress="reviews.progress.value"
+        :best="runEnd.best.value"
+        :is-new-best="runEnd.isNewBest.value"
+        :rank="runEnd.rank.value"
         @again="emit('again')"
         @leave="emit('leave')"
       />
