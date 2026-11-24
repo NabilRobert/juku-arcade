@@ -120,3 +120,26 @@ export function makeTale(
       'template on one of them. Add templates, or more points.',
   );
 }
+
+/** Enough points for a tale of up to 6 lines, each on its own point, covering 起承転結. */
+export const MIN_TALE_POINTS = 6;
+
+/**
+ * A tale from the first points of a ranking (D57: today's grammar first):
+ * the top MIN_TALE_POINTS, or as many more as it takes, since some sets
+ * leave a part of the tale with no template.
+ */
+export function makeTaleFromRanking(
+  ranked: readonly string[],
+  templates: readonly Template[],
+  random: RandomSource,
+): Tale {
+  for (let count = Math.min(MIN_TALE_POINTS, ranked.length); count < ranked.length; count++) {
+    try {
+      return makeTale(ranked.slice(0, count), templates, random);
+    } catch {
+      // This set can't fill every part of a tale; try with the next point too.
+    }
+  }
+  return makeTale(ranked, templates, random);
+}
