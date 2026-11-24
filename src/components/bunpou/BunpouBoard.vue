@@ -46,6 +46,21 @@ const markedOf = computed(() => {
 });
 const canMove = computed(() => props.run.phase === 'building' && !isPaused.value);
 
+/** Tiles placed at least once this line: taken back, they reappear without being dealt again. */
+const placedThisLine = ref(new Set<string>());
+watch(
+  () => props.run.lineIndex,
+  () => {
+    placedThisLine.value = new Set();
+  },
+);
+watch(
+  () => props.run.slots,
+  (slots) => {
+    for (const tile of slots) if (tile !== null) placedThisLine.value.add(tile);
+  },
+);
+
 /** The combo just lost, shown dropping away until ComboMeter has shown it. */
 const brokenCombo = ref<number | null>(null);
 watch(
@@ -170,7 +185,8 @@ function dropAt(tile: string, point: Point): void {
     <div class="flex min-h-24 flex-wrap justify-center gap-4" data-testid="offered">
       <BunpouTile
         v-for="(tile, index) in unplaced"
-        :key="tile"
+        :key="`${run.lineIndex}-${tile}`"
+        :deal-index="placedThisLine.has(tile) ? undefined : index"
         :marked="markedOf(tile)"
         :number="index + 1"
         :is-draggable="canMove"

@@ -6,10 +6,20 @@
  * it was let go, and the board places the tile there. A press that
  * wobbles less than TAP_SLOP_PX still counts as a tap, as with the cards.
  * While paused it turns face down, showing the card back, at the same
- * size so nothing on the table moves (D8).
+ * size so nothing on the table moves (D8). A line's tiles are dealt in
+ * like word mode's cards (D58): one after another from above, each with
+ * the card-landing tap, a little higher than the one before.
  */
 import { m, type PanInfo } from 'motion-v';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+import { useLater } from '../../composables/useLater.ts';
+import { hoverPitch, playSound } from '../../sound/sfx.ts';
+import {
+  dealDelayMs,
+  tileDealTransition,
+  TILE_DEALT_FROM,
+  TILE_RESTING,
+} from '../cards/card-motion.ts';
 import { isDrag, type Point } from '../cards/throw-geometry.ts';
 import FuriganaText from '../words/FuriganaText.vue';
 
@@ -20,10 +30,18 @@ const props = defineProps<{
   isWrong?: boolean;
   isDraggable?: boolean;
   isFaceDown?: boolean;
+  /** Its place in a fresh deal, so it's dealt in; left out, it just appears (a tile taken back). */
+  dealIndex?: number;
 }>();
 const emit = defineEmits<{ tap: []; release: [point: Point] }>();
 
 const HELD_POSE = { scale: 1.1, rotate: 4 } as const;
+
+const later = useLater();
+onMounted(() => {
+  const index = props.dealIndex;
+  if (index !== undefined) later(() => playSound('deal', hoverPitch(index)), dealDelayMs(index));
+});
 
 const faceClass = computed(() => {
   if (props.isFaceDown) return 'card-back';
@@ -53,6 +71,9 @@ function onRelease(info: PanInfo): void {
   <m.div
     :drag="props.isDraggable === true"
     drag-snap-to-origin
+    :initial="dealIndex === undefined ? false : TILE_DEALT_FROM"
+    :animate="TILE_RESTING"
+    :transition="tileDealTransition(dealIndex ?? 0)"
     :while-drag="HELD_POSE"
     class="relative"
     @drag-end="(_event: PointerEvent, info: PanInfo) => onRelease(info)"
