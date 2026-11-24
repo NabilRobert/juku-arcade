@@ -7,7 +7,8 @@
  * dark silhouettes (crowd-strip.ts) that sit still, cheer and hop, or
  * show one phone glowing when a tale falls flat. The crowd's shout floats
  * over the stage, and at the end of the show the curtains close on it
- * from both sides. The board and the performance drive it with props; it
+ * from both sides. A cedar frame with a dark inner edge, drawn over the
+ * curtains, makes the stage's opening. The board and the performance drive it with props; it
  * has no state of its own.
  */
 import { computed } from 'vue';
@@ -54,7 +55,7 @@ const crowdLayers = computed(() =>
 
 <template>
   <section
-    class="pixel-panel relative h-60 overflow-hidden bg-wood/90"
+    class="pixel-panel relative h-60 overflow-hidden border-9 border-cedar bg-wood/90"
     aria-label="The stage"
     data-testid="stage"
     :data-pose="pose"
@@ -132,6 +133,10 @@ const crowdLayers = computed(() =>
       aria-hidden="true"
       :data-testid="`curtain-${side.side}`"
       :data-closed="isCurtainClosed === true ? '' : undefined"
+    />
+    <div
+      class="pointer-events-none absolute inset-0 z-30 border-3 border-sumi/80"
+      aria-hidden="true"
     />
   </section>
 </template>
