@@ -703,9 +703,11 @@ fields. They stay in memory until slice 3 stores them.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
-- **Add a grammar template:** add it to `TEMPLATES` in
-  `src/grammar/templates.ts` (the format is in the file's header), then
-  run `npm run grammar:check` and `npm run grammar:preview`. A new word for
+- **Add a grammar template:** add it to its group's file in
+  `src/grammar/templates/` (the format is in `src/grammar/templates.ts`'s
+  header), then run `npm run grammar:check` and `npm run grammar:preview`.
+  A new grammar point also goes in `CURRICULUM` (its place sets when it's
+  taught) and `POINT_PATTERNS`, both in `templates.ts`. A new word for
   its slots goes in `src/grammar/lexicon.ts`; a new verb class needs rules
   in `src/grammar/conjugate.ts`.
 - **Tune Bunpou's pace or score:** `SECONDS_PER_TILE_BY_LEVEL`,
