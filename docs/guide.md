@@ -385,11 +385,24 @@ pinned OpenJLPT build.
    schedule) and today's progress in the side panel (`DailyBar.vue`), and
    saves it (`storage.ts: appendGrammarEvents`, the `grammarEvents`
    table, never the word log).
-7. After a tale's last line, **`TaleReveal.vue`** lists every line; "Next
-   tale" calls **`nextTale`** with a new tale. "End run" shows
+7. Above the table, **`StoryStage.vue`** shows the storyteller (pixel art
+   in `stage-sprites.ts`, drawn by `ui/PixelSprite.vue`) with one sealed
+   slip per line built, and a packed house of silhouettes. A line that
+   times out, he forgets: he scratches his head and says えーと…. Each
+   line's tiles are dealt in like word mode's cards (`BunpouTile.vue`,
+   with `card-motion.ts: tileDealTransition`).
+8. After a tale's last line, **`TalePerformance.vue`** performs it
+   (**`grammar/usePerformance.ts`**, rules in **`performance.ts`**): a
+   shamisen opening, then each line in turn (`TaleLines.vue`), unrolling a
+   slip: the fan raised on a right line, a trip on a wrong one (with its
+   fix), えーと… on a forgotten one. Then the crowd reacts by how many lines
+   were right (`crowdReaction`): 大爆笑 and cheering, a laugh, a chuckle,
+   or silence with a cough and someone on a phone. Skip jumps to the
+   reaction. After every third tale, **`ChapterScroll.vue`** shows the
+   chapter (第1章) as a scroll. "Next tale" calls **`nextTale`**. "End run" shows
    **`BunpouResults.vue`**: the run's score and lines, grammar seen and
    known, and today's progress.
-8. Pausing (the button or Esc) freezes the line's clock and turns the
+9. Pausing (the button or Esc) freezes the line's clock and turns the
    tiles face down where they lie, with the run's misses floating below. Play time counts toward the
    wellbeing nudges, as in kanji mode (`usePlayClock`).
 
@@ -573,6 +586,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Grammar log** | The browser table of judged Bunpou lines, one event each, kept apart from the word log | `grammar-events.ts`, `storage.ts: grammarEvents` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
+| **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |
+| **Performance** | The tale told line by line after its last line, then the crowd's reaction (roar, laugh, chuckle or silence) | `performance.ts`, `usePerformance.ts`, `TalePerformance.vue` |
+| **Chapter** | Every 3 tales, shown together as a scroll | `ChapterScroll.vue`, `performance.ts: TALES_PER_CHAPTER` |
 | **Hint** | The line's grammar pattern (人＋と), shown beside 起承転結 unless the player turns hints off | `preferences/hints.ts`, `BunpouBoard.vue` |
 | **Preference** | A small on/off choice kept in this browser: sound muted, Bunpou's hint, furigana. Set by an `OnOffButton` | `src/preferences/`, `ui/OnOffButton.vue` |
 | **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
@@ -696,6 +712,13 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Change the stage:** the storyteller and slip are letter grids in
+  `src/components/bunpou/stage-sprites.ts` (one letter per pixel, colours
+  in `STAGE_PALETTE`); the crowd's head shapes, rows and colours are in
+  `crowd-strip.ts`; the crowd's reactions and shouts,
+  and how long each line is told, are in `src/grammar/performance.ts`;
+  the stage's sounds are the `fanTap` to `cough` entries in
+  `src/sound/sfx.ts`.
 - **Change how many grammar points are new each day:**
   `NEW_POINTS_PER_DAY` in `src/grammar/grammar-reviews.ts`; how many points
   a tale starts from is `MIN_TALE_POINTS` in `src/grammar/tale.ts`.

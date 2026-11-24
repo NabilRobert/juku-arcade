@@ -994,3 +994,51 @@ line is logged.
   schedules that could drift apart); counting timeouts as misses (would
   punish slow readers, unlike word mode).
 
+### D58: Bunpou's stage, performance and chapters (G3, 2026-11-24)
+
+The rakugo stage the plan describes, built with the game's own pixel-art
+approach and synth sounds, since there's no art or audio for it yet.
+
+- **The stage** sits above the table: the storyteller kneeling on his
+  cushion in a warm spotlight, one sealed slip per line built (the player
+  sees how far the tale has got, not the story), and a packed house
+  across the stage's full width: two rows of dark silhouettes seen from
+  behind, heads of different shapes at different heights merging into
+  one mass like a concert crowd, rising towards the sides so it wraps
+  round the stage (after playtest feedback: a few detailed audience
+  members looked sparse, and a straight row didn't feel like a crowd
+  round a storyteller). The storyteller is a chibi rakugo performer in
+  haori and hakama, the closed fan held upright, drawn in the game's
+  palette in the style of a reference picture from playtesting, not copied from it. The storyteller and slip are
+  letter grids like the icons (D43), drawn for this game, with
+  `pixel-icons.ts: gridPaths` now serving both; the crowd is built from
+  six head shapes by a seeded generator (`crowd-strip.ts`), so it's the
+  same every time, and drawn as one wide strip that covers any stage
+  width without stretching its pixels. The stage is taller than the
+  first draft, as allowed, to fit the crowd and the light.
+- **Forgetting a line:** when a line times out, the storyteller
+  scratches his head and says えーと…, as the plan's item 8 asks.
+- **The performance** replaces the plain list (D56) after a tale's last
+  line: a three-pluck shamisen opening, then each line told in turn,
+  unrolling a slip. A right line gets the fan raised and a fan tap; a
+  wrong one is told as built, he trips, and its fix shows; a forgotten
+  one gets えーと…. Then the crowd reacts by the plan's table: every line
+  right, 大爆笑 with arms thrown up and the rows hopping (louder at an S
+  rank or above);
+  one wrong, あはは; two, くすくす; three or more, しーん with a cough and
+  someone on a phone. Skip jumps to the reaction. The lines scroll inside
+  their panel so the buttons stay on screen.
+- **Chapters:** every 3 tales, the chapter (第1章) shows as a scroll with
+  each tale (其の一…) and its lines.
+- **Dealing:** a line's tiles are dealt in like word mode's cards, one
+  after another from above with the card-landing tap rising in pitch
+  (asked for in playtesting); a tile taken back just reappears.
+- **Sounds:** fan tap, slip fold, shamisen pluck, three laugh tiers and
+  a cough, all ZzFX synth stand-ins shaped without recordings, to be
+  replaced or tuned by ear.
+- **Not yet:** the storyteller's bow and the haiku card that close the
+  show, and the leaderboard (G4).
+- **Beat:** a separate art pass before building (the plan lists art
+  sourcing as open; pixel grids keep the look consistent and can be
+  redrawn later without code changes); a full-screen performance
+  overlay (hides the side panel's score and progress for no gain).
