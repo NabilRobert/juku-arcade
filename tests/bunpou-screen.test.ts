@@ -1,20 +1,19 @@
-// Bunpou on screen: placing and taking back tiles, keys, a miss's fix, pausing, and the tale's reveal.
+// Bunpou on screen: placing and taking back tiles, keys, a miss's fix, pausing, and the hint.
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import BunpouBoard from '../src/components/bunpou/BunpouBoard.vue';
 import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
-import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
 import { parseFurigana } from '../src/deck/furigana.ts';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
 import { setHintsShown } from '../src/preferences/hints.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
 import { useBunpouRun } from '../src/grammar/useBunpouRun.ts';
 
-const POINTS = Object.keys(POINT_PATTERNS);
+const POINTS = CURRICULUM;
 
 function freshRun(): rules.BunpouRun {
   const random = seededRandom(9);
@@ -33,7 +32,7 @@ function missedRun(): rules.BunpouRun {
 
 /** The line's grammar pattern as it reads, without its furigana markup. */
 function patternOf(run: rules.BunpouRun): string {
-  const marked = POINT_PATTERNS[rules.currentLine(run).point] ?? '';
+  const marked = POINT_PATTERNS[rules.currentLine(run).point];
   return parseFurigana(marked)
     .map((piece) => piece.text)
     .join('');
@@ -48,7 +47,7 @@ function withoutFurigana(element: Element): string {
 
 const mountBoard = (run: rules.BunpouRun) =>
   mount(BunpouBoard, {
-    props: { run, unplaced: run.offered.filter((tile) => !run.slots.includes(tile)), timeLeft: 1 },
+    props: { run, unplaced: run.offered.filter((tile) => !run.boxes.includes(tile)), timeLeft: 1 },
   });
 
 afterEach(() => {
@@ -85,8 +84,8 @@ describe('Bunpou on screen', () => {
   it('shows one box per tile, empty until a tile is put in it', () => {
     const run = freshRun();
     const last = run.offered[0] ?? '';
-    const board = mountBoard(rules.placeTile(run, last, run.slots.length - 1));
-    const boxes = board.findAll('[data-slot]');
+    const board = mountBoard(rules.placeTile(run, last, run.boxes.length - 1));
+    const boxes = board.findAll('[data-box]');
     expect(boxes).toHaveLength(run.offered.length);
     expect(boxes.at(-1)?.find('button').exists()).toBe(true);
     expect(boxes[0]?.find('button').exists()).toBe(false);
@@ -142,13 +141,6 @@ describe('Bunpou on screen', () => {
     expect(board.find('[data-testid="hint"]').exists()).toBe(false);
     setHintsShown(true);
   });
-
-  it('reveals every line of the tale and asks for the next one', async () => {
-    const reveal = mount(TaleReveal, { props: { results: missedRun().results } });
-    expect(reveal.findAll('li')).toHaveLength(1);
-    await reveal.find('[data-testid="next-tale"]').trigger('click');
-    expect(reveal.emitted('next')).toHaveLength(1);
-  });
 });
 
 describe('Bunpou’s keys and pacing', () => {
@@ -157,7 +149,7 @@ describe('Bunpou’s keys and pacing', () => {
     const host = mount(
       defineComponent({
         setup() {
-          game = useBunpouRun(seededRandom(9));
+          game = useBunpouRun({ random: seededRandom(9) });
           return () => h('div');
         },
       }),

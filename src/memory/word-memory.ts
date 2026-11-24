@@ -45,12 +45,17 @@ function answerOf(event: GameEvent): boolean | null {
   return null;
 }
 
-function updatedWord(
+/**
+ * A reviewed item's record after one answer given at `at`. Shared with
+ * grammar reviews (grammar/grammar-reviews.ts), so a grammar point is
+ * scheduled exactly as a word is.
+ */
+export function recordAnswer(
   previous: WordMemory | undefined,
   isCorrect: boolean,
-  event: GameEvent,
+  at: string,
 ): WordMemory {
-  const day = localDayOf(event.at);
+  const day = localDayOf(at);
   const before = previous ?? {
     ...NEW_WORD,
     attempts: 0,
@@ -66,7 +71,7 @@ function updatedWord(
     misses: before.misses + (isCorrect ? 0 : 1),
     lastAnswerDay: day,
     lastDueReviewDay: wasDue ? day : before.lastDueReviewDay,
-    lastAnswerAt: event.at,
+    lastAnswerAt: at,
   };
 }
 
@@ -75,7 +80,10 @@ export function applyEvent(memory: Memory, event: GameEvent): void {
   applyCheckUp(memory.checkUps, event);
   const isCorrect = answerOf(event);
   if (isCorrect === null || event.word_id === null) return;
-  memory.words.set(event.word_id, updatedWord(memory.words.get(event.word_id), isCorrect, event));
+  memory.words.set(
+    event.word_id,
+    recordAnswer(memory.words.get(event.word_id), isCorrect, event.at),
+  );
   memory.daysPlayed.add(localDayOf(event.at));
 }
 

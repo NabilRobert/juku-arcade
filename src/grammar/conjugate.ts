@@ -64,6 +64,11 @@ function politeStem(verb: Verb): Conjugated {
   );
 }
 
+/** True for a form conjugatePolite knows; a template's typo (mashta) isn't one. */
+export function isPoliteForm(form: string): form is PoliteForm {
+  return form in POLITE_ENDINGS;
+}
+
 export function conjugatePolite(verb: Verb, form: PoliteForm): Conjugated {
   const stem = politeStem(verb);
   const ending = POLITE_ENDINGS[form];

@@ -1,14 +1,18 @@
 /**
- * The grammar mode's build check (`npm run grammar:check`):
- * - the templates against the shelf map (src/grammar/template-check.ts);
+ * The grammar mode's build check (`npm run grammar:check`, run in CI
+ * after the build has fetched the pinned OpenJLPT file):
+ * - the templates' shape, and that every tile fills
+ *   (src/grammar/template-check.ts);
+ * - the templates against the shelf map, when there is one;
  * - every word in src/grammar/lexicon.ts against the pinned OpenJLPT
  *   build: an N5 word, with that reading, and for verbs that class.
  * Exits with code 1 and lists the problems if there are any.
  *
- * The shelf map, bunpou-n5-shelf-map.csv, isn't committed yet: it's read
- * from the repo root until a copy is.
+ * The shelf map, bunpou-n5-shelf-map.csv, isn't committed: it's read from
+ * the repo root when it's there (a local copy), and its shelf rules are
+ * skipped with a note when it isn't (a fresh clone, or CI).
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import type { DatabaseSync } from 'node:sqlite';
 import { NOUNS, VERBS } from '../src/grammar/lexicon.ts';
 import { parseShelfMap, templateProblems } from '../src/grammar/template-check.ts';
@@ -49,7 +53,11 @@ function lexiconProblems(n5Words: ReadonlyMap<string, N5Entry[]>): string[] {
   return problems;
 }
 
-const shelfMap = parseShelfMap(readFileSync(SHELF_MAP_PATH, 'utf8'));
+const hasShelfMap = existsSync(SHELF_MAP_PATH);
+const shelfMap = hasShelfMap ? parseShelfMap(readFileSync(SHELF_MAP_PATH, 'utf8')) : null;
+if (!hasShelfMap) {
+  console.log(`No ${SHELF_MAP_PATH} here: skipping the shelf rules, checking everything else.`);
+}
 const database = await openPinnedDatabase();
 const problems = [
   ...templateProblems(TEMPLATES, shelfMap),

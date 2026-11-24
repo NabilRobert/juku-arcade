@@ -123,6 +123,16 @@ export function dealDelayMs(index: number): number {
   return index * DEAL_STAGGER_MS;
 }
 
+/**
+ * A Bunpou tile's deal (D58), the cards' own: it comes in from above its
+ * place on the cards' stagger and spring, with no deck to come off.
+ */
+export const TILE_DEALT_FROM: Pose = DEAL_FROM_ABOVE;
+export const TILE_RESTING: Pose = RESTING;
+export function tileDealTransition(index: number): Transition {
+  return { type: 'spring', stiffness: 380, damping: 26, delay: dealDelayMs(index) / 1000 };
+}
+
 export function cardTransition(status: CardStatus, index: number, isDealt: boolean): Transition {
   if (status === 'matched') {
     return {

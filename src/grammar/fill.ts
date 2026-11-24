@@ -3,11 +3,11 @@
  * in the setting's words, conjugates the verb, adds furigana on the kanji
  * and keeps the template's tiles and units for the order checker.
  */
-import { conjugatePolite, type PoliteForm } from './conjugate.ts';
+import { conjugatePolite, isPoliteForm } from './conjugate.ts';
 import { kanjiFurigana } from './kanji-furigana.ts';
 import { verbByWord, type Noun } from './lexicon.ts';
 import type { OrderRules } from './order-check.ts';
-import type { Shelf, Template } from './templates.ts';
+import type { PointId, Shelf, Template } from './templates.ts';
 
 /** The slots a template can use, and the noun type that fills each. */
 export const SLOT_TYPES = {
@@ -34,7 +34,7 @@ export interface Tile {
 
 export interface Sentence extends OrderRules {
   templateId: string;
-  point: string;
+  point: PointId;
   shelf: Shelf;
   /** The tiles in the template's own (right) order. */
   tiles: Tile[];
@@ -52,7 +52,14 @@ function tokenWord(match: RegExpMatchArray, setting: Setting): { word: string; r
   const [, name, form, fixedText, fixedReading] = match;
   if (fixedText !== undefined) return { word: fixedText, reading: fixedReading ?? '' };
   if (name === undefined) throw new Error(`Unreadable template token ${match[0]}`);
-  if (form !== undefined) return conjugatePolite(verbByWord(name), form as PoliteForm);
+  if (form !== undefined) {
+    if (!isPoliteForm(form)) {
+      throw new Error(
+        `Unknown verb form "${form}" in ${match[0]}: use masu, mashita, masen or masenDeshita`,
+      );
+    }
+    return conjugatePolite(verbByWord(name), form);
+  }
   if (!isSlot(name)) {
     throw new Error(`Unknown template slot <${name}>: use one of fill.ts SLOT_TYPES`);
   }
@@ -94,4 +101,17 @@ export function fillTemplate(template: Template, setting: Setting): Sentence | n
 /** The sentence as one line of text, in the template's order: 先生は日曜日に来ます。 */
 export function sentenceText(sentence: Sentence): string {
   return `${sentence.tiles.map((tile) => tile.text).join('')}。`;
+}
+
+/** One of the sentence's tiles, found by its text, with its furigana markup ({先生|せんせい}). */
+export function markedTile(sentence: Sentence, text: string): string {
+  return sentence.tiles.find((tile) => tile.text === text)?.marked ?? text;
+}
+
+/** The sentence with furigana markup, in the template's order or the tile order given, ending 。 */
+export function markedSentence(
+  sentence: Sentence,
+  order: readonly string[] = sentence.tiles.map((tile) => tile.text),
+): string {
+  return `${order.map((text) => markedTile(sentence, text)).join('')}。`;
 }

@@ -119,25 +119,32 @@ export interface IconPath {
   d: string;
 }
 
-/** The icon's size in pixels, for the SVG's viewBox. */
-export function iconSize(name: IconName): { width: number; height: number } {
-  const grid = ICONS[name];
+/** A grid's size in pixels, for the SVG's viewBox. */
+export function gridSize(grid: readonly string[]): { width: number; height: number } {
   return { width: grid[0]?.length ?? 0, height: grid.length };
 }
 
-/** One path per colour, made of runs of same-coloured pixels along each row. */
-export function iconPaths(name: IconName): IconPath[] {
+/**
+ * One path per colour, made of runs of same-coloured pixels along each row.
+ * Shared with the Bunpou stage's sprites (bunpou/stage-sprites.ts), which
+ * bring their own palette; `name` only labels the error.
+ */
+export function gridPaths(
+  grid: readonly string[],
+  palette: Readonly<Record<string, string>>,
+  name: string,
+): IconPath[] {
   const paths = new Map<string, string>();
-  ICONS[name].forEach((row, y) => {
+  grid.forEach((row, y) => {
     let x = 0;
     while (x < row.length) {
       const letter = row[x] ?? '.';
       let end = x + 1;
       while (row[end] === letter) end += 1;
       if (letter !== '.') {
-        const colour = PALETTE[letter];
+        const colour = palette[letter];
         if (colour === undefined) {
-          throw new Error(`Icon "${name}" uses "${letter}", which isn't in PALETTE: add it there`);
+          throw new Error(`"${name}" uses "${letter}", which isn't in its palette: add it there`);
         }
         paths.set(colour, `${paths.get(colour) ?? ''}M${x} ${y}h${end - x}v1H${x}z`);
       }
@@ -145,4 +152,14 @@ export function iconPaths(name: IconName): IconPath[] {
     }
   });
   return [...paths].map(([colour, d]) => ({ colour, d }));
+}
+
+/** The icon's size in pixels, for the SVG's viewBox. */
+export function iconSize(name: IconName): { width: number; height: number } {
+  return gridSize(ICONS[name]);
+}
+
+/** One path per colour, made of runs of same-coloured pixels along each row. */
+export function iconPaths(name: IconName): IconPath[] {
+  return gridPaths(ICONS[name], PALETTE, `Icon "${name}"`);
 }

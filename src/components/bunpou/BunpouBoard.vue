@@ -16,7 +16,8 @@
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { BunpouRun } from '../../grammar/bunpou-run.ts';
 import { areHintsShown } from '../../preferences/hints.ts';
-import { POINT_PATTERNS } from '../../grammar/templates.ts';
+import { markedTile } from '../../grammar/fill.ts';
+import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -32,19 +33,30 @@ const emit = defineEmits<{
   resume: [];
 }>();
 
-const PART_NAMES = { S: '起', D: '承', T: '転', P: '結' } as const;
-
 const line = computed(() => props.run.tale.lines[props.run.lineIndex]);
 const isPaused = computed(() => props.run.pausedAtMs !== null);
 const hint = computed(() => (line.value ? POINT_PATTERNS[line.value.point] : undefined));
 const judged = computed(() =>
   props.run.phase === 'judged' ? props.run.results.at(-1) : undefined,
 );
-const markedOf = computed(() => {
-  const marks = new Map(line.value?.tiles.map((tile) => [tile.text, tile.marked]));
-  return (text: string): string => marks.get(text) ?? text;
-});
+const markedOf = (text: string): string =>
+  line.value === undefined ? text : markedTile(line.value, text);
 const canMove = computed(() => props.run.phase === 'building' && !isPaused.value);
+
+/** Tiles placed at least once this line: taken back, they reappear without being dealt again. */
+const placedThisLine = ref(new Set<string>());
+watch(
+  () => props.run.lineIndex,
+  () => {
+    placedThisLine.value = new Set();
+  },
+);
+watch(
+  () => props.run.boxes,
+  (boxes) => {
+    for (const tile of boxes) if (tile !== null) placedThisLine.value.add(tile);
+  },
+);
 
 /** The combo just lost, shown dropping away until ComboMeter has shown it. */
 const brokenCombo = ref<number | null>(null);
@@ -62,18 +74,18 @@ function isInside(box: DOMRect, point: Point): boolean {
 }
 
 /** The box a tile was let go over: the nearest one, if it was let go over the strip at all. */
-function slotIndexAt(point: Point): number | null {
+function boxIndexAt(point: Point): number | null {
   const stripBox = strip.value?.getBoundingClientRect();
   if (stripBox === undefined || !isInside(stripBox, point)) return null;
-  const slotBoxes = [...(strip.value?.querySelectorAll('[data-slot]') ?? [])].map((slot) =>
-    slot.getBoundingClientRect(),
+  const boxRects = [...(strip.value?.querySelectorAll('[data-box]') ?? [])].map((box) =>
+    box.getBoundingClientRect(),
   );
   let nearest: number | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
-  slotBoxes.forEach((slotBox, index) => {
+  boxRects.forEach((boxRect, index) => {
     const distance = Math.hypot(
-      slotBox.left + slotBox.width / 2 - point.x,
-      slotBox.top + slotBox.height / 2 - point.y,
+      boxRect.left + boxRect.width / 2 - point.x,
+      boxRect.top + boxRect.height / 2 - point.y,
     );
     if (distance < nearestDistance) {
       nearest = index;
@@ -85,9 +97,9 @@ function slotIndexAt(point: Point): number | null {
 
 /** A dragged tile goes in the box it was let go over; a placed tile let go off the strip goes back. */
 function dropAt(tile: string, point: Point): void {
-  const at = slotIndexAt(point);
+  const at = boxIndexAt(point);
   if (at !== null) emit('place', tile, at);
-  else if (props.run.slots.includes(tile)) emit('takeBack', tile);
+  else if (props.run.boxes.includes(tile)) emit('takeBack', tile);
 }
 </script>
 
@@ -95,7 +107,7 @@ function dropAt(tile: string, point: Point): void {
   <section class="relative flex flex-col gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
-        line ? PART_NAMES[line.shelf] : ''
+        line ? SHELF_NAMES[line.shelf] : ''
       }}</span>
       <span class="text-sm text-washi/70"
         >{{ run.lineIndex + 1 }} / {{ run.tale.lines.length }}</span
@@ -130,11 +142,11 @@ function dropAt(tile: string, point: Point): void {
       <SentenceFix v-if="judged && !judged.isRight" :result="judged" />
       <template v-else>
         <div
-          v-for="(tile, index) in run.slots"
+          v-for="(tile, index) in run.boxes"
           :key="index"
           class="flex min-h-16 min-w-20 items-center justify-center border-2 border-dashed"
           :class="tile === null ? 'border-washi/30' : 'border-transparent'"
-          data-slot
+          data-box
         >
           <BunpouTile
             v-if="tile !== null"
@@ -170,7 +182,8 @@ function dropAt(tile: string, point: Point): void {
     <div class="flex min-h-24 flex-wrap justify-center gap-4" data-testid="offered">
       <BunpouTile
         v-for="(tile, index) in unplaced"
-        :key="tile"
+        :key="`${run.lineIndex}-${tile}`"
+        :deal-index="placedThisLine.has(tile) ? undefined : index"
         :marked="markedOf(tile)"
         :number="index + 1"
         :is-draggable="canMove"

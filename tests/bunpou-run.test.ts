@@ -17,9 +17,9 @@ import {
   type BunpouRun,
 } from '../src/grammar/bunpou-run.ts';
 import { makeTale } from '../src/grammar/tale.ts';
-import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
+import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 
-const POINTS = Object.keys(POINT_PATTERNS);
+const POINTS = CURRICULUM;
 const random = seededRandom(5);
 const START_MS = 1000;
 
@@ -63,40 +63,40 @@ describe('a Bunpou run', () => {
   it('puts a tapped tile in the first empty box', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
-    expect(placeAll(run, [first, second]).slots.slice(0, 3)).toEqual([first, second, null]);
+    expect(placeAll(run, [first, second]).boxes.slice(0, 3)).toEqual([first, second, null]);
   });
 
   it('takes a placed tile back, leaving its box empty, or the rightmost one', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
     const two = placeAll(run, [first, second]);
-    expect(takeBack(two, first).slots.slice(0, 2)).toEqual([null, second]);
-    expect(takeBack(two).slots.slice(0, 2)).toEqual([first, null]);
+    expect(takeBack(two, first).boxes.slice(0, 2)).toEqual([null, second]);
+    expect(takeBack(two).boxes.slice(0, 2)).toEqual([first, null]);
   });
 
   it('puts a dragged tile in the box it was dropped on, even past empty ones', () => {
     const run = newRun();
     const last = rightOrder(run).at(-1) ?? '';
-    const lastBox = run.slots.length - 1;
+    const lastBox = run.boxes.length - 1;
     const placed = placeTile(run, last, lastBox);
-    expect(placed.slots[lastBox]).toBe(last);
-    expect(placed.slots.slice(0, lastBox).every((tile) => tile === null)).toBe(true);
+    expect(placed.boxes[lastBox]).toBe(last);
+    expect(placed.boxes.slice(0, lastBox).every((tile) => tile === null)).toBe(true);
   });
 
   it('moves a placed tile to another box, swapping with a tile already there', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
     const two = placeAll(run, [first, second]);
-    expect(placeTile(two, first, 1).slots.slice(0, 2)).toEqual([second, first]);
-    expect(placeTile(two, first, 2).slots.slice(0, 3)).toEqual([null, second, first]);
+    expect(placeTile(two, first, 1).boxes.slice(0, 2)).toEqual([second, first]);
+    expect(placeTile(two, first, 2).boxes.slice(0, 3)).toEqual([null, second, first]);
   });
 
   it('sends a tile in the target box back to the offered tiles when a new tile replaces it', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
     const replaced = placeTile(placeTile(run, first, 0), second, 0);
-    expect(replaced.slots[0]).toBe(second);
-    expect(replaced.slots).not.toContain(first);
+    expect(replaced.boxes[0]).toBe(second);
+    expect(replaced.boxes).not.toContain(first);
   });
 
   it('counts a line whose time runs out as a miss, with what was placed', () => {
@@ -107,7 +107,7 @@ describe('a Bunpou run', () => {
     expect(timedOut.results[0]).toMatchObject({
       isTimedOut: true,
       isRight: false,
-      answer: run.slots,
+      answer: run.boxes,
     });
     expect(timedOut.combo).toBe(0);
   });
@@ -120,13 +120,22 @@ describe('a Bunpou run', () => {
     expect(resumed.deadlineMs).toBe(paused.deadlineMs + 2000);
   });
 
+  it('gives a line offered during a pause its full time, no more', () => {
+    const fresh = newRun();
+    const timedOut = checkTime(fresh, fresh.deadlineMs);
+    const paused = pause(timedOut, START_MS + 1000);
+    const next = nextLine(paused, START_MS + 4000, random);
+    const resumed = resume(next, START_MS + 60_000);
+    expect(resumed.deadlineMs - (START_MS + 60_000)).toBe(next.lineDurationMs);
+  });
+
   it('moves to the next line, and reveals the tale after its last', () => {
     let run = newRun();
     for (let line = 1; line < run.tale.lines.length; line++) {
       run = nextLine(placeAll(run, rightOrder(run)), START_MS, random);
       expect(run.phase).toBe('building');
       expect(run.lineIndex).toBe(line);
-      expect(run.slots.every((tile) => tile === null)).toBe(true);
+      expect(run.boxes.every((tile) => tile === null)).toBe(true);
     }
     run = nextLine(placeAll(run, rightOrder(run)), START_MS, random);
     expect(run.phase).toBe('revealed');
