@@ -18,6 +18,7 @@ import { POINT_PATTERNS } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import PixelButton from '../ui/PixelButton.vue';
+import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
 import SentenceFix from './SentenceFix.vue';
 
@@ -79,11 +80,11 @@ function dropAt(tile: string, point: Point): void {
       >
       <span
         v-if="areHintsShown && hint"
-        class="pixel-panel bg-wood/80 px-3 py-1 text-lg text-aqua"
+        class="pixel-panel bg-wood/80 px-3 pt-1 pb-[0.9em] text-xl text-aqua"
         lang="ja"
         data-testid="hint"
-        >{{ hint }}</span
-      >
+        ><FuriganaText :marked="hint" is-reading-below
+      /></span>
       <span class="pixel-panel h-3 flex-1 bg-lacquer" aria-hidden="true">
         <span class="block h-full bg-aqua" :style="{ width: `${timeLeft * 100}%` }" />
       </span>

@@ -37,6 +37,8 @@ const pattern = computed(() => POINT_PATTERNS[props.result.sentence.point] ?? ''
     <p class="text-2xl leading-loose text-aqua" data-testid="fix">
       → <FuriganaText :marked="fixMarked" is-reading-below />
     </p>
-    <p class="text-base text-washi/70">{{ pattern }}</p>
+    <p class="text-base leading-loose text-washi/70">
+      <FuriganaText :marked="pattern" is-reading-below />
+    </p>
   </div>
 </template>

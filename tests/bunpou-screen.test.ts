@@ -7,6 +7,7 @@ import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
 import HintToggle from '../src/components/bunpou/HintToggle.vue';
 import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
+import { parseFurigana } from '../src/deck/furigana.ts';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
 import { areHintsShown, setHintsShown } from '../src/grammar/hints.ts';
@@ -29,6 +30,14 @@ function missedRun(): rules.BunpouRun {
   const run = freshRun();
   const [first = '', second = '', ...rest] = rightOrder(run);
   return [second, first, ...rest].reduce((built, tile) => rules.placeTile(built, tile), run);
+}
+
+/** The line's grammar pattern as it reads, without its furigana markup. */
+function patternOf(run: rules.BunpouRun): string {
+  const marked = POINT_PATTERNS[rules.currentLine(run).point] ?? '';
+  return parseFurigana(marked)
+    .map((piece) => piece.text)
+    .join('');
 }
 
 /** An element's text without its furigana (the <rt> readings). */
@@ -71,7 +80,7 @@ describe('Bunpou on screen', () => {
     expect(withoutFurigana(fix.find('[data-testid="fix"]').element)).toContain(
       rightOrder(run).join(''),
     );
-    expect(fix.text()).toContain(POINT_PATTERNS[rules.currentLine(run).point]);
+    expect(withoutFurigana(fix.element)).toContain(patternOf(run));
   });
 
   it('shows えーと… for a line that timed out with nothing placed', () => {
@@ -102,9 +111,7 @@ describe('Bunpou on screen', () => {
     setHintsShown(true);
     const run = freshRun();
     const board = mountBoard(run);
-    expect(board.find('[data-testid="hint"]').text()).toBe(
-      POINT_PATTERNS[rules.currentLine(run).point],
-    );
+    expect(withoutFurigana(board.find('[data-testid="hint"]').element)).toBe(patternOf(run));
   });
 
   it('hides the hint once the switch turns it off, and remembers that', async () => {
