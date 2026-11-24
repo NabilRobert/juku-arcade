@@ -120,6 +120,15 @@ describe('a Bunpou run', () => {
     expect(resumed.deadlineMs).toBe(paused.deadlineMs + 2000);
   });
 
+  it('gives a line offered during a pause its full time, no more', () => {
+    const fresh = newRun();
+    const timedOut = checkTime(fresh, fresh.deadlineMs);
+    const paused = pause(timedOut, START_MS + 1000);
+    const next = nextLine(paused, START_MS + 4000, random);
+    const resumed = resume(next, START_MS + 60_000);
+    expect(resumed.deadlineMs - (START_MS + 60_000)).toBe(next.lineDurationMs);
+  });
+
   it('moves to the next line, and reveals the tale after its last', () => {
     let run = newRun();
     for (let line = 1; line < run.tale.lines.length; line++) {

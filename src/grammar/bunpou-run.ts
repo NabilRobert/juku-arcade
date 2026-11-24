@@ -109,6 +109,9 @@ function offerLine(
     phase: 'building',
     deadlineMs: nowMs + lineDurationMs,
     lineDurationMs,
+    // A line offered during a pause starts paused from now, so resuming
+    // adds only the time it was actually waiting, not the pause before it.
+    pausedAtMs: run.pausedAtMs === null ? null : nowMs,
   };
 }
 
