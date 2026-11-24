@@ -1,6 +1,6 @@
 // The order checker: units stay whole, the predicate stays last, fixed units keep their place.
 import { describe, expect, it } from 'vitest';
-import { isRightOrder, type OrderRules } from '../src/grammar/order-check.ts';
+import { closestFix, isRightOrder, type OrderRules } from '../src/grammar/order-check.ts';
 
 const wakeUp: OrderRules = {
   units: [['先生', 'は'], ['日曜日', 'に'], ['来ます']],
@@ -56,5 +56,20 @@ describe('the order checker', () => {
     expect(isRightOrder(tiles('午後 から 学校 に 帰りました'), { ...goHome, swaps: [] })).toBe(
       false,
     );
+  });
+});
+
+describe('the fix for a wrong order', () => {
+  it('compares with the right order closest to the answer, so a moved unit isn’t marked', () => {
+    const fix = closestFix(tiles('日曜日 に 先生 来ます は'), wakeUp);
+    expect(fix.order).toEqual(tiles('日曜日 に 先生 は 来ます'));
+    expect(fix.wrongAt).toEqual([3, 4]);
+  });
+
+  it('marks only what was placed in a line that timed out half built', () => {
+    expect(closestFix(tiles('は 先生'), wakeUp)).toEqual({
+      order: tiles('先生 は 日曜日 に 来ます'),
+      wrongAt: [0, 1],
+    });
   });
 });
