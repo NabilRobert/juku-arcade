@@ -738,14 +738,15 @@ after trying both in the game, the two-note "select" blip (`click` in
 
 ### D50: Looping background music with a volume slider (settled, 2026-11-23)
 
-The game plays "You're Not There" by MagiaZ on a loop, the track chosen
-for it, from Pixabay under the Pixabay Content License: free to use in a
+The game plays "France Instrumental" by Sub_Clair on a loop (from
+2026-11-24; it replaced "You're Not There" by MagiaZ), from Pixabay under
+the Pixabay Content License: free to use in a
 game, no credit needed (it's credited in the README anyway). The licence
 bars passing the file on by itself, unchanged; shipping it inside the
 game is its normal use.
 
-- **Lighter file:** the 7.7 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
-  (`public/music/youre-not-there.m4a`, 2.9 MB, the full 4 minutes) with
+- **Lighter file:** the 4.2 MB, 256 kbps MP3 is re-encoded to 96 kbps AAC
+  (`public/music/france-instrumental.m4a`, 1.6 MB, the full 2:11) with
   macOS's own `afconvert`, so the first load stays reasonable. Every
   major browser plays AAC.
 - **Playback:** one looping `<audio>` element (`sound/music.ts`). It
@@ -764,7 +765,7 @@ game is its normal use.
   `RECORDING_VOLUME` in `sound/sfx.ts`). The music keeps its volume.
 
 - **Beat:** Web Audio buffer looping (gapless, but decodes the whole
-  4-minute track into memory); shipping the original MP3 (2.6 times the
+  track into memory); shipping the original MP3 (2.6 times the
   size); a separate music on/off button (the slider's 0 does that).
 
 ### D51: Cards brush with a soft sound on hover (settled, 2026-11-23)

@@ -52,6 +52,6 @@ Word data comes from [OpenJLPT](https://github.com/evanclan/OpenJLPT)
 (CC BY-SA 4.0), which uses JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's
 JLPT lists, and Tatoeba; the generated decks are CC BY-SA 4.0 too. The
 fonts are balatro and Kuronuri (both OFL), and the card sounds are from
-Kenney's Casino Audio pack (CC0). The music is "You're Not There" by
-MagiaZ, from [Pixabay](https://pixabay.com/music/rock-youx27re-not-there-320953/)
+Kenney's Casino Audio pack (CC0). The music is "France Instrumental" by
+Sub_Clair, from [Pixabay](https://pixabay.com/music/france-france-instrumental-633138/)
 (Pixabay Content License). No licence yet for the code.
