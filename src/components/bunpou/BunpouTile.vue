@@ -59,7 +59,7 @@ function onRelease(info: PanInfo): void {
   >
     <button
       type="button"
-      class="pixel-button min-w-20 px-5 pt-3 pb-[1.1em] text-4xl text-sumi"
+      class="pixel-button min-w-20 px-5 pt-3 pb-[1em] text-4xl text-sumi"
       :class="faceClass"
       :data-wrong="isWrong === true ? '' : undefined"
       :disabled="isFaceDown"

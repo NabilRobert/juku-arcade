@@ -20,7 +20,7 @@ const pieces = computed(() => parseFurigana(props.marked));
         v-if="piece.reading && isFuriganaShown"
         :class="isReadingBelow ? '[ruby-align:center] [ruby-position:under]' : ''"
         >{{ piece.text
-        }}<rt class="text-[0.6em]" :class="isReadingBelow ? 'pt-[0.3em]' : ''">{{
+        }}<rt class="text-[0.6em]" :class="isReadingBelow ? 'pt-[0.1em]' : ''">{{
           piece.reading
         }}</rt></ruby
       >
