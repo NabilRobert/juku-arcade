@@ -5,12 +5,13 @@
  * mode's furigana sits above). Tap it, or drag it: a drag reports where
  * it was let go, and the board places the tile there. A press that
  * wobbles less than TAP_SLOP_PX still counts as a tap, as with the cards.
- * While paused it turns face down, showing the card back, at the same
+ * Every tile is the same size (TEXT_SIZES). While paused it turns face down, showing the card back, at the same
  * size so nothing on the table moves (D8). A line's tiles are dealt in
  * like word mode's cards (D58): one after another from above, each with
  * the card-landing tap, a little higher than the one before.
  */
 import { m, type PanInfo } from 'motion-v';
+import { parseFurigana } from '../../deck/furigana.ts';
 import { computed, onMounted } from 'vue';
 import { useLater } from '../../composables/useLater.ts';
 import { hoverPitch, playSound } from '../../sound/sfx.ts';
@@ -41,6 +42,23 @@ const later = useLater();
 onMounted(() => {
   const index = props.dealIndex;
   if (index !== undefined) later(() => playSound('deal', hoverPitch(index)), dealDelayMs(index));
+});
+
+/**
+ * Every tile is the same size, so a line looks tidy whatever its words;
+ * a longer phrase gets a smaller font to fit. The steps are by how many
+ * characters the tile reads, without its furigana.
+ */
+const TEXT_SIZES: readonly { upTo: number; size: string }[] = [
+  { upTo: 3, size: 'text-4xl' },
+  { upTo: 4, size: 'text-3xl' },
+  { upTo: 6, size: 'text-2xl' },
+  { upTo: 8, size: 'text-xl' },
+];
+const SMALLEST_TEXT = 'text-base';
+const textSize = computed(() => {
+  const length = parseFurigana(props.marked).reduce((total, piece) => total + piece.text.length, 0);
+  return TEXT_SIZES.find((step) => length <= step.upTo)?.size ?? SMALLEST_TEXT;
 });
 
 const faceClass = computed(() => {
@@ -80,8 +98,8 @@ function onRelease(info: PanInfo): void {
   >
     <button
       type="button"
-      class="pixel-button min-w-20 px-5 pt-3 pb-[1em] text-4xl text-sumi"
-      :class="faceClass"
+      class="pixel-button flex h-24 w-48 items-center justify-center px-2 text-sumi"
+      :class="[faceClass, textSize]"
       :data-wrong="isWrong === true ? '' : undefined"
       :disabled="isFaceDown"
       :aria-label="isFaceDown ? 'Face-down tile' : undefined"
