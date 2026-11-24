@@ -250,14 +250,14 @@ onMounted(async () => {
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
-        <footer
-          v-if="settings && page === 'game'"
-          class="mt-auto flex justify-center gap-6 text-sm text-washi/60"
-        >
-          <button type="button" class="underline" @click="page = 'mode'">Change mode</button>
-          <button type="button" class="underline" @click="openStats">Stats</button>
-          <button type="button" class="underline" @click="page = 'settings'">Settings</button>
-          <button type="button" class="underline" @click="page = 'about'">About the data</button>
+        <footer class="mt-auto flex flex-col items-center gap-2 text-washi/60">
+          <nav v-if="settings && page === 'game'" class="flex justify-center gap-6 text-sm">
+            <button type="button" class="underline" @click="page = 'mode'">Change mode</button>
+            <button type="button" class="underline" @click="openStats">Stats</button>
+            <button type="button" class="underline" @click="page = 'settings'">Settings</button>
+            <button type="button" class="underline" @click="page = 'about'">About the data</button>
+          </nav>
+          <p class="text-xs text-washi/80">made by @nabilrobert · 2026</p>
         </footer>
       </main>
     </MotionConfig>
