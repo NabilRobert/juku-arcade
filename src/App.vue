@@ -257,7 +257,17 @@ onMounted(async () => {
             <button type="button" class="underline" @click="page = 'settings'">Settings</button>
             <button type="button" class="underline" @click="page = 'about'">About the data</button>
           </nav>
-          <p class="text-xs text-washi/80">made by @nabilrobert · 2026</p>
+          <p class="text-xs text-washi/80">
+            made by
+            <a
+              class="underline"
+              href="https://github.com/NabilRobert"
+              target="_blank"
+              rel="noopener"
+              >@nabilrobert</a
+            >
+            · 2026
+          </p>
         </footer>
       </main>
     </MotionConfig>
