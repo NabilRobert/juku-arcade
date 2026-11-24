@@ -70,7 +70,14 @@ usePauseKey({
 <template>
   <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
     <aside class="sticky top-6 flex flex-col gap-4">
-      <DailyBar :progress="progress" :level="deck.level" />
+      <DailyBar
+        :daily="progress.daily"
+        known-label="Words known"
+        :known="progress.wordsKnown"
+        :total="progress.deckSize"
+        :level="deck.level"
+        :days-played-this-week="progress.daysPlayedThisWeek"
+      />
       <GameHud :state="state" :now-ms="nowMs" @pause="pause" @resume="resume" />
       <BankPanel
         :run="bank"

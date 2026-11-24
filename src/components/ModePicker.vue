@@ -53,7 +53,8 @@ defineEmits<{ choose: [mode: GameMode] }>();
           >七時・に・起きます → 七時に起きます</span
         >
         <span class="block text-sm text-sumi/80">
-          Put each {{ level }} sentence in order, then watch the tale.
+          Put each {{ level }} sentence in order, then watch the tale. Counts toward your grammar
+          reviews.
         </span>
       </PixelButton>
     </section>

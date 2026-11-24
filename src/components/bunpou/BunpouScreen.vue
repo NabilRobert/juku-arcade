@@ -1,42 +1,63 @@
 <script setup lang="ts">
 /**
- * Bunpou on screen (D56): a side panel (the mode, score, level and best
- * combo, the sound switch) beside the table, or the revealed tale after
- * its last line. Like kanji mode, its play time counts toward the nudges
+ * Bunpou on screen (D56): a side panel (the mode, today's grammar
+ * reviews, score, level and best combo, the hint and sound switches, End
+ * run) beside the table, the revealed tale after its last line, or the
+ * results once the player ends the run. Every judged line goes to the
+ * grammar log and reviews (useGrammarReviews, D57), which also pick each
+ * tale's points. Like kanji mode, its play time counts toward the nudges
  * and the school's daily cap (usePlayClock), the wellbeing screens stand
  * in front of the table, and "Stop for today" goes back to the start
- * screen. Nothing is logged yet: grammar reviews come in G2.
+ * screen.
  */
-import { computed } from 'vue';
-import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
+import { computed, ref } from 'vue';
+import type { GrammarEvent } from '../../grammar/grammar-events.ts';
+import { BUNPOU_POINTS, useBunpouRun } from '../../grammar/useBunpouRun.ts';
+import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
+import DailyBar from '../words/DailyBar.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
+import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
+import BunpouResults from './BunpouResults.vue';
 import TaleReveal from './TaleReveal.vue';
 
 const props = defineProps<{
   level: string;
   settings: Settings;
+  /** The grammar log so far, to rebuild grammar memory from. */
+  pastGrammarEvents: readonly GrammarEvent[];
   /** True while another page covers the game: the line's clock and the play clock stop. */
   isAway: boolean;
 }>();
-const emit = defineEmits<{ leave: [] }>();
+const emit = defineEmits<{ leave: []; again: [] }>();
 
-const game = useBunpouRun();
+const reviews = useGrammarReviews(BUNPOU_POINTS, props.settings, props.pastGrammarEvents);
+const game = useBunpouRun({
+  pointsByPriority: reviews.pointsByPriority,
+  onJudged: reviews.logJudged,
+});
 const { run, unplaced, timeLeft } = game;
 const isPaused = (): boolean => run.value.pausedAtMs !== null;
+const isEnded = ref(false);
+
+/** Ends the run: the line's clock stops for good and the results show. */
+function endRun(): void {
+  game.pause();
+  isEnded.value = true;
+}
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
   props.settings,
-  () => props.isAway || isPaused() || isCapped.value || nudge.value !== null,
+  () => props.isAway || isPaused() || isEnded.value || isCapped.value || nudge.value !== null,
 );
 const { nudge, isCapped, dismissNudge } = useWellbeing({
   sessionPlayMs: clock.sessionPlayMs,
@@ -46,7 +67,7 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
 });
 usePauseKey({
   isPaused,
-  isAvailable: () => !props.isAway && run.value.phase === 'building',
+  isAvailable: () => !props.isAway && !isEnded.value && run.value.phase === 'building',
   pause: game.pause,
   resume: game.resume,
 });
@@ -68,6 +89,13 @@ function dismiss(isStopping: boolean): void {
       <section class="pixel-panel bg-wood/80 p-3 text-center">
         <p class="text-xs tracking-widest text-aqua/80 uppercase">Bunpou · {{ level }}</p>
       </section>
+      <DailyBar
+        :daily="reviews.progress.value.daily"
+        known-label="Grammar known"
+        :known="reviews.progress.value.pointsKnown"
+        :total="reviews.progress.value.pointCount"
+        :level="level"
+      />
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
@@ -83,13 +111,35 @@ function dismiss(isStopping: boolean): void {
       />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
+      <PixelButton
+        v-if="!isEnded"
+        colour="crimson"
+        class="min-h-9 px-4 text-sm"
+        data-testid="end-run"
+        @click="endRun"
+      >
+        End run
+      </PixelButton>
       <p class="text-center text-xs text-washi/60">
         Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
         tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
     </aside>
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
-      <TaleReveal v-if="run.phase === 'revealed'" :results="run.results" @next="game.nextTale" />
+      <BunpouResults
+        v-if="isEnded"
+        :score="run.score"
+        :best-combo="run.bestCombo"
+        :lines="reviews.lines.value"
+        :progress="reviews.progress.value"
+        @again="emit('again')"
+        @leave="emit('leave')"
+      />
+      <TaleReveal
+        v-else-if="run.phase === 'revealed'"
+        :results="run.results"
+        @next="game.nextTale"
+      />
       <BunpouBoard
         v-else
         :run="run"

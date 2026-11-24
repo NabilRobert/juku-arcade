@@ -157,7 +157,7 @@ describe('Bunpou’s keys and pacing', () => {
     const host = mount(
       defineComponent({
         setup() {
-          game = useBunpouRun(seededRandom(9));
+          game = useBunpouRun({ random: seededRandom(9) });
           return () => h('div');
         },
       }),

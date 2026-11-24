@@ -1,7 +1,9 @@
 /**
  * Runs Bunpou on screen (D56): holds the run (bunpou-run.ts), ticks its
  * clock so a line times out, shows a judged line for a moment before the
- * next, and makes each tale as the last one is passed. Sounds follow the
+ * next, and makes each tale as the last one is passed, from the points the
+ * caller picks (grammar reviews, D57). Each judged line is reported to the
+ * caller, which logs it. Sounds follow the
  * other modes: a tile placed picks up like a card, a right line chimes
  * higher with the combo, a wrong one or a timeout misses.
  *
@@ -13,7 +15,7 @@ import type { RandomSource } from '../game/deal.ts';
 import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import * as rules from './bunpou-run.ts';
-import { makeTale } from './tale.ts';
+import { makeTaleFromRanking } from './tale.ts';
 import { POINT_PATTERNS, TEMPLATES } from './templates.ts';
 
 /** How long a right line shows before the next one. */
@@ -22,8 +24,16 @@ const RIGHT_SHOWN_MS = 700;
 const WRONG_SHOWN_MS = 3000;
 /** Often enough for a smooth timer bar and a prompt timeout. */
 const TICK_MS = 100;
-/** Until reviews choose today's points (G2), every point with templates is in play. */
-const POINTS = Object.keys(POINT_PATTERNS);
+/** Every grammar point with templates, in curriculum order (the order they're introduced). */
+export const BUNPOU_POINTS: readonly string[] = Object.keys(POINT_PATTERNS);
+
+export interface BunpouRunOptions {
+  random?: RandomSource;
+  /** Every point, ranked for the next tale (today's grammar first); curriculum order by default. */
+  pointsByPriority?: () => readonly string[];
+  /** Called once per judged line, with how long the player took. */
+  onJudged?: (result: rules.LineResult, msTaken: number) => void;
+}
 
 function useBunpouKeys(actions: { placeNumber: (number: number) => void; takeBack: () => void }) {
   function onKey(event: KeyboardEvent): void {
@@ -52,22 +62,24 @@ function useLineClock(run: RunRef) {
   }, TICK_MS);
   onUnmounted(() => clearInterval(timer));
   return computed(() => {
-    const { deadlineMs, pausedAtMs, level, offered } = run.value;
-    const total = rules.sentenceDurationMs(level, offered.length);
+    const { deadlineMs, pausedAtMs, lineDurationMs } = run.value;
     const left = deadlineMs - (pausedAtMs ?? nowMs.value);
-    return Math.min(Math.max(left / total, 0), 1);
+    return lineDurationMs > 0 ? Math.min(Math.max(left / lineDurationMs, 0), 1) : 0;
   });
 }
 
-/** A judged line sounds, shows for a moment, then the next line comes. */
-function useJudgedLines(run: RunRef, random: RandomSource): void {
+/** A judged line sounds, is reported, shows for a moment, then the next line comes. */
+function useJudgedLines(run: RunRef, options: Required<BunpouRunOptions>): void {
   const later = useLater();
+  const { random, onJudged } = options;
   watch(
     () => run.value.phase,
     (phase) => {
       if (phase !== 'judged') return;
       const result = run.value.results[run.value.results.length - 1];
       playJudged(result, run.value.combo);
+      const msLeft = Math.max(0, run.value.deadlineMs - Date.now());
+      if (result !== undefined) onJudged(result, run.value.lineDurationMs - msLeft);
       const shownMs = result?.isRight === true ? RIGHT_SHOWN_MS : WRONG_SHOWN_MS;
       later(() => {
         run.value = rules.nextLine(run.value, Date.now(), random);
@@ -76,11 +88,17 @@ function useJudgedLines(run: RunRef, random: RandomSource): void {
   );
 }
 
-export function useBunpouRun(random: RandomSource = Math.random) {
-  const newTale = () => makeTale(POINTS, TEMPLATES, random);
+export function useBunpouRun(options: BunpouRunOptions = {}) {
+  const settled: Required<BunpouRunOptions> = {
+    random: options.random ?? Math.random,
+    pointsByPriority: options.pointsByPriority ?? (() => BUNPOU_POINTS),
+    onJudged: options.onJudged ?? (() => undefined),
+  };
+  const { random } = settled;
+  const newTale = () => makeTaleFromRanking(settled.pointsByPriority(), TEMPLATES, random);
   const run = shallowRef(rules.startBunpouRun(newTale(), Date.now(), random));
   const timeLeft = useLineClock(run);
-  useJudgedLines(run, random);
+  useJudgedLines(run, settled);
 
   function place(tile: string, at?: number): void {
     const next = rules.placeTile(run.value, tile, at);
