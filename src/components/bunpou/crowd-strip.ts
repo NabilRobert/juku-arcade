@@ -21,14 +21,15 @@ const BODY = 'z';
 /**
  * The crowd sits in tiers, like raked seating: tier 0 at the top, each
  * next one TIER_STEP lower, give or take TIER_JITTER. A layer's lift
- * raises all its heads, so the middle layer peeks higher over the near one.
+ * raises all its heads, so the middle layer peeks higher over the near
+ * one; its U is shallower too, so it shows across the middle as well.
  */
 const TIER_STEP = 6;
 const TIER_JITTER = 3;
 export const CROWD_LAYERS = {
-  far: { seed: 11, tiers: [0, 1, 2], lift: 0 },
-  middle: { seed: 17, tiers: [3, 4, 5], lift: 4 },
-  near: { seed: 23, tiers: [6, 7], lift: 0 },
+  far: { seed: 11, tiers: [0, 1, 2], lift: 0, uDepth: 35 },
+  middle: { seed: 17, tiers: [3, 4, 5], lift: 4, uDepth: 24 },
+  near: { seed: 23, tiers: [6, 7], lift: 0, uDepth: 35 },
 } as const;
 export type CrowdLayer = keyof typeof CROWD_LAYERS;
 
@@ -42,10 +43,9 @@ export const CROWD_PALETTES: Record<CrowdLayer, Readonly<Record<string, string>>
 /**
  * The crowd parts round the storyteller in a U: at the sides it fills the
  * stage to the top; across the middle (U_HALF_WIDTH of each half) it
- * drops away, deepest, by U_DEPTH, right under his cushion.
+ * drops away, deepest (by each layer's uDepth) right under his cushion.
  */
 const U_HALF_WIDTH = 0.5;
-const U_DEPTH = 35;
 
 /** Heads and shoulders; the body under each is filled down to the strip's bottom. */
 const HEADS: readonly (readonly string[])[] = [
@@ -143,17 +143,25 @@ export interface CrowdLook {
   hasPhone: boolean;
 }
 
-/** How far below its tier a head at `x` sits: none at the sides, U_DEPTH in the middle. */
-function uDrop(x: number): number {
+/** How far below its tier a head at `x` sits: none at the sides, `depth` in the middle. */
+function uDrop(x: number, depth: number): number {
   const fromMiddle = ((2 * x) / CROWD_WIDTH - 1) / U_HALF_WIDTH;
-  return Math.max(0, Math.round(U_DEPTH * (1 - fromMiddle * fromMiddle)));
+  return Math.max(0, Math.round(depth * (1 - fromMiddle * fromMiddle)));
 }
 
-function seatTier(random: () => number, tier: number, lift: number): Member[] {
+interface TierPlace {
+  tier: number;
+  lift: number;
+  uDepth: number;
+}
+
+function seatTier(random: () => number, place: TierPlace): Member[] {
+  const { tier, lift, uDepth } = place;
   const members: Member[] = [];
   for (let x = -4; x < CROWD_WIDTH;) {
     const head = HEADS[Math.floor(random() * HEADS.length)] ?? HEADS[0] ?? [];
-    const wanted = 1 + tier * TIER_STEP - lift + Math.floor(random() * TIER_JITTER) + uDrop(x);
+    const wanted =
+      1 + tier * TIER_STEP - lift + Math.floor(random() * TIER_JITTER) + uDrop(x, uDepth);
     // Shoulders always inside the strip: a head pushed lower would leave a gap in the crowd.
     const y = Math.min(wanted, CROWD_HEIGHT - head.length);
     const raisesArm = random() < ARM_SHARE;
@@ -213,9 +221,9 @@ function phoneHolder(members: readonly Member[]): Member | undefined {
 
 /** A layer as a letter grid: z is a silhouette, p the phone screen, '.' see-through. */
 export function crowdStrip(layer: CrowdLayer, look: CrowdLook): string[] {
-  const { seed, tiers, lift } = CROWD_LAYERS[layer];
+  const { seed, tiers, lift, uDepth } = CROWD_LAYERS[layer];
   const random = seededRandom(seed);
-  const members = tiers.flatMap((tier) => seatTier(random, tier, lift));
+  const members = tiers.flatMap((tier) => seatTier(random, { tier, lift, uDepth }));
   const canvas = Array.from({ length: CROWD_HEIGHT }, () => Array<string>(CROWD_WIDTH).fill('.'));
   for (const member of members) {
     stamp(canvas, member.head, member.x, member.y);
