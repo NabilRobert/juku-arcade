@@ -18,7 +18,9 @@
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "report": "node scripts/build-reports.ts",
-    "power": "node scripts/simulate-power.ts"
+    "power": "node scripts/simulate-power.ts",
+    "grammar:check": "node scripts/grammar-check.ts",
+    "grammar:preview": "node scripts/grammar-preview.ts"
   },
   "dependencies": {
     "@lihbr/kuronuri": "^0.0.3",
