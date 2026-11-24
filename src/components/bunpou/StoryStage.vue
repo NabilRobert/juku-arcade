@@ -55,7 +55,7 @@ const crowdLayers = computed(() =>
 
 <template>
   <section
-    class="pixel-panel relative h-60 overflow-hidden border-9 border-cedar bg-wood/90"
+    class="pixel-panel relative h-66 overflow-hidden border-9 border-cedar bg-wood/90"
     aria-label="The stage"
     data-testid="stage"
     :data-pose="pose"
