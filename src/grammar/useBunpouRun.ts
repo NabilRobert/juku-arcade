@@ -5,8 +5,8 @@
  * other modes: a tile placed picks up like a card, a right line chimes
  * higher with the combo, a wrong one or a timeout misses.
  *
- * Keys, for a laptop: 1–5 place the offered tile with that number,
- * Backspace takes the last tile back (Esc pauses, usePauseKey).
+ * Keys, for a laptop: 1–5 put the offered tile with that number in the
+ * first empty box, Backspace takes the rightmost tile back (Esc pauses, usePauseKey).
  */
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch, type ShallowRef } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
@@ -92,7 +92,7 @@ export function useBunpouRun(random: RandomSource = Math.random) {
   }
   const takeBack = (tile?: string): void => update((current) => rules.takeBack(current, tile));
   const unplaced = computed(() =>
-    run.value.offered.filter((tile) => !run.value.placed.includes(tile)),
+    run.value.offered.filter((tile) => !run.value.slots.includes(tile)),
   );
   useBunpouKeys({ placeNumber: (number) => place(unplaced.value[number - 1] ?? ''), takeBack });
 

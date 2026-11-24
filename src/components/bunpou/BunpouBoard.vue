@@ -1,9 +1,11 @@
 <script setup lang="ts">
 /**
  * Bunpou's table (D56): which part of the tale this line is (起承転結),
- * the line's timer, the strip the tiles are placed on, the combo meter,
- * the grammar hint (preferences/hints.ts) and the offered tiles. Tap an offered tile to place it at the end, or
- * drag it onto the strip where it should go; tap a placed tile to take it
+ * the line's timer, the grammar hint (preferences/hints.ts), the strip of
+ * boxes, one per tile, the combo meter and the offered tiles. Tap an
+ * offered tile to put it in the first empty box, or drag it onto the box
+ * it belongs in; drag a placed tile to another box to move it (a tile
+ * already there swaps places), or off the strip, or tap it, to take it
  * back. A missed line shows its fix for a moment.
  *
  * Pausing turns the tiles face down where they lie, as word mode turns
@@ -42,7 +44,7 @@ const markedOf = computed(() => {
   const marks = new Map(line.value?.tiles.map((tile) => [tile.text, tile.marked]));
   return (text: string): string => marks.get(text) ?? text;
 });
-const emptySlots = computed(() => props.run.offered.length - props.run.placed.length);
+const canMove = computed(() => props.run.phase === 'building' && !isPaused.value);
 
 /** The combo just lost, shown dropping away until ComboMeter has shown it. */
 const brokenCombo = ref<number | null>(null);
@@ -55,17 +57,37 @@ watch(
 
 const strip = useTemplateRef<HTMLElement>('strip');
 
-/** A tile let go over the strip goes in before the first placed tile whose middle is right of it. */
+function isInside(box: DOMRect, point: Point): boolean {
+  return point.x >= box.left && point.x <= box.right && point.y >= box.top && point.y <= box.bottom;
+}
+
+/** The box a tile was let go over: the nearest one, if it was let go over the strip at all. */
+function slotIndexAt(point: Point): number | null {
+  const stripBox = strip.value?.getBoundingClientRect();
+  if (stripBox === undefined || !isInside(stripBox, point)) return null;
+  const slotBoxes = [...(strip.value?.querySelectorAll('[data-slot]') ?? [])].map((slot) =>
+    slot.getBoundingClientRect(),
+  );
+  let nearest: number | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  slotBoxes.forEach((slotBox, index) => {
+    const distance = Math.hypot(
+      slotBox.left + slotBox.width / 2 - point.x,
+      slotBox.top + slotBox.height / 2 - point.y,
+    );
+    if (distance < nearestDistance) {
+      nearest = index;
+      nearestDistance = distance;
+    }
+  });
+  return nearest;
+}
+
+/** A dragged tile goes in the box it was let go over; a placed tile let go off the strip goes back. */
 function dropAt(tile: string, point: Point): void {
-  const box = strip.value?.getBoundingClientRect();
-  if (box === undefined || point.x < box.left || point.x > box.right) return;
-  if (point.y < box.top || point.y > box.bottom) return;
-  const placedTiles = [...(strip.value?.querySelectorAll('[data-placed]') ?? [])];
-  const at = placedTiles.filter((element) => {
-    const placedBox = element.getBoundingClientRect();
-    return placedBox.left + placedBox.width / 2 < point.x;
-  }).length;
-  emit('place', tile, at);
+  const at = slotIndexAt(point);
+  if (at !== null) emit('place', tile, at);
+  else if (props.run.slots.includes(tile)) emit('takeBack', tile);
 }
 </script>
 
@@ -107,19 +129,24 @@ function dropAt(tile: string, point: Point): void {
     >
       <SentenceFix v-if="judged && !judged.isRight" :result="judged" />
       <template v-else>
-        <BunpouTile
-          v-for="tile in run.placed"
-          :key="tile"
-          :marked="markedOf(tile)"
-          :is-face-down="isPaused"
-          data-placed
-          @tap="emit('takeBack', tile)"
-        />
-        <span
-          v-for="slot in emptySlots"
-          :key="`slot-${slot}`"
-          class="h-16 w-20 border-2 border-dashed border-washi/30"
-        />
+        <div
+          v-for="(tile, index) in run.slots"
+          :key="index"
+          class="flex min-h-16 min-w-20 items-center justify-center border-2 border-dashed"
+          :class="tile === null ? 'border-washi/30' : 'border-transparent'"
+          data-slot
+        >
+          <BunpouTile
+            v-if="tile !== null"
+            :key="tile"
+            :marked="markedOf(tile)"
+            :is-face-down="isPaused"
+            :is-draggable="canMove"
+            data-placed
+            @tap="emit('takeBack', tile)"
+            @release="(point: Point) => dropAt(tile, point)"
+          />
+        </div>
         <span v-if="judged?.isRight" class="text-4xl text-aqua" aria-label="right">◯</span>
       </template>
     </div>
@@ -146,7 +173,7 @@ function dropAt(tile: string, point: Point): void {
         :key="tile"
         :marked="markedOf(tile)"
         :number="index + 1"
-        :is-draggable="run.phase === 'building' && !isPaused"
+        :is-draggable="canMove"
         :is-face-down="isPaused"
         @tap="emit('place', tile)"
         @release="(point: Point) => dropAt(tile, point)"

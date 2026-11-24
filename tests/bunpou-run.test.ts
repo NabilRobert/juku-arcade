@@ -60,18 +60,43 @@ describe('a Bunpou run', () => {
     expect(judged.missed[0]?.fix.wrongAt).toEqual([0, 1]);
   });
 
-  it('takes a placed tile back, or the last one placed', () => {
+  it('puts a tapped tile in the first empty box', () => {
+    const run = newRun();
+    const [first = '', second = ''] = rightOrder(run);
+    expect(placeAll(run, [first, second]).slots.slice(0, 3)).toEqual([first, second, null]);
+  });
+
+  it('takes a placed tile back, leaving its box empty, or the rightmost one', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
     const two = placeAll(run, [first, second]);
-    expect(takeBack(two, first).placed).toEqual([second]);
-    expect(takeBack(two).placed).toEqual([first]);
+    expect(takeBack(two, first).slots.slice(0, 2)).toEqual([null, second]);
+    expect(takeBack(two).slots.slice(0, 2)).toEqual([first, null]);
   });
 
-  it('places a dragged tile where it was dropped', () => {
+  it('puts a dragged tile in the box it was dropped on, even past empty ones', () => {
+    const run = newRun();
+    const last = rightOrder(run).at(-1) ?? '';
+    const lastBox = run.slots.length - 1;
+    const placed = placeTile(run, last, lastBox);
+    expect(placed.slots[lastBox]).toBe(last);
+    expect(placed.slots.slice(0, lastBox).every((tile) => tile === null)).toBe(true);
+  });
+
+  it('moves a placed tile to another box, swapping with a tile already there', () => {
     const run = newRun();
     const [first = '', second = ''] = rightOrder(run);
-    expect(placeTile(placeTile(run, second), first, 0).placed).toEqual([first, second]);
+    const two = placeAll(run, [first, second]);
+    expect(placeTile(two, first, 1).slots.slice(0, 2)).toEqual([second, first]);
+    expect(placeTile(two, first, 2).slots.slice(0, 3)).toEqual([null, second, first]);
+  });
+
+  it('sends a tile in the target box back to the offered tiles when a new tile replaces it', () => {
+    const run = newRun();
+    const [first = '', second = ''] = rightOrder(run);
+    const replaced = placeTile(placeTile(run, first, 0), second, 0);
+    expect(replaced.slots[0]).toBe(second);
+    expect(replaced.slots).not.toContain(first);
   });
 
   it('counts a line whose time runs out as a miss, with what was placed', () => {
@@ -82,7 +107,7 @@ describe('a Bunpou run', () => {
     expect(timedOut.results[0]).toMatchObject({
       isTimedOut: true,
       isRight: false,
-      answer: run.placed,
+      answer: run.slots,
     });
     expect(timedOut.combo).toBe(0);
   });
@@ -99,7 +124,9 @@ describe('a Bunpou run', () => {
     let run = newRun();
     for (let line = 1; line < run.tale.lines.length; line++) {
       run = nextLine(placeAll(run, rightOrder(run)), START_MS, random);
-      expect(run).toMatchObject({ lineIndex: line, phase: 'building', placed: [] });
+      expect(run.phase).toBe('building');
+      expect(run.lineIndex).toBe(line);
+      expect(run.slots.every((tile) => tile === null)).toBe(true);
     }
     run = nextLine(placeAll(run, rightOrder(run)), START_MS, random);
     expect(run.phase).toBe('revealed');

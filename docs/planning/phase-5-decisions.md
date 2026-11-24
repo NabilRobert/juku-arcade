@@ -894,8 +894,8 @@ tales for a native speaker to read.
 
 The grammar mode, named Bunpou for now, is the start screen's third mode.
 A run offers each line of a generated tale (D55) as shuffled tiles; the
-player places them, the line is judged when the last tile is placed or
-its time runs out, and the tale is revealed after its last line.
+player puts them in the strip's boxes, the line is judged when the last
+box is filled or its time runs out, and the tale is revealed after its last line.
 
 - **Rules as pure functions** (`src/grammar/bunpou-run.ts`), like word
   mode's (D12), with a thin composable (`useBunpouRun.ts`) for the clock,
@@ -910,9 +910,12 @@ its time runs out, and the tale is revealed after its last line.
   `ComboMeter`, `WellbeingGate` and `SoundToggle` as they are. Furigana
   sits under the kanji by styling around `FuriganaText`, which is
   unchanged.
-- **Input:** tap to place at the end, drag to place where the tile is let
-  go, tap a placed tile or press Backspace to take it back, keys 1–5 to
-  place. Dragging uses Motion for Vue, which already throws the cards, and
+- **Input:** tap to put a tile in the first empty box, drag it onto any
+  box (even past empty ones, added 2026-11-24 after playtesting), drag a
+  placed tile to another box to move it (swapping with a tile there) or
+  off the strip to take it back, tap a placed tile or press Backspace to
+  take it back, keys 1–5 to place. A timed-out line's empty boxes stay
+  empty in its fix and are never marked wrong. Dragging uses Motion for Vue, which already throws the cards, and
   the cards' tap-or-drag check (`isDrag`). Beat: a sortable-list library
   (SortableJS or vue-draggable-plus, both MIT), a second drag system for
   one strip; plain pointer events, which would rebuild what Motion does.

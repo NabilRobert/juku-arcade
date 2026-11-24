@@ -48,7 +48,7 @@ function withoutFurigana(element: Element): string {
 
 const mountBoard = (run: rules.BunpouRun) =>
   mount(BunpouBoard, {
-    props: { run, unplaced: run.offered.filter((tile) => !run.placed.includes(tile)), timeLeft: 1 },
+    props: { run, unplaced: run.offered.filter((tile) => !run.slots.includes(tile)), timeLeft: 1 },
   });
 
 afterEach(() => {
@@ -80,6 +80,26 @@ describe('Bunpou on screen', () => {
       rightOrder(run).join(''),
     );
     expect(withoutFurigana(fix.element)).toContain(patternOf(run));
+  });
+
+  it('shows one box per tile, empty until a tile is put in it', () => {
+    const run = freshRun();
+    const last = run.offered[0] ?? '';
+    const board = mountBoard(rules.placeTile(run, last, run.slots.length - 1));
+    const boxes = board.findAll('[data-slot]');
+    expect(boxes).toHaveLength(run.offered.length);
+    expect(boxes.at(-1)?.find('button').exists()).toBe(true);
+    expect(boxes[0]?.find('button').exists()).toBe(false);
+  });
+
+  it('keeps a timed-out line’s empty boxes empty in its fix', () => {
+    const run = freshRun();
+    const half = rules.placeTile(run, rightOrder(run)[0] ?? '');
+    const result = rules.checkTime(half, half.deadlineMs).results[0];
+    if (result === undefined) throw new Error('the line did not time out');
+    const fix = mount(SentenceFix, { props: { result } });
+    expect(fix.findAll('[data-empty]')).toHaveLength(run.offered.length - 1);
+    expect(fix.findAll('[data-wrong]')).toHaveLength(0);
   });
 
   it('shows えーと… for a line that timed out with nothing placed', () => {
@@ -151,9 +171,9 @@ describe('Bunpou’s keys and pacing', () => {
     const { host, game } = mountRun();
     const first = game.unplaced.value[0];
     window.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
-    expect(game.run.value.placed).toEqual([first]);
+    expect(rules.placedTiles(game.run.value)).toEqual([first]);
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
-    expect(game.run.value.placed).toEqual([]);
+    expect(rules.placedTiles(game.run.value)).toEqual([]);
     host.unmount();
   });
 

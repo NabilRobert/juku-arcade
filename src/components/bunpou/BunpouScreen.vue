@@ -84,8 +84,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Tap the tiles in order, or drag them into place. Tap a placed tile, or press Backspace, to
-        take it back. Keys 1–5 place a tile; Esc pauses.
+        Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
+        tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
     </aside>
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">

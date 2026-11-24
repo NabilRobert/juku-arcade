@@ -2,9 +2,10 @@
  * A run of the grammar mode, Bunpou (D56): its rules as pure functions, so
  * they're tested on their own, as word mode's are (D12).
  *
- * Sentences come one at a time as shuffled tiles. The player places them
- * (placeTile, takeBack); the sentence is judged as soon as the last tile
- * is placed, or when its time runs out. A right sentence adds to the
+ * Sentences come one at a time as shuffled tiles, with one box per tile.
+ * The player puts tiles in boxes (placeTile, takeBack), in any box, in any
+ * order; the sentence is judged as soon as every box is filled, or when
+ * its time runs out. A right sentence adds to the
  * combo and scores; a wrong one or a timeout resets the combo, as in word
  * mode, and is kept for the pause list. The levels are word mode's
  * (levels.ts), and the time per sentence depends on the level and the
@@ -40,8 +41,8 @@ export type BunpouPhase = 'building' | 'judged' | 'revealed';
 
 export interface LineResult {
   sentence: Sentence;
-  /** The tiles as the player placed them; a timeout leaves it short. */
-  answer: string[];
+  /** The boxes as the player left them; a timeout can leave some empty (null). */
+  answer: (string | null)[];
   isRight: boolean;
   isTimedOut: boolean;
   fix: Fix;
@@ -52,8 +53,8 @@ export interface BunpouRun {
   lineIndex: number;
   /** This line's tiles in the order they're offered (shuffled). */
   offered: string[];
-  /** The tiles placed so far, in the player's order. */
-  placed: string[];
+  /** One box per tile, left to right: the tile put there, or null while empty. */
+  slots: (string | null)[];
   phase: BunpouPhase;
   /** This tale's judged lines, in order. */
   results: LineResult[];
@@ -98,7 +99,7 @@ function offerLine(
     ...run,
     lineIndex,
     offered: shuffled(tiles, random),
-    placed: [],
+    slots: tiles.map(() => null),
     phase: 'building',
     deadlineMs: nowMs + sentenceDurationMs(run.level, tiles.length),
   };
@@ -109,7 +110,7 @@ export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource):
     tale,
     lineIndex: 0,
     offered: [],
-    placed: [],
+    slots: [],
     phase: 'building',
     results: [],
     missed: [],
@@ -125,14 +126,10 @@ export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource):
 
 function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
   const sentence = currentLine(run);
-  const isRight = !isTimedOut && isRightOrder(run.placed, sentence);
-  const result = {
-    sentence,
-    answer: run.placed,
-    isRight,
-    isTimedOut,
-    fix: closestFix(run.placed, sentence),
-  };
+  const answer = run.slots;
+  const isFull = answer.every((tile) => tile !== null);
+  const isRight = !isTimedOut && isFull && isRightOrder(answer, sentence);
+  const result = { sentence, answer, isRight, isTimedOut, fix: closestFix(answer, sentence) };
   const judged = { ...run, phase: 'judged' as const, results: [...run.results, result] };
   if (!isRight) {
     const missed = [result, ...run.missed].slice(0, MISSED_TRAY_SIZE);
@@ -150,18 +147,33 @@ function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
 
 const canPlace = (run: BunpouRun): boolean => run.phase === 'building' && run.pausedAtMs === null;
 
-/** Places an offered tile, at the end or at a position; placing the last tile judges the line. */
-export function placeTile(run: BunpouRun, tile: string, at = run.placed.length): BunpouRun {
-  if (!canPlace(run) || !run.offered.includes(tile) || run.placed.includes(tile)) return run;
-  const placed = [...run.placed.slice(0, at), tile, ...run.placed.slice(at)];
-  const next = { ...run, placed };
-  return placed.length === run.offered.length ? judge(next, false) : next;
+/** The tiles in the boxes, in box order, without the empty ones. */
+export function placedTiles(run: BunpouRun): string[] {
+  return run.slots.filter((tile) => tile !== null);
 }
 
-/** Takes a placed tile back off the strip; with no tile named, the last one placed. */
-export function takeBack(run: BunpouRun, tile = run.placed[run.placed.length - 1]): BunpouRun {
+/**
+ * Puts a tile in a box: with no box named, the first empty one. A tile
+ * already in a box moves; a tile already in the target box swaps into
+ * the moved tile's old box, or goes back to the offered tiles. Filling
+ * the last box judges the line.
+ */
+export function placeTile(run: BunpouRun, tile: string, at?: number): BunpouRun {
+  if (!canPlace(run) || !run.offered.includes(tile)) return run;
+  const target = at ?? run.slots.indexOf(null);
+  if (target < 0 || target >= run.slots.length || run.slots[target] === tile) return run;
+  const slots = [...run.slots];
+  const from = slots.indexOf(tile);
+  if (from >= 0) slots[from] = slots[target] ?? null;
+  slots[target] = tile;
+  const next = { ...run, slots };
+  return slots.includes(null) ? next : judge(next, false);
+}
+
+/** Takes a tile out of its box; with no tile named, the rightmost one placed. */
+export function takeBack(run: BunpouRun, tile = placedTiles(run).at(-1)): BunpouRun {
   if (!canPlace(run) || tile === undefined) return run;
-  return { ...run, placed: run.placed.filter((placed) => placed !== tile) };
+  return { ...run, slots: run.slots.map((placed) => (placed === tile ? null : placed)) };
 }
 
 /** Judges the line as a miss once its time has run out. */
