@@ -3,9 +3,12 @@ import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it } from 'vitest';
 import LeaderboardPanel from '../src/components/LeaderboardPanel.vue';
 import {
+  BUNPOU_SAMPLE_PLAYERS,
   pageCount,
   pageOf,
   rankedPlayers,
+  readBunpouBest,
+  recordBunpouBest,
   ROWS_PER_PAGE,
   SAMPLE_PLAYERS,
 } from '../src/leaderboard/leaderboard.ts';
@@ -58,5 +61,28 @@ describe('the leaderboard panel', () => {
     const panel = mount(LeaderboardPanel);
     expect(panel.find('[data-testid="leaderboard-you"]').text()).toContain(String(scoreAt(0) + 10));
     expect(panel.text()).toContain('Sample players');
+  });
+});
+
+describe('the Bunpou board', () => {
+  afterEach(() => localStorage.clear());
+
+  it('ranks your best run among its own sample players', () => {
+    recordBunpouBest(5000);
+    const you = rankedPlayers(readBunpouBest(), BUNPOU_SAMPLE_PLAYERS).find((row) => row.isYou);
+    expect(you?.rank).toBe(6);
+  });
+
+  it('keeps only a run that beats your best', () => {
+    expect(recordBunpouBest(1200)).toBe(true);
+    expect(recordBunpouBest(800)).toBe(false);
+    expect(readBunpouBest()).toBe(1200);
+  });
+
+  it('switches the start screen’s panel to Bunpou’s board', async () => {
+    const panel = mount(LeaderboardPanel);
+    await panel.find('[data-testid="board-bunpou"]').trigger('click');
+    const firstRow = panel.find('[data-testid="leaderboard-rows"] li').text();
+    expect(firstRow).toContain(String(BUNPOU_SAMPLE_PLAYERS[0]?.score));
   });
 });
