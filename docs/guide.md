@@ -308,6 +308,47 @@ specs use them to check the reports find what's there and don't invent what
 isn't, and `npm run power` uses them to show how often a real effect is
 detected at each class size.
 
+## The flow, part 7: generated grammar tales (G0 spike, no screen yet)
+
+The grammar mode's content is generated, not written: sentence templates
+are filled from one setting per tale. G0 builds only the content and its
+rules; `npm run grammar:preview` prints tales for a person to read.
+
+```mermaid
+flowchart LR
+  A[grammar-preview.ts] --> B[tale.ts: makeTale]
+  B --> C[pickSetting]
+  B --> D[rollPlan]
+  B --> E[pickTemplates]
+  E --> F[fill.ts: fillTemplate]
+  F --> G[conjugate.ts: conjugatePolite]
+  F --> H[kanji-furigana.ts: kanjiFurigana]
+  F --> I[Sentence: tiles and units]
+  I --> J[order-check.ts: isRightOrder]
+```
+
+1. **`scripts/grammar-preview.ts`** asks **`src/grammar/tale.ts:
+   makeTale`** for each tale, with the grammar points that have templates.
+2. **`pickSetting`** casts the tale: two characters, two places, a food, a
+   thing and a time, from the tagged nouns in **`lexicon.ts`**.
+3. **`rollPlan`** rolls 4–6 lines in the order 起承転結 (setup,
+   development, twist, punchline); up to two parts get a second line.
+4. **`pickTemplates`** takes one template per line from
+   **`templates.ts`**: the right shelf, a grammar point not used yet in
+   the tale, and a follow-on template for a second line. If the roll
+   doesn't fit, `makeTale` rolls again.
+5. **`fill.ts: fillTemplate`** fills each template's slots, conjugates its
+   verb (**`conjugate.ts: conjugatePolite`**), adds furigana on the kanji
+   only (**`kanji-furigana.ts: kanjiFurigana`**), and keeps its units.
+   It refuses a filling where two tiles read the same.
+6. In play (G1), **`order-check.ts: isRightOrder`** will judge the
+   player's tile order against those units.
+
+**`npm run grammar:check`** (**`scripts/grammar-check.ts`**) is the build
+check: **`template-check.ts: templateProblems`** checks the templates
+against the shelf map, and every lexicon word is checked against the
+pinned OpenJLPT build.
+
 ## The look and wellbeing
 
 - **The styles** are Tailwind classes in the components. `src/style.css`
@@ -483,6 +524,11 @@ fields. They stay in memory until slice 3 stores them.
 | **Play effect** | After-accuracy minus held-back accuracy, in percentage points: the headline | `report/measurement.ts` |
 | **Bootstrap interval** | The range the play effect would likely fall in, found by resampling players 10,000 times | `bootstrapInterval` |
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
+| **Template / slot** | A grammar sentence with gaps (`<who>`, `<place>`, `<食べる:mashita>`) that a tale's setting fills; it tests one grammar point | `grammar/templates.ts`, `fill.ts` |
+| **Shelf / 起承転結** | The four parts of a tale (setup, development, twist, punchline), coded S, D, T, P; each template sits on one shelf, as the shelf map allows | `templates.ts: Shelf`, `bunpou-n5-shelf-map.csv` |
+| **Follow-on** | A template used only as a part's second line, never to open it | `Template.followOn`, `tale.ts: pickTemplates` |
+| **Unit** | Tiles that move together: a noun and its particle, a fixed phrase, or the predicate (last). Units may swap places; inside one, the order is fixed | `order-check.ts` |
+| **Polite form** | ます, ました, ません, ませんでした: the four verb endings N5 sentences use | `grammar/conjugate.ts` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
 
 ## Where to change things
@@ -589,5 +635,10 @@ fields. They stay in memory until slice 3 stores them.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
+- **Add a grammar template:** add it to `TEMPLATES` in
+  `src/grammar/templates.ts` (the format is in the file's header), then
+  run `npm run grammar:check` and `npm run grammar:preview`. A new word for
+  its slots goes in `src/grammar/lexicon.ts`; a new verb class needs rules
+  in `src/grammar/conjugate.ts`.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
   is one.
