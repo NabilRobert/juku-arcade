@@ -50,6 +50,21 @@ const SOUNDS = {
   levelUp: [0.6, 0, 523, , 0.04, 0.35, 1, 2, , , 262, 0.06, 0.06],
   /** A set cleared: a bright, longer chime. */
   cleared: [0.6, 0, 784, 0.01, 0.12, 0.5, 1, 2, , , 196, 0.1, , , , , 0.1, 0.6],
+  // Bunpou's stage (D58). Synth stand-ins shaped by guesswork: no recordings yet.
+  /** The storyteller's fan tapping on a line told right: a dry wooden clack. */
+  fanTap: [0.7, 0.05, 600, , 0.005, 0.06, 4, 1.5],
+  /** A built line folding into a slip: a short papery swish. */
+  slipFold: [0.3, 0.05, 700, 0.01, 0.03, 0.08, 4, 1, -2],
+  /** One shamisen pluck; the opening plays three at rising pitches. */
+  shamisen: [0.5, 0, 220, 0.002, 0.02, 0.35, 2, 2.5, , , , , , , , , , 0.3, 0.1],
+  /** The crowd roaring: a long warbling swell of noise. */
+  laughBig: [0.8, 0.2, 400, 0.1, 1.2, 0.6, 4, 1, , , , , , 0.5, 12],
+  /** The crowd laughing. */
+  laugh: [0.6, 0.2, 420, 0.05, 0.6, 0.4, 4, 1, , , , , , 0.5, 12],
+  /** A polite chuckle. */
+  chuckle: [0.35, 0.2, 450, 0.02, 0.25, 0.25, 4, 1, , , , , , 0.5, 10],
+  /** Someone coughing into the silence. */
+  cough: [0.6, 0.1, 180, 0.005, 0.05, 0.12, 4, 2, , , , , , 1],
 } satisfies Record<string, SoundSettings>;
 /* eslint-enable no-sparse-arrays */
 

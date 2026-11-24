@@ -2,15 +2,21 @@
 /**
  * Bunpou on screen (D56): a side panel (the mode, today's grammar
  * reviews, score, level and best combo, the hint and sound switches, End
- * run) beside the table, the revealed tale after its last line, or the
- * results once the player ends the run. Every judged line goes to the
+ * run) beside the stage and the table (D58: the storyteller keeps each
+ * built line as a sealed slip, and forgets a line that times out), the
+ * tale's performance after its last line, the chapter's scroll after every
+ * third tale, or the results once the player ends the run. Every judged line goes to the
  * grammar log and reviews (useGrammarReviews, D57), which also pick each
  * tale's points. Like kanji mode, its play time counts toward the nudges
  * and the school's daily cap (usePlayClock), the wellbeing screens stand
  * in front of the table, and "Stop for today" goes back to the start
  * screen.
  */
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef, watch } from 'vue';
+import type { LineResult } from '../../grammar/bunpou-run.ts';
+import { endsChapter, TALES_PER_CHAPTER } from '../../grammar/performance.ts';
+import { FORGOT_LINE } from '../../grammar/usePerformance.ts';
+import { playSound } from '../../sound/sfx.ts';
 import type { GrammarEvent } from '../../grammar/grammar-events.ts';
 import { BUNPOU_POINTS, useBunpouRun } from '../../grammar/useBunpouRun.ts';
 import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
@@ -27,7 +33,9 @@ import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
 import BunpouResults from './BunpouResults.vue';
-import TaleReveal from './TaleReveal.vue';
+import ChapterScroll from './ChapterScroll.vue';
+import StoryStage from './StoryStage.vue';
+import TalePerformance from './TalePerformance.vue';
 
 const props = defineProps<{
   level: string;
@@ -76,6 +84,37 @@ const panels = computed(() => [
   { label: 'Score', value: run.value.score },
   { label: 'Level', value: run.value.level },
 ]);
+
+/** The tales told this run, for the chapter scroll; a chapter shows once its last tale is told. */
+const toldTales = shallowRef<readonly (readonly LineResult[])[]>([]);
+const chapterShown = ref<number | null>(null);
+const chapterTales = computed(() => toldTales.value.slice(-TALES_PER_CHAPTER));
+
+function afterTale(): void {
+  toldTales.value = [...toldTales.value, run.value.results];
+  if (endsChapter(toldTales.value.length)) {
+    chapterShown.value = toldTales.value.length / TALES_PER_CHAPTER;
+    return;
+  }
+  game.nextTale();
+}
+
+function afterChapter(): void {
+  chapterShown.value = null;
+  game.nextTale();
+}
+
+/** The line just judged, while its result shows. */
+const judged = computed(() =>
+  run.value.phase === 'judged' ? run.value.results.at(-1) : undefined,
+);
+// Each built line folds into a slip as it's judged.
+watch(
+  () => run.value.phase,
+  (phase) => {
+    if (phase === 'judged') playSound('slipFold');
+  },
+);
 
 function dismiss(isStopping: boolean): void {
   dismissNudge(false);
@@ -135,21 +174,36 @@ function dismiss(isStopping: boolean): void {
         @again="emit('again')"
         @leave="emit('leave')"
       />
-      <TaleReveal
+      <ChapterScroll
+        v-else-if="chapterShown !== null"
+        :chapter="chapterShown"
+        :tales="chapterTales"
+        @next="afterChapter"
+      />
+      <TalePerformance
         v-else-if="run.phase === 'revealed'"
+        :key="toldTales.length"
         :results="run.results"
-        @next="game.nextTale"
+        :combo="run.combo"
+        :ends-chapter="endsChapter(toldTales.length + 1)"
+        @next="afterTale"
       />
-      <BunpouBoard
-        v-else
-        :run="run"
-        :unplaced="unplaced"
-        :time-left="timeLeft"
-        @place="game.place"
-        @take-back="game.takeBack"
-        @pause="game.pause"
-        @resume="game.resume"
-      />
+      <div v-else class="flex flex-col gap-4">
+        <StoryStage
+          :pose="judged?.isTimedOut ? 'forgot' : 'idle'"
+          :slips="run.results.length"
+          :bubble="judged?.isTimedOut ? FORGOT_LINE : null"
+        />
+        <BunpouBoard
+          :run="run"
+          :unplaced="unplaced"
+          :time-left="timeLeft"
+          @place="game.place"
+          @take-back="game.takeBack"
+          @pause="game.pause"
+          @resume="game.resume"
+        />
+      </div>
     </WellbeingGate>
   </div>
 </template>

@@ -1,10 +1,9 @@
-// Bunpou on screen: placing and taking back tiles, keys, a miss's fix, pausing, and the tale's reveal.
+// Bunpou on screen: placing and taking back tiles, keys, a miss's fix, pausing, and the hint.
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import BunpouBoard from '../src/components/bunpou/BunpouBoard.vue';
 import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
-import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
 import { parseFurigana } from '../src/deck/furigana.ts';
 import { seededRandom } from '../src/game/random.ts';
@@ -141,13 +140,6 @@ describe('Bunpou on screen', () => {
     expect(localStorage.getItem('juku-arcade:bunpou-hints')).toBe('false');
     expect(board.find('[data-testid="hint"]').exists()).toBe(false);
     setHintsShown(true);
-  });
-
-  it('reveals every line of the tale and asks for the next one', async () => {
-    const reveal = mount(TaleReveal, { props: { results: missedRun().results } });
-    expect(reveal.findAll('li')).toHaveLength(1);
-    await reveal.find('[data-testid="next-tale"]').trigger('click');
-    expect(reveal.emitted('next')).toHaveLength(1);
   });
 });
 
