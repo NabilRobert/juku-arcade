@@ -2,7 +2,7 @@
 /**
  * Bunpou's table (D56): which part of the tale this line is (起承転結),
  * the line's timer, the strip the tiles are placed on, the combo meter,
- * the grammar hint (hints.ts) and the offered tiles. Tap an offered tile to place it at the end, or
+ * the grammar hint (preferences/hints.ts) and the offered tiles. Tap an offered tile to place it at the end, or
  * drag it onto the strip where it should go; tap a placed tile to take it
  * back. A missed line shows its fix for a moment.
  *
@@ -13,7 +13,7 @@
  */
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { BunpouRun } from '../../grammar/bunpou-run.ts';
-import { areHintsShown } from '../../grammar/hints.ts';
+import { areHintsShown } from '../../preferences/hints.ts';
 import { POINT_PATTERNS } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';

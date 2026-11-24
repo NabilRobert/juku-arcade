@@ -29,13 +29,13 @@ Pages (`.github/workflows/deploy.yml`).
 
 ## Layout
 
-| Folder     | What it holds                                                                                                         |
-| ---------- | --------------------------------------------------------------------------------------------------------------------- |
-| `src/`     | The game: rules in plain TypeScript (`game/`, `kanji/`, `bank-run/`, `memory/`, `grammar/`), screens in `components/` |
-| `scripts/` | The deck and font builds, and the reports made from exported play data                                                |
-| `public/`  | Fonts, card sounds, music and hosting headers                                                                         |
-| `tests/`   | Vitest specs, one behaviour each                                                                                      |
-| `docs/`    | The guides and planning documents below                                                                               |
+| Folder     | What it holds                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`     | The game: rules in plain TypeScript (`game/`, `kanji/`, `bank-run/`, `memory/`, `grammar/`, `preferences/`), screens in `components/` |
+| `scripts/` | The deck and font builds, and the reports made from exported play data                                                                |
+| `public/`  | Fonts, card sounds, music and hosting headers                                                                                         |
+| `tests/`   | Vitest specs, one behaviour each                                                                                                      |
+| `docs/`    | The guides and planning documents below                                                                                               |
 
 ## Read more
 

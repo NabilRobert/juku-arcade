@@ -13,11 +13,12 @@ import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
+import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
+import OnOffButton from '../ui/OnOffButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
-import HintToggle from './HintToggle.vue';
 import TaleReveal from './TaleReveal.vue';
 
 const props = defineProps<{
@@ -74,7 +75,12 @@ function dismiss(isStopping: boolean): void {
           }}</span>
         </StatPanel>
       </div>
-      <HintToggle />
+      <OnOffButton
+        label="Hints"
+        :is-on="areHintsShown"
+        data-testid="hint-toggle"
+        @change="setHintsShown"
+      />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">

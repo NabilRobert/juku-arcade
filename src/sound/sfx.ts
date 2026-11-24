@@ -12,7 +12,7 @@
  * sound, which always follows a tap or a drag. Muting is remembered in
  * this browser only (localStorage): a classroom may need it off.
  */
-import { ref } from 'vue';
+import { storedFlag } from '../preferences/stored-flag.ts';
 import { storedVolume } from './volume.ts';
 
 /**
@@ -120,24 +120,9 @@ export function comboPitch(combo: number): number {
   return 2 ** (step / SEMITONES_PER_OCTAVE);
 }
 
-function readMuted(): boolean {
-  try {
-    return localStorage.getItem(MUTED_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
-
-export const isMuted = ref(readMuted());
-
-export function setMuted(muted: boolean): void {
-  isMuted.value = muted;
-  try {
-    localStorage.setItem(MUTED_KEY, String(muted));
-  } catch {
-    // Storage can be blocked (a private window); muting still works until reload.
-  }
-}
+const muted = storedFlag(MUTED_KEY, false);
+export const isMuted = muted.isOn;
+export const setMuted = muted.set;
 
 type Player = (name: SoundName, pitch: number) => Promise<void>;
 let player: Promise<Player> | null = null;

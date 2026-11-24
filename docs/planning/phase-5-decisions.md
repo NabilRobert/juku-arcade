@@ -927,10 +927,16 @@ its time runs out, and the tale is revealed after its last line.
 - **Grammar hint** (added 2026-11-24, after playtesting): the line's
   pattern (人＋と) shows beside 起承転結, as building blind was too hard.
   It's free and on by default; a switch in the side panel and in
-  Settings turns it off, remembered in this browser (`grammar/hints.ts`).
+  Settings turns it off, remembered in this browser (`preferences/hints.ts`).
   - **Beat:** a paid hint like word mode's Scout (the point is learning
     the pattern, not saving coins); showing the first tile (gives away
     the order, which is the exercise).
+- **Furigana switch** (added 2026-11-24): Settings can turn furigana off
+  everywhere it shows (Bunpou, and word cards' example sentences), for
+  players who want to read without it. On by default; Kanji mode never
+  shows furigana. It and the hint, like the mute switch, are small on/off
+  choices kept in this browser by one helper (`preferences/stored-flag.ts`),
+  not in the saved settings.
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.

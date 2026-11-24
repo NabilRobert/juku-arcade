@@ -4,13 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import BunpouBoard from '../src/components/bunpou/BunpouBoard.vue';
 import SentenceFix from '../src/components/bunpou/SentenceFix.vue';
-import HintToggle from '../src/components/bunpou/HintToggle.vue';
 import TaleReveal from '../src/components/bunpou/TaleReveal.vue';
 import ModePicker from '../src/components/ModePicker.vue';
 import { parseFurigana } from '../src/deck/furigana.ts';
 import { seededRandom } from '../src/game/random.ts';
 import * as rules from '../src/grammar/bunpou-run.ts';
-import { areHintsShown, setHintsShown } from '../src/grammar/hints.ts';
+import { setHintsShown } from '../src/preferences/hints.ts';
 import { makeTale } from '../src/grammar/tale.ts';
 import { POINT_PATTERNS, TEMPLATES } from '../src/grammar/templates.ts';
 import { useBunpouRun } from '../src/grammar/useBunpouRun.ts';
@@ -114,11 +113,11 @@ describe('Bunpou on screen', () => {
     expect(withoutFurigana(board.find('[data-testid="hint"]').element)).toBe(patternOf(run));
   });
 
-  it('hides the hint once the switch turns it off, and remembers that', async () => {
+  it('hides the hint once hints are turned off, and remembers that', async () => {
     setHintsShown(true);
     const board = mountBoard(freshRun());
-    await mount(HintToggle).trigger('click');
-    expect(areHintsShown.value).toBe(false);
+    setHintsShown(false);
+    await nextTick();
     expect(localStorage.getItem('juku-arcade:bunpou-hints')).toBe('false');
     expect(board.find('[data-testid="hint"]').exists()).toBe(false);
     setHintsShown(true);
