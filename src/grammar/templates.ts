@@ -1,6 +1,5 @@
 /**
- * The sentence templates (D55). G0's spike: 5 grammar points × 3
- * templates.
+ * The sentence templates (D55, D56): 10 grammar points × 3 templates.
  *
  * How a template is written:
  * - `units` lists the sentence's units in order, each a list of tiles.
@@ -17,9 +16,9 @@
  *   template only follows a first sentence on the same shelf.
  *
  * Shelves: S 起 setup, D 承 development, T 転 twist, P 結 punchline.
- * まで, which the design suggested, was swapped for も: none of the other
- * four points may go on the twist shelf (bunpou-n5-shelf-map.csv), and
- * every tale needs a twist.
+ * Every point's shelves are the ones bunpou-n5-shelf-map.csv allows
+ * (npm run grammar:check), and every tale needs a twist, so at least one
+ * point in a pool must be allowed on T.
  */
 
 export type Shelf = 'S' | 'D' | 'T' | 'P';
@@ -137,4 +136,120 @@ export const TEMPLATES: readonly Template[] = [
     followOn: true,
     units: [['<who2>', 'も'], ['<place>', 'へ'], ['<行く:mashita>']],
   },
+  // まで
+  {
+    id: 'made-D',
+    point: 'made',
+    shelf: 'D',
+    units: [['<who>', 'は'], ['<place>', 'まで'], ['<走る:mashita>']],
+  },
+  {
+    id: 'made-D-walk',
+    point: 'made',
+    shelf: 'D',
+    units: [['<place2>', 'から'], ['<place>', 'まで'], ['<歩く:mashita>']],
+    // 駅まで学校から歩きました is right too.
+    swaps: [['から', 'まで']],
+  },
+  {
+    id: 'made-P',
+    point: 'made',
+    shelf: 'P',
+    units: [['<who2>', 'は'], ['<time>', 'まで'], ['<寝る:mashita>']],
+  },
+  // と (with)
+  {
+    id: 'to-S',
+    point: 'to-with',
+    shelf: 'S',
+    units: [['<time>', 'に'], ['<who2>', 'と'], ['<会う:masu>']],
+  },
+  {
+    id: 'to-D',
+    point: 'to-with',
+    shelf: 'D',
+    units: [['<who>', 'は'], ['<who2>', 'と'], ['<遊ぶ:mashita>']],
+  },
+  {
+    id: 'to-D-talk',
+    point: 'to-with',
+    shelf: 'D',
+    units: [['<who2>', 'と'], ['<place>', 'で'], ['<話す:mashita>']],
+  },
+  // から (from)
+  {
+    id: 'kara-D',
+    point: 'kara-from',
+    shelf: 'D',
+    units: [['<who>', 'は'], ['<place2>', 'から'], ['<帰る:mashita>']],
+  },
+  {
+    id: 'kara-D-work',
+    point: 'kara-from',
+    shelf: 'D',
+    units: [['<time>', 'から'], ['<place>', 'で'], ['<働く:mashita>']],
+  },
+  {
+    id: 'kara-P',
+    point: 'kara-from',
+    shelf: 'P',
+    units: [['<who2>', 'が'], ['<place>', 'から'], ['<来る:mashita>']],
+  },
+  // が (subject)
+  {
+    id: 'ga-S',
+    point: 'ga-subject',
+    shelf: 'S',
+    units: [['<place>', 'に'], ['<who2>', 'が'], ['<来る:masu>']],
+  },
+  {
+    id: 'ga-T',
+    point: 'ga-subject',
+    shelf: 'T',
+    units: [['でも、<place>', 'に'], ['<who2>', 'が'], ['<来る:masenDeshita>']],
+    fixedUnits: [0],
+  },
+  {
+    id: 'ga-T-forgot',
+    point: 'ga-subject',
+    shelf: 'T',
+    units: [['<who2>', 'が'], ['<thing>', 'を'], ['<忘れる:mashita>']],
+  },
+  // がある・がいる
+  {
+    id: 'aru-S',
+    point: 'ga-aru-ga-iru',
+    shelf: 'S',
+    units: [['<place>', 'に'], ['<who2>', 'が'], ['<いる:masu>']],
+  },
+  {
+    id: 'aru-S-thing',
+    point: 'ga-aru-ga-iru',
+    shelf: 'S',
+    units: [['<place2>', 'に'], ['<thing>', 'が'], ['<ある:masu>']],
+  },
+  {
+    id: 'aru-T',
+    point: 'ga-aru-ga-iru',
+    shelf: 'T',
+    units: [['でも、<place>', 'に'], ['<food>', 'が'], ['<ある:masenDeshita>']],
+    fixedUnits: [0],
+  },
 ];
+
+/**
+ * Each point's pattern, shown with a fix. Japanese only (D56):
+ * OpenJLPT's patterns carry English, so they're written here.
+ */
+export const POINT_PATTERNS: Readonly<Record<string, string>> = {
+  wa: '名詞＋は',
+  o: '名詞＋を',
+  'ni-time': '時間＋に',
+  'de-place': '場所＋で',
+  mo: '名詞＋も',
+  made: '名詞＋まで',
+  'to-with': '人＋と',
+  'kara-from': '名詞＋から',
+  'ga-subject': '名詞＋が',
+  'ga-aru-ga-iru': '場所＋に＋名詞＋が＋ある・いる',
+};

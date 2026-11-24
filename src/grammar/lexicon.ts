@@ -64,6 +64,13 @@ export const VERBS: readonly Verb[] = [
   { word: '帰る', reading: 'かえる', verbClass: 'v5r' },
   { word: '待つ', reading: 'まつ', verbClass: 'v5t' },
   { word: 'ある', reading: 'ある', verbClass: 'v5r-i' },
+  { word: 'いる', reading: 'いる', verbClass: 'v1' },
+  { word: '走る', reading: 'はしる', verbClass: 'v5r' },
+  { word: '歩く', reading: 'あるく', verbClass: 'v5k' },
+  { word: '働く', reading: 'はたらく', verbClass: 'v5k' },
+  { word: '会う', reading: 'あう', verbClass: 'v5u' },
+  { word: '遊ぶ', reading: 'あそぶ', verbClass: 'v5b' },
+  { word: '話す', reading: 'はなす', verbClass: 'v5s' },
   { word: '来る', reading: 'くる', verbClass: 'vk' },
 ];
 
