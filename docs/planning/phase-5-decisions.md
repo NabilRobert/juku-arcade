@@ -1041,3 +1041,31 @@ approach and synth sounds, since there's no art or audio for it yet.
   sourcing as open; pixel grids keep the look consistent and can be
   redrawn later without code changes); a full-screen performance
   overlay (hides the side panel's score and progress for no gain).
+
+### D59: Bunpou's close: the bow, the haiku and the leaderboard (G4, 2026-11-24)
+
+The player ends a run whenever they choose, and the show closes as the
+plan says.
+
+- **The curtain call:** "End run" has the storyteller bow low to
+  applause and say the rakugo closing line, おあとがよろしいようで; red
+  pixel curtains then slide in from both sides and meet in the middle
+  (asked for in playtesting); then the haiku card is dealt in, and the
+  results come after it. Speech and shouts sit in front of the crowd.
+- **The haiku:** 24 to collect (`grammar/haiku-bank.ts`): 12 written for
+  this game in easy Japanese, and 12 classics by Bashō, Buson and Issa
+  from before 1900, which are public domain. Each is tagged with lexicon
+  words, and a run closes on one that fits its last tale's setting when
+  there is one. None repeats until every one has come up; then the bank
+  reshuffles (`grammar/haiku.ts`). The card shows the poet for a classic,
+  新しい句！ for a new one, and the collection (句集 2 / 24).
+- **The leaderboard:** Bunpou gets its own board, by total run score,
+  beside word mode's on the start screen (a Words / Bunpou switch), with
+  its own sample players until scores can be shared (D47). The results
+  show your best run (★ when it's new) and its rank.
+- **Storage:** the collection and the best run are kept in this browser
+  like word mode's best score, and "Delete my data" now clears both.
+- **Beat:** a dedicated collection page (one more screen before the
+  collection has much in it); haiku picked at random (the plan asks for
+  one that fits the tale); modern haiku (copyrighted).
+

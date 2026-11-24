@@ -54,4 +54,5 @@ JLPT lists, and Tatoeba; the generated decks are CC BY-SA 4.0 too. The
 fonts are balatro and Kuronuri (both OFL), and the card sounds are from
 Kenney's Casino Audio pack (CC0). The music is "France Instrumental" by
 Sub_Clair, from [Pixabay](https://pixabay.com/music/france-france-instrumental-633138/)
-(Pixabay Content License). No licence yet for the code.
+(Pixabay Content License). The classic haiku in Bunpou (Bashō, Buson,
+Issa) are in the public domain; the others were written for the game. No licence yet for the code.

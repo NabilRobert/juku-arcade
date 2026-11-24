@@ -399,7 +399,15 @@ pinned OpenJLPT build.
    were right (`crowdReaction`): 大爆笑 and cheering, a laugh, a chuckle,
    or silence with a cough and someone on a phone. Skip jumps to the
    reaction. After every third tale, **`ChapterScroll.vue`** shows the
-   chapter (第1章) as a scroll. "Next tale" calls **`nextTale`**. "End run" shows
+   chapter (第1章) as a scroll. "Next tale" calls **`nextTale`**. "End
+   run" (**`grammar/useRunEnd.ts`**) keeps a new best run
+   (`leaderboard.ts: recordBunpouBest`), picks the closing haiku
+   (**`haiku.ts: pickHaiku`**, from `haiku-bank.ts`, fitting the last
+   tale's setting) and adds it to the collection, then shows
+   **`CurtainCall.vue`**: the storyteller's bow, the curtains closing
+   (`StoryStage.vue`, the `curtain` utility in `style.css`) and the
+   **`HaikuCard.vue`**.
+   "See results" shows
    **`BunpouResults.vue`**: the run's score and lines, grammar seen and
    known, and today's progress.
 9. Pausing (the button or Esc) freezes the line's clock and turns the
@@ -589,6 +597,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |
 | **Performance** | The tale told line by line after its last line, then the crowd's reaction (roar, laugh, chuckle or silence) | `performance.ts`, `usePerformance.ts`, `TalePerformance.vue` |
 | **Chapter** | Every 3 tales, shown together as a scroll | `ChapterScroll.vue`, `performance.ts: TALES_PER_CHAPTER` |
+| **Curtain call / haiku** | The end of a run: the storyteller bows, then a haiku card closes the show and joins the collection | `CurtainCall.vue`, `haiku.ts`, `haiku-bank.ts` |
 | **Hint** | The line's grammar pattern (人＋と), shown beside 起承転結 unless the player turns hints off | `preferences/hints.ts`, `BunpouBoard.vue` |
 | **Preference** | A small on/off choice kept in this browser: sound muted, Bunpou's hint, furigana. Set by an `OnOffButton` | `src/preferences/`, `ui/OnOffButton.vue` |
 | **Fix** | For a wrong line: the right order closest to the player's, with the tiles out of place marked | `order-check.ts: closestFix`, `SentenceFix.vue` |
@@ -714,6 +723,10 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Add a haiku:** add it to `HAIKU_BANK` in
+  `src/grammar/haiku-bank.ts`, tagged with the lexicon words it fits; the
+  collection's total follows. Bunpou's leaderboard samples are
+  `BUNPOU_SAMPLE_PLAYERS` in `src/leaderboard/leaderboard.ts`.
 - **Change the stage:** the storyteller and slip are letter grids in
   `src/components/bunpou/stage-sprites.ts` (one letter per pixel, colours
   in `STAGE_PALETTE`); the crowd's head shapes, rows and colours are in
