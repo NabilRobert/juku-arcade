@@ -4,10 +4,14 @@
  * - every template sits on a shelf the shelf map allows for its point;
  * - every point with templates has at least 3, on at least 2 shelves;
  * - every template has at least 2 noun+particle units, 3–5 tiles, a
- *   one-tile predicate last, and no two tiles written the same.
+ *   one-tile predicate last, and no two tiles written the same;
+ * - every tile fills (fillProblems): its verb, verb form and slots exist.
  *
  * scripts/grammar-check.ts runs it on the real templates and shelf map.
  */
+import { seededRandom } from '../game/random.ts';
+import { fillTile } from './fill.ts';
+import { pickSetting } from './tale.ts';
 import type { Shelf, Template } from './templates.ts';
 
 export const MIN_TEMPLATES_PER_POINT = 3;
@@ -93,6 +97,31 @@ function shelfProblems(templates: readonly Template[], shelfMap: ShelfMap): stri
   return problems;
 }
 
-export function templateProblems(templates: readonly Template[], shelfMap: ShelfMap): string[] {
-  return [...templates.flatMap(shapeProblems), ...shelfProblems(templates, shelfMap)];
+/** Every problem with the templates; with no shelf map (a fresh clone, or CI), all but the shelf rules. */
+export function templateProblems(
+  templates: readonly Template[],
+  shelfMap: ShelfMap | null,
+): string[] {
+  const shelves = shelfMap === null ? [] : shelfProblems(templates, shelfMap);
+  return [...templates.flatMap(shapeProblems), ...shelves, ...fillProblems(templates)];
+}
+
+/**
+ * Every tile of every template, filled once with a sample setting: a typo
+ * in a verb form, a slot or a verb fails here, at build time, rather than
+ * only when a tale happens to use that template.
+ */
+export function fillProblems(templates: readonly Template[]): string[] {
+  const setting = pickSetting(seededRandom(1));
+  return templates.flatMap((template) =>
+    template.units.flat().flatMap((pattern) => {
+      try {
+        fillTile(pattern, setting);
+        return [];
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return [`${template.id}: ${message}`];
+      }
+    }),
+  );
 }

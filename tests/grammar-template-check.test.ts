@@ -1,6 +1,6 @@
 // The templates' build check: shelves the shelf map allows, enough templates, the agreed tile shape.
 import { describe, expect, it } from 'vitest';
-import { parseShelfMap, templateProblems } from '../src/grammar/template-check.ts';
+import { fillProblems, parseShelfMap, templateProblems } from '../src/grammar/template-check.ts';
 import { POINT_PATTERNS, TEMPLATES, type Template } from '../src/grammar/templates.ts';
 
 // The rows of the points with templates, as they are in bunpou-n5-shelf-map.csv.
@@ -75,5 +75,21 @@ describe('the templates’ build check', () => {
     expect(templateProblems(threeGood({ point: 'ya' }), SHELF_MAP)).toContain(
       "ya: isn't in the shelf map",
     );
+  });
+
+  it('fills every tile of every template', () => {
+    expect(fillProblems(TEMPLATES)).toEqual([]);
+  });
+
+  it('names a template whose verb form has a typo', () => {
+    const typo: Template = {
+      id: 'typo-S',
+      point: 'wa',
+      shelf: 'S',
+      units: [['<who>', 'は'], ['<food>', 'を'], ['<食べる:mashta>']],
+    };
+    expect(fillProblems([typo])).toEqual([
+      'typo-S: Unknown verb form "mashta" in <食べる:mashta>: use masu, mashita, masen or masenDeshita',
+    ]);
   });
 });
