@@ -57,7 +57,7 @@ export interface BunpouRun {
   /** This line's tiles in the order they're offered (shuffled). */
   offered: string[];
   /** One box per tile, left to right: the tile put there, or null while empty. */
-  slots: (string | null)[];
+  boxes: (string | null)[];
   phase: BunpouPhase;
   /** This tale's judged lines, in order. */
   results: LineResult[];
@@ -105,7 +105,7 @@ function offerLine(
     ...run,
     lineIndex,
     offered: shuffled(tiles, random),
-    slots: tiles.map(() => null),
+    boxes: tiles.map(() => null),
     phase: 'building',
     deadlineMs: nowMs + lineDurationMs,
     lineDurationMs,
@@ -120,7 +120,7 @@ export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource):
     tale,
     lineIndex: 0,
     offered: [],
-    slots: [],
+    boxes: [],
     phase: 'building',
     results: [],
     missed: [],
@@ -137,7 +137,7 @@ export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource):
 
 function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
   const sentence = currentLine(run);
-  const answer = run.slots;
+  const answer = run.boxes;
   const isFull = answer.every((tile) => tile !== null);
   const isRight = !isTimedOut && isFull && isRightOrder(answer, sentence);
   const fix = closestFix(answer, sentence);
@@ -169,7 +169,7 @@ const canPlace = (run: BunpouRun): boolean => run.phase === 'building' && run.pa
 
 /** The tiles in the boxes, in box order, without the empty ones. */
 export function placedTiles(run: BunpouRun): string[] {
-  return run.slots.filter((tile) => tile !== null);
+  return run.boxes.filter((tile) => tile !== null);
 }
 
 /**
@@ -180,20 +180,20 @@ export function placedTiles(run: BunpouRun): string[] {
  */
 export function placeTile(run: BunpouRun, tile: string, at?: number): BunpouRun {
   if (!canPlace(run) || !run.offered.includes(tile)) return run;
-  const target = at ?? run.slots.indexOf(null);
-  if (target < 0 || target >= run.slots.length || run.slots[target] === tile) return run;
-  const slots = [...run.slots];
-  const from = slots.indexOf(tile);
-  if (from >= 0) slots[from] = slots[target] ?? null;
-  slots[target] = tile;
-  const next = { ...run, slots };
-  return slots.includes(null) ? next : judge(next, false);
+  const target = at ?? run.boxes.indexOf(null);
+  if (target < 0 || target >= run.boxes.length || run.boxes[target] === tile) return run;
+  const boxes = [...run.boxes];
+  const from = boxes.indexOf(tile);
+  if (from >= 0) boxes[from] = boxes[target] ?? null;
+  boxes[target] = tile;
+  const next = { ...run, boxes };
+  return boxes.includes(null) ? next : judge(next, false);
 }
 
 /** Takes a tile out of its box; with no tile named, the rightmost one placed. */
 export function takeBack(run: BunpouRun, tile = placedTiles(run).at(-1)): BunpouRun {
   if (!canPlace(run) || tile === undefined) return run;
-  return { ...run, slots: run.slots.map((placed) => (placed === tile ? null : placed)) };
+  return { ...run, boxes: run.boxes.map((placed) => (placed === tile ? null : placed)) };
 }
 
 /** Judges the line as a miss once its time has run out. */

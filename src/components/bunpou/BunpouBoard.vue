@@ -55,9 +55,9 @@ watch(
   },
 );
 watch(
-  () => props.run.slots,
-  (slots) => {
-    for (const tile of slots) if (tile !== null) placedThisLine.value.add(tile);
+  () => props.run.boxes,
+  (boxes) => {
+    for (const tile of boxes) if (tile !== null) placedThisLine.value.add(tile);
   },
 );
 
@@ -77,18 +77,18 @@ function isInside(box: DOMRect, point: Point): boolean {
 }
 
 /** The box a tile was let go over: the nearest one, if it was let go over the strip at all. */
-function slotIndexAt(point: Point): number | null {
+function boxIndexAt(point: Point): number | null {
   const stripBox = strip.value?.getBoundingClientRect();
   if (stripBox === undefined || !isInside(stripBox, point)) return null;
-  const slotBoxes = [...(strip.value?.querySelectorAll('[data-slot]') ?? [])].map((slot) =>
-    slot.getBoundingClientRect(),
+  const boxRects = [...(strip.value?.querySelectorAll('[data-box]') ?? [])].map((box) =>
+    box.getBoundingClientRect(),
   );
   let nearest: number | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
-  slotBoxes.forEach((slotBox, index) => {
+  boxRects.forEach((boxRect, index) => {
     const distance = Math.hypot(
-      slotBox.left + slotBox.width / 2 - point.x,
-      slotBox.top + slotBox.height / 2 - point.y,
+      boxRect.left + boxRect.width / 2 - point.x,
+      boxRect.top + boxRect.height / 2 - point.y,
     );
     if (distance < nearestDistance) {
       nearest = index;
@@ -100,9 +100,9 @@ function slotIndexAt(point: Point): number | null {
 
 /** A dragged tile goes in the box it was let go over; a placed tile let go off the strip goes back. */
 function dropAt(tile: string, point: Point): void {
-  const at = slotIndexAt(point);
+  const at = boxIndexAt(point);
   if (at !== null) emit('place', tile, at);
-  else if (props.run.slots.includes(tile)) emit('takeBack', tile);
+  else if (props.run.boxes.includes(tile)) emit('takeBack', tile);
 }
 </script>
 
@@ -145,11 +145,11 @@ function dropAt(tile: string, point: Point): void {
       <SentenceFix v-if="judged && !judged.isRight" :result="judged" />
       <template v-else>
         <div
-          v-for="(tile, index) in run.slots"
+          v-for="(tile, index) in run.boxes"
           :key="index"
           class="flex min-h-16 min-w-20 items-center justify-center border-2 border-dashed"
           :class="tile === null ? 'border-washi/30' : 'border-transparent'"
-          data-slot
+          data-box
         >
           <BunpouTile
             v-if="tile !== null"

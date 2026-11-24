@@ -364,9 +364,9 @@ pinned OpenJLPT build.
    which offers the first line's tiles shuffled, with a time set by the
    level and the tile count (`sentenceDurationMs`).
 3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the
-   strip of boxes (one per tile, `run.slots`) and the offered tiles
+   strip of boxes (one per tile, `run.boxes`) and the offered tiles
    (**`BunpouTile.vue`**). A tap puts a tile in the first empty box; a
-   drag drops it in the box it's let go over (`dropAt`, `slotIndexAt`),
+   drag drops it in the box it's let go over (`dropAt`, `boxIndexAt`),
    even past empty ones. A placed tile can be dragged to another box (a
    tile there swaps places) or off the strip; a tap on it, or Backspace,
    takes it back. Keys 1–5 place a tile.
@@ -582,7 +582,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Bootstrap interval** | The range the play effect would likely fall in, found by resampling players 10,000 times | `bootstrapInterval` |
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
-| **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.slots` |
+| **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.boxes` |
 | **Grammar log** | The browser table of judged Bunpou lines, one event each, kept apart from the word log | `grammar-events.ts`, `storage.ts: grammarEvents` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |

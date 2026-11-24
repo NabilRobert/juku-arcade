@@ -47,7 +47,7 @@ function withoutFurigana(element: Element): string {
 
 const mountBoard = (run: rules.BunpouRun) =>
   mount(BunpouBoard, {
-    props: { run, unplaced: run.offered.filter((tile) => !run.slots.includes(tile)), timeLeft: 1 },
+    props: { run, unplaced: run.offered.filter((tile) => !run.boxes.includes(tile)), timeLeft: 1 },
   });
 
 afterEach(() => {
@@ -84,8 +84,8 @@ describe('Bunpou on screen', () => {
   it('shows one box per tile, empty until a tile is put in it', () => {
     const run = freshRun();
     const last = run.offered[0] ?? '';
-    const board = mountBoard(rules.placeTile(run, last, run.slots.length - 1));
-    const boxes = board.findAll('[data-slot]');
+    const board = mountBoard(rules.placeTile(run, last, run.boxes.length - 1));
+    const boxes = board.findAll('[data-box]');
     expect(boxes).toHaveLength(run.offered.length);
     expect(boxes.at(-1)?.find('button').exists()).toBe(true);
     expect(boxes[0]?.find('button').exists()).toBe(false);

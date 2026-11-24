@@ -61,6 +61,6 @@ export function makeGrammarEvent(
 }
 
 /** The boxes as one string for the log: tiles joined by '|', '_' for an empty box. */
-export function answerText(slots: readonly (string | null)[]): string {
-  return slots.map((tile) => tile ?? '_').join('|');
+export function answerText(boxes: readonly (string | null)[]): string {
+  return boxes.map((tile) => tile ?? '_').join('|');
 }

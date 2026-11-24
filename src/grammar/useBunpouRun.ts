@@ -110,7 +110,7 @@ export function useBunpouRun(options: BunpouRunOptions = {}) {
   }
   const takeBack = (tile?: string): void => update((current) => rules.takeBack(current, tile));
   const unplaced = computed(() =>
-    run.value.offered.filter((tile) => !run.value.slots.includes(tile)),
+    run.value.offered.filter((tile) => !run.value.boxes.includes(tile)),
   );
   useBunpouKeys({ placeNumber: (number) => place(unplaced.value[number - 1] ?? ''), takeBack });
 
