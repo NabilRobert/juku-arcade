@@ -922,7 +922,8 @@ its time runs out, and the tale is revealed after its last line.
   (`POINT_PATTERNS`). A timeout with nothing placed shows えーと….
 - **Pause** freezes the line's clock, turns the tiles face down where
   they lie (the card back, as word mode does, so the table doesn't move),
-  and lists the run's last 8 misses with their fixes below it.
+  and floats the run's last 8 misses with their fixes below it, over
+  the page rather than in the layout, with the hint over the combo meter.
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.

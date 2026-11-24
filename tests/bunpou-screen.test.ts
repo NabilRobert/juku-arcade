@@ -90,6 +90,7 @@ describe('Bunpou on screen', () => {
       expect(tile.attributes('disabled')).toBeDefined();
     }
     expect(board.find('[data-testid="strip"]').exists()).toBe(true);
+    expect(board.find('[data-testid="pause-hint"]').exists()).toBe(true);
     expect(
       board.find('[data-testid="paused"]').findAll('[data-testid="sentence-fix"]'),
     ).toHaveLength(1);

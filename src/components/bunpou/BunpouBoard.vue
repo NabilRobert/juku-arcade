@@ -8,7 +8,8 @@
  *
  * Pausing turns the tiles face down where they lie, as word mode turns
  * its cards (D8), so a pause gives no free thinking time; the run's
- * misses are listed below the table.
+ * misses float below the table and the hint over the combo meter, so
+ * nothing on the table moves, as in word mode.
  */
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { BunpouRun } from '../../grammar/bunpou-run.ts';
@@ -65,7 +66,7 @@ function dropAt(tile: string, point: Point): void {
 </script>
 
 <template>
-  <section class="flex flex-col gap-4" aria-label="Bunpou table">
+  <section class="relative flex flex-col gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? PART_NAMES[line.shelf] : ''
@@ -111,7 +112,23 @@ function dropAt(tile: string, point: Point): void {
         <span v-if="judged?.isRight" class="text-4xl text-aqua" aria-label="right">◯</span>
       </template>
     </div>
-    <ComboMeter :combo="run.combo" :broken-combo="brokenCombo" @broken-shown="brokenCombo = null" />
+    <div class="relative">
+      <div :class="{ invisible: isPaused }">
+        <ComboMeter
+          :combo="run.combo"
+          :broken-combo="brokenCombo"
+          @broken-shown="brokenCombo = null"
+        />
+      </div>
+      <p
+        v-if="isPaused"
+        class="pixel-panel absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-wood/90 px-4 py-2 text-sm whitespace-nowrap text-aqua"
+        role="status"
+        data-testid="pause-hint"
+      >
+        Paused. The tiles stay face down until you resume.
+      </p>
+    </div>
     <div class="flex min-h-24 flex-wrap justify-center gap-4" data-testid="offered">
       <BunpouTile
         v-for="(tile, index) in unplaced"
@@ -125,11 +142,11 @@ function dropAt(tile: string, point: Point): void {
       />
     </div>
     <div
-      v-if="isPaused"
-      class="pixel-panel flex max-h-[40dvh] flex-col gap-4 overflow-y-auto bg-wood/80 p-4"
+      v-if="isPaused && run.missed.length > 0"
+      class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35dvh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
       data-testid="paused"
     >
-      <p class="text-aqua">Paused. The tiles stay face down until you resume.</p>
+      <p class="text-sm text-aqua">Missed so far</p>
       <SentenceFix v-for="(missed, index) in run.missed" :key="index" :result="missed" />
     </div>
   </section>
