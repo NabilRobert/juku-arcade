@@ -5,10 +5,9 @@
  * tagged with a word from the last tale's setting is preferred. The
  * collection is every haiku ever closed on, kept in this browser.
  */
+import { HAIKU_KEY } from '../memory/progress-keys.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { HAIKU_BANK, type Haiku } from './haiku-bank.ts';
-
-export const HAIKU_KEY = 'juku-arcade:haiku';
 
 export interface HaikuShelf {
   /** Every haiku ever collected, by id. */

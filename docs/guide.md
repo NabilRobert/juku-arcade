@@ -711,6 +711,10 @@ fields. They stay in memory until slice 3 stores them.
   built for the `/juku-arcade/` folder); a class deploy is in
   `docs/playtest.md`.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
+- **Keep a new kind of progress in the browser** (a best score, a
+  collection): add its key to `src/memory/progress-keys.ts`, so "Delete
+  my data" clears it too. Preferences (sound, hints, furigana) don't go
+  there; a delete keeps them.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Add a grammar template:** add it to its group's file in

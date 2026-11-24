@@ -61,9 +61,11 @@ describe('browser storage', () => {
     expect(await loadEvents()).toEqual([]);
   });
 
-  it('deletes every event and setting', async () => {
+  it('deletes every event, setting, best score and the haiku collection, but keeps preferences', async () => {
     localStorage.setItem('juku-arcade:haiku', '{"collected":["park"],"round":[]}');
     localStorage.setItem('juku-arcade:best-bunpou-score', '900');
+    localStorage.setItem('juku-arcade:best-bank-score', '450');
+    localStorage.setItem('juku-arcade:music-volume', '0.5');
     await appendGrammarEvents([sentence('o', '2026-11-24', 'wrong')]);
     await deleteAllData();
     expect([await loadEvents(), await loadGrammarEvents(), await loadSettings()]).toEqual([
@@ -73,5 +75,8 @@ describe('browser storage', () => {
     ]);
     expect(localStorage.getItem('juku-arcade:haiku')).toBeNull();
     expect(localStorage.getItem('juku-arcade:best-bunpou-score')).toBeNull();
+    expect(localStorage.getItem('juku-arcade:best-bank-score')).toBeNull();
+    // A preference isn't progress: the delete keeps it.
+    expect(localStorage.getItem('juku-arcade:music-volume')).toBe('0.5');
   });
 });

@@ -5,6 +5,7 @@
  * ends the run's combo through `endCombo`. Opening the shop pauses the
  * game, and leaving it resumes play.
  */
+import { BANK_BEST_KEY } from '../memory/progress-keys.ts';
 import { ref, shallowRef, watch, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import type { RunState } from '../game/run.ts';
@@ -24,12 +25,10 @@ import type { ItemId } from './items.ts';
 import { useNotice } from '../composables/useNotice.ts';
 import { useCrests } from './useCrests.ts';
 
-const BEST_SCORE_KEY = 'juku-arcade:best-bank-score';
-
 /** The best score (banked coins) reached in this browser, for the stats and the leaderboard. */
 export function readBestScore(): number {
   try {
-    return Number(localStorage.getItem(BEST_SCORE_KEY) ?? 0);
+    return Number(localStorage.getItem(BANK_BEST_KEY) ?? 0);
   } catch {
     return 0;
   }
@@ -37,7 +36,7 @@ export function readBestScore(): number {
 
 function saveBestScore(score: number): void {
   try {
-    localStorage.setItem(BEST_SCORE_KEY, String(score));
+    localStorage.setItem(BANK_BEST_KEY, String(score));
   } catch {
     // Storage can be blocked (a private window); the best score then lasts this visit.
   }
