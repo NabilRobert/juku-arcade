@@ -79,12 +79,17 @@ describe('Bunpou on screen', () => {
     expect(mount(SentenceFix, { props: { result } }).text()).toContain('えーと…');
   });
 
-  it('hides the tiles while paused and lists the run’s misses', () => {
+  it('turns the tiles face down in place while paused and lists the run’s misses', () => {
     const judged = missedRun();
     const paused = rules.pause(rules.nextLine(judged, 0, seededRandom(1)), 0);
     const board = mountBoard(paused);
-    expect(board.find('[data-testid="offered"]').exists()).toBe(false);
-    expect(board.find('[data-testid="strip"]').exists()).toBe(false);
+    const offered = board.find('[data-testid="offered"]').findAll('button');
+    expect(offered.length).toBeGreaterThan(0);
+    for (const tile of offered) {
+      expect(tile.attributes('aria-label')).toBe('Face-down tile');
+      expect(tile.attributes('disabled')).toBeDefined();
+    }
+    expect(board.find('[data-testid="strip"]').exists()).toBe(true);
     expect(
       board.find('[data-testid="paused"]').findAll('[data-testid="sentence-fix"]'),
     ).toHaveLength(1);

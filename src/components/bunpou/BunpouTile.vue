@@ -5,8 +5,11 @@
  * mode's furigana sits above). Tap it, or drag it: a drag reports where
  * it was let go, and the board places the tile there. A press that
  * wobbles less than TAP_SLOP_PX still counts as a tap, as with the cards.
+ * While paused it turns face down, showing the card back, at the same
+ * size so nothing on the table moves (D8).
  */
 import { m, type PanInfo } from 'motion-v';
+import { computed } from 'vue';
 import { isDrag, type Point } from '../cards/throw-geometry.ts';
 import FuriganaText from '../words/FuriganaText.vue';
 
@@ -16,10 +19,16 @@ const props = defineProps<{
   number?: number;
   isWrong?: boolean;
   isDraggable?: boolean;
+  isFaceDown?: boolean;
 }>();
 const emit = defineEmits<{ tap: []; release: [point: Point] }>();
 
 const HELD_POSE = { scale: 1.1, rotate: 4 } as const;
+
+const faceClass = computed(() => {
+  if (props.isFaceDown) return 'card-back';
+  return props.isWrong ? 'bg-crimson text-washi' : 'washi';
+});
 let pressedAt: Point | null = null;
 
 function onPress(event: PointerEvent): void {
@@ -51,15 +60,19 @@ function onRelease(info: PanInfo): void {
     <button
       type="button"
       class="pixel-button min-w-20 px-5 pt-3 pb-[1.1em] text-4xl text-sumi"
-      :class="isWrong ? 'bg-crimson text-washi' : 'washi'"
+      :class="faceClass"
       :data-wrong="isWrong === true ? '' : undefined"
+      :disabled="isFaceDown"
+      :aria-label="isFaceDown ? 'Face-down tile' : undefined"
       @pointerdown="onPress"
       @click="onClick"
     >
-      <FuriganaText :marked="marked" is-reading-below />
+      <FuriganaText :class="{ invisible: isFaceDown }" :marked="marked" is-reading-below />
     </button>
-    <span v-if="number !== undefined" class="absolute -top-2 -left-2 text-xs text-aqua">{{
-      number
-    }}</span>
+    <span
+      v-if="number !== undefined && !isFaceDown"
+      class="absolute -top-2 -left-2 text-xs text-aqua"
+      >{{ number }}</span
+    >
   </m.div>
 </template>

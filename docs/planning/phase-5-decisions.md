@@ -920,8 +920,9 @@ its time runs out, and the tale is revealed after its last line.
   wrong ones marked against the closest right order (`closestFix`), the
   right sentence, and the point's pattern in Japanese only
   (`POINT_PATTERNS`). A timeout with nothing placed shows えーと….
-- **Pause** freezes the line's clock, hides the tiles, and lists the run's
-  last 8 misses with their fixes.
+- **Pause** freezes the line's clock, turns the tiles face down where
+  they lie (the card back, as word mode does, so the table doesn't move),
+  and lists the run's last 8 misses with their fixes below it.
 - **Content:** 5 more points (まで, と, から, が, がある・がいる), 3
   templates each, for 30 templates on 10 points. With three points on the
   twist shelf, tales now reach 6 lines.
