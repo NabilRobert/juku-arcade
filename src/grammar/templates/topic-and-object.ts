@@ -10,7 +10,8 @@ export const topicAndObject: readonly Template[] = [
     id: 'wa-S',
     point: 'wa',
     shelf: 'S',
-    units: [['<who>', 'は'], ['{毎朝|まいあさ}<food>', 'を'], ['<食べる:masu>']],
+    // 毎朝 rides with the verb it describes, not with the food: 卵を｜毎朝食べます.
+    units: [['<who>', 'は'], ['<food>', 'を'], ['{毎朝|まいあさ}<食べる:masu>']],
   },
   {
     id: 'wa-D',
