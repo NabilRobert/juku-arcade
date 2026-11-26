@@ -688,6 +688,9 @@ fields. They stay in memory until slice 3 stores them.
   stats, settings, about, research) sit at the bottom of the drawer
   (`composables/usePageLinks.ts`, `ui/PageLinks.vue`), so the board fits
   the screen with nothing to scroll.
+  Opening the drawer pauses a timed run, and closing it resumes the run if
+  the drawer paused it (`composables/usePanelPause.ts`, wired to
+  SidePanel's `toggle` event in each mode screen).
 - **Add a screen:** if it isn't needed on the start screen, add it to
   `lazy-screens.ts` so it loads on demand (and is prefetched when idle).
 - **Change the stats page:** word numbers come from `memory/stats.ts`, grammar

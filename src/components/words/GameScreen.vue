@@ -15,7 +15,8 @@ import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
 import { timeShareLeft } from '../../game/run.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
-import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { usePanelPause } from '../../composables/usePanelPause.ts';
+import { usePauseKey, type PauseKeyInput } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
 import { useDeckFinish } from '../../composables/useDeckFinish.ts';
 import { usePreviousBest } from '../../composables/usePreviousBest.ts';
@@ -111,17 +112,20 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   pause,
 });
 
-usePauseKey({
+const pauseControls: PauseKeyInput = {
   isPaused: () => state.value.pausedAtMs !== null,
   isAvailable: () => !props.isAway && !finish.isShown.value && state.value.phase === 'playing',
   pause,
   resume,
-});
+};
+usePauseKey(pauseControls);
+/** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
+const onPanelToggle = usePanelPause(pauseControls);
 </script>
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Word run">
+    <SidePanel label="Word run" @toggle="onPanelToggle">
       <DailyBar
         :daily="progress.daily"
         known-label="Words known"

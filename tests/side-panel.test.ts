@@ -51,6 +51,14 @@ describe('a mode’s side panel', () => {
     expect(panel.find('[data-testid="side-panel"]').classes()).toContain('-translate-x-full');
   });
 
+  it('tells the mode when it opens and closes, so the mode can pause', async () => {
+    asPhone();
+    const panel = mountPanel();
+    await panel.find('[data-testid="side-panel-toggle"]').trigger('click');
+    await panel.find('[data-testid="side-panel-backdrop"]').trigger('click');
+    expect(panel.emitted('toggle')).toEqual([[true], [false]]);
+  });
+
   it('clicks like every other button when its tab is pressed', async () => {
     asPhone();
     const panel = mountPanel();

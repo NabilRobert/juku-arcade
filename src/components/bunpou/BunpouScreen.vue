@@ -23,7 +23,8 @@ import { CURRICULUM } from '../../grammar/templates.ts';
 import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
 import { outcomeOf, useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { useRunEnd } from '../../grammar/useRunEnd.ts';
-import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { usePanelPause } from '../../composables/usePanelPause.ts';
+import { usePauseKey, type PauseKeyInput } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
 import { withAnswer, type Answers } from '../../memory/play-log.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
@@ -95,12 +96,15 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   isAway: () => props.isAway,
   pause: game.pause,
 });
-usePauseKey({
+const pauseControls: PauseKeyInput = {
   isPaused,
   isAvailable: () => !props.isAway && !isEnded.value && run.value.phase === 'building',
   pause: game.pause,
   resume: game.resume,
-});
+};
+usePauseKey(pauseControls);
+/** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
+const onPanelToggle = usePanelPause(pauseControls);
 
 const panels = computed(() => [
   { label: 'Score', value: run.value.score },
@@ -147,7 +151,7 @@ function dismiss(isStopping: boolean): void {
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Bunpou run">
+    <SidePanel label="Bunpou run" @toggle="onPanelToggle">
       <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
         :daily="reviews.progress.value.daily"
