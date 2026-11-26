@@ -19,9 +19,7 @@ describe('the start screen', () => {
   it('notes that Bunpou is N5 only and still in development', () => {
     const picker = mount(ModePicker, { props: { deck } });
     const notes = picker.findAll('[data-testid="mode-note"]');
-    expect(notes.map((note) => note.text())).toEqual([
-      'N5 only for now · still in development',
-    ]);
+    expect(notes.map((note) => note.text())).toEqual(['N5 only for now · still in development']);
   });
 
   it("shows each mode's level goal on its card, with Bunpou's rakugo rank", async () => {
