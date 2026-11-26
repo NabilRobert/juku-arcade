@@ -1227,3 +1227,18 @@ file (181 KB compressed), parsed before the start screen showed.
 - **Beat:** splitting word mode too (the most played mode; it would only
   add a fetch to its first tap); a service worker for offline play (more
   to keep in step than the gain for now).
+
+### D65: Grammar on the stats page and in the export; the check-up stays words (2026-11-26)
+
+- **Stats page:** a Grammar section (`components/GrammarStats.vue`,
+  `memory/grammar-stats.ts`): points known and seen, sentences right
+  today and overall, the points missed most by their pattern, and the
+  kinds of mistake (the rule a wrong order broke).
+- **Export:** format 2 adds the grammar log (`memory/export.ts`), so a
+  teacher sees Bunpou too; the report reads both formats.
+- **Check-up:** stays words only (playtest decision). Grammar there would
+  either measure only before and after, or hold new grammar points back
+  from Bunpou for 3 days to compare, which slows a player's grammar. The
+  stats page and the export already show grammar.
+- **Beat:** grammar in the check-up, before and after only; the full
+  design with hold-backs.
