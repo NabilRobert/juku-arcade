@@ -1170,3 +1170,22 @@ From playtesting: "make another mode that has a game over".
   played); a speed-up with no floor (unfair to slow readers); new
   question screens of its own (the other modes' boards look and feel the
   same).
+
+### D63: The game fits a phone (2026-11-26)
+
+The game was laptop-only (D30). From playtesting, and since the school's
+students may play on phones, it now fits a phone-width screen too, with
+desktop unchanged.
+
+- **Below the lg breakpoint:** the start screen stacks (streak, modes,
+  leaderboard); each mode puts its board first and folds its side panel
+  away under a Show panel button (`ui/SidePanel.vue`), asked for in
+  playtesting; word mode's set timer also shows above its cards.
+- **Cards and tiles:** card rows cap their height by the window's width
+  as well as its height, so a hand fits across; the kanji hand overlaps
+  less; Bunpou's tiles shrink with their text. The calendar shows 12
+  weeks.
+- **Not yet checked on a real phone:** touch drags (throwing a card) work
+  in a phone emulator, but a playtest on a real device is still to come.
+- **Beat:** a separate phone app (more to keep in step); hiding modes on a
+  phone (every mode fits).

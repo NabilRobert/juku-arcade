@@ -13,6 +13,7 @@ import { computed, watch } from 'vue';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
+import { timeShareLeft } from '../../game/run.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
@@ -27,6 +28,8 @@ import MissedTray from './MissedTray.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
+import SidePanel from '../ui/SidePanel.vue';
+import TimerBar from '../ui/TimerBar.vue';
 import RunResults from '../ui/RunResults.vue';
 import { useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
@@ -100,8 +103,8 @@ usePauseKey({
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-4">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Word run">
       <DailyBar
         :daily="progress.daily"
         known-label="Words known"
@@ -119,8 +122,10 @@ usePauseKey({
         @scout="bankRun.scout"
         @open-shop="bankRun.openShop"
       />
-    </aside>
+    </SidePanel>
     <div class="flex flex-col gap-5">
+      <!-- On a phone the panel with the set's timer is folded away, so the timer shows here too. -->
+      <TimerBar class="lg:hidden" :time-left="timeShareLeft(state, nowMs)" />
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
         <RunResults
           v-if="finish.isShown.value"

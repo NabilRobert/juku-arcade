@@ -17,6 +17,7 @@ import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
+import SidePanel from '../ui/SidePanel.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import RunResults from '../ui/RunResults.vue';
@@ -72,8 +73,8 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-3" aria-label="Dojo run">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Dojo run">
       <ModeHeader :title="`Dojo · ${level}`">
         <p class="text-sm text-washi/70" data-testid="stage">Stage {{ stage }} / 5</p>
       </ModeHeader>
@@ -95,7 +96,7 @@ function dismiss(isStopping: boolean): void {
         Words, kanji and grammar you've met, until three misses. The timer tightens every 10 right
         answers. Esc pauses.
       </p>
-    </aside>
+    </SidePanel>
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <RunResults
         v-if="state.isOver"
