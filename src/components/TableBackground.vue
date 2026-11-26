@@ -14,7 +14,7 @@
  * isn't drawn at all. Public builds leave it unset.
  */
 import { useReducedMotion } from 'motion-v';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { createSwirl, swirlPhase, type Swirl } from '../background/swirl-shader.ts';
 
 /** The canvas is this many times smaller than the window, then stretched to fill it. */
@@ -56,8 +56,16 @@ onMounted(() => {
   };
   window.addEventListener('resize', redraw);
   onUnmounted(() => window.removeEventListener('resize', redraw));
-  if (isReducedMotion.value === true) swirl.draw(0);
-  else animate(swirl, performance.now());
+  // Follows the reduce-motion setting as it changes mid-visit: the swirl stops still, or starts again.
+  watch(
+    isReducedMotion,
+    (isReduced) => {
+      cancelAnimationFrame(frame);
+      if (isReduced === true) swirl.draw(0);
+      else animate(swirl, performance.now());
+    },
+    { immediate: true },
+  );
 });
 onUnmounted(() => cancelAnimationFrame(frame));
 </script>
