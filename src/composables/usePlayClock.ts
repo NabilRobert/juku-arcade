@@ -7,7 +7,8 @@
 import { onUnmounted, ref } from 'vue';
 import { localDay } from '../game/events.ts';
 import { tickPlayClock, withPlayTime, type PlayClock } from '../game/wellbeing.ts';
-import { updateSavedSettings, type Settings } from '../memory/storage.ts';
+import { playTimeSaver } from '../memory/play-time-saver.ts';
+import type { Settings } from '../memory/storage.ts';
 
 /** Often enough to stop the clock promptly when the game pauses. */
 const TICK_MS = 250;
@@ -19,13 +20,7 @@ export function usePlayClock(initial: Settings, isPaused: () => boolean) {
   const sessionPlayMs = ref(0);
   const playMsToday = ref(settings.playMsToday);
 
-  /** Saves only today's play time, so a level changed or data deleted meanwhile stays as it is. */
-  function save(): void {
-    const { playDay, playMsToday } = settings;
-    updateSavedSettings((saved) => ({ ...saved, playDay, playMsToday })).catch((error: unknown) =>
-      console.warn('Could not save play time:', error),
-    );
-  }
+  const saver = playTimeSaver(today);
 
   const timer = setInterval(() => {
     const played = tickPlayClock(clock, settings, { ms: Date.now(), day: today() }, isPaused());
@@ -33,12 +28,13 @@ export function usePlayClock(initial: Settings, isPaused: () => boolean) {
     settings = played.record;
     sessionPlayMs.value += played.playedMs;
     playMsToday.value = settings.playMsToday;
-    if (played.isSaveDue) save();
+    saver.add(played.playedMs);
+    if (played.isSaveDue) saver.flush();
   }, TICK_MS);
 
   onUnmounted(() => {
     clearInterval(timer);
-    save();
+    saver.flush();
   });
 
   return { sessionPlayMs, playMsToday };
