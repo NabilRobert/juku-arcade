@@ -1261,3 +1261,22 @@ game didn't yet do:
 - **A fair word board:** a word run counts toward the best and the board
   only until today's deck is cleared, the pot banked at that moment
   included (`useDeckFinish.isRanked`); practice after it doesn't count.
+
+### D67: A reachable kanji goal, and sheets that balance learning with review (2026-11-26)
+
+- **The goal counts the level's official kanji list.** It counted every
+  kanji the level's words use, 405 for N5, most of them from harder
+  levels' lists (欲 in ほしい). It now counts the kanji OpenJLPT tags as on
+  the level's own list (Jonathan Waller's lists, not "supplementary"):
+  78 for N5, the 79th being in no N5 word. The deck builder carries the tag
+  (`KanjiNote.listLevel`); the other kanji are still played.
+- **Each sheet balances learning with review** (`kanji/sheet-mix.ts`):
+  every third kanji (3 of a sheet's 10) is one the player has mastered, so
+  it stays fresh; the rest are still being learned, from the official list
+  3 times in 4, so the goal fills, and from the level's other kanji
+  otherwise. A kind with nothing left falls back to the next (review →
+  list → other), so a new player only learns.
+- Considered: drawing only from the list until it's mastered (it hides most
+  of the kanji the level's words use for weeks), and plain weights (a
+  sheet's mix would vary too much to explain). Playtest decision:
+  "a balance of that would be nice".

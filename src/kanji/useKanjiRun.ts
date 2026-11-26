@@ -12,7 +12,8 @@
  * hand over to show them, and a crested card adds or takes points when
  * it's thrown.
  *
- * Kanji mode is practice (D37): nothing here is logged or reviewed.
+ * Kanji mode is practice (D37): nothing here is logged or reviewed. Which
+ * kanji come up balances learning with review (sheet-mix.ts, D67).
  */
 import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
@@ -32,6 +33,9 @@ import {
   type RoundResult,
 } from './kanji-round.ts';
 import { useKanjiCrests } from './useKanjiCrests.ts';
+import { kindForRound } from './sheet-mix.ts';
+import { masteredKanji } from '../memory/level-goals.ts';
+import { loadKanjiRounds } from '../memory/storage.ts';
 
 export type KanjiPhase = 'picking' | 'playing' | 'revealed';
 
@@ -47,11 +51,33 @@ const REVEAL_MS = 2200;
 /** A kanji isn't dealt again until this many others have been. */
 const RECENT_KANJI = 8;
 
+/**
+ * The kanji the player has mastered, read from the play log once the run
+ * starts. Until it's read (or if storage is blocked) nothing counts as
+ * mastered, so a round meant for review is dealt from the learning kinds.
+ */
+function useMastered() {
+  const mastered = shallowRef<ReadonlySet<string>>(new Set());
+  loadKanjiRounds()
+    .then((rounds) => {
+      mastered.value = masteredKanji(rounds);
+    })
+    .catch(() => undefined);
+  return mastered;
+}
+
 function useRounds(deck: Deck, random: RandomSource) {
   const pool = kanjiPool(deck);
+  const mastered = useMastered();
   const recent: string[] = [];
+  let dealt = 0;
   function deal(): KanjiRound {
-    const round = dealKanjiRound(pool, random, recent);
+    dealt += 1;
+    const wish = {
+      kind: kindForRound(dealt, random),
+      standing: { mastered: mastered.value, levelList: pool.levelList },
+    };
+    const round = dealKanjiRound(pool, random, recent, wish);
     recent.unshift(round.kanji);
     recent.splice(RECENT_KANJI);
     return round;

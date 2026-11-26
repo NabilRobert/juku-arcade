@@ -20,6 +20,7 @@ const note = (onyomi: string[], kunyomi: string[]): KanjiNote => ({
   kunyomi,
   meanings: [],
   words: [],
+  listLevel: 'N5',
 });
 const used = (id: string, readings: Record<string, string[]>) => ({
   ...deckWord(id, id, ''),
