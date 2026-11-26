@@ -57,3 +57,17 @@ export function calendarWeeks(
     }),
   );
 }
+
+const DAY_FORMAT = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'UTC',
+});
+
+/** A day as the calendar names it: Today, Yesterday, or the date (Mon 24 Nov). */
+export function dayLabel(day: string, today: string): string {
+  if (day === today) return 'Today';
+  if (day === addDays(today, -1)) return 'Yesterday';
+  return DAY_FORMAT.format(new Date(`${day}T00:00:00Z`));
+}

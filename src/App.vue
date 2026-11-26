@@ -223,7 +223,7 @@ onMounted(async () => {
             @done="finishCheckUp"
             @skip="finishCheckUp([])"
           />
-          <ModePicker v-else-if="page === 'mode'" :level="deck.level" @choose="chooseMode" />
+          <ModePicker v-else-if="page === 'mode'" :deck="deck" @choose="chooseMode" />
           <KanjiScreen
             v-else-if="mode === 'kanji'"
             v-show="!isAway"

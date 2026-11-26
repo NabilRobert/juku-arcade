@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlayedRun } from '../src/memory/play-log.ts';
-import { calendarWeeks, playedDays, shadeFor } from '../src/memory/play-calendar.ts';
+import { calendarWeeks, dayLabel, playedDays, shadeFor } from '../src/memory/play-calendar.ts';
 
 const TODAY = '2026-11-26'; // a Thursday
 
@@ -37,5 +37,11 @@ describe('the play calendar', () => {
   it("adds up a day's answers across its runs", () => {
     const weeks = calendarWeeks([run(TODAY, 8), run(TODAY, 4)], TODAY, 1);
     expect(weeks[0]?.[3]).toMatchObject({ answers: 12, shade: 2 });
+  });
+
+  it('names today and yesterday, and other days by their date', () => {
+    expect(dayLabel(TODAY, TODAY)).toBe('Today');
+    expect(dayLabel('2026-11-25', TODAY)).toBe('Yesterday');
+    expect(dayLabel('2026-11-23', TODAY)).toBe('Mon 23 Nov');
   });
 });
