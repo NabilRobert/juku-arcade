@@ -137,8 +137,11 @@ watch(
     </div>
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
+      <!-- On a 4:3 tablet in landscape, 20svh cards made the hand of 8 (and the deck) too wide for its
+         column, so it wrapped onto a second row and the screen scrolled; 13vw caps them so one row fits.
+         On a 16:10 laptop the height still sets their size. -->
       <div
-        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16svh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20svh] lg:[--hand-overlap:1]"
+        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16svh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:min(20svh,13vw)] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
@@ -172,7 +175,7 @@ watch(
       </div>
       <div
         :ref="table.registerDeck"
-        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20svh,8vw)] lg:block lg:[--card-height:20svh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20svh,8vw)] lg:block lg:[--card-height:min(20svh,13vw)]"
       >
         <CardDeck />
       </div>

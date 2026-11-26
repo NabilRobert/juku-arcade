@@ -110,7 +110,8 @@ function dropAt(tile: string, point: Point): void {
 </script>
 
 <template>
-  <section class="relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
+  <!-- A size container, so a row of tiles can be sized to fit its width (MAX_TILES = 5). -->
+  <section class="@container relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? SHELF_NAMES[line.shelf] : ''
@@ -148,7 +149,7 @@ function dropAt(tile: string, point: Point): void {
         <div
           v-for="(tile, index) in run.boxes"
           :key="index"
-          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48"
+          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48 lg:w-[min(12rem,calc((100cqw-4rem)/5))]"
           :class="tile === null ? 'outline-washi/30 outline-dashed' : 'outline-transparent'"
           data-box
         >
