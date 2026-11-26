@@ -8,6 +8,7 @@
  * light up. Each round is dealt off the deck, as in word mode. The dojo
  * (D62) reuses it for its word and kanji questions.
  */
+import LanternRow from '../ui/LanternRow.vue';
 import { useAnimate, useReducedMotion } from 'motion-v';
 import { reactive, watch } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
@@ -42,8 +43,14 @@ const props = withDefaults(
     maxWrongPicks?: number;
     /** Scouted crests (D42), by reading card index. */
     crestMarks: ReadonlyMap<number, CrestMark>;
+    /**
+     * Kanji mode's lanterns (D72), shown where the wrong-pick squares would
+     * be, so the sheet's lives are in sight on every screen (playtest
+     * decision); the dojo, which has its own, leaves them out.
+     */
+    lanterns?: { lit: number; total: number };
   }>(),
-  { maxWrongPicks: MAX_WRONG_PICKS },
+  { maxWrongPicks: MAX_WRONG_PICKS, lanterns: undefined },
 );
 defineEmits<{ toggle: [index: number]; play: [] }>();
 
@@ -109,8 +116,16 @@ watch(
       </p>
     </div>
     <div class="relative">
-      <!-- One square per wrong pick allowed, crossed out from the left as they're used. -->
+      <LanternRow
+        v-if="lanterns"
+        class="absolute top-1/2 left-0 -translate-y-1/2"
+        is-compact
+        :lit="lanterns.lit"
+        :total="lanterns.total"
+      />
+      <!-- Otherwise one square per wrong pick allowed, crossed out from the left as they're used. -->
       <p
+        v-else
         class="absolute top-1/2 left-0 flex -translate-y-1/2 gap-1.5"
         role="img"
         :aria-label="`${wrongPicksLeft} of ${maxWrongPicks} wrong picks left`"

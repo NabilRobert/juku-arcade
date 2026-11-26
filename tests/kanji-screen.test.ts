@@ -22,9 +22,10 @@ const ROUND: KanjiRound = {
   ],
 };
 
-async function mountBoard() {
+async function mountBoard(lanterns?: { lit: number; total: number }) {
   const board = mount(KanjiBoard, {
     props: {
+      lanterns,
       round: ROUND,
       roundNumber: 1,
       level: 'N5',
@@ -71,5 +72,18 @@ describe('kanji mode on screen', () => {
     await readings[2]?.trigger('click');
     expect(board.emitted('toggle')?.[0]).toEqual([2]);
     expect(board.find('[data-testid="play"]').attributes('disabled')).toBeDefined();
+  });
+});
+
+describe("kanji mode's lanterns on the board", () => {
+  it('shows the lanterns where the wrong-pick squares were, so they are in sight on every screen', async () => {
+    const board = await mountBoard({ lit: 2, total: 3 });
+    expect(board.find('[aria-label="2 of 3 lanterns lit"]').exists()).toBe(true);
+    expect(board.find('[data-testid="wrong-picks"]').exists()).toBe(false);
+  });
+
+  it('keeps the wrong-pick squares where no lanterns are given (practice mode)', async () => {
+    const board = await mountBoard();
+    expect(board.find('[data-testid="wrong-picks"]').exists()).toBe(true);
   });
 });

@@ -13,7 +13,6 @@
  * show them (KanjiScoutPanel.vue).
  */
 import { LANTERNS } from '../../game/lanterns.ts';
-import LanternRow from '../ui/LanternRow.vue';
 import { computed } from 'vue';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
@@ -96,7 +95,6 @@ function dismiss(isStopping: boolean): void {
           Kanji {{ kanjiNumber }} / {{ KANJI_PER_SHEET }}
         </p>
       </ModeHeader>
-      <LanternRow :lit="sheet.lanterns.value" :total="LANTERNS" />
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
@@ -122,14 +120,6 @@ function dismiss(isStopping: boolean): void {
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">
-      <!-- On a phone or a tablet the side panel is folded away, so the lanterns show above the board. -->
-      <LanternRow
-        v-if="!isSheetDone"
-        class="lg:hidden"
-        is-compact
-        :lit="sheet.lanterns.value"
-        :total="LANTERNS"
-      />
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
         <RunResults
           v-if="isSheetDone"
@@ -153,6 +143,7 @@ function dismiss(isStopping: boolean): void {
           :can-play="canPlay"
           :wrong-picks-left="wrongPicksLeft"
           :crest-marks="crestMarks"
+          :lanterns="{ lit: sheet.lanterns.value, total: LANTERNS }"
           @toggle="run.toggle"
           @play="run.play"
         />
