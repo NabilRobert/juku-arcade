@@ -209,10 +209,13 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         Play ▶
       </PixelButton>
     </div>
-    <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
+    <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop.
+         On a tablet the hand's three columns sit together, spaced like the table's row, rather than
+         spread across the width: the cards can't grow, as they match the table's, whose row of 5
+         already fills the width. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16svh,33vw)] sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24svh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16svh,33vw)] sm:w-auto sm:grid-cols-[repeat(3,auto)] sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24svh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
