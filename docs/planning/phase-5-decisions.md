@@ -1184,7 +1184,8 @@ desktop unchanged.
   tablets; word mode's set timer also shows above its cards.
 - **Cards and tiles:** card rows cap their height by the window's width
   as well as its height. On a phone the hand is a grid of cards side by
-  side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2), so
+  side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2, on
+  tablets too, with bigger cards), so
   each reading is big enough to read and tap (playtest: the fan was hard
   to read and too small to tap). Bunpou's tiles shrink with their text. The calendar shows 12
   weeks.
