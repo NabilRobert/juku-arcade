@@ -2,13 +2,16 @@
 /**
  * A word card's back, shown while paused (L9, D29): its reading, meanings,
  * an example, and each kanji with all its readings. The readings this word
- * uses are highlighted, next to other words that use the same kanji.
+ * uses are highlighted, next to other words that use the same kanji. The
+ * panel and each kanji's notes are shared with a kanji's own back
+ * (CardBackPanel.vue, KanjiNoteSection.vue).
  */
 import { computed } from 'vue';
 import { isKanji, REPEAT_MARK } from '../../deck/kana.ts';
 import type { DeckWord, KanjiNote } from '../../deck/types.ts';
+import CardBackPanel from './CardBackPanel.vue';
 import FuriganaText from './FuriganaText.vue';
-import PixelButton from '../ui/PixelButton.vue';
+import KanjiNoteSection from './KanjiNoteSection.vue';
 
 const props = defineProps<{ word: DeckWord; kanji: Readonly<Record<string, KanjiNote>> }>();
 defineEmits<{ close: [] }>();
@@ -32,19 +35,11 @@ const kanjiInWord = computed(() =>
 </script>
 
 <template>
-  <article
-    class="max-h-[70vh] space-y-4 overflow-y-auto pixel-panel washi p-4 text-sumi"
-    aria-label="Card back"
-  >
-    <header class="flex items-baseline justify-between gap-3">
-      <p lang="ja">
-        <span class="text-3xl font-bold">{{ word.word }}</span>
-        <span class="ml-2 text-xl">{{ word.reading }}</span>
-      </p>
-      <PixelButton colour="steel" class="px-3 py-1 text-sm" @click="$emit('close')">
-        Turn over
-      </PixelButton>
-    </header>
+  <CardBackPanel @close="$emit('close')">
+    <template #title>
+      <span class="text-3xl font-bold">{{ word.word }}</span>
+      <span class="ml-2 text-xl">{{ word.reading }}</span>
+    </template>
     <p class="text-lg">{{ word.meanings.join('; ') }}</p>
     <section v-if="word.example" class="pixel-panel bg-white/50 p-3">
       <p class="text-lg leading-loose"><FuriganaText :marked="word.example.text" /></p>
@@ -55,28 +50,13 @@ const kanjiInWord = computed(() =>
         >Tatoeba #{{ word.example.tatoebaId }}</a
       >
     </section>
-    <section v-for="item in kanjiInWord" :key="item.char" class="border-t border-sumi/15 pt-3">
-      <p class="flex items-baseline gap-3">
-        <span class="text-3xl" lang="ja">{{ item.char }}</span>
-        <span class="text-sm text-sumi/70">{{ item.note.meanings.slice(0, 3).join(', ') }}</span>
-      </p>
-      <p class="mt-1 flex flex-wrap gap-1.5" lang="ja">
-        <span
-          v-for="reading in [...item.note.onyomi, ...item.note.kunyomi]"
-          :key="reading"
-          class="px-1.5 py-0.5 text-sm"
-          data-testid="kanji-reading"
-          :class="
-            item.used.includes(reading) ? 'bg-crimson font-semibold text-washi' : 'bg-washi-shade'
-          "
-          >{{ reading }}</span
-        >
-      </p>
-      <p v-if="item.others.length" class="mt-1 text-sm text-sumi/70" lang="ja">
-        <span v-for="other in item.others" :key="other.word" class="mr-3"
-          >{{ other.word }} {{ other.reading }}</span
-        >
-      </p>
-    </section>
-  </article>
+    <KanjiNoteSection
+      v-for="item in kanjiInWord"
+      :key="item.char"
+      :char="item.char"
+      :note="item.note"
+      :used="item.used"
+      :others="item.others"
+    />
+  </CardBackPanel>
 </template>

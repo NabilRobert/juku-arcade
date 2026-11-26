@@ -696,6 +696,18 @@ fields. They stay in memory until slice 3 stores them.
 - **Change the stats page:** word numbers come from `memory/stats.ts`, grammar
   numbers from `memory/grammar-stats.ts` (its section is
   `components/GrammarStats.vue`); each list is a `ui/RankedList.vue`.
+- **Fold a start-screen panel:** the leaderboard and the streak each have a
+  Hide/Show button (`ui/FoldButton.vue`, which is the leaderboard's Back and
+  Next button, `ui/ArcadeButton.vue`); whether each is folded is remembered in this browser
+  (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
+  length in sight, and on a wide screen the start screen drops to one
+  column, with the leaderboard as a bar across the top (`ModePicker.vue`).
+- **Change a card back:** a word's back is `words/CardBack.vue` and a
+  kanji's is `words/KanjiCardBack.vue`; both are built from
+  `words/CardBackPanel.vue` (the paper panel and Turn over) and
+  `words/KanjiNoteSection.vue` (one kanji's readings and words). The
+  streak's day detail opens a kanji's back over the start screen in
+  `ui/CardOverlay.vue` when its kanji is clicked (`streak/KanjiHighlight.vue`).
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are
