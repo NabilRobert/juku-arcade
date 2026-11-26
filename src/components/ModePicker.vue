@@ -22,6 +22,7 @@ import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/leve
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
 import ModeCard from './ModeCard.vue';
+import SettingsButton from './ui/SettingsButton.vue';
 import type { ButtonColour } from './ui/PixelButton.vue';
 
 export type GameMode = 'words' | 'kanji' | 'bunpou' | 'dojo';
@@ -97,6 +98,10 @@ defineEmits<{ choose: [mode: GameMode] }>();
         : 'lg:grid-cols-[minmax(20rem,30%)_1fr]'
     "
   >
+    <!-- On a phone or a tablet, Settings is at the top too, not only in the footer under the long page. -->
+    <div class="flex justify-end lg:hidden">
+      <SettingsButton />
+    </div>
     <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" :kanji-notes="deck.kanji" />
