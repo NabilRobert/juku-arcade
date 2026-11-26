@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * Shows a card (its slot) over the whole screen, on a dimmed table, for a
- * card opened outside a game: the start screen's kanji backs. Tapping
- * outside the card or pressing Esc closes it, as its own Turn over button
- * does. Teleported to the page's body, so a scrolling panel it opens from
+ * Shows a card or a small question (its slot) over the whole screen, on a
+ * dimmed table: the start screen's kanji backs, and End run's "End this
+ * run?" (EndRunButton.vue). Tapping outside it or pressing Esc closes it,
+ * as its own close button does. Teleported to the page's body, so a scrolling panel it opens from
  * can't clip it.
  */
 import { onMounted, onUnmounted } from 'vue';

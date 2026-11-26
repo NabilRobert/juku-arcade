@@ -21,6 +21,7 @@ const note = (onyomi: string[], kunyomi: string[]): KanjiNote => ({
   kunyomi,
   meanings: [],
   words: [],
+  listLevel: 'N5',
 });
 const used = (id: string, word: string, reading: string, readings: Record<string, string[]>) => ({
   ...deckWord(id, word, reading),

@@ -10,6 +10,7 @@
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import type { Deck } from '../deck/types.ts';
 import { allReadingsOf, readingsUsedByKanji, type KanjiReading } from './readings.ts';
+import { candidatesOfKind, type KanjiKind, type KanjiStanding } from './sheet-mix.ts';
 
 /** Reading cards in a kanji round's hand. */
 export const CARDS_PER_ROUND = 8;
@@ -42,6 +43,8 @@ export interface RoundResult {
 export interface KanjiPool {
   deck: Deck;
   readings: Map<string, KanjiReading[]>;
+  /** The kanji on the deck level's official kanji list (D67): what the kanji goal counts. */
+  levelList: ReadonlySet<string>;
 }
 
 export function kanjiPool(deck: Deck): KanjiPool {
@@ -49,7 +52,16 @@ export function kanjiPool(deck: Deck): KanjiPool {
   for (const kanji of [...readings.keys()]) {
     if (deck.kanji[kanji] === undefined) readings.delete(kanji);
   }
-  return { deck, readings };
+  const onList = [...readings.keys()].filter(
+    (kanji) => deck.kanji[kanji]?.listLevel === deck.level,
+  );
+  return { deck, readings, levelList: new Set(onList) };
+}
+
+/** A sheet's wish for a round (sheet-mix.ts): the kind of kanji to draw, and what decides it. */
+export interface RoundWish {
+  kind: KanjiKind;
+  standing: KanjiStanding;
 }
 
 /** Readings of other kanji that aren't readings of this one, in random order, one card per reading. */
@@ -76,8 +88,15 @@ function decoysFor(pool: KanjiPool, kanji: string, random: RandomSource): KanjiR
  */
 const MAX_PICK_WEIGHT = 4;
 
-function pickKanji(pool: KanjiPool, random: RandomSource, recent: readonly string[]): string {
-  const choices = [...pool.readings].filter(([kanji]) => !recent.includes(kanji));
+function pickKanji(
+  pool: KanjiPool,
+  random: RandomSource,
+  recent: readonly string[],
+  wish?: RoundWish,
+): string {
+  const fresh = [...pool.readings.keys()].filter((kanji) => !recent.includes(kanji));
+  const wanted = new Set(wish ? candidatesOfKind(fresh, wish.kind, wish.standing) : fresh);
+  const choices = [...pool.readings].filter(([kanji]) => wanted.has(kanji));
   const weightOf = (readings: KanjiReading[]): number => Math.min(readings.length, MAX_PICK_WEIGHT);
   const total = choices.reduce((sum, [, readings]) => sum + weightOf(readings), 0);
   let roll = random() * total;
@@ -88,13 +107,17 @@ function pickKanji(pool: KanjiPool, random: RandomSource, recent: readonly strin
   throw new Error("Can't deal a kanji round: this deck has no kanji left to show.");
 }
 
-/** Deals a round for a kanji not shown in the last few rounds. */
+/**
+ * Deals a round for a kanji not shown in the last few rounds, of the kind
+ * a sheet wishes for if it says (kanji mode); the dojo draws without one.
+ */
 export function dealKanjiRound(
   pool: KanjiPool,
   random: RandomSource,
   recent: readonly string[],
+  wish?: RoundWish,
 ): KanjiRound {
-  const kanji = pickKanji(pool, random, recent);
+  const kanji = pickKanji(pool, random, recent, wish);
   const rights = shuffled(pool.readings.get(kanji) ?? [], random).slice(0, CARDS_PER_ROUND);
   const decoys = decoysFor(pool, kanji, random).slice(0, CARDS_PER_ROUND - rights.length);
   const cards = [

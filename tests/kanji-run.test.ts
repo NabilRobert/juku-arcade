@@ -8,6 +8,7 @@ import type { Deck, KanjiNote } from '../src/deck/types.ts';
 import { CURSE_POINTS } from '../src/kanji/kanji-crests.ts';
 import { POINTS_PER_HIT } from '../src/kanji/kanji-round.ts';
 import { useKanjiRun } from '../src/kanji/useKanjiRun.ts';
+import { playSound } from '../src/sound/sfx.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
 
 vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
@@ -20,6 +21,7 @@ const note = (onyomi: string[], kunyomi: string[]): KanjiNote => ({
   kunyomi,
   meanings: [],
   words: [],
+  listLevel: 'N5',
 });
 const used = (id: string, readings: Record<string, string[]>) => ({
   ...deckWord(id, id, ''),
@@ -185,6 +187,21 @@ describe('three wrong picks per kanji', () => {
     expect(run.statusOf(wrong)).toBe('wrong');
     run.toggle(wrong);
     expect(run.picked.value).toEqual([]);
+  });
+
+  it('applauds a kanji whose readings were all found, but not one left with readings missed', () => {
+    vi.mocked(playSound).mockClear();
+    const missed = runFor();
+    for (const index of wrongIndexes(missed).slice(0, 3)) missed.toggle(index);
+    missed.play();
+    vi.advanceTimersByTime(10_000);
+    expect(playSound).not.toHaveBeenCalledWith('applause');
+
+    const found = runFor();
+    for (const index of rightIndexes(found)) found.toggle(index);
+    found.play();
+    vi.advanceTimersByTime(10_000);
+    expect(playSound).toHaveBeenCalledWith('applause');
   });
 
   it('shows the answers after the third wrong pick', () => {

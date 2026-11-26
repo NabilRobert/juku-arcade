@@ -8,7 +8,14 @@ import { onUnmounted, ref, shallowRef, type Ref, type ShallowRef } from 'vue';
 import type { DeckWord } from '../deck/types.ts';
 import { localDay, type GameEvent } from '../game/events.ts';
 import { flipCard, pause, resume } from '../game/pause.ts';
-import { nextSet, startRun, timeUp, type RunContext, type RunState } from '../game/run.ts';
+import {
+  isOutOfTime,
+  nextSet,
+  startRun,
+  timeUp,
+  type RunContext,
+  type RunState,
+} from '../game/run.ts';
 import type { TagTable } from '../game/tags.ts';
 import { throwReading } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
@@ -23,6 +30,13 @@ export interface RunSetup {
   words: readonly DeckWord[];
   settings: Settings;
   pastEvents: readonly GameEvent[];
+  /**
+   * Runs as the set's time runs out, just before it ends: the board plays
+   * the cards the player laid, so they're judged rather than lost
+   * (playtest, 2026-11-26: "if time runs out it should just automatically
+   * play the cards i already selected").
+   */
+  beforeTimeUp?: () => void;
 }
 
 const today = (): string => localDay(new Date());
@@ -141,9 +155,10 @@ function countPlayTime(driver: Driver, view: RunView): void {
   );
 }
 
-function tick(driver: Driver, view: RunView): void {
+function tick(driver: Driver, view: RunView, beforeTimeUp?: () => void): void {
   view.nowMs.value = Date.now();
   countPlayTime(driver, view);
+  if (isOutOfTime(view.state.value, view.nowMs.value)) beforeTimeUp?.();
   view.state.value = timeUp(view.state.value, driver.context, view.nowMs.value);
   if (view.state.value.phase !== 'playing') dealNextSetAfterPause(driver, view);
   afterChange(driver, view);
@@ -163,7 +178,7 @@ export function useRun(setup: RunSetup) {
     view.state.value = change(view.state.value, driver.context);
     afterChange(driver, view);
   };
-  const timer = setInterval(() => tick(driver, view), TICK_MS);
+  const timer = setInterval(() => tick(driver, view, setup.beforeTimeUp), TICK_MS);
   onUnmounted(() => clearInterval(timer));
   usePauseWhenHidden(() => act((current, context) => pause(current, context, Date.now())));
   return {

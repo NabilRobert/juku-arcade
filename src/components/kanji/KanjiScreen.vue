@@ -23,6 +23,7 @@ import type { Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
+import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
@@ -101,6 +102,7 @@ function dismiss(isStopping: boolean): void {
         @scout="run.toggleScout"
       />
       <SoundToggle />
+      <EndRunButton v-if="!isSheetDone" @end="sheet.endNow" />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
         Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji. It
@@ -111,7 +113,7 @@ function dismiss(isStopping: boolean): void {
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
         <RunResults
           v-if="isSheetDone"
-          title="Sheet done"
+          :title="sheet.isEndedEarly.value ? 'Run ended' : 'Sheet done'"
           :panels="sheetPanels"
           note="A sheet is 10 kanji. A kanji counts as mastered once you find all its readings with no wrong pick on two separate days."
           again-label="Another sheet"

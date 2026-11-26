@@ -4,7 +4,7 @@
  * on kanji mode's card board (CardQuestionView), or a grammar sentence on
  * Bunpou's tile board (GrammarQuestionView).
  */
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import { roundOfWord, type DojoQuestion } from '../../dojo/dojo-questions.ts';
 import CardQuestionView from './CardQuestionView.vue';
@@ -20,6 +20,13 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ answer: [isRight: boolean]; pause: []; resume: [] }>();
 
+const cardView = useTemplateRef<InstanceType<typeof CardQuestionView>>('cardView');
+/**
+ * As time runs out: a card question judges the cards on the table (right
+ * or wrong); a grammar question returns null and times out as it always has.
+ */
+defineExpose({ judgeNow: (): boolean | null => cardView.value?.judgeNow() ?? null });
+
 const cardRound = computed(() => {
   if (props.question.kind === 'word') return roundOfWord(props.question);
   if (props.question.kind === 'kanji') return props.question.round;
@@ -30,6 +37,7 @@ const cardRound = computed(() => {
 <template>
   <CardQuestionView
     v-if="cardRound"
+    ref="cardView"
     :round="cardRound"
     :level="level"
     :combo="combo"

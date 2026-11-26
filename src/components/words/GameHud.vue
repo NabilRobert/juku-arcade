@@ -67,7 +67,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
       @click="isPaused ? $emit('resume') : $emit('pause')"
     >
       {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      <span class="ml-1 text-xs opacity-70" aria-hidden="true">Esc</span>
+      <span class="ml-1 text-xs" aria-hidden="true">Esc</span>
     </PixelButton>
     <SoundToggle />
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>

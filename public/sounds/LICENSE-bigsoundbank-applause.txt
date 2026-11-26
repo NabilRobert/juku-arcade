@@ -1,0 +1,11 @@
+applause.ogg
+
+"Applause from 40 People #5" by Joseph Sardin, BigSoundBank
+https://bigsoundbank.com/applause-from-40-people-5-s3521.html
+
+License: CC0 (public domain), as stated on the page:
+"CC0 (public domain): Free and royalty-free".
+Credit is appreciated but not required.
+
+The file is the site's OGG download, unchanged; the game plays a slice of
+it (src/sound/sfx.ts: RECORDING_STARTS_S, RECORDING_MAX_S).

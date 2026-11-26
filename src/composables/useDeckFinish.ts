@@ -10,11 +10,16 @@
  * moment. Coins from practice after it (or from a run that started with
  * the deck already cleared) don't count, so the board can't be won by
  * playing longer.
+ *
+ * End run (`endNow`) shows the same results early, with the pot banked; the
+ * deck isn't cleared, so play after "Keep playing" still counts.
  */
 import { nextTick, ref, watch } from 'vue';
 
 export function useDeckFinish(isCleared: () => boolean, onFinish: () => void) {
   const isShown = ref(false);
+  /** True while the results show because the player ended the run, not because the deck cleared. */
+  const isEndedEarly = ref(false);
   let hasFinished = isCleared();
   const isRanked = ref(!hasFinished);
 
@@ -32,8 +37,15 @@ export function useDeckFinish(isCleared: () => boolean, onFinish: () => void) {
   return {
     isShown,
     isRanked,
+    isEndedEarly,
+    endNow: () => {
+      isEndedEarly.value = true;
+      isShown.value = true;
+      onFinish();
+    },
     keepPractising: () => {
       isShown.value = false;
+      isEndedEarly.value = false;
     },
   };
 }

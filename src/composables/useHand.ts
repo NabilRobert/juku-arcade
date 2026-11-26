@@ -62,13 +62,27 @@ function usePlayback(
     );
   }
 
+  /**
+   * Throws every laid card still in the hand at once, as the set's time
+   * runs out: the rest of a hand already playing, or one laid but not yet
+   * played. Each is judged before the set ends.
+   */
+  function playNow(): void {
+    stop();
+    for (const pair of playOrder(state(), hand.value)) {
+      if (!isInPlay(state())) return;
+      hand.value = takeBack(hand.value, pair.readingIndex);
+      throwCard(pair);
+    }
+  }
+
   onUnmounted(stop);
-  return { isPlaying, stop, play };
+  return { isPlaying, stop, play, playNow };
 }
 
 export function useHand(state: () => RunState, throwCard: (pair: PlayedPair) => void) {
   const hand = shallowRef<Hand>(emptyHand(state()));
-  const { isPlaying, stop, play } = usePlayback(state, hand, throwCard);
+  const { isPlaying, stop, play, playNow } = usePlayback(state, hand, throwCard);
 
   watch(
     () => state().setIndex,
@@ -82,6 +96,7 @@ export function useHand(state: () => RunState, throwCard: (pair: PlayedPair) => 
     hand,
     isPlaying,
     play,
+    playNow,
     isReady: computed(() => isHandReady(state(), hand.value)),
     /** The number tag a reading card shows (1 for the first word card), or undefined in hand. */
     orderOf: (readingIndex: number): number | undefined => {

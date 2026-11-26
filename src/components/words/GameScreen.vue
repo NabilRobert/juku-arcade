@@ -9,7 +9,7 @@
  * player can keep practising. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
@@ -31,6 +31,7 @@ import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
 import FloatingPause from '../ui/FloatingPause.vue';
+import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import TimerBar from '../ui/TimerBar.vue';
 import RunResults from '../ui/RunResults.vue';
@@ -46,10 +47,13 @@ const props = defineProps<{
   /** True while another page covers the game: it pauses. */
   isAway: boolean;
 }>();
+const board = useTemplateRef<InstanceType<typeof GameBoard>>('board');
 const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
+  // Cards laid when time runs out are played, not lost.
+  beforeTimeUp: () => board.value?.playLaidCards(),
 });
 const { state, nowMs, progress, throwReading, pause, resume } = run;
 
@@ -94,6 +98,13 @@ watch([() => state.value.events.length, rankedCoins], () =>
   runLog.record({ score: rankedCoins.value, ...tallyWordEvents(state.value.events) }),
 );
 
+const TODAY_DONE_TITLE = "Today's deck done";
+const finishNote = computed(() =>
+  finish.isEndedEarly.value
+    ? "Your pot was banked. Today's deck isn't done yet: keep playing, or come back to finish it."
+    : "Today's reviews and new words are done. Come back tomorrow for the next ones, or keep practising now: practice coins don't count toward your best.",
+);
+
 const finishPanels = computed(() => [
   { label: 'Coins', value: String(bank.value.coins) },
   { label: 'Today', value: `${progress.value.daily.done} / ${progress.value.daily.total}` },
@@ -121,6 +132,8 @@ const pauseControls: PauseKeyInput = {
 usePauseKey(pauseControls);
 /** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
 const onPanelToggle = usePanelPause(pauseControls);
+/** Asking "End this run?" pauses the set's clock too, on its own count, like the drawer. */
+const onEndRunToggle = usePanelPause(pauseControls);
 </script>
 
 <template>
@@ -143,6 +156,7 @@ const onPanelToggle = usePanelPause(pauseControls);
         @scout="bankRun.scout"
         @open-shop="bankRun.openShop"
       />
+      <EndRunButton v-if="!finish.isShown.value" @end="finish.endNow" @toggle="onEndRunToggle" />
     </SidePanel>
     <div class="flex flex-col gap-5">
       <!-- On a phone the panel with the set's timer is folded away, so the timer shows here too. -->
@@ -156,10 +170,10 @@ const onPanelToggle = usePanelPause(pauseControls);
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
         <RunResults
           v-if="finish.isShown.value"
-          title="Today's deck done"
+          :title="finish.isEndedEarly.value ? 'Run ended' : TODAY_DONE_TITLE"
           :panels="finishPanels"
-          note="Today's reviews and new words are done. Come back tomorrow for the next ones, or keep practising now: practice coins don't count toward your best."
-          again-label="Keep practising"
+          :note="finishNote"
+          :again-label="finish.isEndedEarly.value ? 'Keep playing' : 'Keep practising'"
           :comparison="{ score: rankedCoins, previousBest }"
           @again="keepPractising"
           @leave="emit('leave')"
@@ -173,6 +187,7 @@ const onPanelToggle = usePanelPause(pauseControls);
         <!-- Hidden, not removed, while a card's back shows: rebuilding it would re-deal the set. -->
         <GameBoard
           v-show="!state.flippedWord && !finish.isShown.value"
+          ref="board"
           :state="state"
           :now-ms="nowMs"
           :level="deck.level"

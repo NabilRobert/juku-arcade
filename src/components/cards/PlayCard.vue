@@ -189,7 +189,7 @@ function onClick(event: MouseEvent): void {
 <template>
   <m.button
     type="button"
-    class="@container relative mx-auto block aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] whitespace-nowrap text-sumi [transform-style:preserve-3d]"
+    class="@container relative mx-auto block aspect-[3/4] w-[min(100%,calc(var(--card-height)*0.75))] whitespace-nowrap text-sumi [transform-style:preserve-3d] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-lamp"
     :class="[STATUS_CLASSES[status], isThrowable ? 'cursor-grab active:cursor-grabbing' : '']"
     :initial="dealtPose"
     :animate="pose"

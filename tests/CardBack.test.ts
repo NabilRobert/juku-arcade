@@ -21,8 +21,9 @@ const KANJI: Record<string, KanjiNote> = {
       { word: '学校', reading: 'がっこう' },
       { word: '学生', reading: 'がくせい' },
     ],
+    listLevel: 'N5',
   },
-  校: { onyomi: ['コウ', 'キョウ'], kunyomi: [], meanings: ['school'], words: [] },
+  校: { onyomi: ['コウ', 'キョウ'], kunyomi: [], meanings: ['school'], words: [], listLevel: 'N5' },
 };
 
 describe('CardBack', () => {

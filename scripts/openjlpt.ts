@@ -39,6 +39,12 @@ export interface RawExample {
 export interface KanjiRow extends KanjiReadings {
   /** KANJIDIC2's frequency rank (1 is the most common); null when unranked. */
   frequencyRank: number | null;
+  /**
+   * The JLPT level whose official kanji list has it (Jonathan Waller's lists,
+   * via OpenJLPT); null for a kanji OpenJLPT only adds as "supplementary",
+   * because a level's words use it although it isn't on any list.
+   */
+  listLevel: JlptLevel | null;
   meanings: string[];
   /** JLPT words that use this kanji, as OpenJLPT lists them. */
   words: string[];
@@ -89,7 +95,9 @@ export function readVocab(database: DatabaseSync): VocabRow[] {
 
 export function readKanji(database: DatabaseSync): Map<string, KanjiRow> {
   const rows = database
-    .prepare('SELECT character, onyomi, kunyomi, freq, meanings, words FROM kanji')
+    .prepare(
+      'SELECT character, level, supplementary, onyomi, kunyomi, freq, meanings, words FROM kanji',
+    )
     .all();
   const table = new Map<string, KanjiRow>();
   for (const row of rows) {
@@ -97,6 +105,7 @@ export function readKanji(database: DatabaseSync): Map<string, KanjiRow> {
       onyomi: parseList(row.onyomi),
       kunyomi: parseList(row.kunyomi),
       frequencyRank: typeof row.freq === 'number' ? row.freq : null,
+      listLevel: row.supplementary === 1 ? null : (String(row.level) as JlptLevel),
       meanings: parseList(row.meanings),
       words: parseList(row.words),
     });

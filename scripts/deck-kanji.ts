@@ -29,6 +29,7 @@ export function kanjiNotesFor(
       kunyomi: kanji.kunyomi,
       meanings: kanji.meanings,
       words: otherWords,
+      listLevel: kanji.listLevel,
     };
   }
   return notes;

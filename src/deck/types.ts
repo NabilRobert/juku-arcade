@@ -63,6 +63,12 @@ export interface KanjiNote {
   meanings: string[];
   /** Up to a few other JLPT words that use this kanji, with their readings. */
   words: { word: string; reading: string }[];
+  /**
+   * The JLPT level whose official kanji list has it, or null when it's on
+   * none (a level's words can use kanji from harder levels). The kanji
+   * goal counts only the deck level's own list (D67).
+   */
+  listLevel: JlptLevel | null;
 }
 
 export interface Deck {
