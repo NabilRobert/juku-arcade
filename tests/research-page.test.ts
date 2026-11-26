@@ -14,11 +14,36 @@ describe('the research page', () => {
     for (const card of shown) expect(card.text()).toContain('In juku-arcade:');
   });
 
-  it('links each source that is online, over https', () => {
+  it('cites exactly the 8 sources of the client quote', () => {
+    expect(sources.map((source) => source.id)).toEqual([
+      'cepeda2006',
+      'roediger2006',
+      'hattie2007',
+      'sailer2020',
+      'ryan2006',
+      'kivetz2006',
+      'silverman2023',
+      'moreno2000',
+    ]);
+  });
+
+  it('links each source twice over https: its DOI and a free copy', () => {
     const page = mount(ResearchPage);
     const links = page.findAll('[data-testid="source"] a');
-    expect(links).toHaveLength(sources.filter((source) => source.url !== null).length);
+    expect(links).toHaveLength(sources.length * 2);
     for (const link of links) expect(link.attributes('href')).toMatch(/^https:\/\//);
+  });
+
+  it('explains each study in a paragraph and says where in the paper the claim is', () => {
+    const page = mount(ResearchPage);
+    expect(page.findAll('[data-testid="source-summary"]')).toHaveLength(sources.length);
+    const places = page.findAll('[data-testid="source-where"]');
+    expect(places).toHaveLength(sources.length);
+    for (const place of places) expect(place.text()).toContain('Where in the paper:');
+  });
+
+  it('says the research is no guarantee of results', () => {
+    expect(mount(ResearchPage).text()).toContain('no guarantee of learning results or exam scores');
   });
 
   it('says the sources back the ideas, not this game', () => {
