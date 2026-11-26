@@ -43,6 +43,12 @@ const goals = computed<Partial<Record<GameMode, LevelGoal>>>(() => ({
   bunpou: grammarGoal(CURRICULUM, history.value.grammarEvents, today),
 }));
 
+const dojoBest = computed(() =>
+  history.value.runs
+    .filter((run) => run.mode === 'dojo')
+    .reduce((best, run) => Math.max(best, run.score), 0),
+);
+
 const cards: readonly Card[] = [
   {
     mode: 'words',
@@ -84,12 +90,13 @@ defineEmits<{ choose: [mode: GameMode] }>();
     <LeaderboardPanel />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" />
-      <section class="grid grid-cols-4 gap-4" aria-label="Choose a mode">
+      <section class="grid grid-cols-2 gap-4" aria-label="Choose a mode">
         <ModeCard
           v-for="card in cards"
           :key="card.mode"
           v-bind="card"
           :goal="goals[card.mode]"
+          :stat="card.mode === 'dojo' ? { label: 'Best run', value: dojoBest } : undefined"
           @click="$emit('choose', card.mode)"
         />
       </section>
