@@ -1,60 +1,36 @@
-import { describe, expect, it } from 'vitest';
+// Word mode's finish line (D70): clearing today's deck shows a banner and play goes on.
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
-import { useDeckFinish } from '../src/composables/useDeckFinish.ts';
+import { BANNER_MS, useDeckFinish } from '../src/composables/useDeckFinish.ts';
+
+afterEach(() => vi.useRealTimers());
 
 describe("word mode's finish line", () => {
-  it('ends the run the moment today’s deck is cleared, once', async () => {
+  it('shows a banner the moment today’s deck is cleared, without ending the run', async () => {
+    vi.useFakeTimers();
     const isCleared = ref(false);
-    let finishes = 0;
+    let ends = 0;
     const finish = useDeckFinish(
       () => isCleared.value,
-      () => (finishes += 1),
+      () => (ends += 1),
     );
     isCleared.value = true;
     await nextTick();
-    expect([finish.isShown.value, finishes]).toEqual([true, 1]);
-    finish.keepPractising();
-    isCleared.value = false;
-    await nextTick();
-    isCleared.value = true;
-    await nextTick();
-    expect([finish.isShown.value, finishes]).toEqual([false, 1]);
+    expect([finish.isBannerShown.value, finish.isShown.value, ends]).toEqual([true, false, 0]);
+    vi.advanceTimersByTime(BANNER_MS);
+    expect(finish.isBannerShown.value).toBe(false);
   });
 
-  it('never finishes a run that started with the deck already cleared', async () => {
+  it('shows the banner once a day, and not at all if the deck was already cleared', async () => {
     const isCleared = ref(true);
-    let finishes = 0;
     const finish = useDeckFinish(
       () => isCleared.value,
-      () => (finishes += 1),
+      () => undefined,
     );
     isCleared.value = false;
     await nextTick();
     isCleared.value = true;
     await nextTick();
-    expect([finish.isShown.value, finishes]).toEqual([false, 0]);
-  });
-
-  it('counts the run toward the best until the deck is cleared, the final bank included', async () => {
-    const isCleared = ref(false);
-    const finish = useDeckFinish(
-      () => isCleared.value,
-      () => undefined,
-    );
-    expect(finish.isRanked.value).toBe(true);
-    isCleared.value = true;
-    await nextTick();
-    // The finishing bank happens in this tick, and still counts.
-    expect(finish.isRanked.value).toBe(true);
-    await nextTick();
-    expect(finish.isRanked.value).toBe(false);
-  });
-
-  it('never counts a run that started with the deck already cleared', () => {
-    const finish = useDeckFinish(
-      () => true,
-      () => undefined,
-    );
-    expect(finish.isRanked.value).toBe(false);
+    expect(finish.isBannerShown.value).toBe(false);
   });
 });
