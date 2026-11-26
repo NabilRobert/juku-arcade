@@ -1181,7 +1181,8 @@ desktop unchanged.
   leaderboard); each mode's board fills the screen and its side panel is
   a drawer folded away to the left, slid open or closed by a tab on its
   edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
-  tablets; word mode's set timer also shows above its cards.
+  tablets; word mode's set timer also shows above its cards, and the
+  pause button sits fixed at the top right (`ui/FloatingPause.vue`).
 - **Cards and tiles:** card rows cap their height by the window's width
   as well as its height. On a phone the hand is a grid of cards side by
   side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2, on
