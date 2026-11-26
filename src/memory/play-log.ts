@@ -12,7 +12,17 @@
  */
 import type { GameEvent } from '../game/events.ts';
 
-export type PlayMode = 'words' | 'kanji' | 'bunpou' | 'dojo';
+/** Every mode, in the order the start screen, the boards and a day's scores list them. */
+export const PLAY_MODES = ['words', 'kanji', 'bunpou', 'dojo'] as const;
+export type PlayMode = (typeof PLAY_MODES)[number];
+
+/** Each mode's name on screen; the dojo is "Practice" to players (D62). */
+export const MODE_NAMES: Readonly<Record<PlayMode, string>> = {
+  words: 'Words',
+  kanji: 'Kanji',
+  bunpou: 'Bunpou',
+  dojo: 'Practice',
+};
 
 /** One run, as it stood after its last answer. */
 export interface PlayedRun {

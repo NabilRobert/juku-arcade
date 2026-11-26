@@ -17,6 +17,7 @@ import {
   rankedPlayers,
   type BoardId,
 } from '../leaderboard/leaderboard.ts';
+import { MODE_NAMES, PLAY_MODES } from '../memory/play-log.ts';
 import { isLeaderboardFolded, setLeaderboardFolded } from '../preferences/folded-panels.ts';
 import ArcadeButton from './ui/ArcadeButton.vue';
 import FoldButton from './ui/FoldButton.vue';
@@ -26,10 +27,7 @@ import PixelIcon from './ui/PixelIcon.vue';
 const props = defineProps<{ bests: Readonly<Record<BoardId, number>> }>();
 
 const BOARDS: readonly { board: BoardId; label: string }[] = [
-  { board: 'words', label: 'Words' },
-  { board: 'kanji', label: 'Kanji' },
-  { board: 'bunpou', label: 'Bunpou' },
-  { board: 'dojo', label: 'Practice' },
+  ...PLAY_MODES.map((mode) => ({ board: mode, label: MODE_NAMES[mode] })),
   { board: 'total', label: 'Total' },
 ];
 

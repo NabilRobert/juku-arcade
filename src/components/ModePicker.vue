@@ -19,18 +19,17 @@ import { CURRICULUM } from '../grammar/curriculum.ts';
 import { kanjiPool } from '../kanji/kanji-round.ts';
 import { isLeaderboardFolded } from '../preferences/folded-panels.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
+import { MODE_NAMES, type PlayMode } from '../memory/play-log.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
 import ModeCard from './ModeCard.vue';
 import SettingsButton from './ui/SettingsButton.vue';
 import type { ButtonColour } from './ui/PixelButton.vue';
 
-export type GameMode = 'words' | 'kanji' | 'bunpou' | 'dojo';
-
 const props = defineProps<{ deck: Deck }>();
 
 interface Card {
-  mode: GameMode;
+  mode: PlayMode;
   colour: ButtonColour;
   name: string;
   example: string;
@@ -42,7 +41,7 @@ const level = props.deck.level;
 const { history, today } = usePlayHistory(props.deck);
 /** The kanji goal counts the level's official kanji list only (D67), not every kanji its words use. */
 const levelKanji = [...kanjiPool(props.deck).levelList];
-const goals = computed<Partial<Record<GameMode, LevelGoal>>>(() => ({
+const goals = computed<Partial<Record<PlayMode, LevelGoal>>>(() => ({
   words: wordGoal(props.deck.words, history.value.wordEvents),
   kanji: kanjiGoal(levelKanji, history.value.kanjiRounds),
   bunpou: grammarGoal(CURRICULUM, history.value.grammarEvents, today),
@@ -57,21 +56,21 @@ const cards: readonly Card[] = [
   {
     mode: 'words',
     colour: 'crimson',
-    name: 'Words',
+    name: MODE_NAMES.words,
     example: '学校 → がっこう',
     description: `Match each ${level} word to its reading. Counts toward your reviews.`,
   },
   {
     mode: 'kanji',
     colour: 'steel',
-    name: 'Kanji',
+    name: MODE_NAMES.kanji,
     example: '生 → セイ・う(まれる)…',
     description: "Find every reading of a kanji among 8 cards. Doesn't count toward your reviews.",
   },
   {
     mode: 'bunpou',
     colour: 'aqua',
-    name: 'Bunpou',
+    name: MODE_NAMES.bunpou,
     example: '行く・駅・に → 駅に行く',
     description: 'Put each sentence in order, then watch the tale. Counts toward grammar reviews.',
     // The grammar content is N5's only (D60); other levels are still to write.
@@ -80,12 +79,12 @@ const cards: readonly Card[] = [
   {
     mode: 'dojo',
     colour: 'paper',
-    name: 'Practice',
+    name: MODE_NAMES.dojo,
     example: '提灯 ×3',
     description: "Words, kanji and grammar you've met, until three misses. Ranked.",
   },
 ];
-defineEmits<{ choose: [mode: GameMode] }>();
+defineEmits<{ choose: [mode: PlayMode] }>();
 </script>
 
 <template>

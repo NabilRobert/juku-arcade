@@ -26,11 +26,12 @@ import {
 } from './memory/storage.ts';
 import { provideGoToPage, type PageTarget } from './composables/usePageLinks.ts';
 import { usePhoneLandscape } from './composables/usePhoneLandscape.ts';
+import type { PlayMode } from './memory/play-log.ts';
 import AppFooter from './components/AppFooter.vue';
 import RotateNotice from './components/ui/RotateNotice.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
-import ModePicker, { type GameMode } from './components/ModePicker.vue';
+import ModePicker from './components/ModePicker.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
@@ -56,7 +57,7 @@ const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
 /** Word mode, kanji mode (D37), Bunpou (D56) or the dojo (D62), picked on the start screen each time. */
-const mode = ref<GameMode>('words');
+const mode = ref<PlayMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
 const isPhoneLandscape = usePhoneLandscape();
@@ -161,7 +162,7 @@ function closePage(): void {
 }
 provideGoToPage(goTo);
 
-async function chooseMode(next: GameMode): Promise<void> {
+async function chooseMode(next: PlayMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
   if (next === 'bunpou') grammarEvents.value = await orFallback(loadGrammarEvents, []);
