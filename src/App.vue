@@ -34,8 +34,9 @@ import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
+import ResearchPage from './components/ResearchPage.vue';
 
-type Page = 'game' | 'about' | 'settings' | 'checkUp' | 'mode' | 'stats';
+type Page = 'game' | 'about' | 'research' | 'settings' | 'checkUp' | 'mode' | 'stats';
 
 const settings = shallowRef<Settings | null>(null);
 const deck = shallowRef<Deck | null>(null);
@@ -201,6 +202,7 @@ onMounted(async () => {
         <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
         <template v-else-if="settings && deck">
           <AboutData v-if="page === 'about'" @close="page = 'game'" />
+          <ResearchPage v-if="page === 'research'" @close="page = 'game'" />
           <StatsPage
             v-if="page === 'stats'"
             :deck="deck"
@@ -264,6 +266,7 @@ onMounted(async () => {
             <button type="button" class="underline" @click="openStats">Stats</button>
             <button type="button" class="underline" @click="page = 'settings'">Settings</button>
             <button type="button" class="underline" @click="page = 'about'">About the data</button>
+            <button type="button" class="underline" @click="page = 'research'">The research</button>
           </nav>
           <p class="text-xs text-washi/80">
             made by

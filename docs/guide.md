@@ -659,6 +659,8 @@ fields. They stay in memory until slice 3 stores them.
   `tests/pause.test.ts`.
 - **Change the review schedule:** edit `memory/leitner.ts`. Specs:
   `tests/memory.test.ts`.
+- **Add a source to the research page:** add it to `SOURCE_GROUPS` in
+  `research/sources.ts`, with what it found and where the game uses it.
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are
