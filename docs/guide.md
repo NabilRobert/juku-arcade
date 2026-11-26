@@ -606,7 +606,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Official kanji list** | The kanji a JLPT level's list names (79 for N5), as OpenJLPT tags them. A level's words also use harder kanji (欲 in ほしい); those are played but not counted by the goal (D67) | `deck/types.ts: KanjiNote.listLevel`, `kanji/kanji-round.ts: kanjiPool` |
 | **Sheet mix** | Which kind of kanji each round of kanji mode draws: every third a mastered one, for review; the rest still being learned, from the official list 3 times in 4 (D67) | `kanji/sheet-mix.ts` |
 | **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; not timed (D69) | `dojo/`, `components/dojo/` |
-| **Total board** | The leaderboard that adds up your best run in each mode | `leaderboard/leaderboard.ts: boardBests` |
+| **Total board** | The leaderboard that adds up your best run in each timed mode: Words, Kanji and Bunpou. Practice mode is left out, as it has no timer (D71) | `leaderboard/leaderboard.ts: TOTAL_BOARDS, boardBests` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
 | **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |

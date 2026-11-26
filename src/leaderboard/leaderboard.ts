@@ -2,9 +2,10 @@
  * The start screen's leaderboards (D47, D62), with sample players until
  * there's a server to share real scores: one for each mode, ranking its
  * best run (word mode's banked coins, kanji mode's best sheet, Bunpou's
- * best show, the dojo's best run), and a Total board, the sum of each
- * mode's best, which rewards being good at everything rather than playing
- * longest. Each ranks your best from this browser among its samples and
+ * best show, the dojo's best run), and a Total board, the sum of the timed
+ * modes' bests (TOTAL_BOARDS), which rewards being good at everything
+ * rather than playing longest. Practice mode is left out of it: it has no
+ * timer (D69), so its scores aren't on the same footing (D71). Each ranks your best from this browser among its samples and
  * splits the ranking into pages the panel flips through with Back and
  * Next.
  */
@@ -13,6 +14,8 @@ import { BUNPOU_BEST_KEY } from '../memory/progress-keys.ts';
 
 export type BoardId = PlayMode | 'total';
 export const MODE_BOARDS: readonly PlayMode[] = ['words', 'kanji', 'bunpou', 'dojo'];
+/** The boards the Total adds up: every mode but practice mode, which isn't timed (D71). */
+export const TOTAL_BOARDS: readonly PlayMode[] = ['words', 'kanji', 'bunpou'];
 type Samples = readonly { name: string; score: number }[];
 
 export interface LeaderboardRow {
@@ -114,10 +117,10 @@ const MODE_SAMPLES: Readonly<Record<PlayMode, Samples>> = {
   dojo: DOJO_SAMPLE_PLAYERS,
 };
 
-/** The Total board's samples: each sample player's scores on every mode's board, added up. */
+/** The Total board's samples: each sample player's scores on the timed modes' boards, added up. */
 function totalSamples(): Samples {
   const totals = new Map<string, number>();
-  for (const samples of Object.values(MODE_SAMPLES)) {
+  for (const samples of TOTAL_BOARDS.map((mode) => MODE_SAMPLES[mode])) {
     for (const { name, score } of samples) totals.set(name, (totals.get(name) ?? 0) + score);
   }
   return [...totals].map(([name, score]) => ({ name, score })).sort((a, b) => b.score - a.score);
@@ -131,7 +134,7 @@ export const BOARD_SAMPLES: Readonly<Record<BoardId, Samples>> = {
 /**
  * Your best on every board: each mode's best run in the play log, or a best
  * kept from before the play log existed (`legacy`), whichever is higher;
- * and the Total, those bests added up.
+ * and the Total, the timed modes' bests added up.
  */
 export function boardBests(
   runs: readonly PlayedRun[],
@@ -142,7 +145,7 @@ export function boardBests(
     const logged = runs.filter((run) => run.mode === mode).map((run) => run.score);
     bests[mode] = Math.max(legacy[mode] ?? 0, ...logged);
   }
-  bests.total = MODE_BOARDS.reduce((sum, mode) => sum + bests[mode], 0);
+  bests.total = TOTAL_BOARDS.reduce((sum, mode) => sum + bests[mode], 0);
   return bests;
 }
 

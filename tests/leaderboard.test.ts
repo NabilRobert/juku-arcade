@@ -112,13 +112,14 @@ describe('the boards for every mode, and the Total', () => {
       kanji: 210,
       bunpou: 900,
       dojo: 12,
-      total: 450 + 210 + 900 + 12,
+      // Practice mode isn't timed, so it's left out of the Total (D71).
+      total: 450 + 210 + 900,
     });
   });
 
-  it('adds up each sample player’s scores for the Total board, highest first', () => {
+  it('adds up each sample player’s timed-mode scores for the Total board, highest first', () => {
     const total = BOARD_SAMPLES.total;
-    const kitsune = ['words', 'kanji', 'bunpou', 'dojo'].reduce((sum, board) => {
+    const kitsune = ['words', 'kanji', 'bunpou'].reduce((sum, board) => {
       const samples = BOARD_SAMPLES[board as keyof typeof BOARD_SAMPLES];
       return sum + (samples.find((player) => player.name === 'Kitsune')?.score ?? 0);
     }, 0);
