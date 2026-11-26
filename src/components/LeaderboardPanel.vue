@@ -18,6 +18,7 @@ import {
   type BoardId,
 } from '../leaderboard/leaderboard.ts';
 import { isLeaderboardFolded, setLeaderboardFolded } from '../preferences/folded-panels.ts';
+import ArcadeButton from './ui/ArcadeButton.vue';
 import FoldButton from './ui/FoldButton.vue';
 import PixelButton from './ui/PixelButton.vue';
 import PixelIcon from './ui/PixelIcon.vue';
@@ -51,14 +52,15 @@ function turn(by: number): void {
 
 <template>
   <section class="pixel-panel flex flex-col gap-4 bg-steel p-6 uppercase" aria-label="Leaderboard">
-    <div class="relative">
+    <!-- Three columns keep the title centred, moving it aside only on a screen too narrow for both. -->
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <h2
-        class="text-center text-3xl tracking-widest text-[#ffd84a] drop-shadow-[0_3px_0_var(--color-sumi)]"
+        class="col-start-2 text-center text-3xl tracking-widest text-[#ffd84a] drop-shadow-[0_3px_0_var(--color-sumi)]"
       >
         Leaderboard
       </h2>
       <FoldButton
-        class="absolute top-1/2 right-0 -translate-y-1/2"
+        class="justify-self-end"
         :is-folded="isLeaderboardFolded"
         label="leaderboard"
         @toggle="setLeaderboardFolded(!isLeaderboardFolded)"
@@ -93,27 +95,19 @@ function turn(by: number): void {
         </li>
       </ol>
       <div class="flex items-center justify-center gap-4">
-        <PixelButton
-          colour="crimson"
-          class="min-h-10 px-5 font-bold uppercase disabled:opacity-40"
-          :disabled="page === 0"
-          data-testid="leaderboard-back"
-          @click="turn(-1)"
-        >
+        <ArcadeButton :disabled="page === 0" data-testid="leaderboard-back" @click="turn(-1)">
           Back
-        </PixelButton>
+        </ArcadeButton>
         <span class="text-sm text-washi/80" data-testid="leaderboard-page"
           >{{ page + 1 }} / {{ pages }}</span
         >
-        <PixelButton
-          colour="crimson"
-          class="min-h-10 px-5 font-bold uppercase disabled:opacity-40"
+        <ArcadeButton
           :disabled="page === pages - 1"
           data-testid="leaderboard-next"
           @click="turn(1)"
         >
           Next
-        </PixelButton>
+        </ArcadeButton>
       </div>
       <p class="text-center text-xs text-washi/70 normal-case">Sample players for now.</p>
     </template>

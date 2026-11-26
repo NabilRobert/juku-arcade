@@ -1,29 +1,23 @@
 <script setup lang="ts">
 /**
- * The small button that folds a panel down to its headline and opens it
- * again: ▲ folds, ▼ opens. A PixelButton, so it clicks like every other
- * button. Used by the start screen's leaderboard and streak panels.
- *
- * Aqua, not steel: a steel button vanished into the steel leaderboard, and
- * steel's click wipe is crimson, which on a button this small showed as
- * two red bars at its sides (playtest, 2026-11-26). Aqua's wipe is a pale
- * blink.
+ * The button that folds a panel down to its headline (Hide) and opens it
+ * again (Show). It's the leaderboard's Back and Next button
+ * (ArcadeButton.vue), so the start screen's buttons match (playtest
+ * decision, 2026-11-26). Used by the leaderboard and streak panels.
  */
-import PixelButton from './PixelButton.vue';
+import ArcadeButton from './ArcadeButton.vue';
 
 defineProps<{ isFolded: boolean; label: string }>();
 defineEmits<{ toggle: [] }>();
 </script>
 
 <template>
-  <PixelButton
-    colour="aqua"
-    class="min-h-9 min-w-9 px-2 text-sm"
+  <ArcadeButton
     :aria-expanded="!isFolded"
     :aria-label="isFolded ? `Show the ${label}` : `Hide the ${label}`"
     data-testid="fold-button"
     @click="$emit('toggle')"
   >
-    {{ isFolded ? '▼' : '▲' }}
-  </PixelButton>
+    {{ isFolded ? 'Show' : 'Hide' }}
+  </ArcadeButton>
 </template>

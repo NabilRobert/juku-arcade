@@ -697,7 +697,8 @@ fields. They stay in memory until slice 3 stores them.
   numbers from `memory/grammar-stats.ts` (its section is
   `components/GrammarStats.vue`); each list is a `ui/RankedList.vue`.
 - **Fold a start-screen panel:** the leaderboard and the streak each have a
-  `ui/FoldButton.vue`; whether each is folded is remembered in this browser
+  Hide/Show button (`ui/FoldButton.vue`, which is the leaderboard's Back and
+  Next button, `ui/ArcadeButton.vue`); whether each is folded is remembered in this browser
   (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
   length in sight, and on a wide screen the start screen drops to one
   column, with the leaderboard as a bar across the top (`ModePicker.vue`).

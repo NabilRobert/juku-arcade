@@ -23,7 +23,9 @@ afterEach(() => {
 describe('folding the leaderboard', () => {
   it('folds down to its title, and opens again', async () => {
     const panel = mount(LeaderboardPanel, { props: { bests: NO_BESTS } });
+    expect(panel.find('[data-testid="fold-button"]').text()).toBe('Hide');
     await panel.find('[data-testid="fold-button"]').trigger('click');
+    expect(panel.find('[data-testid="fold-button"]').text()).toBe('Show');
     expect(panel.text()).toContain('Leaderboard');
     expect(panel.find('[data-testid="leaderboard-rows"]').exists()).toBe(false);
     expect(panel.find('[data-testid="fold-button"]').attributes('aria-expanded')).toBe('false');
