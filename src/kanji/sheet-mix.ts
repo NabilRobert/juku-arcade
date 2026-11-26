@@ -2,33 +2,36 @@
  * Which kind of kanji each round of kanji mode draws (D67), so a sheet
  * balances learning with review (playtest decision, 2026-11-26):
  *
- * - every REVIEW_EVERY-th kanji is one the player has mastered, so it
- *   stays fresh;
- * - the rest are kanji still being learned: from the level's official
- *   kanji list LIST_SHARE of the time, so the kanji goal fills, and
- *   otherwise from the level's other kanji, which its words use too.
+ * - every REVIEW_EVERY-th kanji is one due for review (D75: kanji-reviews.ts);
+ * - the rest are new kanji: from the level's official kanji list
+ *   LIST_SHARE of the time, so the kanji goal fills, and otherwise from
+ *   the level's other kanji, which its words use too.
  *
- * When a kind has nothing left to show (nothing mastered yet, or the list
- * all mastered), the next kind in FALLBACKS stands in.
+ * Kanji played but not due yet rest. When a kind has nothing left to show
+ * (nothing due, or the list all played), the next kind in FALLBACKS
+ * stands in, and resting kanji come last.
  */
 import type { RandomSource } from '../game/deal.ts';
 
+/** The kinds a round can ask for; a kanji can also be 'resting', which no round asks for. */
 export type KanjiKind = 'review' | 'list' | 'other';
+type KanjiClass = KanjiKind | 'resting';
 
 /** In a sheet of 10, rounds 3, 6 and 9 are review: 3 review to 7 learning. */
 export const REVIEW_EVERY = 3;
 /** Of the learning rounds, the share drawn from the level's official list. */
 export const LIST_SHARE = 0.75;
 
-const FALLBACKS: Readonly<Record<KanjiKind, readonly KanjiKind[]>> = {
-  review: ['review', 'list', 'other'],
-  list: ['list', 'other', 'review'],
-  other: ['other', 'list', 'review'],
+const FALLBACKS: Readonly<Record<KanjiKind, readonly KanjiClass[]>> = {
+  review: ['review', 'list', 'other', 'resting'],
+  list: ['list', 'other', 'review', 'resting'],
+  other: ['other', 'list', 'review', 'resting'],
 };
 
-/** What a sheet knows about the player: the kanji they've mastered, and the level's list. */
+/** What a sheet knows about the player: the kanji due for review, those resting, and the level's list. */
 export interface KanjiStanding {
-  mastered: ReadonlySet<string>;
+  due: ReadonlySet<string>;
+  resting: ReadonlySet<string>;
   levelList: ReadonlySet<string>;
 }
 
@@ -38,8 +41,9 @@ export function kindForRound(roundNumber: number, random: RandomSource): KanjiKi
   return random() < LIST_SHARE ? 'list' : 'other';
 }
 
-export function kindOf(kanji: string, standing: KanjiStanding): KanjiKind {
-  if (standing.mastered.has(kanji)) return 'review';
+export function kindOf(kanji: string, standing: KanjiStanding): KanjiClass {
+  if (standing.due.has(kanji)) return 'review';
+  if (standing.resting.has(kanji)) return 'resting';
   return standing.levelList.has(kanji) ? 'list' : 'other';
 }
 

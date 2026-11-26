@@ -33,8 +33,9 @@ const DECK: Deck = {
   ],
 };
 
-const standing = (mastered: string[]): KanjiStanding => ({
-  mastered: new Set(mastered),
+const standing = (due: string[], resting: string[] = []): KanjiStanding => ({
+  due: new Set(due),
+  resting: new Set(resting),
   levelList: kanjiPool(DECK).levelList,
 });
 
@@ -45,7 +46,7 @@ describe('the kanji goal', () => {
 });
 
 describe('the balance of a kanji sheet', () => {
-  it('makes every third kanji a review of one already mastered', () => {
+  it('makes every third kanji a review of one that is due', () => {
     const kinds = [1, 2, 3, 4, 5, 6].map((round) => kindForRound(round, () => 0));
     expect(kinds).toEqual(['list', 'list', 'review', 'list', 'list', 'review']);
     expect(REVIEW_EVERY).toBe(3);
@@ -56,17 +57,23 @@ describe('the balance of a kanji sheet', () => {
     expect(kindForRound(1, () => LIST_SHARE)).toBe('other');
   });
 
-  it('reviews only mastered kanji, and learns only unmastered ones', () => {
+  it('reviews only due kanji, and learns only ones never played', () => {
     const all = ['日', '山', '欲', '込'];
     expect(candidatesOfKind(all, 'review', standing(['山']))).toEqual(['山']);
     expect(candidatesOfKind(all, 'list', standing(['山']))).toEqual(['日']);
     expect(candidatesOfKind(all, 'other', standing([]))).toEqual(['欲', '込']);
   });
 
-  it('learns instead when nothing is mastered yet, and moves on once the list is all mastered', () => {
+  it('learns instead when nothing is due, and moves on once the list has all been played', () => {
     const all = ['日', '山', '欲', '込'];
     expect(candidatesOfKind(all, 'review', standing([]))).toEqual(['日', '山']);
     expect(candidatesOfKind(all, 'list', standing(['日', '山']))).toEqual(['欲', '込']);
+  });
+
+  it('keeps kanji that are resting out, until nothing else is left', () => {
+    const all = ['日', '山', '欲', '込'];
+    expect(candidatesOfKind(all, 'list', standing([], ['日']))).toEqual(['山']);
+    expect(candidatesOfKind(all, 'review', standing([], all))).toEqual(all);
   });
 
   it('deals the kanji of the kind the sheet asks for', () => {

@@ -7,7 +7,7 @@ export const modes = {
   kanji: {
     name: 'Kanji',
     description:
-      "Find every reading of a kanji among {cards} cards, with {lanterns} lanterns a sheet. Doesn't count toward your reviews.",
+      'Find every reading of a kanji among {cards} cards, with {lanterns} lanterns a sheet. Counts toward kanji reviews.',
   },
   bunpou: {
     name: 'Bunpou',

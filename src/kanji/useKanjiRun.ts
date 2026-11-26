@@ -12,9 +12,10 @@
  * hand over to show them, and a crested card adds or takes points when
  * it's thrown.
  *
- * Kanji mode doesn't feed the reviews (D37): its rounds go only to the play
- * log, for the streak, the calendar and the kanji goal (useKanjiSheet.ts).
- * Which kanji come up balances learning with review (sheet-mix.ts, D67).
+ * Its rounds go to the play log (useKanjiSheet.ts), for the streak, the
+ * calendar, the kanji goal and the kanji's own reviews (kanji-reviews.ts,
+ * D75), never to the word reviews or the school's events (D37). Which
+ * kanji come up balances new kanji with due ones (sheet-mix.ts, D67).
  */
 import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
@@ -34,8 +35,9 @@ import {
   type RoundResult,
 } from './kanji-round.ts';
 import { useKanjiCrests } from './useKanjiCrests.ts';
+import { kanjiReviewsOf, kanjiStanding, type KanjiMemory } from './kanji-reviews.ts';
 import { kindForRound } from './sheet-mix.ts';
-import { masteredKanji } from '../memory/level-goals.ts';
+import { localDay } from '../game/events.ts';
 import { loadKanjiRounds } from '../memory/storage.ts';
 
 export type KanjiPhase = 'picking' | 'playing' | 'revealed';
@@ -51,32 +53,35 @@ const REVEAL_MS = 2200;
 const RECENT_KANJI = 8;
 
 /**
- * The kanji the player has mastered, read from the play log once the run
- * starts. Until it's read (or if storage is blocked) nothing counts as
- * mastered, so a round meant for review is dealt from the learning kinds.
+ * Each kanji's reviews (D75), read from the play log once the run starts.
+ * Until they're read (or if storage is blocked) every kanji counts as new,
+ * so a round meant for review is dealt from the new kinds.
  */
-function useMastered() {
-  const mastered = shallowRef<ReadonlySet<string>>(new Set());
+function useKanjiReviews() {
+  const reviews = shallowRef<ReadonlyMap<string, KanjiMemory>>(new Map());
   loadKanjiRounds()
     .then((rounds) => {
-      mastered.value = masteredKanji(rounds);
+      reviews.value = kanjiReviewsOf(rounds);
     })
     .catch(() => undefined);
-  return mastered;
+  return reviews;
 }
 
 function useRounds(deck: Deck, random: RandomSource) {
   const pool = kanjiPool(deck);
-  const mastered = useMastered();
+  const reviews = useKanjiReviews();
+  const dealtThisRun = new Set<string>();
   const recent: string[] = [];
   let dealt = 0;
   function deal(): KanjiRound {
     dealt += 1;
+    const today = localDay(new Date());
     const wish = {
       kind: kindForRound(dealt, random),
-      standing: { mastered: mastered.value, levelList: pool.levelList },
+      standing: kanjiStanding(reviews.value, today, pool.levelList, dealtThisRun),
     };
     const round = dealKanjiRound(pool, random, recent, wish);
+    dealtThisRun.add(round.kanji);
     recent.unshift(round.kanji);
     recent.splice(RECENT_KANJI);
     return round;

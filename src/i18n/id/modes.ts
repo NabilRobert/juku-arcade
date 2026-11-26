@@ -8,7 +8,7 @@ export const modes: Messages['modes'] = {
   kanji: {
     name: 'Kanji',
     description:
-      'Temukan semua cara baca satu kanji di antara {cards} kartu, dengan {lanterns} lentera per lembar. Tidak dihitung untuk ulasanmu.',
+      'Temukan semua cara baca satu kanji di antara {cards} kartu, dengan {lanterns} lentera per lembar. Dihitung untuk ulasan kanji.',
   },
   bunpou: {
     name: 'Bunpou',
