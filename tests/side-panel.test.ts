@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
+import PixelButton from '../src/components/ui/PixelButton.vue';
 import SidePanel from '../src/components/ui/SidePanel.vue';
 
 /** Pretends the window is phone-width (not lg), as matchMedia reports it. */
@@ -45,6 +46,14 @@ describe('a mode’s side panel', () => {
     );
     await panel.find('[data-testid="side-panel-backdrop"]').trigger('click');
     expect(panel.find('[data-testid="side-panel"]').classes()).toContain('-translate-x-full');
+  });
+
+  it('clicks like every other button when its tab is pressed', async () => {
+    asPhone();
+    const panel = mountPanel();
+    await panel.find('[data-testid="side-panel-toggle"]').trigger('click');
+    expect(panel.findComponent(PixelButton).exists()).toBe(true);
+    expect(panel.find('[data-testid="wipe"]').exists()).toBe(true);
   });
 
   it('stays open beside the board on a wide screen, with no tab', () => {

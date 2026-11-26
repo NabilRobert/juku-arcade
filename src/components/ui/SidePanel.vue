@@ -3,11 +3,13 @@
  * A mode's side panel. On a wide screen it sits beside the board, always
  * open. On a phone or a tablet it's a drawer folded away to the left, so
  * the board fills the screen: a tab on its edge slides it open or closed,
- * and tapping outside it closes it (asked for in playtesting). While it's
+ * and tapping outside it closes it (asked for in playtesting). The tab is a
+ * PixelButton, so it clicks and wipes like every other button. While it's
  * folded away, keyboards and screen readers skip it (inert).
  */
 import { computed, ref } from 'vue';
 import { useIsWide } from '../../composables/useIsWide.ts';
+import PixelButton from './PixelButton.vue';
 
 defineProps<{ label: string }>();
 
@@ -37,15 +39,15 @@ const isHidden = computed(() => !isWide.value && !isOpen.value);
       <slot />
     </div>
     <!-- The tab rides on the drawer's edge, so it shows whether the drawer is open or not. -->
-    <button
-      type="button"
-      class="pixel-button absolute top-3 left-full bg-steel px-3 py-2 text-washi lg:hidden"
+    <PixelButton
+      colour="steel"
+      class="absolute top-3 left-full px-3 py-2 lg:hidden"
       :aria-expanded="isOpen"
       :aria-label="isOpen ? 'Close the panel' : 'Open the panel'"
       data-testid="side-panel-toggle"
       @click="isOpen = !isOpen"
     >
       {{ isOpen ? '◀' : '▶' }}
-    </button>
+    </PixelButton>
   </aside>
 </template>
