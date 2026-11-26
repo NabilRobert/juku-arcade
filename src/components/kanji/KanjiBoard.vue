@@ -138,7 +138,7 @@ watch(
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(15dvh,27vw)] sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16dvh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
