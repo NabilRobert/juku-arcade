@@ -4,7 +4,28 @@
  */
 import { common } from './common.ts';
 import { settings } from './settings.ts';
+import { modes } from './modes.ts';
+import { menu } from './menu.ts';
+import { streak } from './streak.ts';
+import { leaderboard } from './leaderboard.ts';
+import { game } from './game.ts';
+import { kanji } from './kanji.ts';
+import { bunpou } from './bunpou.ts';
+import { practice } from './practice.ts';
+import { pages } from './pages.ts';
 
-export const en = { common, settings };
+export const en = {
+  common,
+  settings,
+  modes,
+  menu,
+  streak,
+  leaderboard,
+  game,
+  kanji,
+  bunpou,
+  practice,
+  pages,
+};
 
 export type Messages = typeof en;
