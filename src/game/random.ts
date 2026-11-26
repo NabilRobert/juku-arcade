@@ -11,3 +11,8 @@ export function seededRandom(seed: number): () => number {
     return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/** One of `items`, picked at random, or undefined when there are none. */
+export function pickOne<T>(items: readonly T[], random: () => number = Math.random): T | undefined {
+  return items[Math.floor(random() * items.length)];
+}

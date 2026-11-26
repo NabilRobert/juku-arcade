@@ -3,6 +3,7 @@
  * log in this browser, the same log the reviews read. Nothing here is sent
  * anywhere. Kanji mode logs nothing, so these are word mode's numbers.
  */
+import { tally } from './tally.ts';
 import { localDayOf } from './days.ts';
 import type { DeckWord, DecoyType } from '../deck/types.ts';
 import { wordAnswerScore, type ErrorType, type GameEvent } from '../game/events.ts';
@@ -68,12 +69,8 @@ export function percentRight(counts: AnswerCounts): string {
 }
 
 function mostMissed(misses: readonly GameEvent[], words: readonly DeckWord[]): MissedWord[] {
-  const byWord = new Map<string, number>();
-  for (const miss of misses) {
-    if (miss.word_id !== null) byWord.set(miss.word_id, (byWord.get(miss.word_id) ?? 0) + 1);
-  }
-  return [...byWord]
-    .sort((a, b) => b[1] - a[1])
+  const wordIds = misses.flatMap((miss) => (miss.word_id === null ? [] : [miss.word_id]));
+  return tally(wordIds)
     .slice(0, MOST_MISSED_SHOWN)
     .flatMap(([wordId, count]) => {
       const word = words.find((candidate) => candidate.id === wordId);
@@ -82,14 +79,8 @@ function mostMissed(misses: readonly GameEvent[], words: readonly DeckWord[]): M
 }
 
 function mistakeKinds(misses: readonly GameEvent[]): { name: string; count: number }[] {
-  const byKind = new Map<ErrorType, number>();
-  for (const miss of misses) {
-    if (miss.error_type !== null)
-      byKind.set(miss.error_type, (byKind.get(miss.error_type) ?? 0) + 1);
-  }
-  return [...byKind]
-    .sort((a, b) => b[1] - a[1])
-    .map(([kind, count]) => ({ name: MISTAKE_NAMES[kind], count }));
+  const kinds = misses.flatMap((miss) => (miss.error_type === null ? [] : [miss.error_type]));
+  return tally(kinds).map(([kind, count]) => ({ name: MISTAKE_NAMES[kind], count }));
 }
 
 export function playerStats(

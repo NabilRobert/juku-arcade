@@ -7,6 +7,7 @@
  * never the popular misattributions. Each is short, and the translations
  * are in plain English.
  */
+import { pickOne } from '../game/random.ts';
 import type { RandomSource } from '../game/deal.ts';
 
 export interface Quote {
@@ -99,7 +100,7 @@ export const REST_QUOTES: readonly Quote[] = [
 
 /** One quote from the list (the game-over quotes unless another is given), picked at random. */
 export function pickQuote(random: RandomSource, from: readonly Quote[] = QUOTES): Quote {
-  const quote = from[Math.floor(random() * from.length)] ?? from[0];
+  const quote = pickOne(from, random);
   if (quote === undefined)
     throw new Error('This quote list is empty: add a quote to it in quotes.ts.');
   return quote;

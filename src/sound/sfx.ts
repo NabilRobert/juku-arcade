@@ -13,6 +13,7 @@
  * sound, which always follows a tap or a drag. Muting is remembered in
  * this browser only (localStorage): a classroom may need it off.
  */
+import { pickOne } from '../game/random.ts';
 import { storedFlag } from '../preferences/stored-flag.ts';
 import { storedVolume } from './volume.ts';
 
@@ -228,7 +229,7 @@ async function loadPlayer(): Promise<Player> {
   };
   return async (name, pitch) => {
     const files = RECORDINGS[name];
-    const file = files?.[Math.floor(Math.random() * files.length)];
+    const file = files === undefined ? undefined : pickOne(files);
     if (file === undefined) return playSynth(name, pitch);
     try {
       const maxS = RECORDING_MAX_S[name] ?? DEFAULT_RECORDING_MAX_S;
