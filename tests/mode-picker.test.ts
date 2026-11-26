@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import ModePicker from '../src/components/ModePicker.vue';
 
@@ -22,6 +22,17 @@ describe('the start screen', () => {
     expect(notes.map((note) => note.text())).toEqual([
       'Only playable in N5 for now · still in development',
     ]);
+  });
+
+  it("shows each mode's level goal on its card, with Bunpou's rakugo rank", async () => {
+    const picker = mount(ModePicker, { props: { deck } });
+    await flushPromises();
+    const goals = picker.findAll('[data-testid="goal"]').map((goal) => goal.text());
+    expect(goals).toHaveLength(3);
+    expect(goals[0]).toContain('Words known');
+    expect(goals[1]).toContain('Kanji mastered');
+    expect(goals[2]).toContain('前座');
+    expect(goals[2]).toContain('0 / 20');
   });
 
   it('puts the streak above the modes', () => {

@@ -5,23 +5,21 @@
  * first). The streak and the calendar are read fresh
  * each time the start screen opens.
  */
-import { computed, ref } from 'vue';
-import type { Deck } from '../../deck/types.ts';
-import { IS_SAMPLE_PLAY, usePlayHistory } from '../../composables/usePlayHistory.ts';
+import { computed, ref, toRef } from 'vue';
+import { IS_SAMPLE_PLAY } from '../../composables/usePlayHistory.ts';
 import { useStreak } from '../../composables/useStreak.ts';
-import { summariseDay } from '../../memory/day-summary.ts';
+import { summariseDay, type PlayHistory } from '../../memory/day-summary.ts';
 import { calendarWeeks } from '../../memory/play-calendar.ts';
 import DayDetail from './DayDetail.vue';
 import PlayCalendar from './PlayCalendar.vue';
 import StreakHeader from './StreakHeader.vue';
 
-const props = defineProps<{ deck: Deck }>();
+const props = defineProps<{ history: PlayHistory; today: string }>();
 
-const { history, today } = usePlayHistory(props.deck);
-const { streak, message, milestone } = useStreak(history, today);
-const selected = ref(today);
-const weeks = computed(() => calendarWeeks(history.value.runs, today));
-const summary = computed(() => summariseDay(selected.value, history.value));
+const { streak, message, milestone } = useStreak(toRef(props, 'history'), props.today);
+const selected = ref(props.today);
+const weeks = computed(() => calendarWeeks(props.history.runs, props.today));
+const summary = computed(() => summariseDay(selected.value, props.history));
 </script>
 
 <template>

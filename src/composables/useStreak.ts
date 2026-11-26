@@ -5,7 +5,7 @@
  * play history has loaded, and remembered, so the next visit picks
  * another; a milestone is celebrated on the first visit after it's reached.
  */
-import { computed, ref, watch, type ShallowRef } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import type { PlayHistory } from '../memory/day-summary.ts';
 import { playedDays } from '../memory/play-calendar.ts';
 import { LAST_STREAK_MESSAGE_KEY, STREAK_CELEBRATED_KEY } from '../memory/progress-keys.ts';
@@ -29,7 +29,7 @@ function writeKey(key: string, value: string): void {
   }
 }
 
-export function useStreak(history: ShallowRef<PlayHistory>, today: string) {
+export function useStreak(history: Readonly<Ref<PlayHistory>>, today: string) {
   const days = computed(() => playedDays(history.value.runs));
   const streak = computed(() => streakOn(days.value, today));
   const message = ref<StreakMessage | null>(null);

@@ -6,7 +6,7 @@ import DayDetail from '../src/components/streak/DayDetail.vue';
 import FlameSprite from '../src/components/streak/FlameSprite.vue';
 import { FLAME_FRAMES } from '../src/components/streak/flame-frames.ts';
 import PlayCalendar from '../src/components/streak/PlayCalendar.vue';
-import StreakPanel from '../src/components/streak/StreakPanel.vue';
+import ModePicker from '../src/components/ModePicker.vue';
 import { localDay } from '../src/game/events.ts';
 import type { DaySummary } from '../src/memory/day-summary.ts';
 import { addDays } from '../src/memory/leitner.ts';
@@ -120,7 +120,7 @@ describe("a day's kanji and scores on screen", () => {
   });
 });
 
-describe('the streak panel', () => {
+describe('the streak on the start screen', () => {
   beforeEach(async () => {
     await deleteAllData();
   });
@@ -140,7 +140,7 @@ describe('the streak panel', () => {
         right: 2,
       });
     }
-    const panel = mount(StreakPanel, { props: { deck: emptyDeck } });
+    const panel = mount(ModePicker, { props: { deck: emptyDeck } });
     await flushPromises();
     expect(panel.find('[data-testid="streak-days"]').text()).toBe('2-day streak');
     expect(panel.find('[data-testid="streak-message"]').text()).toContain(

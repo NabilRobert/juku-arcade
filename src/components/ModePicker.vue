@@ -6,9 +6,15 @@
  * which is practice at finding every reading of one kanji; or Bunpou
  * (D56), which puts grammar tiles in order. The leaderboard (D47) sits on
  * the left; the streak and the play calendar (StreakPanel.vue) sit above
- * the modes.
+ * the modes, and each mode's card shows its level goal (level-goals.ts).
+ * The play history is read once here for both.
  */
+import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
+import { usePlayHistory } from '../composables/usePlayHistory.ts';
+import { CURRICULUM } from '../grammar/templates.ts';
+import { kanjiPool } from '../kanji/kanji-round.ts';
+import { grammarGoal, kanjiGoal, wordGoal } from '../memory/level-goals.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
 import ModeCard from './ModeCard.vue';
@@ -28,6 +34,14 @@ interface Card {
 }
 
 const level = props.deck.level;
+const { history, today } = usePlayHistory(props.deck);
+const levelKanji = [...kanjiPool(props.deck).readings.keys()];
+const goals = computed(() => ({
+  words: wordGoal(props.deck.words, history.value.wordEvents),
+  kanji: kanjiGoal(levelKanji, history.value.kanjiRounds),
+  bunpou: grammarGoal(CURRICULUM, history.value.grammarEvents, today),
+}));
+
 const cards: readonly Card[] = [
   {
     mode: 'words',
@@ -61,12 +75,13 @@ defineEmits<{ choose: [mode: GameMode] }>();
   <div class="grid w-full flex-1 grid-cols-[minmax(20rem,30%)_1fr] gap-10">
     <LeaderboardPanel />
     <div class="flex flex-col justify-center gap-6">
-      <StreakPanel :deck="deck" />
+      <StreakPanel :history="history" :today="today" />
       <section class="grid grid-cols-3 gap-6" aria-label="Choose a mode">
         <ModeCard
           v-for="card in cards"
           :key="card.mode"
           v-bind="card"
+          :goal="goals[card.mode]"
           @click="$emit('choose', card.mode)"
         />
       </section>
