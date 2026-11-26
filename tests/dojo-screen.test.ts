@@ -8,7 +8,7 @@ import { THROW_S } from '../src/components/cards/card-motion.ts';
 import CardQuestionView from '../src/components/dojo/CardQuestionView.vue';
 import DojoGame from '../src/components/dojo/DojoGame.vue';
 import DojoScreen from '../src/components/dojo/DojoScreen.vue';
-import LanternRow from '../src/components/dojo/LanternRow.vue';
+import LanternRow from '../src/components/ui/LanternRow.vue';
 import type { Deck } from '../src/deck/types.ts';
 import { dojoPools } from '../src/dojo/dojo-questions.ts';
 import { QUOTES, REST_QUOTES } from '../src/dojo/quotes.ts';

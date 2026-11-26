@@ -12,6 +12,8 @@
  * Crests (D42) hide on some cards: the scout panel flips the hand over to
  * show them (KanjiScoutPanel.vue).
  */
+import { LANTERNS } from '../../game/lanterns.ts';
+import LanternRow from '../ui/LanternRow.vue';
 import { computed } from 'vue';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
@@ -63,6 +65,12 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   pause: () => undefined,
 });
 
+/** Why the sheet ended: its last lantern out, End run, or all its kanji played. */
+const sheetTitle = computed(() => {
+  if (sheet.isOutOfLanterns.value) return 'Lanterns out';
+  return sheet.isEndedEarly.value ? 'Run ended' : 'Sheet done';
+});
+
 const sheetPanels = computed(() => [
   { label: 'Perfect', value: `${sheet.tally.value.right} / ${KANJI_PER_SHEET}` },
   { label: 'Score', value: String(score.value) },
@@ -88,6 +96,7 @@ function dismiss(isStopping: boolean): void {
           Kanji {{ kanjiNumber }} / {{ KANJI_PER_SHEET }}
         </p>
       </ModeHeader>
+      <LanternRow :lit="sheet.lanterns.value" :total="LANTERNS" />
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
@@ -108,16 +117,25 @@ function dismiss(isStopping: boolean): void {
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
         Pick every reading of the kanji, then press Play. You can make {{ MAX_WRONG_PICKS }} wrong
-        picks per kanji. It doesn't change your reviews.
+        picks per kanji; a kanji left with readings unfound puts out a lantern, and the sheet ends
+        when all {{ LANTERNS }} are out. It doesn't change your reviews.
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">
+      <!-- On a phone or a tablet the side panel is folded away, so the lanterns show above the board. -->
+      <LanternRow
+        v-if="!isSheetDone"
+        class="lg:hidden"
+        is-compact
+        :lit="sheet.lanterns.value"
+        :total="LANTERNS"
+      />
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
         <RunResults
           v-if="isSheetDone"
-          :title="sheet.isEndedEarly.value ? 'Run ended' : 'Sheet done'"
+          :title="sheetTitle"
           :panels="sheetPanels"
-          :note="`A sheet is ${KANJI_PER_SHEET} kanji. A kanji counts as mastered once you find all its readings with no wrong pick on ${CORRECT_DAYS_TO_KNOW} separate days.`"
+          :note="`A sheet is ${KANJI_PER_SHEET} kanji, or ends when all ${LANTERNS} lanterns are out. A kanji counts as mastered once you find all its readings with no wrong pick on ${CORRECT_DAYS_TO_KNOW} separate days.`"
           again-label="Another sheet"
           :comparison="{ score, previousBest }"
           @again="emit('again')"

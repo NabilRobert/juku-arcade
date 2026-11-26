@@ -10,7 +10,7 @@
 import { computed } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
-import { LANTERNS } from '../../dojo/dojo-run.ts';
+import { LANTERNS } from '../../game/lanterns.ts';
 import { pickQuote } from '../../dojo/quotes.ts';
 import { useDojoRun } from '../../dojo/useDojoRun.ts';
 import { usePanelPause } from '../../composables/usePanelPause.ts';
@@ -29,7 +29,7 @@ import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import DojoQuestionView from './DojoQuestionView.vue';
-import LanternRow from './LanternRow.vue';
+import LanternRow from '../ui/LanternRow.vue';
 import QuoteCard from '../ui/QuoteCard.vue';
 
 const props = defineProps<{
@@ -107,6 +107,14 @@ function dismiss(isStopping: boolean): void {
       :is-paused="isPaused"
       @pause="dojo.pause"
       @resume="dojo.resume"
+    />
+    <!-- On a phone or a tablet the side panel is folded away, so the lanterns show above the question. -->
+    <LanternRow
+      v-if="!state.isOver"
+      class="lg:hidden"
+      is-compact
+      :lit="state.lanterns"
+      :total="LANTERNS"
     />
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <RunResults
