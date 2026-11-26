@@ -55,16 +55,16 @@ const cards: readonly Card[] = [
     colour: 'steel',
     name: 'Kanji',
     example: '生 → セイ・う(まれる)…',
-    description: 'Find every reading of one kanji among 8 cards. Practice only.',
+    description: 'Find every reading of a kanji among 8 cards. Practice only.',
   },
   {
     mode: 'bunpou',
     colour: 'aqua',
     name: 'Bunpou',
-    example: '七時・に・起きます → 七時に起きます',
-    description: `Put each ${level} sentence in order, then watch the tale. Counts toward your grammar reviews.`,
+    example: '行く・駅・に → 駅に行く',
+    description: 'Put each sentence in order, then watch the tale. Counts toward grammar reviews.',
     // The grammar content is N5's only (D60); other levels are still to write.
-    note: 'Only playable in N5 for now · still in development',
+    note: 'N5 only for now · still in development',
   },
 ];
 defineEmits<{ choose: [mode: GameMode] }>();

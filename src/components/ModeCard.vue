@@ -27,13 +27,14 @@ const textClass = computed(() =>
 </script>
 
 <template>
-  <PixelButton :colour="colour" class="flex flex-col gap-2 p-6 text-left">
-    <span class="block text-2xl font-bold">{{ name }}</span>
-    <span class="block text-sm" :class="textClass" lang="ja">{{ example }}</span>
-    <span class="block text-sm" :class="textClass">{{ description }}</span>
-    <GoalBar v-if="goal" :goal="goal" :class="textClass" />
-    <span v-if="note" class="block text-xs italic" :class="textClass" data-testid="mode-note">{{
+  <!-- Every card has the same parts in the same places: the goal bar always sits at the bottom. -->
+  <PixelButton :colour="colour" is-card class="p-5 text-left">
+    <span class="text-2xl font-bold">{{ name }}</span>
+    <span class="mt-1 truncate text-sm" :class="textClass" lang="ja">{{ example }}</span>
+    <span class="mt-2 flex-1 text-sm" :class="textClass">{{ description }}</span>
+    <span v-if="note" class="mt-2 text-xs italic" :class="textClass" data-testid="mode-note">{{
       note
     }}</span>
+    <GoalBar v-if="goal" :goal="goal" class="mt-3" :class="textClass" />
   </PixelButton>
 </template>

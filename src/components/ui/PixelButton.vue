@@ -18,7 +18,14 @@ import { playSound } from '../../sound/sfx.ts';
 
 export type ButtonColour = 'crimson' | 'steel' | 'aqua' | 'paper';
 
-const props = withDefaults(defineProps<{ colour?: ButtonColour }>(), { colour: 'steel' });
+const props = withDefaults(
+  defineProps<{
+    colour?: ButtonColour;
+    /** For a card-like button: its content fills it as a column, so parts can sit at the bottom. */
+    isCard?: boolean;
+  }>(),
+  { colour: 'steel', isCard: false },
+);
 
 const BACKGROUNDS: Record<ButtonColour, string> = {
   crimson: 'bg-crimson text-washi',
@@ -97,7 +104,12 @@ function finishWipe(): void {
 </script>
 
 <template>
-  <button type="button" class="pixel-button" :class="BACKGROUNDS[shownColour]" @click="flash">
+  <button
+    type="button"
+    class="pixel-button"
+    :class="[BACKGROUNDS[shownColour], isCard ? 'flex h-full flex-col' : '']"
+    @click="flash"
+  >
     <span
       v-if="wipe"
       :key="wipe.key"
@@ -107,6 +119,6 @@ function finishWipe(): void {
       aria-hidden="true"
       @animationend="finishWipe"
     />
-    <span class="relative"><slot /></span>
+    <span class="relative" :class="isCard ? 'flex flex-1 flex-col' : ''"><slot /></span>
   </button>
 </template>

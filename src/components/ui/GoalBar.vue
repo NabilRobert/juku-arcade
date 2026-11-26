@@ -19,7 +19,7 @@ const isCleared = computed(() => props.goal.total > 0 && props.goal.done >= prop
   <span class="flex flex-col gap-1 text-xs" data-testid="goal">
     <span class="flex justify-between gap-2">
       <span>
-        <span v-if="goal.title" class="mr-1 bg-sumi/40 px-1 font-bold" lang="ja">{{
+        <span v-if="goal.title" class="mr-1 bg-sumi px-1 font-bold text-aqua" lang="ja">{{
           goal.title
         }}</span>
         {{ isCleared ? 'Level cleared ✓' : goal.label }}

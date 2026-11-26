@@ -20,7 +20,7 @@ describe('the start screen', () => {
     const picker = mount(ModePicker, { props: { deck } });
     const notes = picker.findAll('[data-testid="mode-note"]');
     expect(notes.map((note) => note.text())).toEqual([
-      'Only playable in N5 for now · still in development',
+      'N5 only for now · still in development',
     ]);
   });
 
