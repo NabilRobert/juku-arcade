@@ -6,7 +6,7 @@
  * the data".
  */
 import { SOURCE_GROUPS } from '../research/sources.ts';
-import PixelButton from './ui/PixelButton.vue';
+import BackButton from './ui/BackButton.vue';
 
 defineEmits<{ close: [] }>();
 </script>
@@ -44,8 +44,6 @@ defineEmits<{ close: [] }>();
         <p class="text-sm text-lamp">In juku-arcade: {{ source.inGame }}</p>
       </div>
     </section>
-    <PixelButton colour="steel" class="px-4 py-2" @click="$emit('close')">
-      Back to the game
-    </PixelButton>
+    <BackButton @click="$emit('close')" />
   </article>
 </template>

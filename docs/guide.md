@@ -694,7 +694,10 @@ fields. They stay in memory until slice 3 stores them.
   During a game the footer is hidden there, and its links (change mode,
   stats, settings, about, research) sit at the bottom of the drawer
   (`composables/usePageLinks.ts`, `ui/PageLinks.vue`), so the board fits
-  the screen with nothing to scroll.
+  the screen with nothing to scroll. The start screen's footer shows the
+  same links, without Change mode, so Settings and Stats are reachable
+  from the menu on any screen; a page opened from there closes back to it
+  (`App.vue: closePage`).
   Opening the drawer pauses a timed run, and closing it resumes the run if
   the drawer paused it (`composables/usePanelPause.ts`, wired to
   SidePanel's `toggle` event in each mode screen).
