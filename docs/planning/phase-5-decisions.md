@@ -1131,3 +1131,42 @@ total score rewarded whoever played longest, which works against the
 - **Beat:** a fixed 30-match word run (it wouldn't follow the day's
   reviews); a ranked total for each mode (ranking moves to the game-over
   mode); sheets weighted toward kanji not yet mastered (left for later).
+
+### D62: The dojo, a game-over mode, and a board for every mode (2026-11-26)
+
+From playtesting: "make another mode that has a game over".
+
+- **What it asks:** only what the player has met, so it tests rather
+  than teaches (`dojo/dojo-questions.ts`): words matched before (the
+  reading among four, the word's own decoys first), kanji found perfectly
+  at least once (a hand of eight readings), and grammar points built right
+  (one Bunpou sentence). Repeats are allowed. It opens once 10 words have
+  been matched, and says so until then.
+- **Reused boards:** word and kanji questions are dealt as cards on kanji
+  mode's board, and grammar questions on Bunpou's tile board, as asked in
+  playtesting; one wrong card is a miss.
+- **Three lanterns:** a miss or a timeout puts one out
+  (`dojo/dojo-run.ts`); the score is the right answers. Lit and dim
+  lanterns are drawn in the game's palette after a reference from
+  playtesting.
+- **The timer** tightens every 10 right answers through five stages,
+  then holds: words 20, 17, 15, 13, 12 s; kanji 60, 52, 45, 40, 36 s; a
+  grammar sentence 30, 26, 23, 20, 18 s (the whole sentence). The floor
+  is sized for a slow reader who knows the answer: the game should help
+  people learn, not shut out slow readers.
+- **Game over** recaps the score, the best combo and the stage, with a
+  quote from a historic figure or a well-known character, each with its
+  source (`dojo/quotes.ts`), then Restart or Quit to main menu.
+- **Logging:** runs go to the play log (streak, calendar, boards);
+  nothing goes to the reviews, since a timed test isn't practice.
+- **Leaderboards:** a board for each mode, ranking its best run (word
+  mode's coins, kanji mode's best sheet, Bunpou's best show, the dojo's
+  best run), and a Total board, the sum of each mode's best, which
+  rewards being good at everything rather than playing longest
+  (`leaderboard/leaderboard.ts: boardBests`). Bests kept before the play
+  log existed still count.
+- **Beat:** one board for the dojo only (asked for a board per mode and
+  a total instead); a total of every point ever scored (rewards time
+  played); a speed-up with no floor (unfair to slow readers); new
+  question screens of its own (the other modes' boards look and feel the
+  same).

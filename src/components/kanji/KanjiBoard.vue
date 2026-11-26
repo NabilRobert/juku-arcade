@@ -5,7 +5,8 @@
  * row beside the deck. Clicking a reading card picks it (it lifts) or puts it back; Play
  * throws the picked cards at the kanji. A right card flies in and the
  * kanji jolts; a wrong one shakes; the right readings left in the hand
- * light up. Each round is dealt off the deck, as in word mode.
+ * light up. Each round is dealt off the deck, as in word mode. The dojo
+ * (D62) reuses it for its word and kanji questions.
  */
 import { useAnimate, useReducedMotion } from 'motion-v';
 import { reactive, watch } from 'vue';
@@ -25,20 +26,25 @@ import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 /** Eight cards overlap more than word mode's six, to fit the same width. */
 const HAND_OVERLAP = '-4dvh';
 
-const props = defineProps<{
-  round: KanjiRound;
-  roundNumber: number;
-  level: JlptLevel;
-  statusOf: (index: number) => CardStatus;
-  thrown: readonly number[];
-  combo: number;
-  impacts: number;
-  canPlay: boolean;
-  /** Wrong picks the player can still make on this kanji (D45). */
-  wrongPicksLeft: number;
-  /** Scouted crests (D42), by reading card index. */
-  crestMarks: ReadonlyMap<number, CrestMark>;
-}>();
+const props = withDefaults(
+  defineProps<{
+    round: KanjiRound;
+    roundNumber: number;
+    level: JlptLevel;
+    statusOf: (index: number) => CardStatus;
+    thrown: readonly number[];
+    combo: number;
+    impacts: number;
+    canPlay: boolean;
+    /** Wrong picks the player can still make on this kanji (D45). */
+    wrongPicksLeft: number;
+    /** Wrong picks allowed in all (kanji mode's 3; the dojo's 1). */
+    maxWrongPicks?: number;
+    /** Scouted crests (D42), by reading card index. */
+    crestMarks: ReadonlyMap<number, CrestMark>;
+  }>(),
+  { maxWrongPicks: MAX_WRONG_PICKS },
+);
 defineEmits<{ toggle: [index: number]; play: [] }>();
 
 /** The kanji is the word slot at position 0; the reading slots are the hand. */
@@ -104,15 +110,15 @@ watch(
       <p
         class="absolute top-1/2 left-0 flex -translate-y-1/2 gap-1.5"
         role="img"
-        :aria-label="`${wrongPicksLeft} of ${MAX_WRONG_PICKS} wrong picks left`"
+        :aria-label="`${wrongPicksLeft} of ${maxWrongPicks} wrong picks left`"
         data-testid="wrong-picks"
       >
         <span
-          v-for="pick in MAX_WRONG_PICKS"
+          v-for="pick in maxWrongPicks"
           :key="pick"
           class="pixel-panel flex size-8 items-center justify-center font-sans text-base"
-          :class="pick <= MAX_WRONG_PICKS - wrongPicksLeft ? 'bg-crimson text-washi' : 'bg-wood/80'"
-          >{{ pick <= MAX_WRONG_PICKS - wrongPicksLeft ? '✗' : '' }}</span
+          :class="pick <= maxWrongPicks - wrongPicksLeft ? 'bg-crimson text-washi' : 'bg-wood/80'"
+          >{{ pick <= maxWrongPicks - wrongPicksLeft ? '✗' : '' }}</span
         >
       </p>
       <ComboMeter :combo="combo" :broken-combo="null" />

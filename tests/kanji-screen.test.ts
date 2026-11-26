@@ -42,7 +42,7 @@ async function mountBoard() {
 }
 
 describe('kanji mode on screen', () => {
-  it('offers word mode, kanji mode and Bunpou on the start screen', async () => {
+  it('offers word mode, kanji mode, Bunpou and the dojo on the start screen', async () => {
     const picker = mount(ModePicker, {
       props: { deck: { level: 'N5', sourceCommit: 'test', words: [], kanji: {} } },
     });
@@ -52,6 +52,7 @@ describe('kanji mode on screen', () => {
       expect.stringContaining('Words'),
       expect.stringContaining('Kanji'),
       expect.stringContaining('Bunpou'),
+      expect.stringContaining('Dojo'),
     ]);
     await buttons[1]?.trigger('click');
     expect(picker.emitted('choose')?.[0]).toEqual(['kanji']);

@@ -13,7 +13,7 @@ import type { KanjiRoundRecord, PlayMode, PlayedRun } from './play-log.ts';
 import { localDayOf } from './word-memory.ts';
 
 const MS_PER_MINUTE = 60_000;
-const MODES: readonly PlayMode[] = ['words', 'kanji', 'bunpou'];
+const MODES: readonly PlayMode[] = ['words', 'kanji', 'bunpou', 'dojo'];
 
 export interface PlayHistory {
   runs: readonly PlayedRun[];

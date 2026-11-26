@@ -17,6 +17,8 @@ const props = defineProps<{
   example: string;
   description: string;
   goal?: LevelGoal;
+  /** A mode with no level goal shows a number in its place (the dojo's best run). */
+  stat?: { label: string; value: number };
   note?: string;
 }>();
 
@@ -36,5 +38,14 @@ const textClass = computed(() =>
       note
     }}</span>
     <GoalBar v-if="goal" :goal="goal" class="mt-3" :class="textClass" />
+    <span
+      v-else-if="stat"
+      class="mt-3 flex justify-between text-xs"
+      :class="textClass"
+      data-testid="mode-stat"
+    >
+      <span>{{ stat.label }}</span>
+      <span class="font-bold">{{ stat.value }}</span>
+    </span>
   </PixelButton>
 </template>
