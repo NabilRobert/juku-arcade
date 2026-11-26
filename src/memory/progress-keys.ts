@@ -1,10 +1,11 @@
 /**
  * Progress the game keeps in this browser's localStorage rather than in
- * its database (storage.ts): the best scores, Bunpou's haiku
- * collection, and the streak's last reminder and milestone. They're named here, in one list, so "Delete my data" clears
- * every one of them (storage.ts: deleteAllData) and a new one can't be
- * missed. Preferences (sound, hints, furigana) aren't progress, so a
- * delete keeps them.
+ * its database (storage.ts): the best scores, Bunpou's haiku collection,
+ * and the streak's last reminder and milestone. They're named here, in one
+ * list, so "Delete my data" clears every one of them (storage.ts:
+ * deleteAllData) and a new one can't be missed. Preferences
+ * (preference-keys.ts: sound, hints, furigana and the like) aren't
+ * progress, so a delete keeps them.
  */
 
 /** Word mode's best bank run (banked coins, D46). */

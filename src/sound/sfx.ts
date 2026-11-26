@@ -215,6 +215,16 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playba
   source.start(now, startS, length);
 }
 
+/** Recordings that failed, so each failure is reported once, not on every play. */
+const failedRecordings = new Set<string>();
+
+/** A recording that won't load (a misspelt file name, a missing file) falls back to synth, but says so. */
+function warnOnce(file: string, error: unknown): void {
+  if (failedRecordings.has(file)) return;
+  failedRecordings.add(file);
+  console.warn(`Sound file ${file} could not play; using its synth sound instead.`, error);
+}
+
 async function loadPlayer(): Promise<Player> {
   const { ZZFX, ZZFXSound } = await import('zzfx');
   ZZFX.volume = SYNTH_VOLUME;
@@ -240,7 +250,8 @@ async function loadPlayer(): Promise<Player> {
       const fadeS = RECORDING_FADES_S[name] ?? FADE_OUT_S;
       const playback = { pitch: playbackPitch, maxS, gain, startS, fadeS };
       playBuffer(ZZFX.audioContext, await loadRecording(file), playback);
-    } catch {
+    } catch (error) {
+      warnOnce(file, error);
       playSynth(name, pitch);
     }
   };

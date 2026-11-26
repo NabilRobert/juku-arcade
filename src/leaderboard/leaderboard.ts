@@ -5,9 +5,9 @@
  * best show, the dojo's best run), and a Total board, the sum of the timed
  * modes' bests (TOTAL_BOARDS), which rewards being good at everything
  * rather than playing longest. Practice mode is left out of it: it has no
- * timer (D69), so its scores aren't on the same footing (D71). Each ranks your best from this browser among its samples and
- * splits the ranking into pages the panel flips through with Back and
- * Next.
+ * timer (D69), so its scores aren't on the same footing (D71). Each board
+ * ranks your best from this browser among its samples and splits the
+ * ranking into pages the panel flips through with Back and Next.
  */
 import { readStoredBest, recordStoredBest } from '../memory/safe-storage.ts';
 import { PLAY_MODES, type PlayMode, type PlayedRun } from '../memory/play-log.ts';

@@ -12,8 +12,9 @@
  * hand over to show them, and a crested card adds or takes points when
  * it's thrown.
  *
- * Kanji mode is practice (D37): nothing here is logged or reviewed. Which
- * kanji come up balances learning with review (sheet-mix.ts, D67).
+ * Kanji mode doesn't feed the reviews (D37): its rounds go only to the play
+ * log, for the streak, the calendar and the kanji goal (useKanjiSheet.ts).
+ * Which kanji come up balances learning with review (sheet-mix.ts, D67).
  */
 import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';

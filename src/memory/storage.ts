@@ -127,8 +127,9 @@ export async function updateSavedSettings(change: (saved: Settings) => Settings)
 /**
  * "Delete my data" (N5): removes every event, word or grammar, every
  * setting, the play log, and the progress kept outside the database
- * (progress-keys.ts: the best scores and the haiku collection) from this
- * browser.
+ * (progress-keys.ts: the best scores, the haiku collection and the
+ * streak's reminders) from this browser. Preferences stay
+ * (preference-keys.ts).
  */
 export async function deleteAllData(): Promise<void> {
   const tables = [

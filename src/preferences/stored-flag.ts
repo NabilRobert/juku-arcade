@@ -1,7 +1,8 @@
 /**
  * An on/off preference remembered in this browser (localStorage), for the
  * small switches that don't belong in the saved settings: sound muted,
- * Bunpou's hint, furigana. Plain code: a ref and localStorage need no
+ * Bunpou's hint, furigana, the folded start-screen panels, sample data
+ * (keys in preference-keys.ts). Plain code: a ref and localStorage need no
  * library.
  */
 import { readStored, writeStored } from '../memory/safe-storage.ts';

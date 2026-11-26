@@ -1,7 +1,7 @@
 /**
  * The player's own stats, for the stats page: worked out from the event
  * log in this browser, the same log the reviews read. Nothing here is sent
- * anywhere. Kanji mode logs nothing, so these are word mode's numbers.
+ * anywhere. Kanji mode's rounds aren't review events, so these are word mode's numbers.
  */
 import { tally } from './tally.ts';
 import { localDayOf } from './days.ts';

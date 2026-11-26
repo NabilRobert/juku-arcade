@@ -5,8 +5,7 @@
  * when the player tires, and its board compares knowledge.
  *
  * There's no timer (D69, playtest decision 2026-11-26: "no timer on
- * practice mode thats just cruel"). An earlier version had one that
- * tightened through five stages.
+ * practice mode thats just cruel").
  */
 import { LANTERNS, lanternsAfter } from '../game/lanterns.ts';
 
