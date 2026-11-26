@@ -50,17 +50,16 @@ describe('the End run button', () => {
 });
 
 describe('ending a run early, in each mode', () => {
-  it('word mode banks the pot and shows its results, then plays on, still ranked', () => {
-    let finishes = 0;
+  it('word mode banks the pot and shows its results, then plays on', () => {
+    let ends = 0;
     const finish = useDeckFinish(
       () => false,
-      () => (finishes += 1),
+      () => (ends += 1),
     );
     finish.endNow();
-    expect([finish.isShown.value, finish.isEndedEarly.value, finishes]).toEqual([true, true, 1]);
-    finish.keepPractising();
-    expect([finish.isShown.value, finish.isEndedEarly.value]).toEqual([false, false]);
-    expect(finish.isRanked.value).toBe(true);
+    expect([finish.isShown.value, ends]).toEqual([true, 1]);
+    finish.keepPlaying();
+    expect(finish.isShown.value).toBe(false);
   });
 
   it('kanji mode ends the sheet at once', () => {

@@ -96,7 +96,7 @@ export const SOURCE_GROUPS: readonly SourceGroup[] = [
         venue: 'Journal of Marketing Research 43(1), 39–58',
         url: 'https://doi.org/10.1509/jmkr.43.1.39',
         finding: 'People speed up as a goal gets closer.',
-        inGame: "Today's deck as a finish line, and progress toward knowing a level's words.",
+        inGame: "Today's deck as a daily goal, and progress toward knowing a level's words.",
       },
       {
         citation: 'Nunes & Drèze (2006). The Endowed Progress Effect.',

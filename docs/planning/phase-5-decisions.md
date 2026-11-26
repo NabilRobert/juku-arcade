@@ -1319,3 +1319,20 @@ practice mode thats just cruel".
 - Trade-off: with no clock, a player could look answers up. The board
   ranks sample players for now; revisit this with real leaderboards.
 
+### D70: Clearing today's deck shows a banner, and every word coin counts (2026-11-26)
+
+Playtest: today's deck as a finish line "seems like a bad feature i felt
+like it cut me off more than anything". This changes D61 for word mode
+and undoes D66's fair word board.
+
+- **No stop.** Clearing today's deck shows a banner for a few seconds,
+  "今日の分 完了 · Today's deck done!", with the cleared set's applause,
+  and play goes on (`useDeckFinish.ts`, `ui/FloatingBanner.vue`). Word
+  mode's results come only from End run: "Run ended", the pot banked.
+- **Every coin counts.** A run's best is everything it banks; coins after
+  the deck is cleared are no longer set aside as practice. The daily time
+  cap and the break nudges still stop marathon runs.
+- Considered: no banner at all (the side panel's daily bar fills anyway),
+  and keeping the results screen. Arthur chose the banner, and counting
+  every coin.
+

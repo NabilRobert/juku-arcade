@@ -13,11 +13,7 @@ vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
   playSound: vi.fn(),
 }));
 
-function bankFor(
-  initial: RunState,
-  random: () => number = Math.random,
-  isRanked: () => boolean = () => true,
-) {
+function bankFor(initial: RunState, random: () => number = Math.random) {
   const state = ref(initial);
   const endCombo = vi.fn(() => {
     state.value = { ...state.value, combo: 0 };
@@ -32,7 +28,7 @@ function bankFor(
   mount(
     defineComponent({
       setup() {
-        bank = useBankRun(() => state.value, { endCombo, pause, resume }, random, isRanked);
+        bank = useBankRun(() => state.value, { endCombo, pause, resume }, random);
         return () => h('div');
       },
     }),
@@ -71,19 +67,13 @@ describe('the bank run alongside a word run', () => {
     expect(bank.run.value.items).toEqual(['tsuru']);
   });
 
-  it('keeps a banked score as the best only while the run counts (not in practice)', async () => {
+  it("keeps every banked score toward the best, today's deck cleared or not (D70)", async () => {
     localStorage.clear();
-    const ranked = bankFor(start().state);
-    await match(ranked.state);
-    ranked.bank.bank();
+    const { state, bank } = bankFor(start().state);
+    await match(state);
+    bank.bank();
     await nextTick();
-    expect(ranked.bank.bestScore.value).toBe(COINS_PER_MATCH);
-    localStorage.clear();
-    const practice = bankFor(start().state, Math.random, () => false);
-    await match(practice.state);
-    practice.bank.bank();
-    await nextTick();
-    expect(practice.bank.bestScore.value).toBe(0);
+    expect(bank.bestScore.value).toBe(COINS_PER_MATCH);
   });
 
   it('brings the shop now and then; opening it pauses the game and leaving it resumes', async () => {
