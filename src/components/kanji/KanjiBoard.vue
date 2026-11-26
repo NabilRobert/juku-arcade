@@ -84,7 +84,7 @@ watch(
 <template>
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
     <div
-      class="flex flex-col items-center gap-2 [--card-height:min(24dvh,45vw)] sm:[--card-height:min(28dvh,35vw)] lg:[--card-height:34dvh]"
+      class="flex flex-col items-center gap-2 [--card-height:min(24dvh,45vw)] sm:[--card-height:min(20dvh,24vw)] lg:[--card-height:34dvh]"
       data-testid="kanji-row"
     >
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
@@ -138,7 +138,7 @@ watch(
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(15dvh,27vw)] sm:[--card-height:min(19dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(15dvh,27vw)] sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
