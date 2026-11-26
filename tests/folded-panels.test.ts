@@ -44,7 +44,9 @@ describe('folding the leaderboard', () => {
 
 describe('folding the streak', () => {
   it('hides the calendar but keeps the streak’s length in sight', async () => {
-    const panel = mount(StreakPanel, { props: { history: NO_PLAY, today: '2026-11-26' } });
+    const panel = mount(StreakPanel, {
+      props: { history: NO_PLAY, today: '2026-11-26', kanjiNotes: {} },
+    });
     await panel.find('[data-testid="fold-button"]').trigger('click');
     expect(panel.find('[data-testid="streak-days"]').exists()).toBe(true);
     expect(panel.find('[data-testid="play-calendar"]').exists()).toBe(false);

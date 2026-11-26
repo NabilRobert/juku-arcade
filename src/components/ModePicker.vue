@@ -98,7 +98,7 @@ defineEmits<{ choose: [mode: GameMode] }>();
   >
     <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
-      <StreakPanel :history="history" :today="today" />
+      <StreakPanel :history="history" :today="today" :kanji-notes="deck.kanji" />
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Choose a mode">
         <ModeCard
           v-for="card in cards"

@@ -9,6 +9,7 @@
 import { computed, ref, toRef } from 'vue';
 import { IS_SAMPLE_PLAY } from '../../composables/usePlayHistory.ts';
 import { useStreak } from '../../composables/useStreak.ts';
+import type { KanjiNote } from '../../deck/types.ts';
 import { summariseDay, type PlayHistory } from '../../memory/day-summary.ts';
 import { calendarWeeks } from '../../memory/play-calendar.ts';
 import { isStreakFolded, setStreakFolded } from '../../preferences/folded-panels.ts';
@@ -17,7 +18,12 @@ import DayDetail from './DayDetail.vue';
 import PlayCalendar from './PlayCalendar.vue';
 import StreakHeader from './StreakHeader.vue';
 
-const props = defineProps<{ history: PlayHistory; today: string }>();
+const props = defineProps<{
+  history: PlayHistory;
+  today: string;
+  /** The deck's notes on each kanji, so a kanji in the day's detail opens its card back. */
+  kanjiNotes: Readonly<Record<string, KanjiNote>>;
+}>();
 
 const { streak, message, milestone } = useStreak(toRef(props, 'history'), props.today);
 const selected = ref(props.today);
@@ -54,6 +60,7 @@ const summary = computed(() => summariseDay(selected.value, props.history));
         :today="today"
         :summary="summary"
         :is-rest-day="streak.restDays.includes(selected)"
+        :kanji-notes="kanjiNotes"
       />
     </div>
   </section>

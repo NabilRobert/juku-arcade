@@ -3,21 +3,33 @@
  * One day of the play calendar, picked on its grid (day-summary.ts): the
  * runs and minutes played, each mode's best that day beside its best that
  * month and ever, the words and grammar answered, the most recognised and
- * most missed kanji, and the day's haiku.
+ * most missed kanji, and the day's haiku. Clicking a kanji opens its card
+ * back over the screen (KanjiCardBack.vue).
  */
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import type { KanjiNote } from '../../deck/types.ts';
 import type { DaySummary } from '../../memory/day-summary.ts';
 import { dayLabel } from '../../memory/play-calendar.ts';
 import DayHaiku from './DayHaiku.vue';
 import DayScores from './DayScores.vue';
 import KanjiHighlight from './KanjiHighlight.vue';
+import CardOverlay from '../ui/CardOverlay.vue';
+import KanjiCardBack from '../words/KanjiCardBack.vue';
 
 const props = defineProps<{
   day: string;
   today: string;
   summary: DaySummary;
   isRestDay: boolean;
+  /** The deck's notes on each kanji, for the card back a clicked kanji opens. */
+  kanjiNotes: Readonly<Record<string, KanjiNote>>;
 }>();
+
+/** The kanji whose card back is open, if any. */
+const openKanji = ref<string | null>(null);
+const openNote = computed(() =>
+  openKanji.value === null ? undefined : props.kanjiNotes[openKanji.value],
+);
 
 const isToday = computed(() => props.day === props.today);
 
@@ -78,6 +90,7 @@ const answerLines = computed(() => {
           label="Most recognised kanji"
           :count="summary.kanji.mostRecognised"
           data-testid="most-recognised"
+          @open="openKanji = summary.kanji.mostRecognised.kanji"
         />
         <KanjiHighlight
           v-if="summary.kanji.mostMissed"
@@ -85,9 +98,17 @@ const answerLines = computed(() => {
           :count="summary.kanji.mostMissed"
           is-missed
           data-testid="most-missed"
+          @open="openKanji = summary.kanji.mostMissed.kanji"
         />
       </div>
       <DayHaiku :haiku-ids="summary.haikuIds" :is-today="isToday" />
     </template>
+    <CardOverlay
+      v-if="openKanji !== null && openNote"
+      :label="`The card for ${openKanji}`"
+      @close="openKanji = null"
+    >
+      <KanjiCardBack :char="openKanji" :note="openNote" @close="openKanji = null" />
+    </CardOverlay>
   </section>
 </template>
