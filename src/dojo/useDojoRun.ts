@@ -12,7 +12,14 @@ import { useRunLog } from '../composables/useRunLog.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import { nextQuestion, type DojoPools, type DojoQuestion } from './dojo-questions.ts';
-import { afterAnswer, FRESH_DOJO, secondsFor, stageOf, type DojoState } from './dojo-run.ts';
+import {
+  afterAnswer,
+  endedEarly,
+  FRESH_DOJO,
+  secondsFor,
+  stageOf,
+  type DojoState,
+} from './dojo-run.ts';
 
 /** How long an answer shows before the next question: longer after a miss, to read the fix. */
 const RIGHT_SHOWN_MS = 800;
@@ -115,6 +122,7 @@ export function useDojoRun(pools: DojoPools, options: DojoRunOptions = {}) {
     isPaused: clock.isPaused,
     timeLeft: clock.timeLeft,
     answer,
+    endNow: () => (state.value = endedEarly(state.value)),
     pause: clock.pause,
     resume: clock.resume,
   };

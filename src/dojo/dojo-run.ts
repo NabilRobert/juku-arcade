@@ -66,3 +66,8 @@ export function afterAnswer(state: DojoState, isRight: boolean): DojoState {
     isOver: lanterns <= 0,
   };
 }
+
+/** End run: the run is over at once, its score kept, as if the last lantern went out. */
+export function endedEarly(state: DojoState): DojoState {
+  return { ...state, isOver: true };
+}

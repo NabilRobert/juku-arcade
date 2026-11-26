@@ -33,9 +33,9 @@ import type { Settings } from '../../memory/storage.ts';
 import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
 import DailyBar from '../words/DailyBar.vue';
 import FloatingPause from '../ui/FloatingPause.vue';
+import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
-import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
 import StatPanel from '../ui/StatPanel.vue';
@@ -105,6 +105,8 @@ const pauseControls: PauseKeyInput = {
 usePauseKey(pauseControls);
 /** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
 const onPanelToggle = usePanelPause(pauseControls);
+/** Asking "End this run?" pauses the line's clock too, on its own count, like the drawer. */
+const onEndRunToggle = usePanelPause(pauseControls);
 
 const panels = computed(() => [
   { label: 'Score', value: run.value.score },
@@ -179,15 +181,7 @@ function dismiss(isStopping: boolean): void {
       />
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
-      <PixelButton
-        v-if="!isEnded"
-        colour="crimson"
-        class="min-h-9 px-4 text-sm"
-        data-testid="end-run"
-        @click="endRun"
-      >
-        End run
-      </PixelButton>
+      <EndRunButton v-if="!isEnded" @end="endRun" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
         Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
         tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.

@@ -709,6 +709,13 @@ fields. They stay in memory until slice 3 stores them.
   (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
   length in sight, and on a wide screen the start screen drops to one
   column, with the leaderboard as a bar across the top (`ModePicker.vue`).
+- **Change End run:** every mode's side panel has `ui/EndRunButton.vue`,
+  which asks "End this run?" (in `ui/CardOverlay.vue`) before it ends the
+  run, and pauses the clock while it asks (`usePanelPause`). What ending
+  does is each mode's own: word mode banks the pot and shows its results
+  (`useDeckFinish.endNow`), kanji mode ends the sheet (`useKanjiSheet.endNow`),
+  practice mode ends as if the last lantern went out (`dojo-run.ts:
+  endedEarly`), and Bunpou plays its curtain call.
 - **Change a card back:** a word's back is `words/CardBack.vue` and a
   kanji's is `words/KanjiCardBack.vue`; both are built from
   `words/CardBackPanel.vue` (the paper panel and Turn over) and
