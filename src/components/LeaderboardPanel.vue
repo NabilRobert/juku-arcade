@@ -1,42 +1,42 @@
 <script setup lang="ts">
 /**
- * The leaderboard on the start screen (D47), drawn like an arcade high
- * score table: a blue pixel box with LEADERBOARD inside it, numbered
- * rows with each player's score, and Back and Next to page through the
- * ranking. Words and Bunpou (D59) have a board each, switched at the
- * top: words by banked coins, Bunpou by total run score. Your best from
- * this browser is ranked among sample players until there's a server to
- * share real scores, and the panel says so.
+ * The leaderboard on the start screen (D47, D62), drawn like an arcade
+ * high-score table: a blue pixel box with LEADERBOARD inside it,
+ * numbered rows with each player's score, and Back and Next to page
+ * through the ranking. There's a board for each mode and a Total board
+ * (each mode's best added up), switched at the top. Your bests from this
+ * browser (`bests`, worked out by the start screen) are ranked among
+ * sample players until there's a server to share real scores, and the
+ * panel says so.
  */
 import { computed, ref } from 'vue';
-import { readBestScore } from '../bank-run/useBankRun.ts';
 import {
-  BUNPOU_SAMPLE_PLAYERS,
+  BOARD_SAMPLES,
   pageCount,
   pageOf,
   rankedPlayers,
-  readBunpouBest,
+  type BoardId,
 } from '../leaderboard/leaderboard.ts';
 import PixelButton from './ui/PixelButton.vue';
 import PixelIcon from './ui/PixelIcon.vue';
 
-type Board = 'words' | 'bunpou';
-const BOARDS: readonly { board: Board; label: string }[] = [
+const props = defineProps<{ bests: Readonly<Record<BoardId, number>> }>();
+
+const BOARDS: readonly { board: BoardId; label: string }[] = [
   { board: 'words', label: 'Words' },
+  { board: 'kanji', label: 'Kanji' },
   { board: 'bunpou', label: 'Bunpou' },
+  { board: 'dojo', label: 'Dojo' },
+  { board: 'total', label: 'Total' },
 ];
 
-const board = ref<Board>('words');
+const board = ref<BoardId>('words');
 const page = ref(0);
-const ranked = computed(() =>
-  board.value === 'words'
-    ? rankedPlayers(readBestScore())
-    : rankedPlayers(readBunpouBest(), BUNPOU_SAMPLE_PLAYERS),
-);
+const ranked = computed(() => rankedPlayers(props.bests[board.value], BOARD_SAMPLES[board.value]));
 const pages = computed(() => pageCount(ranked.value));
 const rows = computed(() => pageOf(ranked.value, page.value));
 
-function show(next: Board): void {
+function show(next: BoardId): void {
   board.value = next;
   page.value = 0;
 }
@@ -54,12 +54,12 @@ function turn(by: number): void {
     >
       Leaderboard
     </h2>
-    <div class="flex justify-center gap-2" role="group" aria-label="Which board">
+    <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Which board">
       <PixelButton
         v-for="choice in BOARDS"
         :key="choice.board"
         :colour="board === choice.board ? 'aqua' : 'steel'"
-        class="min-h-9 px-4 text-sm font-bold uppercase"
+        class="min-h-9 px-3 text-sm font-bold uppercase"
         :aria-pressed="board === choice.board"
         :data-testid="`board-${choice.board}`"
         @click="show(choice.board)"

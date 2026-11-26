@@ -12,7 +12,9 @@
  */
 import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
+import { readBestScore } from '../bank-run/useBankRun.ts';
 import { usePlayHistory } from '../composables/usePlayHistory.ts';
+import { boardBests, readBunpouBest } from '../leaderboard/leaderboard.ts';
 import { CURRICULUM } from '../grammar/templates.ts';
 import { kanjiPool } from '../kanji/kanji-round.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
@@ -43,10 +45,9 @@ const goals = computed<Partial<Record<GameMode, LevelGoal>>>(() => ({
   bunpou: grammarGoal(CURRICULUM, history.value.grammarEvents, today),
 }));
 
-const dojoBest = computed(() =>
-  history.value.runs
-    .filter((run) => run.mode === 'dojo')
-    .reduce((best, run) => Math.max(best, run.score), 0),
+// Bests kept before the play log existed still count (word mode's coins, Bunpou's run).
+const bests = computed(() =>
+  boardBests(history.value.runs, { words: readBestScore(), bunpou: readBunpouBest() }),
 );
 
 const cards: readonly Card[] = [
@@ -87,7 +88,7 @@ defineEmits<{ choose: [mode: GameMode] }>();
 <template>
   <!-- The leaderboard fills the left of the screen; the streak, then the modes, sit on the right. -->
   <div class="grid w-full flex-1 grid-cols-[minmax(20rem,30%)_1fr] gap-10">
-    <LeaderboardPanel />
+    <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" />
       <section class="grid grid-cols-2 gap-4" aria-label="Choose a mode">
@@ -96,7 +97,7 @@ defineEmits<{ choose: [mode: GameMode] }>();
           :key="card.mode"
           v-bind="card"
           :goal="goals[card.mode]"
-          :stat="card.mode === 'dojo' ? { label: 'Best run', value: dojoBest } : undefined"
+          :stat="card.mode === 'dojo' ? { label: 'Best run', value: bests.dojo } : undefined"
           @click="$emit('choose', card.mode)"
         />
       </section>
