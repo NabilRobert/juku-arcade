@@ -13,6 +13,7 @@
  * in front of the table, and "Stop for today" goes back to the start
  * screen.
  */
+import { MAX_TILES } from '../../grammar/template-check.ts';
 import { computed, ref, shallowRef, watch } from 'vue';
 import type { LineResult } from '../../grammar/bunpou-run.ts';
 import { endsChapter, TALES_PER_CHAPTER } from '../../grammar/performance.ts';
@@ -184,7 +185,7 @@ function dismiss(isStopping: boolean): void {
       <EndRunButton v-if="!isEnded" @end="endRun" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
         Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
-        tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
+        tap it or press Backspace to take it back. Keys 1–{{ MAX_TILES }} place a tile; Esc pauses.
       </p>
     </SidePanel>
     <FloatingPause

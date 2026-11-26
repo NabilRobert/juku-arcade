@@ -14,7 +14,7 @@ import { learnedTags } from './difficulty.ts';
 import { addDays } from './leitner.ts';
 import { applyEvent, deriveMemory, isWordKnown, localDayOf, type Memory } from './word-memory.ts';
 
-const CALENDAR_DAYS = 7;
+export const CALENDAR_DAYS = 7;
 
 export interface Progress {
   /** R7: words answered right on 2 separate days, out of the deck. */

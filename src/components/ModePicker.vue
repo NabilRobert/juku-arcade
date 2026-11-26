@@ -10,13 +10,14 @@
  * the modes, and each mode's card shows its level goal (level-goals.ts).
  * The play history is read once here for both.
  */
+import { LANTERNS } from '../dojo/dojo-run.ts';
 import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import { readBestScore } from '../bank-run/useBankRun.ts';
 import { usePlayHistory } from '../composables/usePlayHistory.ts';
 import { boardBests, readBunpouBest } from '../leaderboard/leaderboard.ts';
 import { CURRICULUM } from '../grammar/curriculum.ts';
-import { kanjiPool } from '../kanji/kanji-round.ts';
+import { CARDS_PER_ROUND, kanjiPool } from '../kanji/kanji-round.ts';
 import { isLeaderboardFolded } from '../preferences/folded-panels.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
 import { MODE_NAMES, type PlayMode } from '../memory/play-log.ts';
@@ -65,7 +66,7 @@ const cards: readonly Card[] = [
     colour: 'steel',
     name: MODE_NAMES.kanji,
     example: '生 → セイ・う(まれる)…',
-    description: "Find every reading of a kanji among 8 cards. Doesn't count toward your reviews.",
+    description: `Find every reading of a kanji among ${CARDS_PER_ROUND} cards. Doesn't count toward your reviews.`,
   },
   {
     mode: 'bunpou',
@@ -80,8 +81,8 @@ const cards: readonly Card[] = [
     mode: 'dojo',
     colour: 'paper',
     name: MODE_NAMES.dojo,
-    example: '提灯 ×3',
-    description: "Words, kanji and grammar you've met, until three misses. Ranked.",
+    example: `提灯 ×${LANTERNS}`,
+    description: `Words, kanji and grammar you've met, until ${LANTERNS} misses. Ranked.`,
   },
 ];
 defineEmits<{ choose: [mode: PlayMode] }>();

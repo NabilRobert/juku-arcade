@@ -98,8 +98,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
-        Words, kanji and grammar you've met, until three misses. Take as long as you need. Esc
-        pauses.
+        Words, kanji and grammar you've met, until {{ LANTERNS }} misses. Take as long as you need.
+        Esc pauses.
       </p>
     </SidePanel>
     <FloatingPause
