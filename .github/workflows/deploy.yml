@@ -30,8 +30,12 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      # Pages serves the game from /juku-arcade/, not from the root.
+      # Pages serves the game from /juku-arcade/, not from the root. The sample
+      # week of play is on, so a demo from this link shows a filled-in streak
+      # calendar (playtest decision, 2026-11-26); it's labelled "sample data".
       - run: npm run build -- --base=/juku-arcade/
+        env:
+          VITE_SAMPLE_PLAY: '1'
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
