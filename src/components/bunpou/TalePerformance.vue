@@ -48,7 +48,7 @@ watch(told, async () => {
       :is-shout-loud="isLouder"
     />
     <div class="pixel-panel flex flex-col gap-4 bg-wood/80 p-6">
-      <div ref="linesBox" class="max-h-[36dvh] overflow-y-auto">
+      <div ref="linesBox" class="max-h-[36svh] overflow-y-auto">
         <TaleLines :results="results.slice(0, told)" />
       </div>
       <div class="flex items-center justify-between">

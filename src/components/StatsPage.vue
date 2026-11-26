@@ -1,22 +1,30 @@
 <script setup lang="ts">
 /**
- * The player's stats (from the event log in this browser, memory/stats.ts):
- * words known, right answers today and overall, best combo and best set,
- * play today, the words missed most and the kinds of mistake made most.
+ * The player's stats (from the event logs in this browser, memory/stats.ts
+ * and grammar-stats.ts): words known, right answers today and overall,
+ * best combo and best set, play today, the words missed most and the kinds
+ * of mistake made most, then the same for grammar (GrammarStats.vue).
  * A plain page, like the About page.
  */
 import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import { localDay, type GameEvent } from '../game/events.ts';
 import { createLocalEngine } from '../memory/review-engine.ts';
-import { accuracy, playerStats, type AnswerCounts } from '../memory/stats.ts';
+import { percentRight, playerStats } from '../memory/stats.ts';
 import type { Settings } from '../memory/storage.ts';
 import PixelButton from './ui/PixelButton.vue';
 import StatPanel from './ui/StatPanel.vue';
 import { readBestScore } from '../bank-run/useBankRun.ts';
-import PanelLabel from './ui/PanelLabel.vue';
+import type { GrammarEvent } from '../grammar/grammar-events.ts';
+import GrammarStats from './GrammarStats.vue';
+import RankedList from './ui/RankedList.vue';
 
-const props = defineProps<{ deck: Deck; settings: Settings; events: readonly GameEvent[] }>();
+const props = defineProps<{
+  deck: Deck;
+  settings: Settings;
+  events: readonly GameEvent[];
+  grammarEvents: readonly GrammarEvent[];
+}>();
 defineEmits<{ close: [] }>();
 
 const MS_PER_MINUTE = 60_000;
@@ -30,10 +38,14 @@ const minutesToday = computed(() =>
   props.settings.playDay === today ? Math.round(props.settings.playMsToday / MS_PER_MINUTE) : 0,
 );
 
-function percent(counts: AnswerCounts): string {
-  const share = accuracy(counts);
-  return share === null ? '–' : `${Math.round(share * 100)}%`;
-}
+const missedWords = computed(() =>
+  stats.value.mostMissed.map((word) => ({ key: word.word, count: word.misses })),
+);
+const mistakeKinds = computed(() =>
+  stats.value.mistakes.map((mistake) => ({ key: mistake.name, count: mistake.count })),
+);
+const readingOf = (word: string): string =>
+  stats.value.mostMissed.find((missed) => missed.word === word)?.reading ?? '';
 
 const tiles = computed(() => [
   {
@@ -42,12 +54,12 @@ const tiles = computed(() => [
   },
   {
     label: 'Right today',
-    value: percent(stats.value.today),
+    value: percentRight(stats.value.today),
     note: `${stats.value.today.right} right`,
   },
   {
     label: 'Right overall',
-    value: percent(stats.value.allTime),
+    value: percentRight(stats.value.allTime),
     note: `${stats.value.allTime.right} right`,
   },
   { label: 'Best combo', value: String(props.settings.bestCombo) },
@@ -61,41 +73,24 @@ const tiles = computed(() => [
 <template>
   <article class="mx-auto w-full max-w-3xl space-y-5 text-washi/90" aria-label="Your stats">
     <h2 class="text-xl font-semibold">Your stats</h2>
-    <div class="grid grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatPanel v-for="tile in tiles" :key="tile.label" :label="tile.label" :note="tile.note">
         <span class="block text-2xl font-bold">{{ tile.value }}</span>
       </StatPanel>
     </div>
-    <div class="grid grid-cols-2 gap-3">
-      <section class="pixel-panel bg-wood/80 p-3">
-        <PanelLabel as="h3" class="mb-2">Missed most</PanelLabel>
-        <ol v-if="stats.mostMissed.length" class="space-y-1">
-          <li v-for="word in stats.mostMissed" :key="word.word" class="flex justify-between gap-3">
-            <span lang="ja"
-              >{{ word.word }} <span class="text-washi/60">{{ word.reading }}</span></span
-            >
-            <span class="text-washi/60">{{ word.misses }}×</span>
-          </li>
-        </ol>
-        <p v-else class="text-sm text-washi/60">No misses yet.</p>
-      </section>
-      <section class="pixel-panel bg-wood/80 p-3">
-        <PanelLabel as="h3" class="mb-2">Mistakes by kind</PanelLabel>
-        <ol v-if="stats.mistakes.length" class="space-y-1">
-          <li
-            v-for="mistake in stats.mistakes"
-            :key="mistake.name"
-            class="flex justify-between gap-3"
+    <div class="grid gap-3 sm:grid-cols-2">
+      <RankedList title="Missed most" :items="missedWords" empty-text="No misses yet." unit="×">
+        <template #default="{ item }">
+          <span lang="ja"
+            >{{ item.key }} <span class="text-washi/60">{{ readingOf(item.key) }}</span></span
           >
-            <span>{{ mistake.name }}</span>
-            <span class="text-washi/60">{{ mistake.count }}</span>
-          </li>
-        </ol>
-        <p v-else class="text-sm text-washi/60">No mistakes yet.</p>
-      </section>
+        </template>
+      </RankedList>
+      <RankedList title="Mistakes by kind" :items="mistakeKinds" empty-text="No mistakes yet." />
     </div>
+    <GrammarStats :events="grammarEvents" :today="today" />
     <p class="text-xs text-washi/60">
-      From what you've played in this browser. Kanji mode is practice and isn't counted.
+      From what you've played in this browser. Kanji mode and practice mode aren't counted.
     </p>
     <PixelButton colour="steel" class="px-4 py-2" @click="$emit('close')">
       Back to the game

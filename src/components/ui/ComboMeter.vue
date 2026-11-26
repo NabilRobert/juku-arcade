@@ -34,7 +34,7 @@ watch(
 
 <template>
   <div
-    class="pointer-events-none flex h-[9dvh] items-center justify-center"
+    class="pointer-events-none flex h-[9svh] items-center justify-center"
     aria-live="polite"
     data-testid="combo-meter"
   >
@@ -45,7 +45,7 @@ watch(
     >
       <m.span
         :key="rank.letter"
-        class="text-[7dvh] leading-none font-bold"
+        class="text-[7svh] leading-none font-bold"
         :class="rank.colour"
         :initial="{ scale: 2.2, rotate: -12, opacity: 0 }"
         :animate="{ scale: 1, rotate: 0, opacity: 1 }"
@@ -55,7 +55,7 @@ watch(
       >
       <span class="flex flex-col gap-1">
         <span
-          class="text-[3dvh] leading-none font-bold"
+          class="text-[3svh] leading-none font-bold"
           :class="rank.colour"
           lang="ja"
           :title="rank.meaning"
@@ -63,7 +63,7 @@ watch(
         >
         <m.span
           :key="combo"
-          class="text-[2dvh] leading-none tracking-widest uppercase"
+          class="text-[2svh] leading-none tracking-widest uppercase"
           :class="rank.colour"
           lang="en"
           :initial="{ scale: 1.4 }"
@@ -88,7 +88,7 @@ watch(
       :transition="{ duration: 0.9, ease: 'easeIn' }"
       @animation-complete="$emit('brokenShown')"
     >
-      <span class="text-[3.5dvh] line-through">{{ brokenCombo }} combo</span>
+      <span class="text-[3.5svh] line-through">{{ brokenCombo }} combo</span>
     </m.p>
   </div>
 </template>

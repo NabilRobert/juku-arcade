@@ -1134,7 +1134,10 @@ total score rewarded whoever played longest, which works against the
 
 ### D62: The dojo, a game-over mode, and a board for every mode (2026-11-26)
 
-From playtesting: "make another mode that has a game over".
+From playtesting: "make another mode that has a game over". On screen it's
+called **Practice mode** (renamed in playtesting); the code keeps the
+name `dojo`. Kanji mode's card no longer says "practice only", to avoid
+the clash.
 
 - **What it asks:** only what the player has met, so it tests rather
   than teaches (`dojo/dojo-questions.ts`): words matched before (the
@@ -1224,3 +1227,37 @@ file (181 KB compressed), parsed before the start screen showed.
 - **Beat:** splitting word mode too (the most played mode; it would only
   add a fetch to its first tap); a service worker for offline play (more
   to keep in step than the gain for now).
+
+### D65: Grammar on the stats page and in the export; the check-up stays words (2026-11-26)
+
+- **Stats page:** a Grammar section (`components/GrammarStats.vue`,
+  `memory/grammar-stats.ts`): points known and seen, sentences right
+  today and overall, the points missed most by their pattern, and the
+  kinds of mistake (the rule a wrong order broke).
+- **Export:** format 2 adds the grammar log (`memory/export.ts`), so a
+  teacher sees Bunpou too; the report reads both formats.
+- **Check-up:** stays words only (playtest decision). Grammar there would
+  either measure only before and after, or hold new grammar points back
+  from Bunpou for 3 days to compare, which slows a player's grammar. The
+  stats page and the export already show grammar.
+- **Beat:** grammar in the check-up, before and after only; the full
+  design with hold-backs.
+
+### D66: Results against the best, a head start, and a fair word board (2026-11-26)
+
+Three things the research page claimed, or the boards needed, that the
+game didn't yet do:
+
+- **How close a run came** (the near-miss effect, Clark et al. 2009): the
+  results card says "New best! Up from 20.", "That ties your best" or
+  "3 away from your best (20).", on practice mode, kanji mode's sheet and
+  word mode's deck (`memory/best-comparison.ts`,
+  `composables/usePreviousBest.ts`).
+- **A head start** (the endowed-progress effect, Nunes & Drèze 2006):
+  words answered right in their check-up before first play count as known,
+  on the start screen's goal and in word mode alike
+  (`word-memory.ts: isWordKnown`). Display only: the review schedule still
+  ignores check-ups (C4).
+- **A fair word board:** a word run counts toward the best and the board
+  only until today's deck is cleared, the pot banked at that moment
+  included (`useDeckFinish.isRanked`); practice after it doesn't count.

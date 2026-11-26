@@ -13,7 +13,9 @@ import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../dojo/dojo-run.ts';
 import { pickQuote } from '../../dojo/quotes.ts';
 import { useDojoRun } from '../../dojo/useDojoRun.ts';
-import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { usePanelPause } from '../../composables/usePanelPause.ts';
+import { usePauseKey, type PauseKeyInput } from '../../composables/usePauseKey.ts';
+import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
@@ -52,18 +54,22 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   isAway: () => props.isAway,
   pause: dojo.pause,
 });
-usePauseKey({
+const pauseControls: PauseKeyInput = {
   isPaused: () => isPaused.value,
   isAvailable: () => !props.isAway && !state.value.isOver,
   pause: dojo.pause,
   resume: dojo.resume,
-});
+};
+usePauseKey(pauseControls);
+/** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
+const onPanelToggle = usePanelPause(pauseControls);
 
 const resultPanels = computed(() => [
   { label: 'Your score was', value: String(state.value.right) },
   { label: 'Your best combo was', value: String(state.value.bestCombo) },
   { label: 'Stage reached', value: `${stage.value} / 5` },
 ]);
+const previousBest = usePreviousBest('dojo');
 /** Picked once per run, for its game-over screen. */
 const quote = pickQuote(Math.random);
 
@@ -75,8 +81,8 @@ function dismiss(isStopping: boolean): void {
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Dojo run">
-      <ModeHeader :title="`Dojo · ${level}`">
+    <SidePanel label="Dojo run" @toggle="onPanelToggle">
+      <ModeHeader :title="`Practice mode · ${level}`">
         <p class="text-sm text-washi/70" data-testid="stage">Stage {{ stage }} / 5</p>
       </ModeHeader>
       <LanternRow :lit="state.lanterns" :total="LANTERNS" />
@@ -111,6 +117,7 @@ function dismiss(isStopping: boolean): void {
         :panels="resultPanels"
         again-label="Restart"
         leave-label="Quit to main menu"
+        :comparison="{ score: state.right, previousBest }"
         @again="emit('again')"
         @leave="emit('leave')"
       >

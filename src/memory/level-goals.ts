@@ -2,7 +2,8 @@
  * Each mode's goal for the whole level (D61), shown on its card on the
  * start screen, so there's something to finish beyond a single run:
  * - Words: know every word in the level's deck (correct on two separate
- *   days, leitner.ts). Stamps mark each quarter, after the goal-gradient
+ *   days, leitner.ts, or right in the check-up before first play, so the
+ *   goal never starts at zero). Stamps mark each quarter, after the goal-gradient
  *   effect (Kivetz, Urminsky & Zheng 2006): effort rises as a goal nears.
  * - Kanji: master every kanji the level's words use, which takes every
  *   reading found with no wrong pick on two separate days.
@@ -15,7 +16,7 @@ import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import { createGrammarReviews } from '../grammar/grammar-reviews.ts';
 import { CORRECT_DAYS_TO_KNOW } from './leitner.ts';
 import type { KanjiRoundRecord } from './play-log.ts';
-import { deriveMemory } from './word-memory.ts';
+import { deriveMemory, isWordKnown } from './word-memory.ts';
 
 /** The quarters stamped on the way to a goal, as shares of it. */
 export const GOAL_STAMPS = [0.25, 0.5, 0.75, 1] as const;
@@ -43,7 +44,7 @@ export function stampsReached(goal: LevelGoal): number {
 
 export function wordGoal(words: readonly DeckWord[], wordEvents: readonly GameEvent[]): LevelGoal {
   const memory = deriveMemory(wordEvents);
-  const known = words.filter((word) => memory.words.get(word.id)?.isKnown === true).length;
+  const known = words.filter((word) => isWordKnown(memory, word.id)).length;
   return { label: 'Words known', done: known, total: words.length };
 }
 

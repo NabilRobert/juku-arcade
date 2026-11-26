@@ -36,10 +36,10 @@ const pools = computed(() => dojoPools(props.deck.words, kanjiPool(props.deck), 
     class="pixel-panel mx-auto flex max-w-lg flex-col items-center gap-4 bg-wood/80 p-8 text-center"
     data-testid="dojo-closed"
   >
-    <h2 class="text-2xl font-bold text-aqua">The dojo isn't open yet</h2>
+    <h2 class="text-2xl font-bold text-aqua">Practice mode isn't open yet</h2>
     <p>
-      The dojo asks only what you've learned. Match {{ MIN_DOJO_WORDS }} words in Words mode first,
-      then come back.
+      Practice mode asks only what you've learned. Match {{ MIN_DOJO_WORDS }} words in Words mode
+      first, then come back.
     </p>
     <PixelButton colour="steel" class="px-6 py-2" @click="emit('leave')">Change mode</PixelButton>
   </section>

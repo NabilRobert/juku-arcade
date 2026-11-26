@@ -103,7 +103,8 @@ export const SOURCE_GROUPS: readonly SourceGroup[] = [
         venue: 'Journal of Consumer Research 32(4), 504–512',
         url: 'https://doi.org/10.1086/500480',
         finding: 'A goal that starts part-done is finished far more often.',
-        inGame: 'Counting what a player already knows, so no goal starts at zero.',
+        inGame:
+          'Words you get right in the check-up before playing them count as known from the start.',
       },
       {
         citation: 'Csikszentmihalyi (1990). Flow: The Psychology of Optimal Experience.',

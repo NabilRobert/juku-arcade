@@ -1,12 +1,16 @@
 /**
- * The barebones export (A1, decision D18): this browser's event log as an
- * anonymous JSON file, which the player chooses to send to their teacher.
- * The report script (slice 5b) reads a folder of these files.
+ * The barebones export (A1, decision D18): this browser's event logs as an
+ * anonymous JSON file, which the player chooses to send to their teacher:
+ * the word log and, from format 2, the grammar log (D57). The report
+ * script (slice 5b) reads a folder of these files; a format 1 file simply
+ * has no grammar.
  */
 import type { GameEvent } from '../game/events.ts';
+import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import type { Settings } from './storage.ts';
 
-export const EXPORT_FORMAT_VERSION = 1;
+/** 2 added the grammar log. */
+export const EXPORT_FORMAT_VERSION = 2;
 
 export interface ExportFile {
   format_version: number;
@@ -16,12 +20,16 @@ export interface ExportFile {
   level: string;
   event_count: number;
   events: readonly GameEvent[];
+  /** Missing from format 1 files, made before grammar was exported. */
+  grammar_event_count?: number;
+  grammar_events?: readonly GrammarEvent[];
 }
 
 export function buildExport(
   events: readonly GameEvent[],
   settings: Settings,
   exportedAt: Date,
+  grammarEvents: readonly GrammarEvent[] = [],
 ): ExportFile {
   return {
     format_version: EXPORT_FORMAT_VERSION,
@@ -31,6 +39,8 @@ export function buildExport(
     level: settings.level,
     event_count: events.length,
     events,
+    grammar_event_count: grammarEvents.length,
+    grammar_events: grammarEvents,
   };
 }
 

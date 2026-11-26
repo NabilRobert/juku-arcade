@@ -17,6 +17,7 @@ import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
 import { KANJI_PER_SHEET, useKanjiSheet } from '../../kanji/useKanjiSheet.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
+import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
@@ -43,6 +44,7 @@ const { wrongPicksLeft } = run;
 const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
 
 const sheet = useKanjiSheet(run);
+const previousBest = usePreviousBest('kanji');
 const { isDone: isSheetDone, kanjiNumber } = sheet;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -101,8 +103,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji.
-        Practice only: it doesn't change your reviews.
+        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji. It
+        doesn't change your reviews.
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">
@@ -113,6 +115,7 @@ function dismiss(isStopping: boolean): void {
           :panels="sheetPanels"
           note="A sheet is 10 kanji. A kanji counts as mastered once you find all its readings with no wrong pick on two separate days."
           again-label="Another sheet"
+          :comparison="{ score, previousBest }"
           @again="emit('again')"
           @leave="emit('leave')"
         />

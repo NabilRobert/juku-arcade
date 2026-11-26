@@ -9,7 +9,7 @@ const MODE_NAMES: Record<PlayMode, string> = {
   words: 'Words',
   kanji: 'Kanji',
   bunpou: 'Bunpou',
-  dojo: 'Dojo',
+  dojo: 'Practice',
 };
 </script>
 

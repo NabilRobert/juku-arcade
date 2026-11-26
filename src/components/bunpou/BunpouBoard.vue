@@ -194,7 +194,7 @@ function dropAt(tile: string, point: Point): void {
     </div>
     <div
       v-if="isPaused && run.missed.length > 0"
-      class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35dvh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
+      class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35svh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
       data-testid="paused"
     >
       <p class="text-sm text-aqua">Missed so far</p>

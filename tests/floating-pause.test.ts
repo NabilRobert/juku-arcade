@@ -7,6 +7,8 @@ describe('the pause button on a phone or a tablet', () => {
     const running = mount(FloatingPause, { props: { isPaused: false } });
     await running.trigger('click');
     expect(running.emitted('pause')).toHaveLength(1);
+    // A PixelButton: the click sound plays with its wipe.
+    expect(running.find('[data-testid="wipe"]').exists()).toBe(true);
     const paused = mount(FloatingPause, { props: { isPaused: true } });
     expect(paused.text()).toContain('Resume');
     await paused.trigger('click');

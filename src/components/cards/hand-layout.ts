@@ -16,7 +16,7 @@ export const SLOT_SIZE = 'mx-auto aspect-[3/4] w-[min(100%,calc(var(--card-heigh
 const HAND_TILTS_DEG = [-1.5, 1, -0.5, 1.5, -1, 0.5, 1.2, -0.8];
 const HAND_RAISES_PX = [2, 0, 3, 1, 0, 2, 1, 3];
 /** How far each card overlaps the one before it. */
-const HAND_OVERLAP = '-3dvh';
+const HAND_OVERLAP = '-3svh';
 
 /** How far a card floats up (px) and sways (degrees): the held reading cards more than the word cards. */
 const FLOAT = { word: { px: 4, deg: 0.6 }, reading: { px: 7, deg: 1.2 } } as const;

@@ -137,7 +137,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       aria-hidden="true"
     />
     <div
-      class="flex flex-wrap justify-center gap-2 [--card-height:min(16dvh,33vw)] sm:[--card-height:min(20dvh,24vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32dvh]"
+      class="flex flex-wrap justify-center gap-2 [--card-height:min(16svh,33vw)] sm:[--card-height:min(20svh,24vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32svh]"
       data-testid="word-row"
     >
       <!-- On a phone the cards wrap three to a row, the last row centred; on a tablet or desktop they're a row of five. Below lg every card on the board is the same size. -->
@@ -212,7 +212,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16dvh,33vw)] sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16svh,33vw)] sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24svh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
@@ -249,7 +249,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       </div>
       <div
         :ref="registerDeck"
-        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] lg:block lg:[--card-height:22dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(22svh,14vw)] lg:block lg:[--card-height:22svh]"
       >
         <CardDeck />
       </div>
