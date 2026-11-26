@@ -9,7 +9,9 @@
  * over the stage, and at the end of the show the curtains close on it
  * from both sides. A cedar frame with a dark inner edge, drawn over the
  * curtains, makes the stage's opening. The board and the performance drive it with props; it
- * has no state of its own.
+ * has no state of its own. On a phone or a tablet the stage can grow taller to fill the
+ * screen (BunpouScreen.vue); the crowd keeps the stage's usual height, so the extra shows as
+ * more of the dark hall above it rather than a giant crowd.
  */
 import { computed } from 'vue';
 import PixelSprite from '../ui/PixelSprite.vue';
@@ -103,7 +105,7 @@ const crowdLayers = computed(() =>
     <div
       v-for="crowd in crowdLayers"
       :key="crowd.layer"
-      class="absolute inset-x-0 -bottom-2 h-[calc(100%+0.5rem)]"
+      class="absolute inset-x-0 -bottom-2 h-[calc(11rem+0.5rem)] sm:h-[calc(16.5rem+0.5rem)]"
       :class="isCrowdLaughing ? 'motion-safe:animate-cheer' : ''"
       :style="{ animationDelay: crowd.delay }"
       aria-hidden="true"

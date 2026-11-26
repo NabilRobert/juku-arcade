@@ -150,7 +150,11 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+  <!-- On a phone or a tablet the screen fills the height and the stage takes what's spare, so
+       nothing is left empty under the tiles; the curtain call and results sit centred in it. -->
+  <div
+    class="flex flex-col gap-4 max-lg:grow max-lg:justify-center lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8"
+  >
     <SidePanel label="Bunpou run" @toggle="onPanelToggle">
       <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
@@ -231,8 +235,10 @@ function dismiss(isStopping: boolean): void {
         :ends-chapter="endsChapter(toldTales.length + 1)"
         @next="afterTale"
       />
-      <div v-else class="flex flex-col gap-4">
+      <div v-else class="flex flex-col gap-4 max-lg:grow max-lg:justify-center">
+        <!-- Grows into the spare height, up to 40% of the screen, so the tiles keep their room. -->
         <StoryStage
+          class="max-lg:max-h-[40svh] max-lg:shrink-0 max-lg:grow"
           :pose="judged?.isTimedOut ? 'forgot' : 'idle'"
           :slips="run.results.length"
           :bubble="judged?.isTimedOut ? FORGOT_LINE : null"
