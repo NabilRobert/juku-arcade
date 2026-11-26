@@ -3,7 +3,8 @@
  * The app shell: loads the player's settings and history from the browser,
  * shows first-launch setup if there are none, then loads the level's deck
  * and starts a run. The game stays mounted (v-show) under the About and
- * Settings pages, and pauses while they cover it.
+ * Settings pages, and pauses while they cover it. Screens other than the
+ * start screen and word mode load on demand (lazy-screens.ts).
  */
 import { domMax, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
@@ -23,20 +24,23 @@ import {
   saveSettings,
   type Settings,
 } from './memory/storage.ts';
-import AboutData from './components/AboutData.vue';
 import AppFooter, { type FooterTarget } from './components/AppFooter.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
-import KanjiScreen from './components/kanji/KanjiScreen.vue';
-import BunpouScreen from './components/bunpou/BunpouScreen.vue';
-import DojoScreen from './components/dojo/DojoScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
-import SettingsPanel from './components/SettingsPanel.vue';
-import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
-import ResearchPage from './components/ResearchPage.vue';
+import {
+  AboutData,
+  BunpouScreen,
+  DojoScreen,
+  KanjiScreen,
+  prefetchScreens,
+  ResearchPage,
+  SettingsPanel,
+  StatsPage,
+} from './lazy-screens.ts';
 
 type Page = 'game' | 'about' | 'research' | 'settings' | 'checkUp' | 'mode' | 'stats';
 
@@ -191,6 +195,7 @@ onMounted(async () => {
   const saved = await orFallback(loadSettings, null);
   isLoaded.value = true;
   if (saved) await startGame(saved);
+  prefetchScreens();
 });
 </script>
 

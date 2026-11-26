@@ -15,7 +15,7 @@ import type { Deck } from '../deck/types.ts';
 import { readBestScore } from '../bank-run/useBankRun.ts';
 import { usePlayHistory } from '../composables/usePlayHistory.ts';
 import { boardBests, readBunpouBest } from '../leaderboard/leaderboard.ts';
-import { CURRICULUM } from '../grammar/templates.ts';
+import { CURRICULUM } from '../grammar/curriculum.ts';
 import { kanjiPool } from '../kanji/kanji-round.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
