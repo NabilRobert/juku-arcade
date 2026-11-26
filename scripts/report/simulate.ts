@@ -5,6 +5,7 @@ import type { DecoyType } from '../../src/deck/types.ts';
 import { makeEvent, type GameEvent, type SessionIdentity } from '../../src/game/events.ts';
 import { seededRandom } from '../../src/game/random.ts';
 import type { CheckRole } from '../../src/memory/check-up.ts';
+import { MS_PER_DAY } from '../../src/memory/days.ts';
 import type { ExportFile } from '../../src/memory/export.ts';
 
 export interface Plan {
@@ -19,7 +20,6 @@ export interface Plan {
   hardType?: { type: DecoyType; missChance: number };
 }
 
-const DAY_MS = 86_400_000;
 const START = Date.parse('2026-11-01T10:00:00+07:00');
 const ROLES: [CheckRole, number][] = [
   ['before', 2],
@@ -30,7 +30,7 @@ const TYPES: DecoyType[] = ['longVowel', 'smallTsu', 'dakuten', 'smallYoon', 'ot
 const OTHER_MISS_CHANCE = 0.1;
 
 function at(day: number, minute: number): string {
-  const date = new Date(START + day * DAY_MS + minute * 60_000);
+  const date = new Date(START + day * MS_PER_DAY + minute * 60_000);
   return `${date.toISOString().slice(0, 19)}+07:00`;
 }
 

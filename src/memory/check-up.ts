@@ -13,7 +13,7 @@ import type { DeckWord } from '../deck/types.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { shuffled } from '../game/deal.ts';
 import { makeEvent, type GameEvent, type SessionIdentity } from '../game/events.ts';
-import { addDays } from './leitner.ts';
+import { addDays, localDayOf } from './days.ts';
 
 /** C2: questions per check-up, by role. */
 export const QUESTIONS_PER_ROLE = { before: 2, after: 2, held_back: 1 } as const;
@@ -59,7 +59,7 @@ export function isCheckUpEvent(event: GameEvent): boolean {
 /** Updates a word's check-up history with one check-up answer, in place. */
 export function applyCheckUp(records: Map<string, CheckRecord>, event: GameEvent): void {
   if (!isCheckUpEvent(event) || event.word_id === null) return;
-  const day = event.at.slice(0, 10);
+  const day = localDayOf(event.at);
   const existing = records.get(event.word_id);
   if (event.check_up_role === 'before' && existing === undefined) {
     const held = isHeldBack(event.player_id, event.word_id);

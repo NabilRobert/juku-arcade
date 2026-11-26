@@ -8,7 +8,7 @@
 import type { BrokenRule } from '../grammar/broken-rule.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import type { AnswerCounts } from './stats.ts';
-import { localDayOf } from './word-memory.ts';
+import { localDayOf } from './days.ts';
 
 /** How many most-missed grammar points the page lists. */
 export const MOST_MISSED_POINTS_SHOWN = 5;

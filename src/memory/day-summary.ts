@@ -10,7 +10,7 @@ import type { GameEvent } from '../game/events.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import { kanjiOfDay, type KanjiDay } from './kanji-tally.ts';
 import { PLAY_MODES, type KanjiRoundRecord, type PlayMode, type PlayedRun } from './play-log.ts';
-import { localDayOf } from './word-memory.ts';
+import { localDayOf } from './days.ts';
 
 const MS_PER_MINUTE = 60_000;
 

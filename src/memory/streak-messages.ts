@@ -7,7 +7,7 @@
  * one. The milestones are celebrated on the day they're reached.
  */
 import type { RandomSource } from '../game/deal.ts';
-import { addDays } from './leitner.ts';
+import { addDays } from './days.ts';
 import type { Streak } from './streak.ts';
 
 /** Streak lengths celebrated on the day they're reached. */

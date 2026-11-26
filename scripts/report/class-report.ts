@@ -5,6 +5,7 @@
  * single learner can be picked out.
  */
 import type { GameEvent } from '../../src/game/events.ts';
+import { MS_PER_DAY } from '../../src/memory/days.ts';
 import {
   eventsByPlayer,
   isAnswer,
@@ -25,7 +26,6 @@ export const RETEACH_SHARE = 0.4;
 export const ERROR_TYPE_FLAG_RATIO = 2;
 export const DAYS_WITHOUT_PLAY_FLAG = 7;
 const TOP_WORDS = 10;
-const MS_PER_DAY = 86_400_000;
 
 export interface WordRow {
   word: string;

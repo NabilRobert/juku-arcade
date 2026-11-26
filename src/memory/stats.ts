@@ -3,6 +3,7 @@
  * log in this browser, the same log the reviews read. Nothing here is sent
  * anywhere. Kanji mode logs nothing, so these are word mode's numbers.
  */
+import { localDayOf } from './days.ts';
 import type { DeckWord, DecoyType } from '../deck/types.ts';
 import { wordAnswerScore, type ErrorType, type GameEvent } from '../game/events.ts';
 
@@ -101,7 +102,7 @@ export function playerStats(
     allTime: countAnswers(events),
     today: countAnswers(events.filter((event) => isDay(event, today))),
     setsPlayed: events.filter((event) => event.kind === 'deal').length,
-    daysPlayed: new Set(events.map((event) => event.at.slice(0, 10))).size,
+    daysPlayed: new Set(events.map((event) => localDayOf(event.at))).size,
     mostMissed: mostMissed(misses, words),
     mistakes: mistakeKinds(misses),
   };

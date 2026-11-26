@@ -4,9 +4,8 @@
  * today. Each day is shaded by how much was played: answers given in every
  * run that day (play-log.ts), so a busy day glows brighter.
  */
-import { addDays } from './leitner.ts';
+import { addDays, weekStartOf } from './days.ts';
 import type { PlayedRun } from './play-log.ts';
-import { weekStartOf } from './streak.ts';
 
 /** Weeks the calendar shows: about four months, enough to see a habit form. */
 export const CALENDAR_WEEKS = 18;

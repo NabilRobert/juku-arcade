@@ -5,11 +5,12 @@
  * held after about 1, 4 and 8 days.
  */
 import type { GameEvent } from '../../src/game/events.ts';
+import { MS_PER_DAY } from '../../src/memory/days.ts';
 import { deriveMemory } from '../../src/memory/word-memory.ts';
 import { isRight, isWrong, pickedReading, wordSpellings } from './answers.ts';
 
 const WEAK_WORDS_SHOWN = 5;
-const MS_PER_WEEK = 7 * 86_400_000;
+const MS_PER_WEEK = 7 * MS_PER_DAY;
 /** Retention buckets: days since the word was last seen, as [label, from, to]. */
 const RETENTION_BUCKETS: readonly [string, number, number][] = [
   ['1 day', 1, 1],

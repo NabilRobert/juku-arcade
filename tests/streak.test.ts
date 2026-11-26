@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { streakOn, weekStartOf } from '../src/memory/streak.ts';
+import { weekStartOf } from '../src/memory/days.ts';
+import { streakOn } from '../src/memory/streak.ts';
 
 // 2026-11-26 is a Thursday; its week starts Monday 2026-11-23.
 const TODAY = '2026-11-26';
