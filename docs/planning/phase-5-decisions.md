@@ -1333,7 +1333,7 @@ and undoes D66's fair word board.
   the deck is cleared are no longer set aside as practice. The daily time
   cap and the break nudges still stop marathon runs.
 - Considered: no banner at all (the side panel's daily bar fills anyway),
-  and keeping the results screen. Arthur chose the banner, and counting
+  and keeping the results screen. The owner chose the banner, and counting
   every coin.
 
 ### D71: The Total board leaves practice mode out (2026-11-26)
@@ -1372,7 +1372,7 @@ visit follows the browser's language, and the choice is remembered in this
 browser like the other preferences. The page's `lang` attribute follows it.
 
 - **Library: vue-i18n** (MIT, the Vue team's own i18n library, Composition
-  API mode). Arthur's OK, 2026-11-26.
+  API mode). Approved by the owner, 2026-11-26.
   - Rejected: a hand-written dictionary. It's lighter, but plurals,
     placeholders and fallbacks would be ours to maintain: the kind of
     hand-rolled framework the workspace rules warn against.
