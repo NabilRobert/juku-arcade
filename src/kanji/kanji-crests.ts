@@ -9,6 +9,7 @@
 import { pickOne } from '../game/random.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { CRESTS, type CrestKind } from '../bank-run/crests.ts';
+import { translate } from '../i18n/index.ts';
 import { POINTS_PER_HIT, type KanjiRound } from './kanji-round.ts';
 
 /** The chance a round hides a good crest, and a curse. */
@@ -23,12 +24,14 @@ export const CURSE_POINTS = 10;
 export const SCOUTS_AT_START = 2;
 export const MAX_SCOUTS = 3;
 
-/** What each crest does in kanji mode, for the Scout button's tooltip. */
-export const KANJI_CREST_EFFECTS: Record<CrestKind, string> = {
-  koban: `Picked right: double points for that reading.`,
-  omikuji: `Picked right: a bonus of ${OMIKUJI_MIN} to ${OMIKUJI_MAX} points.`,
-  cursed: `Picked: lose ${CURSE_POINTS} points. It's always a wrong reading.`,
-};
+/** What a crest does in kanji mode, for the Scout button's tooltip; call it while rendering. */
+export function kanjiCrestEffect(kind: CrestKind): string {
+  return translate(`kanji.crestEffects.${kind}`, {
+    min: OMIKUJI_MIN,
+    max: OMIKUJI_MAX,
+    points: CURSE_POINTS,
+  });
+}
 
 /** Which of a round's cards carry a crest, by their place in the hand. */
 export function dealKanjiCrests(round: KanjiRound, random: RandomSource): Map<number, CrestKind> {
@@ -48,7 +51,18 @@ export function dealKanjiCrests(round: KanjiRound, random: RandomSource): Map<nu
 
 export interface CrestBonus {
   points: number;
+  /** The notice it floats up, translated when the card is thrown. */
   label: string;
+}
+
+/** The points a thrown card's crest adds (or, cursed, takes), or null when it doesn't apply. */
+function bonusPoints(crest: CrestKind, isRight: boolean, random: RandomSource): number | null {
+  if (crest === 'koban' && isRight) return POINTS_PER_HIT;
+  if (crest === 'omikuji' && isRight) {
+    return OMIKUJI_MIN + Math.floor(random() * (OMIKUJI_MAX - OMIKUJI_MIN + 1));
+  }
+  if (crest === 'cursed' && !isRight) return -CURSE_POINTS;
+  return null;
 }
 
 /** What a thrown card's crest is worth, or null when it has none or it doesn't apply. */
@@ -57,15 +71,12 @@ export function crestBonus(
   isRight: boolean,
   random: RandomSource,
 ): CrestBonus | null {
-  if (crest === 'koban' && isRight) {
-    return { points: POINTS_PER_HIT, label: `${CRESTS.koban.symbol} Koban! +${POINTS_PER_HIT}` };
-  }
-  if (crest === 'omikuji' && isRight) {
-    const points = OMIKUJI_MIN + Math.floor(random() * (OMIKUJI_MAX - OMIKUJI_MIN + 1));
-    return { points, label: `${CRESTS.omikuji.symbol} Omikuji! +${points}` };
-  }
-  if (crest === 'cursed' && !isRight) {
-    return { points: -CURSE_POINTS, label: `${CRESTS.cursed.symbol} Cursed! −${CURSE_POINTS}` };
-  }
-  return null;
+  if (crest === undefined) return null;
+  const points = bonusPoints(crest, isRight, random);
+  if (points === null) return null;
+  const label = translate(`kanji.crestBonus.${crest}`, {
+    symbol: CRESTS[crest].symbol,
+    points: Math.abs(points),
+  });
+  return { points, label };
 }

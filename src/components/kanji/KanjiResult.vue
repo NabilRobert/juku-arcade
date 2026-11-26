@@ -11,14 +11,18 @@ defineProps<{ result: PlayedRound | null }>();
 <template>
   <section class="pixel-panel bg-wood/80 p-3 text-center text-sm" aria-live="polite">
     <template v-if="result">
-      <p v-if="result.isPerfect" class="font-bold text-aqua">Perfect! +{{ result.points }}</p>
+      <p v-if="result.isPerfect" class="font-bold text-aqua">
+        {{ $t('kanji.result.perfect', { points: result.points }) }}
+      </p>
       <template v-else>
         <p>
-          Found {{ result.hits }} of {{ result.hits + result.misses }}
-          <span class="text-washi/70">· +{{ result.points }}</span>
+          {{ $t('kanji.result.found', { hits: result.hits, total: result.hits + result.misses }) }}
+          <span class="text-washi/70">{{
+            $t('kanji.result.points', { points: result.points })
+          }}</span>
         </p>
         <p v-if="result.wrongPicks > 0" class="text-washi/70">
-          {{ result.wrongPicks }} wrong {{ result.wrongPicks === 1 ? 'pick' : 'picks' }}
+          {{ $t('kanji.result.wrongPicks', result.wrongPicks) }}
         </p>
       </template>
       <p
@@ -26,9 +30,14 @@ defineProps<{ result: PlayedRound | null }>();
         :class="result.crestPoints > 0 ? 'text-gold' : 'text-crimson'"
         data-testid="crest-points"
       >
-        Crests {{ result.crestPoints > 0 ? '+' : '−' }}{{ Math.abs(result.crestPoints) }}
+        {{
+          $t('kanji.result.crests', {
+            sign: result.crestPoints > 0 ? '+' : '−',
+            points: Math.abs(result.crestPoints),
+          })
+        }}
       </p>
     </template>
-    <p v-else class="text-washi/60">Pick the readings, then Play.</p>
+    <p v-else class="text-washi/60">{{ $t('kanji.result.prompt') }}</p>
   </section>
 </template>

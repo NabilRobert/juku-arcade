@@ -116,8 +116,8 @@ describe('the dojo on screen', () => {
       await vi.advanceTimersByTimeAsync(2500);
     }
     const results = game.find('[data-testid="results"]');
-    expect(results.find('[data-testid="result-Your score was"]').text()).toBe('3');
-    expect(results.find('[data-testid="result-Your best combo was"]').text()).toBe('2');
+    expect(results.find('[data-testid="result-score"]').text()).toBe('3');
+    expect(results.find('[data-testid="result-best-combo"]').text()).toBe('2');
     expect(results.find('[data-testid="quote"]').text()).toMatch(/― .+, .+/);
     // No earlier run in this browser: the first best is greeted.
     expect(results.find('[data-testid="best-comparison"]').text()).toContain('Your first best');

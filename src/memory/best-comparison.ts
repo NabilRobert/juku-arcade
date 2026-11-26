@@ -2,12 +2,15 @@
  * How a finished run compares with the player's best, for the results
  * card: a new best, a tie, or how close it came. Showing how near a run
  * came to the best makes another try appealing (the near-miss effect,
- * Clark et al. 2009), so a miss reads as "3 away", not as a loss.
+ * Clark et al. 2009), so a miss reads as "3 away", not as a loss. The text
+ * is in the interface language, so RunResults calls it while rendering.
  */
+import { translate } from '../i18n/index.ts';
 
 export function bestComparison(score: number, previousBest: number): string {
-  if (previousBest <= 0) return score > 0 ? 'Your first best: beat it next time!' : '';
-  if (score > previousBest) return `New best! Up from ${previousBest}.`;
-  if (score === previousBest) return `That ties your best (${previousBest}).`;
-  return `${previousBest - score} away from your best (${previousBest}).`;
+  const best = { best: previousBest };
+  if (previousBest <= 0) return score > 0 ? translate('game.results.firstBest') : '';
+  if (score > previousBest) return translate('game.results.newBest', best);
+  if (score === previousBest) return translate('game.results.tie', best);
+  return translate('game.results.away', { ...best, gap: previousBest - score });
 }

@@ -19,7 +19,11 @@ const rightCount = (results: readonly LineResult[]): number =>
 </script>
 
 <template>
-  <section class="flex flex-col items-stretch" aria-label="The chapter" data-testid="chapter">
+  <section
+    class="flex flex-col items-stretch"
+    :aria-label="$t('bunpou.chapter')"
+    data-testid="chapter"
+  >
     <div class="pixel-corners mx-[-0.75rem] h-4 bg-cedar" aria-hidden="true" />
     <div class="flex max-h-[70svh] flex-col gap-6 overflow-y-auto bg-wood/95 px-8 py-6">
       <h2 class="text-center text-3xl font-bold text-aqua" lang="ja">第{{ chapter }}章</h2>
@@ -38,7 +42,7 @@ const rightCount = (results: readonly LineResult[]): number =>
         data-testid="chapter-next"
         @click="$emit('next')"
       >
-        Curtain call ▶
+        {{ $t('bunpou.curtainCall') }}
       </PixelButton>
     </div>
     <div class="pixel-corners mx-[-0.75rem] h-4 bg-cedar" aria-hidden="true" />

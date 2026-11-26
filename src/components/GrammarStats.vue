@@ -5,6 +5,7 @@
  * their pattern, in Japanese with furigana) and the kinds of mistake.
  */
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { CURRICULUM } from '../grammar/curriculum.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import { createGrammarReviews } from '../grammar/grammar-reviews.ts';
@@ -16,6 +17,7 @@ import RankedList from './ui/RankedList.vue';
 import StatPanel from './ui/StatPanel.vue';
 
 const props = defineProps<{ events: readonly GrammarEvent[]; today: string }>();
+const { t } = useI18n();
 
 const stats = computed(() => grammarStats(props.events, props.today));
 const progress = computed(() =>
@@ -29,41 +31,56 @@ const mistakes = computed(() =>
 );
 
 const tiles = computed(() => [
-  { label: 'Grammar known', value: `${progress.value.pointsKnown} / ${progress.value.pointCount}` },
   {
-    label: 'Right today',
+    label: t('pages.grammarStats.known'),
+    value: `${progress.value.pointsKnown} / ${progress.value.pointCount}`,
+  },
+  {
+    label: t('pages.stats.rightToday'),
     value: percentRight(stats.value.today),
-    note: `${stats.value.today.right} right`,
+    note: t('pages.stats.rightCount', { count: stats.value.today.right }),
   },
   {
-    label: 'Right overall',
+    label: t('pages.stats.rightOverall'),
     value: percentRight(stats.value.allTime),
-    note: `${stats.value.allTime.right} right`,
+    note: t('pages.stats.rightCount', { count: stats.value.allTime.right }),
   },
-  { label: 'Grammar seen', value: `${progress.value.pointsSeen} / ${progress.value.pointCount}` },
+  {
+    label: t('pages.grammarStats.seen'),
+    value: `${progress.value.pointsSeen} / ${progress.value.pointCount}`,
+  },
 ]);
 
 const patternOf = (pointId: string): string => POINT_PATTERNS[pointId as PointId] ?? pointId;
 </script>
 
 <template>
-  <section class="space-y-3" aria-label="Grammar" data-testid="grammar-stats">
-    <h3 class="text-lg font-semibold">Grammar</h3>
+  <section
+    class="space-y-3"
+    :aria-label="t('pages.grammarStats.title')"
+    data-testid="grammar-stats"
+  >
+    <h3 class="text-lg font-semibold">{{ t('pages.grammarStats.title') }}</h3>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatPanel v-for="tile in tiles" :key="tile.label" :label="tile.label" :note="tile.note">
         <span class="block text-2xl font-bold">{{ tile.value }}</span>
       </StatPanel>
     </div>
     <div class="grid gap-3 sm:grid-cols-2">
-      <RankedList title="Grammar missed most" :items="missed" empty-text="No misses yet." unit="×">
+      <RankedList
+        :title="t('pages.grammarStats.missedMost')"
+        :items="missed"
+        :empty-text="t('pages.stats.noMisses')"
+        unit="×"
+      >
         <template #default="{ item }">
           <span lang="ja"><FuriganaText :marked="patternOf(item.key)" is-reading-below /></span>
         </template>
       </RankedList>
       <RankedList
-        title="Grammar mistakes by kind"
+        :title="t('pages.grammarStats.mistakesByKind')"
         :items="mistakes"
-        empty-text="No mistakes yet."
+        :empty-text="t('pages.stats.noMistakes')"
       />
     </div>
   </section>

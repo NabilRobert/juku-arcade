@@ -40,7 +40,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-4" aria-label="The end of the show" data-testid="curtain-call">
+  <section
+    class="flex flex-col gap-4"
+    :aria-label="$t('bunpou.endOfShow')"
+    data-testid="curtain-call"
+  >
     <StoryStage
       pose="bow"
       :slips="0"
@@ -63,7 +67,7 @@ onMounted(() => {
           data-testid="see-results"
           @click="$emit('results')"
         >
-          See results ▶
+          {{ $t('bunpou.seeResults') }}
         </PixelButton>
       </template>
     </div>

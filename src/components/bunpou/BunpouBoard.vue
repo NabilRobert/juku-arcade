@@ -111,7 +111,10 @@ function dropAt(tile: string, point: Point): void {
 
 <template>
   <!-- A size container, so a row of tiles can be sized to fit its width (MAX_TILES = 5). -->
-  <section class="@container relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
+  <section
+    class="@container relative flex flex-col gap-2 lg:gap-4"
+    :aria-label="$t('bunpou.table')"
+  >
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? SHELF_NAMES[line.shelf] : ''
@@ -162,7 +165,9 @@ function dropAt(tile: string, point: Point): void {
             @release="(point: Point) => dropAt(tile, point)"
           />
         </div>
-        <span v-if="judged?.isRight" class="text-4xl text-aqua" aria-label="right">◯</span>
+        <span v-if="judged?.isRight" class="text-4xl text-aqua" :aria-label="$t('bunpou.right')"
+          >◯</span
+        >
       </template>
     </div>
     <!-- On a phone or a tablet the combo shows at half size in a short row, so the tiles sit close to the boxes. -->
@@ -180,7 +185,7 @@ function dropAt(tile: string, point: Point): void {
         role="status"
         data-testid="pause-hint"
       >
-        Paused. The tiles stay face down until you resume.
+        {{ $t('bunpou.pausedHint') }}
       </p>
     </div>
     <div class="flex min-h-24 flex-wrap justify-center gap-2 sm:gap-4" data-testid="offered">
@@ -201,7 +206,7 @@ function dropAt(tile: string, point: Point): void {
       class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35svh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
       data-testid="paused"
     >
-      <p class="text-sm text-aqua">Missed so far</p>
+      <p class="text-sm text-aqua">{{ $t('bunpou.missedSoFar') }}</p>
       <SentenceFix v-for="(missed, index) in run.missed" :key="index" :result="missed" />
     </div>
   </section>

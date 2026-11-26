@@ -15,6 +15,7 @@
  */
 import { MAX_TILES } from '../../grammar/template-check.ts';
 import { computed, ref, shallowRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { LineResult } from '../../grammar/bunpou-run.ts';
 import { endsChapter, TALES_PER_CHAPTER } from '../../grammar/performance.ts';
 import { FORGOT_LINE } from '../../grammar/usePerformance.ts';
@@ -57,6 +58,7 @@ const props = defineProps<{
   isAway: boolean;
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
+const { t } = useI18n();
 
 const reviews = useGrammarReviews(CURRICULUM, props.settings, props.pastGrammarEvents);
 const runLog = useRunLog('bunpou');
@@ -110,8 +112,8 @@ const onPanelToggle = usePanelPause(pauseControls);
 const onEndRunToggle = usePanelPause(pauseControls);
 
 const panels = computed(() => [
-  { label: 'Score', value: run.value.score },
-  { label: 'Level', value: run.value.level },
+  { id: 'score', label: t('bunpou.score'), value: run.value.score },
+  { id: 'level', label: t('bunpou.level'), value: run.value.level },
 ]);
 
 /** The tales told this run, for the chapter scroll; a chapter shows once its last tale is told. */
@@ -158,34 +160,33 @@ function dismiss(isStopping: boolean): void {
   <div
     class="flex flex-col gap-4 max-lg:grow max-lg:justify-center lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8"
   >
-    <SidePanel label="Bunpou run" @toggle="onPanelToggle">
-      <ModeHeader :title="`Bunpou · ${level}`" />
+    <SidePanel :label="t('bunpou.sidePanel')" @toggle="onPanelToggle">
+      <ModeHeader :title="t('bunpou.title', { level })" />
       <DailyBar
         :daily="reviews.progress.value.daily"
-        known-label="Grammar known"
+        counted="grammar"
         :known="reviews.progress.value.pointsKnown"
         :total="reviews.progress.value.pointCount"
         :level="level"
       />
       <div class="grid grid-cols-2 gap-3">
-        <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
-          <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
-            panel.value
-          }}</span>
+        <StatPanel v-for="panel in panels" :key="panel.id" :label="panel.label">
+          <span class="text-3xl font-bold" :data-testid="panel.id">{{ panel.value }}</span>
         </StatPanel>
       </div>
       <OnOffButton
-        label="Hints"
+        :label="t('settings.hints')"
         :is-on="areHintsShown"
         data-testid="hint-toggle"
         @change="setHintsShown"
       />
       <SoundToggle />
-      <p class="text-center text-xs text-washi/60">Best combo {{ run.bestCombo }}</p>
+      <p class="text-center text-xs text-washi/60">
+        {{ t('bunpou.bestCombo', { combo: run.bestCombo }) }}
+      </p>
       <EndRunButton v-if="!isEnded" @end="endRun" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
-        Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
-        tap it or press Backspace to take it back. Keys 1–{{ MAX_TILES }} place a tile; Esc pauses.
+        {{ t('bunpou.help', { maxTiles: MAX_TILES }) }}
       </p>
     </SidePanel>
     <FloatingPause

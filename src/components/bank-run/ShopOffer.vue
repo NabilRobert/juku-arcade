@@ -7,11 +7,13 @@
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PixelButton from '../ui/PixelButton.vue';
 import PixelIcon from '../ui/PixelIcon.vue';
 import { MAX_ITEMS, type BankRun } from '../../bank-run/bank-run.ts';
-import { itemById, type ItemId } from '../../bank-run/items.ts';
+import { itemById, itemEffect, itemName, type ItemId } from '../../bank-run/items.ts';
 
+const { t } = useI18n();
 const props = defineProps<{ run: BankRun }>();
 defineEmits<{ buy: [id: ItemId]; leave: [] }>();
 
@@ -23,12 +25,12 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
   <div
     class="fixed inset-0 z-30 flex flex-col items-center justify-center gap-6 bg-lacquer/85"
     role="dialog"
-    aria-label="Shop"
+    :aria-label="t('game.shop.label')"
   >
-    <p class="text-3xl font-bold text-aqua">The shop</p>
+    <p class="text-3xl font-bold text-aqua">{{ t('game.shop.title') }}</p>
     <p class="text-lg">
-      Your coins <PixelIcon name="coin" /> {{ run.coins
-      }}<span v-if="isFull" class="text-washi/60"> · item slots full</span>
+      {{ t('game.shop.yourCoins') }} <PixelIcon name="coin" /> {{ run.coins
+      }}<span v-if="isFull" class="text-washi/60"> {{ t('game.shop.slotsFull') }}</span>
     </p>
     <div class="flex gap-6">
       <m.div
@@ -40,21 +42,21 @@ const isFull = computed(() => props.run.items.length >= MAX_ITEMS);
         :transition="{ type: 'spring', stiffness: 300, damping: 22, delay: index * 0.08 }"
       >
         <span class="text-5xl" lang="ja">{{ item.kanji }}</span>
-        <span class="text-lg font-semibold">{{ item.name }}</span>
-        <span class="text-center text-sm text-sumi/80">{{ item.effect }}</span>
+        <span class="text-lg font-semibold">{{ itemName(item.id) }}</span>
+        <span class="text-center text-sm text-sumi/80">{{ itemEffect(item.id) }}</span>
         <PixelButton
           colour="crimson"
           class="mt-1 min-h-10 w-full px-3 disabled:opacity-40"
           :disabled="run.coins < item.price || isFull"
           @click="$emit('buy', item.id)"
         >
-          Buy <PixelIcon name="coin" /> {{ item.price }}
+          {{ t('game.shop.buy') }} <PixelIcon name="coin" /> {{ item.price }}
         </PixelButton>
       </m.div>
-      <p v-if="offered.length === 0" class="text-washi/70">Sold out.</p>
+      <p v-if="offered.length === 0" class="text-washi/70">{{ t('game.shop.soldOut') }}</p>
     </div>
     <PixelButton colour="steel" class="min-h-11 px-8 text-lg" @click="$emit('leave')">
-      Back to the table ▶
+      {{ t('game.shop.backToTable') }}
     </PixelButton>
   </div>
 </template>

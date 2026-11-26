@@ -13,22 +13,21 @@ export interface ComboRank {
   /** The combo this rank starts at. */
   from: number;
   letter: RankLetter;
+  /** Its word of praise; what it means is a message (game.rankMeanings), by letter. */
   praise: string;
-  /** What the praise means, for the card's title. */
-  meaning: string;
 }
 
 /** Lowest first, F up to SSS. One match isn't a streak yet, so the first rank starts at 2. */
 export const COMBO_RANKS: readonly ComboRank[] = [
-  { from: 2, letter: 'F', praise: 'がんばれ', meaning: 'keep going' },
-  { from: 4, letter: 'E', praise: 'よし', meaning: 'good' },
-  { from: 6, letter: 'D', praise: 'いいね', meaning: 'nice' },
-  { from: 9, letter: 'C', praise: 'うまい', meaning: 'skilful' },
-  { from: 12, letter: 'B', praise: 'すごい', meaning: 'amazing' },
-  { from: 15, letter: 'A', praise: 'さいこう', meaning: 'the best' },
-  { from: 20, letter: 'S', praise: 'かんぺき', meaning: 'perfect' },
-  { from: 25, letter: 'SS', praise: 'てんさい', meaning: 'genius' },
-  { from: 30, letter: 'SSS', praise: 'でんせつ', meaning: 'legend' },
+  { from: 2, letter: 'F', praise: 'がんばれ' },
+  { from: 4, letter: 'E', praise: 'よし' },
+  { from: 6, letter: 'D', praise: 'いいね' },
+  { from: 9, letter: 'C', praise: 'うまい' },
+  { from: 12, letter: 'B', praise: 'すごい' },
+  { from: 15, letter: 'A', praise: 'さいこう' },
+  { from: 20, letter: 'S', praise: 'かんぺき' },
+  { from: 25, letter: 'SS', praise: 'てんさい' },
+  { from: 30, letter: 'SSS', praise: 'でんせつ' },
 ];
 
 export interface RankProgress {

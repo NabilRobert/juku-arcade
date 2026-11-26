@@ -7,19 +7,23 @@ import { tally } from './tally.ts';
 import { localDayOf } from './days.ts';
 import type { DeckWord, DecoyType } from '../deck/types.ts';
 import { wordAnswerScore, type ErrorType, type GameEvent } from '../game/events.ts';
+import { translate } from '../i18n/index.ts';
 
 /** How many most-missed words the page lists. */
 export const MOST_MISSED_SHOWN = 5;
 
-/** Each kind of mistake, as the page names it. */
-export const MISTAKE_NAMES: Record<ErrorType, string> = {
-  longVowel: 'Long vowels (おう or おお?)',
-  smallTsu: 'Small っ',
-  dakuten: 'Dakuten (か or が?)',
-  smallYoon: 'Small ゃゅょ',
-  otherReading: "Another of the kanji's readings",
-  mixUp: 'Mixing up two words',
-} satisfies Record<DecoyType | 'mixUp', string>;
+/** A kind of mistake as the page names it, in the interface language, so call it while the page computes. */
+export function mistakeName(kind: ErrorType): string {
+  const names: Record<ErrorType, string> = {
+    longVowel: translate('pages.stats.mistakes.longVowel'),
+    smallTsu: translate('pages.stats.mistakes.smallTsu'),
+    dakuten: translate('pages.stats.mistakes.dakuten'),
+    smallYoon: translate('pages.stats.mistakes.smallYoon'),
+    otherReading: translate('pages.stats.mistakes.otherReading'),
+    mixUp: translate('pages.stats.mistakes.mixUp'),
+  } satisfies Record<DecoyType | 'mixUp', string>;
+  return names[kind];
+}
 
 export interface AnswerCounts {
   right: number;
@@ -80,7 +84,7 @@ function mostMissed(misses: readonly GameEvent[], words: readonly DeckWord[]): M
 
 function mistakeKinds(misses: readonly GameEvent[]): { name: string; count: number }[] {
   const kinds = misses.flatMap((miss) => (miss.error_type === null ? [] : [miss.error_type]));
-  return tally(kinds).map(([kind, count]) => ({ name: MISTAKE_NAMES[kind], count }));
+  return tally(kinds).map(([kind, count]) => ({ name: mistakeName(kind), count }));
 }
 
 export function playerStats(

@@ -10,16 +10,20 @@ import type { BrokenRule } from '../grammar/broken-rule.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import type { AnswerCounts } from './stats.ts';
 import { localDayOf } from './days.ts';
+import { translate } from '../i18n/index.ts';
 
 /** How many most-missed grammar points the page lists. */
 export const MOST_MISSED_POINTS_SHOWN = 5;
 
-/** Each broken rule as the page names it. */
-export const BROKEN_RULE_NAMES: Readonly<Record<BrokenRule, string>> = {
-  verb_not_last: 'The verb not at the end',
-  particle_after_wrong_word: 'A particle after the wrong word',
-  pieces_out_of_order: "A pattern's pieces out of order",
-};
+/** A broken rule as the page names it, in the interface language, so call it while the page computes. */
+export function brokenRuleName(rule: BrokenRule): string {
+  const names: Readonly<Record<BrokenRule, string>> = {
+    verb_not_last: translate('pages.grammarStats.brokenRules.verbNotLast'),
+    particle_after_wrong_word: translate('pages.grammarStats.brokenRules.particleAfterWrongWord'),
+    pieces_out_of_order: translate('pages.grammarStats.brokenRules.piecesOutOfOrder'),
+  };
+  return names[rule];
+}
 
 export interface GrammarStats {
   allTime: AnswerCounts;
@@ -48,6 +52,6 @@ export function grammarStats(events: readonly GrammarEvent[], today: string): Gr
     mostMissed: tally(missed.map((event) => event.point_id))
       .slice(0, MOST_MISSED_POINTS_SHOWN)
       .map(([pointId, misses]) => ({ pointId, misses })),
-    mistakes: tally(broken).map(([rule, count]) => ({ name: BROKEN_RULE_NAMES[rule], count })),
+    mistakes: tally(broken).map(([rule, count]) => ({ name: brokenRuleName(rule), count })),
   };
 }

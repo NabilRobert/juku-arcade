@@ -8,6 +8,7 @@
  * wellbeing screens stand in front of the question.
  */
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../game/lanterns.ts';
@@ -39,6 +40,7 @@ const props = defineProps<{
   isAway: boolean;
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
+const { t } = useI18n();
 
 const dojo = useDojoRun(props.pools);
 const { state, question, questionNumber, isLocked, isPaused } = dojo;
@@ -67,8 +69,8 @@ const onPanelToggle = usePanelPause(pauseControls);
 const onEndRunToggle = usePanelPause(pauseControls);
 
 const resultPanels = computed(() => [
-  { label: 'Your score was', value: String(state.value.right) },
-  { label: 'Your best combo was', value: String(state.value.bestCombo) },
+  { id: 'score', label: t('practice.yourScore'), value: String(state.value.right) },
+  { id: 'best-combo', label: t('practice.yourBestCombo'), value: String(state.value.bestCombo) },
 ]);
 const previousBest = usePreviousBest('dojo');
 /** Picked once per run, for its game-over screen. */
@@ -82,10 +84,10 @@ function dismiss(isStopping: boolean): void {
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Dojo run" @toggle="onPanelToggle">
-      <ModeHeader :title="`Practice mode · ${level}`" />
+    <SidePanel :label="t('practice.sidePanel')" @toggle="onPanelToggle">
+      <ModeHeader :title="t('practice.title', { level })" />
       <LanternRow :lit="state.lanterns" :total="LANTERNS" />
-      <StatPanel label="Score">
+      <StatPanel :label="t('practice.score')">
         <span class="text-3xl font-bold" data-testid="score">{{ state.right }}</span>
       </StatPanel>
       <PauseButton
@@ -98,8 +100,7 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
-        Words, kanji and grammar you've met, until {{ LANTERNS }} misses. Take as long as you need.
-        Esc pauses.
+        {{ t('practice.help', { lanterns: LANTERNS }) }}
       </p>
     </SidePanel>
     <FloatingPause
@@ -119,10 +120,10 @@ function dismiss(isStopping: boolean): void {
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <RunResults
         v-if="state.isOver"
-        :title="state.lanterns > 0 ? 'Run ended' : 'Game over'"
+        :title="state.lanterns > 0 ? t('practice.runEnded') : t('practice.gameOver')"
         :panels="resultPanels"
-        again-label="Restart"
-        leave-label="Quit to main menu"
+        :again-label="t('practice.restart')"
+        :leave-label="t('practice.quit')"
         :comparison="{ score: state.right, previousBest }"
         @again="emit('again')"
         @leave="emit('leave')"
@@ -137,7 +138,7 @@ function dismiss(isStopping: boolean): void {
           class="pixel-panel absolute inset-0 z-20 flex items-center justify-center bg-wood p-10 text-center text-xl"
           data-testid="dojo-paused"
         >
-          Paused
+          {{ t('practice.paused') }}
         </p>
         <!-- Keyed on the question asked, not the answers given: an answer stays on screen until the next
              question comes, and each new question gets a fresh board. -->

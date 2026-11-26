@@ -12,12 +12,12 @@ defineEmits<{ close: [] }>();
 <template>
   <article
     class="max-h-[70vh] space-y-4 overflow-y-auto pixel-panel washi p-4 text-sumi"
-    aria-label="Card back"
+    :aria-label="$t('game.card.back')"
   >
     <header class="flex items-baseline justify-between gap-3">
       <p lang="ja"><slot name="title" /></p>
       <PixelButton colour="steel" class="px-3 py-1 text-sm" @click="$emit('close')">
-        Turn over
+        {{ $t('game.card.turnOver') }}
       </PixelButton>
     </header>
     <slot />

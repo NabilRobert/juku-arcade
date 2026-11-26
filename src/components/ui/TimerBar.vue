@@ -8,13 +8,12 @@ export const LOW_TIME_SHARE = 0.25;
  * Time left as a bar that shrinks from full (1) to empty (0), turning
  * crimson when it's nearly out. One bar for every timed screen: word mode
  * (its panel, and above the board on a phone), Bunpou's line, the word
- * check-up. Screen readers hear it as a progress bar, as `label`.
+ * check-up. Screen readers hear it as a progress bar, as `label`, or as
+ * "Time left" in the interface language.
  */
 import { computed } from 'vue';
 
-const props = withDefaults(defineProps<{ timeLeft: number; label?: string }>(), {
-  label: 'Time left',
-});
+const props = defineProps<{ timeLeft: number; label?: string }>();
 
 const isLow = computed(() => props.timeLeft < LOW_TIME_SHARE);
 </script>
@@ -23,7 +22,7 @@ const isLow = computed(() => props.timeLeft < LOW_TIME_SHARE);
   <span
     class="pixel-panel block h-3 overflow-hidden bg-lacquer"
     role="progressbar"
-    :aria-label="label"
+    :aria-label="label ?? $t('game.timeLeft')"
     aria-valuemin="0"
     aria-valuemax="100"
     :aria-valuenow="Math.round(timeLeft * 100)"

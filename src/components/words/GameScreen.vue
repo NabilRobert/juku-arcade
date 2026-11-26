@@ -10,6 +10,7 @@
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
 import { computed, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
@@ -39,6 +40,7 @@ import RunResults from '../ui/RunResults.vue';
 import { readBestScore, useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
 import { playSound } from '../../sound/sfx.ts';
+import { language } from '../../i18n/index.ts';
 
 const emit = defineEmits<{ leave: [] }>();
 const props = defineProps<{
@@ -48,6 +50,7 @@ const props = defineProps<{
   /** True while another page covers the game: it pauses. */
   isAway: boolean;
 }>();
+const { t } = useI18n();
 const board = useTemplateRef<InstanceType<typeof GameBoard>>('board');
 const run = useRun({
   words: props.deck.words,
@@ -90,15 +93,22 @@ watch([() => state.value.events.length, () => bank.value.coins], () =>
 );
 
 const finishNote = computed(() =>
-  progress.value.daily.isCleared
-    ? "Your pot was banked, and today's deck is done. Come back tomorrow for the next words."
-    : "Your pot was banked. Today's deck isn't done yet: keep playing, or come back to finish it.",
+  progress.value.daily.isCleared ? t('game.words.finishDeckDone') : t('game.words.finishDeckLeft'),
 );
 
 const finishPanels = computed(() => [
-  { label: 'Coins', value: String(bank.value.coins) },
-  { label: 'Today', value: `${progress.value.daily.done} / ${progress.value.daily.total}` },
-  { label: 'Words known', value: `${progress.value.wordsKnown} / ${progress.value.deckSize}` },
+  { id: 'coins', label: t('game.words.coins'), value: String(bank.value.coins) },
+  {
+    id: 'today',
+    label: t('game.daily.label'),
+    value: `${progress.value.daily.done} / ${progress.value.daily.total}`,
+  },
+  {
+    id: 'words-known',
+    label: t('game.words.wordsKnown'),
+
+    value: `${progress.value.wordsKnown} / ${progress.value.deckSize}`,
+  },
 ]);
 
 function keepPlaying(): void {
@@ -128,10 +138,10 @@ const onEndRunToggle = usePanelPause(pauseControls);
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Word run" @toggle="onPanelToggle">
+    <SidePanel :label="t('game.words.sidePanel')" @toggle="onPanelToggle">
       <DailyBar
         :daily="progress.daily"
-        known-label="Words known"
+        counted="words"
         :known="progress.wordsKnown"
         :total="progress.deckSize"
         :level="deck.level"
@@ -152,7 +162,7 @@ const onEndRunToggle = usePanelPause(pauseControls);
       <!-- On a phone the panel with the set's timer is folded away, so the timer shows here too. -->
       <TimerBar class="lg:hidden" :time-left="timeShareLeft(state, nowMs)" />
       <FloatingBanner :is-shown="finish.isBannerShown.value" lang="ja">
-        今日の分 完了 · <span lang="en">Today's deck done!</span>
+        今日の分 完了 · <span :lang="language">{{ t('game.words.deckDone') }}</span>
       </FloatingBanner>
       <FloatingPause
         :is-paused="state.pausedAtMs !== null"
@@ -163,10 +173,10 @@ const onEndRunToggle = usePanelPause(pauseControls);
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
         <RunResults
           v-if="finish.isShown.value"
-          title="Run ended"
+          :title="t('game.runEnded')"
           :panels="finishPanels"
           :note="finishNote"
-          again-label="Keep playing"
+          :again-label="t('game.keepPlaying')"
           :comparison="{ score: bank.coins, previousBest }"
           @again="keepPlaying"
           @leave="emit('leave')"

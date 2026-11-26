@@ -39,16 +39,16 @@ function confirmEnd(): void {
 
 <template>
   <ArcadeButton class="min-h-9 text-sm" data-testid="end-run" @click="setAsking(true)">
-    End run
+    {{ $t('game.endRun.button') }}
   </ArcadeButton>
-  <CardOverlay v-if="isAsking" label="End this run?" @close="setAsking(false)">
+  <CardOverlay v-if="isAsking" :label="$t('game.endRun.question')" @close="setAsking(false)">
     <section
       class="pixel-panel flex flex-col items-center gap-4 bg-wood p-6 text-center"
       data-testid="end-run-confirm"
     >
-      <p class="text-2xl font-bold text-aqua">End this run?</p>
+      <p class="text-2xl font-bold text-aqua">{{ $t('game.endRun.question') }}</p>
       <QuoteCard class="text-left" :quote="quote" />
-      <p class="text-sm text-washi">Your score so far is kept.</p>
+      <p class="text-sm text-washi">{{ $t('game.endRun.kept') }}</p>
       <div class="flex gap-4">
         <PixelButton
           colour="steel"
@@ -56,9 +56,11 @@ function confirmEnd(): void {
           data-testid="end-run-cancel"
           @click="setAsking(false)"
         >
-          Keep playing
+          {{ $t('game.keepPlaying') }}
         </PixelButton>
-        <ArcadeButton data-testid="end-run-yes" @click="confirmEnd">End run</ArcadeButton>
+        <ArcadeButton data-testid="end-run-yes" @click="confirmEnd">{{
+          $t('game.endRun.button')
+        }}</ArcadeButton>
       </div>
     </section>
   </CardOverlay>

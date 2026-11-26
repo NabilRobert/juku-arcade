@@ -14,6 +14,7 @@
  */
 import { LANTERNS } from '../../game/lanterns.ts';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
 import { KANJI_PER_SHEET, useKanjiSheet } from '../../kanji/useKanjiSheet.ts';
@@ -42,6 +43,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
 
+const { t } = useI18n();
 const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
 const { wrongPicksLeft } = run;
@@ -66,19 +68,32 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
 
 /** Why the sheet ended: its last lantern out, End run, or all its kanji played. */
 const sheetTitle = computed(() => {
-  if (sheet.isOutOfLanterns.value) return 'Lanterns out';
-  return sheet.isEndedEarly.value ? 'Run ended' : 'Sheet done';
+  if (sheet.isOutOfLanterns.value) return t('kanji.lanternsOut');
+  return sheet.isEndedEarly.value ? t('game.runEnded') : t('kanji.sheetDone');
 });
 
 const sheetPanels = computed(() => [
-  { label: 'Perfect', value: `${sheet.tally.value.right} / ${KANJI_PER_SHEET}` },
-  { label: 'Score', value: String(score.value) },
-  { label: 'Best combo', value: String(bestCombo.value) },
+  {
+    id: 'perfect',
+    label: t('kanji.perfect'),
+    value: `${sheet.tally.value.right} / ${KANJI_PER_SHEET}`,
+  },
+  { id: 'score', label: t('game.score'), value: String(score.value) },
+  { id: 'best-combo', label: t('game.bestCombo'), value: String(bestCombo.value) },
 ]);
 
+const sheetNote = computed(() =>
+  t('kanji.sheetNote', {
+    perSheet: KANJI_PER_SHEET,
+    lanterns: LANTERNS,
+    days: CORRECT_DAYS_TO_KNOW,
+  }),
+);
+
+/** The side panel's numbers; the id names each for the tests, whatever the language. */
 const panels = computed(() => [
-  { label: 'Score', value: score.value },
-  { label: 'Combo', value: combo.value },
+  { id: 'score', label: t('game.score'), value: score.value },
+  { id: 'combo', label: t('game.combo'), value: combo.value },
 ]);
 
 function dismiss(isStopping: boolean): void {
@@ -89,17 +104,15 @@ function dismiss(isStopping: boolean): void {
 
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-    <SidePanel label="Kanji run">
-      <ModeHeader :title="`Kanji mode · ${deck.level}`">
+    <SidePanel :label="t('kanji.sidePanel')">
+      <ModeHeader :title="t('kanji.modeTitle', { level: deck.level })">
         <p class="text-sm text-washi/70" data-testid="sheet-progress">
-          Kanji {{ kanjiNumber }} / {{ KANJI_PER_SHEET }}
+          {{ t('kanji.progress', { number: kanjiNumber, total: KANJI_PER_SHEET }) }}
         </p>
       </ModeHeader>
       <div class="grid grid-cols-2 gap-3">
-        <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
-          <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{
-            panel.value
-          }}</span>
+        <StatPanel v-for="panel in panels" :key="panel.id" :label="panel.label">
+          <span class="text-3xl font-bold" :data-testid="panel.id">{{ panel.value }}</span>
         </StatPanel>
       </div>
       <KanjiResult :result="lastResult" />
@@ -112,11 +125,11 @@ function dismiss(isStopping: boolean): void {
       />
       <SoundToggle />
       <EndRunButton v-if="!isSheetDone" @end="sheet.endNow" />
-      <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. You can make {{ MAX_WRONG_PICKS }} wrong
-        picks per kanji; a kanji left with readings unfound puts out a lantern, and the sheet ends
-        when all {{ LANTERNS }} are out. It doesn't change your reviews.
+        {{ t('game.bestComboIs', { count: bestCombo }) }}
+      </p>
+      <p class="text-center text-xs text-washi/60">
+        {{ t('kanji.howToPlay', { maxWrong: MAX_WRONG_PICKS, lanterns: LANTERNS }) }}
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">
@@ -125,8 +138,8 @@ function dismiss(isStopping: boolean): void {
           v-if="isSheetDone"
           :title="sheetTitle"
           :panels="sheetPanels"
-          :note="`A sheet is ${KANJI_PER_SHEET} kanji, or ends when all ${LANTERNS} lanterns are out. A kanji counts as mastered once you find all its readings with no wrong pick on ${CORRECT_DAYS_TO_KNOW} separate days.`"
-          again-label="Another sheet"
+          :note="sheetNote"
+          :again-label="t('kanji.anotherSheet')"
           :comparison="{ score, previousBest }"
           @again="emit('again')"
           @leave="emit('leave')"

@@ -206,7 +206,7 @@ function onClick(event: MouseEvent): void {
     :transition="transition"
     :disabled="isDisabled"
     :aria-pressed="status === 'selected'"
-    :aria-label="isFaceDown ? 'Face-down card: tap to flip it' : undefined"
+    :aria-label="isFaceDown ? $t('game.card.faceDown') : undefined"
     lang="ja"
     :drag="isThrowable"
     drag-snap-to-origin

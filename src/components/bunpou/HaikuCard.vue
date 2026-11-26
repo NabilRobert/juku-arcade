@@ -15,7 +15,7 @@ defineProps<{ haiku: Haiku; isNew: boolean; collected: number; total: number }>(
   <article
     class="pixel-panel washi relative flex flex-col items-center gap-2 px-16 pt-10 pb-6 text-sumi"
     lang="ja"
-    aria-label="Haiku"
+    :aria-label="$t('bunpou.haiku')"
     data-testid="haiku"
   >
     <p

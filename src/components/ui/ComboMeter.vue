@@ -13,6 +13,7 @@ import { computed, watch } from 'vue';
 import { playSound } from '../../sound/sfx.ts';
 import { rankFor } from '../../game/combo-ranks.ts';
 import { RANK_COLOURS } from './combo-rank-colours.ts';
+import { language } from '../../i18n/index.ts';
 
 const props = defineProps<{ combo: number; brokenCombo: number | null }>();
 defineEmits<{ brokenShown: [] }>();
@@ -59,18 +60,18 @@ watch(
           class="text-[3svh] leading-none font-bold"
           :class="RANK_COLOURS[rank.letter]"
           lang="ja"
-          :title="rank.meaning"
+          :title="$t(`game.rankMeanings.${rank.letter}`)"
           >{{ rank.praise }}</span
         >
         <m.span
           :key="combo"
           class="text-[2svh] leading-none tracking-widest uppercase"
           :class="RANK_COLOURS[rank.letter]"
-          lang="en"
+          :lang="language"
           :initial="{ scale: 1.4 }"
           :animate="{ scale: 1 }"
           :transition="{ type: 'spring', stiffness: 520, damping: 14 }"
-          >{{ combo }} combo</m.span
+          >{{ $t('game.comboCount', { count: combo }) }}</m.span
         >
         <span class="h-1 w-24 bg-lacquer" aria-hidden="true">
           <span
@@ -89,7 +90,9 @@ watch(
       :transition="{ duration: 0.9, ease: 'easeIn' }"
       @animation-complete="$emit('brokenShown')"
     >
-      <span class="text-[3.5svh] line-through">{{ brokenCombo }} combo</span>
+      <span class="text-[3.5svh] line-through">{{
+        $t('game.comboCount', { count: brokenCombo })
+      }}</span>
     </m.p>
   </div>
 </template>

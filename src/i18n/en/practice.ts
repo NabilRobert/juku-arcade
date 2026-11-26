@@ -1,2 +1,40 @@
-/** Practice mode (the dojo) and its rest quotes. */
-export const practice = {};
+/** Practice mode (the dojo), its game-over quotes and End run's rest quotes (dojo/quotes.ts). */
+export const practice = {
+  sidePanel: 'Dojo run',
+  title: 'Practice mode · {level}',
+  score: 'Score',
+  help: "Words, kanji and grammar you've met, until {lanterns} misses. Take as long as you need. Esc pauses.",
+  paused: 'Paused',
+  runEnded: 'Run ended',
+  gameOver: 'Game over',
+  yourScore: 'Your score was',
+  yourBestCombo: 'Your best combo was',
+  restart: 'Restart',
+  quit: 'Quit to main menu',
+  loading: 'Loading…',
+  closedTitle: "Practice mode isn't open yet",
+  closedBody:
+    "Practice mode asks only what you've learned. Match {count} words in Words mode first, then come back.",
+  changeMode: 'Change mode',
+  japaneseProverb: 'Japanese proverb',
+  quotes: {
+    journey: 'A journey of a thousand miles begins with a single step.',
+    pleasureToLearn: 'Is it not a pleasure to learn, and to practise what you have learned?',
+    knowWhatYouKnow: 'To know what you know, and to know what you do not know: that is knowledge.',
+    realMistake: 'To make a mistake and not correct it: that is the real mistake.',
+    teachAndLearn: 'Even while they teach, people learn.',
+    shoulders: 'If I have seen further, it is by standing on the shoulders of giants.',
+    standThenFly: 'First learn stand, then learn fly.',
+    doOrDoNot: 'Do. Or do not. There is no try.',
+    timeGiven: 'All we have to decide is what to do with the time that is given us.',
+    genius: 'Genius is one per cent inspiration and ninety-nine per cent perspiration.',
+  },
+  restQuotes: {
+    notIdleness:
+      "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day, listening to the murmur of the water, or watching the clouds float across the sky, is by no means a waste of time.",
+    restedField: 'Take rest; a field that has rested gives a bountiful crop.',
+    unplug: 'Almost everything will work again if you unplug it for a few minutes, including you.',
+    doingNothing: 'Doing nothing often leads to the very best something.',
+    fallSeven: 'Fall seven times, stand up eight.',
+  },
+};

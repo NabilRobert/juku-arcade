@@ -24,6 +24,7 @@ import {
 } from './bank-run.ts';
 import type { ItemId } from './items.ts';
 import { useNotice } from '../composables/useNotice.ts';
+import { translate } from '../i18n/index.ts';
 import { useCrests } from './useCrests.ts';
 
 /** The best score (banked coins) reached in this browser, for the stats and the leaderboard. */
@@ -101,7 +102,7 @@ function usePot(
     if (now.combo === 0 && before.combo > 0 && !isBanking) {
       const { run: next, lost } = losePot(run.value);
       run.value = next;
-      if (lost > 0) notify(`−${lost} lost!`, false);
+      if (lost > 0) notify(translate('game.notices.potLost', { lost }), false);
     }
     isBanking = false;
     if (now.flash !== null && now.flash !== before.flash) crests.onMiss(now.flash.wordId);
