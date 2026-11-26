@@ -1,9 +1,10 @@
 // End run, in every mode: it asks first, so a misclick can't end a run (playtest, 2026-11-26).
 import 'fake-indexeddb/auto';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
-import { nextTick, ref } from 'vue';
+import { describe, expect, it, vi } from 'vitest';
+import { defineComponent, h, nextTick, ref } from 'vue';
 import EndRunButton from '../src/components/ui/EndRunButton.vue';
+import SidePanel from '../src/components/ui/SidePanel.vue';
 import { useDeckFinish } from '../src/composables/useDeckFinish.ts';
 import { endedEarly, FRESH_DOJO } from '../src/dojo/dojo-run.ts';
 import { REST_QUOTES } from '../src/dojo/quotes.ts';
@@ -46,6 +47,34 @@ describe('the End run button', () => {
     expect(button.emitted('end')).toHaveLength(1);
     expect(buttonIn('end-run-confirm')).toBeNull();
     button.unmount();
+  });
+});
+
+describe('ending a run from the side drawer', () => {
+  it('closes the drawer as the run ends, so the results show at once', async () => {
+    vi.stubGlobal('matchMedia', () => ({
+      matches: false,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    const ended: string[] = [];
+    const screen = mount(
+      defineComponent({
+        setup: () => () =>
+          h(SidePanel, { label: 'Run' }, () => h(EndRunButton, { onEnd: () => ended.push('end') })),
+      }),
+      { attachTo: document.body },
+    );
+    await nextTick();
+    await screen.find('[data-testid="side-panel-toggle"]').trigger('click');
+    expect(screen.find('[data-testid="side-panel"]').classes()).toContain('translate-x-0');
+    await screen.find('[data-testid="end-run"]').trigger('click');
+    buttonIn('end-run-yes')?.click();
+    await nextTick();
+    expect(ended).toEqual(['end']);
+    expect(screen.find('[data-testid="side-panel"]').classes()).toContain('-translate-x-full');
+    screen.unmount();
+    vi.unstubAllGlobals();
   });
 });
 
