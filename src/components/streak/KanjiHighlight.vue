@@ -11,9 +11,10 @@ defineProps<{ label: string; count: KanjiCount; isMissed?: boolean }>();
 <template>
   <p>
     <span class="block text-xs text-washi/60">{{ label }}</span>
+    <!-- Its own box, padded: as plain text, the crimson stopped short of the pixel font's glyph. -->
     <span
-      class="text-3xl"
-      :class="isMissed ? 'bg-crimson px-1 text-washi' : 'text-aqua'"
+      class="inline-block px-1 py-0.5 text-3xl leading-tight"
+      :class="isMissed ? 'bg-crimson text-washi' : 'text-aqua'"
       lang="ja"
       >{{ count.kanji }}</span
     >

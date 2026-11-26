@@ -51,9 +51,14 @@ const answerLines = computed(() => {
 </script>
 
 <template>
+  <!-- A day with several haiku runs long, so the detail scrolls inside a fixed height
+       rather than stretching the start screen (playtest decision, 2026-11-26). Focusable,
+       so a keyboard can scroll it too. -->
   <section
-    class="flex min-w-64 flex-1 flex-col gap-3 text-sm"
+    class="flex max-h-72 min-w-64 flex-1 flex-col gap-3 overflow-y-auto pr-2 text-sm [scrollbar-color:var(--color-steel)_transparent] [scrollbar-width:thin]"
+    tabindex="0"
     aria-live="polite"
+    :aria-label="`${dayLabel(day, today)}: what you played`"
     data-testid="day-detail"
   >
     <h3 class="text-lg font-bold text-aqua">{{ dayLabel(day, today) }}</h3>
