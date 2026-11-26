@@ -1,8 +1,9 @@
 /**
  * Quotes for the dojo's game-over screen (D62): a line on learning and
- * keeping at it, from a historic figure. Only quotes with a known source
- * are here (a book, a letter), never the popular misattributions; the
- * translations are short and in plain English.
+ * keeping at it, from a historic figure or a well-known character.
+ * Only quotes with a known source are here (a book, a letter, a film),
+ * never the popular misattributions. Each is short, and the translations
+ * are in plain English.
  */
 import type { RandomSource } from '../game/deal.ts';
 
@@ -43,6 +44,21 @@ export const QUOTES: readonly Quote[] = [
     text: 'If I have seen further, it is by standing on the shoulders of giants.',
     by: 'Isaac Newton',
     source: 'Letter to Robert Hooke, 1675',
+  },
+  {
+    text: 'First learn stand, then learn fly.',
+    by: 'Mr. Miyagi',
+    source: 'The Karate Kid (1984)',
+  },
+  {
+    text: 'Do. Or do not. There is no try.',
+    by: 'Yoda',
+    source: 'The Empire Strikes Back (1980)',
+  },
+  {
+    text: 'All we have to decide is what to do with the time that is given us.',
+    by: 'Gandalf',
+    source: 'The Fellowship of the Ring (1954)',
   },
   {
     text: 'Genius is one per cent inspiration and ninety-nine per cent perspiration.',
