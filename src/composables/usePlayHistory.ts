@@ -3,9 +3,10 @@
  * rounds and both event logs, from this browser. Read fresh each time the
  * start screen opens, so the streak is worked out from today's date and
  * the runs just played. A local copy can add placeholder play
- * (VITE_SAMPLE_PLAY, sample-play.ts), which is shown and never saved.
+ * (VITE_SAMPLE_PLAY, sample-play.ts), which is shown and never saved; the
+ * dojo, which asks only what the player has really met, leaves it out.
  */
-import { onMounted, shallowRef } from 'vue';
+import { onMounted, ref, shallowRef } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import { localDay } from '../game/events.ts';
 import type { PlayHistory } from '../memory/day-summary.ts';
@@ -23,7 +24,10 @@ async function orEmpty<T>(load: () => Promise<T[]>): Promise<T[]> {
   }
 }
 
-export function usePlayHistory(deck: Deck) {
+export function usePlayHistory(
+  deck: Deck,
+  options: { withSample: boolean } = { withSample: true },
+) {
   const wordTextById = new Map(deck.words.map((word) => [word.id, word.word]));
   const history = shallowRef<PlayHistory>({
     runs: [],
@@ -33,6 +37,7 @@ export function usePlayHistory(deck: Deck) {
     wordTextById,
   });
   const today = localDay(new Date());
+  const isLoaded = ref(false);
 
   onMounted(async () => {
     const [runs, kanjiRounds, wordEvents, grammarEvents] = await Promise.all([
@@ -41,7 +46,8 @@ export function usePlayHistory(deck: Deck) {
       orEmpty(loadEvents),
       orEmpty(loadGrammarEvents),
     ]);
-    const sample = IS_SAMPLE_PLAY ? samplePlay(today) : { runs: [], kanjiRounds: [] };
+    const isSampleShown = IS_SAMPLE_PLAY && options.withSample;
+    const sample = isSampleShown ? samplePlay(today) : { runs: [], kanjiRounds: [] };
     history.value = {
       runs: [...sample.runs, ...runs],
       kanjiRounds: [...sample.kanjiRounds, ...kanjiRounds],
@@ -49,7 +55,8 @@ export function usePlayHistory(deck: Deck) {
       grammarEvents,
       wordTextById,
     };
+    isLoaded.value = true;
   });
 
-  return { history, today };
+  return { history, today, isLoaded };
 }

@@ -27,10 +27,20 @@ export interface DojoState {
   lanterns: number;
   right: number;
   answered: number;
+  /** Right answers in a row now, and the most in a row this run. */
+  combo: number;
+  bestCombo: number;
   isOver: boolean;
 }
 
-export const FRESH_DOJO: DojoState = { lanterns: LANTERNS, right: 0, answered: 0, isOver: false };
+export const FRESH_DOJO: DojoState = {
+  lanterns: LANTERNS,
+  right: 0,
+  answered: 0,
+  combo: 0,
+  bestCombo: 0,
+  isOver: false,
+};
 
 /** The stage, 1 to 5, after this many right answers. */
 export function stageOf(right: number): number {
@@ -46,10 +56,13 @@ export function secondsFor(kind: QuestionKind, right: number): number {
 export function afterAnswer(state: DojoState, isRight: boolean): DojoState {
   if (state.isOver) return state;
   const lanterns = isRight ? state.lanterns : state.lanterns - 1;
+  const combo = isRight ? state.combo + 1 : 0;
   return {
     lanterns,
     right: state.right + (isRight ? 1 : 0),
     answered: state.answered + 1,
+    combo,
+    bestCombo: Math.max(state.bestCombo, combo),
     isOver: lanterns <= 0,
   };
 }

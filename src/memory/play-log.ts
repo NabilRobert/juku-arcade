@@ -12,7 +12,7 @@
  */
 import type { GameEvent } from '../game/events.ts';
 
-export type PlayMode = 'words' | 'kanji' | 'bunpou';
+export type PlayMode = 'words' | 'kanji' | 'bunpou' | 'dojo';
 
 /** One run, as it stood after its last answer. */
 export interface PlayedRun {

@@ -4,7 +4,8 @@
  * (after the daily check-up) and from "Change mode": word mode, which
  * pairs words with their readings and feeds the reviews; kanji mode,
  * which is practice at finding every reading of one kanji; or Bunpou
- * (D56), which puts grammar tiles in order. The leaderboard (D47) sits on
+ * (D56), which puts grammar tiles in order; or the dojo (D62), the
+ * game-over mode. The leaderboard (D47) sits on
  * the left; the streak and the play calendar (StreakPanel.vue) sit above
  * the modes, and each mode's card shows its level goal (level-goals.ts).
  * The play history is read once here for both.
@@ -14,13 +15,13 @@ import type { Deck } from '../deck/types.ts';
 import { usePlayHistory } from '../composables/usePlayHistory.ts';
 import { CURRICULUM } from '../grammar/templates.ts';
 import { kanjiPool } from '../kanji/kanji-round.ts';
-import { grammarGoal, kanjiGoal, wordGoal } from '../memory/level-goals.ts';
+import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
 import ModeCard from './ModeCard.vue';
 import type { ButtonColour } from './ui/PixelButton.vue';
 
-export type GameMode = 'words' | 'kanji' | 'bunpou';
+export type GameMode = 'words' | 'kanji' | 'bunpou' | 'dojo';
 
 const props = defineProps<{ deck: Deck }>();
 
@@ -36,7 +37,7 @@ interface Card {
 const level = props.deck.level;
 const { history, today } = usePlayHistory(props.deck);
 const levelKanji = [...kanjiPool(props.deck).readings.keys()];
-const goals = computed(() => ({
+const goals = computed<Partial<Record<GameMode, LevelGoal>>>(() => ({
   words: wordGoal(props.deck.words, history.value.wordEvents),
   kanji: kanjiGoal(levelKanji, history.value.kanjiRounds),
   bunpou: grammarGoal(CURRICULUM, history.value.grammarEvents, today),
@@ -66,6 +67,13 @@ const cards: readonly Card[] = [
     // The grammar content is N5's only (D60); other levels are still to write.
     note: 'N5 only for now · still in development',
   },
+  {
+    mode: 'dojo',
+    colour: 'paper',
+    name: 'Dojo',
+    example: '提灯 ×3',
+    description: "Words, kanji and grammar you've met, until three misses. Ranked.",
+  },
 ];
 defineEmits<{ choose: [mode: GameMode] }>();
 </script>
@@ -76,7 +84,7 @@ defineEmits<{ choose: [mode: GameMode] }>();
     <LeaderboardPanel />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" />
-      <section class="grid grid-cols-3 gap-6" aria-label="Choose a mode">
+      <section class="grid grid-cols-4 gap-4" aria-label="Choose a mode">
         <ModeCard
           v-for="card in cards"
           :key="card.mode"

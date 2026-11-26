@@ -29,6 +29,7 @@ import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
 import KanjiScreen from './components/kanji/KanjiScreen.vue';
 import BunpouScreen from './components/bunpou/BunpouScreen.vue';
+import DojoScreen from './components/dojo/DojoScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import StatsPage from './components/StatsPage.vue';
@@ -47,7 +48,7 @@ const grammarEvents = shallowRef<readonly GrammarEvent[]>([]);
 const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
-/** Word mode, kanji mode (D37) or Bunpou (D56), picked on the start screen each time the game opens. */
+/** Word mode, kanji mode (D37), Bunpou (D56) or the dojo (D62), picked on the start screen each time. */
 const mode = ref<GameMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
@@ -243,6 +244,17 @@ onMounted(async () => {
             :is-away="isAway"
             @leave="page = 'mode'"
             @again="chooseMode('kanji')"
+          />
+          <DojoScreen
+            v-else-if="mode === 'dojo'"
+            v-show="!isAway"
+            :key="`dojo-${runKey}`"
+            class="my-auto"
+            :deck="deck"
+            :settings="settings"
+            :is-away="isAway"
+            @leave="page = 'mode'"
+            @again="chooseMode('dojo')"
           />
           <BunpouScreen
             v-else-if="mode === 'bunpou'"
