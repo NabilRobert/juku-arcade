@@ -2,7 +2,12 @@
 import { describe, expect, it } from 'vitest';
 import { seededRandom } from '../src/game/random.ts';
 import { createGrammarReviews, NEW_POINTS_PER_DAY } from '../src/grammar/grammar-reviews.ts';
-import { makeTaleFromRanking, MIN_TALE_POINTS } from '../src/grammar/tale.ts';
+import {
+  makeTale,
+  makeTaleFromRanking,
+  MIN_TALE_POINTS,
+  NoTaleFitsError,
+} from '../src/grammar/tale.ts';
 import { CURRICULUM, TEMPLATES } from '../src/grammar/templates.ts';
 import { sentence } from './helpers/grammar-events.ts';
 
@@ -54,6 +59,10 @@ describe('grammar reviews', () => {
     const lines = makeTaleFromRanking(ranked, TEMPLATES, seededRandom(1)).lines;
     expect(lines.some((line) => line.point === 'mo')).toBe(true);
     expect(lines.every((line) => line.point !== 'ga-subject')).toBe(true);
+  });
+
+  it('says when no tale fits with its own error, the only one a retry with more points catches', () => {
+    expect(() => makeTale(['wa'], TEMPLATES, seededRandom(1))).toThrow(NoTaleFitsError);
   });
 
   it('puts points due today first, then today’s new points', () => {

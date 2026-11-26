@@ -103,6 +103,16 @@ function fillAll(templates: readonly Template[], setting: Setting): Sentence[] |
   return lines;
 }
 
+/**
+ * No tale can be told from these grammar points: some part of the tale (a
+ * shelf) has no template on any of them. makeTaleFromRanking catches this
+ * one error to try with one more point; any other error is a real bug in
+ * the templates or the lexicon, and goes through.
+ */
+export class NoTaleFitsError extends Error {
+  override name = 'NoTaleFitsError';
+}
+
 export function makeTale(
   points: readonly string[],
   templates: readonly Template[],
@@ -115,7 +125,7 @@ export function makeTale(
     const lines = picked === null ? null : fillAll(picked, setting);
     if (lines !== null) return { setting, lines };
   }
-  throw new Error(
+  throw new NoTaleFitsError(
     `No tale fits the grammar points ${points.join(', ')}: every shelf (S, D, T, P) needs a ` +
       'template on one of them. Add templates, or more points.',
   );
@@ -137,8 +147,9 @@ export function makeTaleFromRanking(
   for (let count = Math.min(MIN_TALE_POINTS, ranked.length); count < ranked.length; count++) {
     try {
       return makeTale(ranked.slice(0, count), templates, random);
-    } catch {
-      // This set can't fill every part of a tale; try with the next point too.
+    } catch (error) {
+      // This set can't fill every part of a tale; try with the next point too. Anything else is a bug.
+      if (!(error instanceof NoTaleFitsError)) throw error;
     }
   }
   return makeTale(ranked, templates, random);
