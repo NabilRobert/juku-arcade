@@ -21,7 +21,7 @@ defineProps<{
     <header class="flex items-center gap-3">
       <FlameSprite class="h-10" />
       <p class="text-2xl font-bold" data-testid="streak-days">{{ days }}-day streak</p>
-      <span v-if="isSample" class="ml-auto text-xs text-washi/50">sample data</span>
+      <span v-if="isSample" class="ml-auto text-xs text-washi/60">sample data</span>
     </header>
     <p
       v-if="milestone"

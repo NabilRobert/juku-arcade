@@ -1280,3 +1280,25 @@ game didn't yet do:
   of the kanji the level's words use for weeks), and plain weights (a
   sheet's mix would vary too much to explain). Playtest decision:
   "a balance of that would be nice".
+
+### D68: An accessibility pass: contrast and keyboard focus (2026-11-26)
+
+Checked against WCAG 2.1 AA in the built game, at desktop and phone sizes:
+contrast measured from the colours on screen, every button checked for a
+name, then keyboard focus by hand.
+
+- **Steel is a shade darker** (`#457b9d` → `#3c7090`, `--color-steel`):
+  white on steel was 4.3:1, under AA's 4.5:1, on every steel button, the
+  leaderboard and the Kanji card; it's 5.0:1 now. Faded white text on
+  steel (80%, 70%) can't pass on any steel this light, so it's full white
+  there; "sample data" on the wood goes from 50% to 60% white.
+- **Keyboard focus shows.** The pixel buttons' stepped corners are a
+  clip-path, which cut off the browser's focus outline, so nothing showed
+  where focus was. A ring is drawn inside each pixel button in its text
+  colour, and the cards get a lamp-yellow ring.
+- Already fine: every control has a name, Japanese text is marked `lang`,
+  motion follows the reduce-motion setting, and the timed modes pause (the
+  timers are part of the game, which WCAG allows when they can be paused).
+- Not covered: a screen reader run with VoiceOver, and playing a whole run
+  by keyboard alone; both are worth a session on a real device.
+
