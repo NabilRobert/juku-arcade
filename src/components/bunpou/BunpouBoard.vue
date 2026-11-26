@@ -105,7 +105,7 @@ function dropAt(tile: string, point: Point): void {
 </script>
 
 <template>
-  <section class="relative flex flex-col gap-4" aria-label="Bunpou table">
+  <section class="relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? SHELF_NAMES[line.shelf] : ''
@@ -161,8 +161,9 @@ function dropAt(tile: string, point: Point): void {
         <span v-if="judged?.isRight" class="text-4xl text-aqua" aria-label="right">◯</span>
       </template>
     </div>
-    <div class="relative">
-      <div :class="{ invisible: isPaused }">
+    <!-- On a phone or a tablet the combo shows at half size in a short row, so the tiles sit close to the boxes. -->
+    <div class="relative max-lg:flex max-lg:h-10 max-lg:items-center max-lg:justify-center">
+      <div class="max-lg:scale-[0.55]" :class="{ invisible: isPaused }">
         <ComboMeter
           :combo="run.combo"
           :broken-combo="brokenCombo"
