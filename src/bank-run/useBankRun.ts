@@ -5,6 +5,7 @@
  * ends the run's combo through `endCombo`. Opening the shop pauses the
  * game, and leaving it resumes play.
  */
+import { readStoredBest, recordStoredBest } from '../memory/safe-storage.ts';
 import { BANK_BEST_KEY } from '../memory/progress-keys.ts';
 import { ref, shallowRef, watch, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
@@ -27,19 +28,7 @@ import { useCrests } from './useCrests.ts';
 
 /** The best score (banked coins) reached in this browser, for the stats and the leaderboard. */
 export function readBestScore(): number {
-  try {
-    return Number(localStorage.getItem(BANK_BEST_KEY) ?? 0);
-  } catch {
-    return 0;
-  }
-}
-
-function saveBestScore(score: number): void {
-  try {
-    localStorage.setItem(BANK_BEST_KEY, String(score));
-  } catch {
-    // Storage can be blocked (a private window); the best score then lasts this visit.
-  }
+  return readStoredBest(BANK_BEST_KEY);
 }
 
 function useBestScore() {
@@ -49,7 +38,7 @@ function useBestScore() {
     record: (score: number) => {
       if (score <= bestScore.value) return;
       bestScore.value = score;
-      saveBestScore(score);
+      recordStoredBest(BANK_BEST_KEY, score);
     },
   };
 }

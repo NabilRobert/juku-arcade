@@ -5,6 +5,7 @@
  * tagged with a word from the last tale's setting is preferred. The
  * collection is every haiku ever closed on, kept in this browser.
  */
+import { readStoredJson, writeStored } from '../memory/safe-storage.ts';
 import { HAIKU_KEY } from '../memory/progress-keys.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { HAIKU_BANK, type Haiku } from './haiku-bank.ts';
@@ -53,21 +54,11 @@ export function pickHaiku(
 }
 
 export function loadHaikuShelf(): HaikuShelf {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem(HAIKU_KEY) ?? 'null',
-    ) as Partial<HaikuShelf> | null;
-    if (saved === null) return EMPTY_SHELF;
-    return { collected: saved.collected ?? [], round: saved.round ?? [] };
-  } catch {
-    return EMPTY_SHELF;
-  }
+  const saved = readStoredJson<Partial<HaikuShelf> | null>(HAIKU_KEY, null);
+  if (saved === null) return EMPTY_SHELF;
+  return { collected: saved.collected ?? [], round: saved.round ?? [] };
 }
 
 export function saveHaikuShelf(shelf: HaikuShelf): void {
-  try {
-    localStorage.setItem(HAIKU_KEY, JSON.stringify(shelf));
-  } catch {
-    // Storage can be blocked (a private window); the collection then lasts this visit.
-  }
+  writeStored(HAIKU_KEY, JSON.stringify(shelf));
 }

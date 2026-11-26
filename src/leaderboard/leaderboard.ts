@@ -9,6 +9,7 @@
  * splits the ranking into pages the panel flips through with Back and
  * Next.
  */
+import { readStoredBest, recordStoredBest } from '../memory/safe-storage.ts';
 import { PLAY_MODES, type PlayMode, type PlayedRun } from '../memory/play-log.ts';
 import { BUNPOU_BEST_KEY } from '../memory/progress-keys.ts';
 
@@ -150,22 +151,12 @@ export function boardBests(
 
 /** Your best Bunpou run in this browser, for its leaderboard. */
 export function readBunpouBest(): number {
-  try {
-    return Number(localStorage.getItem(BUNPOU_BEST_KEY) ?? 0);
-  } catch {
-    return 0;
-  }
+  return readStoredBest(BUNPOU_BEST_KEY);
 }
 
 /** Keeps a run's score if it beats your best; true when it did. */
 export function recordBunpouBest(score: number): boolean {
-  if (score <= readBunpouBest()) return false;
-  try {
-    localStorage.setItem(BUNPOU_BEST_KEY, String(score));
-  } catch {
-    // Storage can be blocked (a private window); the best then lasts this visit.
-  }
-  return true;
+  return recordStoredBest(BUNPOU_BEST_KEY, score);
 }
 
 /** Rows on one page of the panel. */

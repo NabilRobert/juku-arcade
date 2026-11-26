@@ -4,6 +4,7 @@
  * Bunpou's hint, furigana. Plain code: a ref and localStorage need no
  * library.
  */
+import { readStored, writeStored } from '../memory/safe-storage.ts';
 import { ref, type Ref } from 'vue';
 
 export interface StoredFlag {
@@ -12,14 +13,10 @@ export interface StoredFlag {
 }
 
 function readFlag(key: string, fallback: boolean): boolean {
-  try {
-    const saved = localStorage.getItem(key);
-    if (saved === 'true') return true;
-    if (saved === 'false') return false;
-    return fallback;
-  } catch {
-    return fallback;
-  }
+  const saved = readStored(key);
+  if (saved === 'true') return true;
+  if (saved === 'false') return false;
+  return fallback;
 }
 
 export function storedFlag(key: string, fallback: boolean): StoredFlag {
@@ -28,11 +25,7 @@ export function storedFlag(key: string, fallback: boolean): StoredFlag {
     isOn,
     set: (next: boolean): void => {
       isOn.value = next;
-      try {
-        localStorage.setItem(key, String(next));
-      } catch {
-        // Storage can be blocked (a private window); the choice then lasts this visit.
-      }
+      writeStored(key, String(next));
     },
   };
 }
