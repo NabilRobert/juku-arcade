@@ -29,6 +29,8 @@ function playAnswerSound(isRight: boolean, rightSoFar: number): void {
 export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random) {
   const state = ref<DojoState>(FRESH_DOJO);
   const question = shallowRef<DojoQuestion>(nextQuestion(pools, random));
+  /** Counts the questions asked, so the board is rebuilt for each new question (and only then). */
+  const questionNumber = ref(1);
   const isLocked = ref(false);
   const later = useLater();
   const runLog = useRunLog('dojo');
@@ -36,6 +38,7 @@ export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random)
 
   function ask(): void {
     question.value = nextQuestion(pools, random);
+    questionNumber.value += 1;
     isLocked.value = false;
   }
 
@@ -52,6 +55,7 @@ export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random)
   return {
     state,
     question,
+    questionNumber,
     isLocked,
     isPaused,
     answer,

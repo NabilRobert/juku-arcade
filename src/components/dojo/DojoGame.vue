@@ -41,7 +41,7 @@ const props = defineProps<{
 const emit = defineEmits<{ leave: []; again: [] }>();
 
 const dojo = useDojoRun(props.pools);
-const { state, question, isLocked, isPaused } = dojo;
+const { state, question, questionNumber, isLocked, isPaused } = dojo;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -121,16 +121,20 @@ function dismiss(isStopping: boolean): void {
       >
         <QuoteCard :quote="quote" />
       </RunResults>
-      <p
-        v-else-if="isPaused"
-        class="pixel-panel bg-wood/80 p-10 text-center text-xl"
-        data-testid="dojo-paused"
-      >
-        Paused
-      </p>
-      <div v-else class="flex flex-col gap-6">
+      <!-- Paused covers the question rather than replacing it, so the cards picked or tiles placed are
+           still there on resume. -->
+      <div v-else class="relative flex flex-col gap-6">
+        <p
+          v-if="isPaused"
+          class="pixel-panel absolute inset-0 z-20 flex items-center justify-center bg-wood p-10 text-center text-xl"
+          data-testid="dojo-paused"
+        >
+          Paused
+        </p>
+        <!-- Keyed on the question asked, not the answers given: an answer stays on screen until the next
+             question comes, and each new question gets a fresh board. -->
         <DojoQuestionView
-          :key="state.answered"
+          :key="questionNumber"
           :question="question"
           :level="level"
           :combo="state.combo"
