@@ -4,6 +4,7 @@
  * the pause button, the sound switch, and what's happening (L5, L6, L9,
  * L12).
  */
+import TimerBar from '../ui/TimerBar.vue';
 import { themeColour } from '../ui/theme-colour.ts';
 import { m } from 'motion-v';
 import { computed } from 'vue';
@@ -18,7 +19,6 @@ defineEmits<{ pause: []; resume: [] }>();
 
 const isPaused = computed(() => props.state.pausedAtMs !== null);
 const timeShare = computed(() => timeShareLeft(props.state, props.nowMs));
-const isTimeLow = computed(() => timeShare.value < 0.25);
 /** A new level flashes aqua, then settles to the panel's white (palette tokens, read once). */
 const LEVEL_UP_COLOUR = themeColour('aqua');
 const LEVEL_COLOUR = themeColour('washi');
@@ -51,18 +51,7 @@ const LEVEL_COLOUR = themeColour('washi');
         >
       </StatPanel>
     </div>
-    <div
-      class="h-2.5 overflow-hidden bg-lacquer"
-      role="progressbar"
-      aria-label="Time left in this set"
-      :aria-valuenow="Math.round(timeShare * 100)"
-    >
-      <div
-        class="h-full transition-[width] duration-100"
-        :class="isTimeLow ? 'bg-crimson' : 'bg-aqua'"
-        :style="{ width: `${timeShare * 100}%` }"
-      />
-    </div>
+    <TimerBar :time-left="timeShare" label="Time left in this set" />
     <PauseButton
       class="max-lg:hidden"
       :is-paused="isPaused"
