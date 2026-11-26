@@ -2,6 +2,10 @@
 import 'fake-indexeddb/auto';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
+import PlayCard from '../src/components/cards/PlayCard.vue';
+import { THROW_S } from '../src/components/cards/card-motion.ts';
+import CardQuestionView from '../src/components/dojo/CardQuestionView.vue';
 import DojoGame from '../src/components/dojo/DojoGame.vue';
 import DojoScreen from '../src/components/dojo/DojoScreen.vue';
 import LanternRow from '../src/components/dojo/LanternRow.vue';
@@ -40,13 +44,19 @@ const POOLS = dojoPools(DECK.words, kanjiPool(DECK), {
 const mountGame = () =>
   mount(DojoGame, { props: { pools: POOLS, level: 'N5', settings: SETTINGS, isAway: false } });
 
-/** Clicks one of the word question's choices: the right one or a wrong one. */
+/** Picks a right or a wrong reading card on the question's board, plays it, and lets it land. */
 async function choose(game: ReturnType<typeof mountGame>, isRight: boolean): Promise<void> {
-  const choices = game.find('[data-testid="word-question"]').findAll('button');
-  const choice = choices.find(
-    (button) => (button.attributes('data-right') !== undefined) === isRight,
-  );
-  await choice?.trigger('click');
+  // The board deals its cards once it's on the page.
+  await nextTick();
+  const board = game.findComponent(CardQuestionView);
+  const index = board.props('round').cards.findIndex((card) => card.isRight === isRight);
+  const readings = board
+    .findAllComponents(PlayCard)
+    .filter((card) => card.props('kind') === 'reading');
+  readings[index]?.vm.$emit('tap');
+  await nextTick();
+  await board.find('[data-testid="play"]').trigger('click');
+  await vi.advanceTimersByTimeAsync(THROW_S * 1000 + 50);
 }
 
 afterEach(() => {
@@ -62,6 +72,7 @@ describe('the dojo on screen', () => {
   });
 
   it('scores a right answer and keeps every lantern lit', async () => {
+    vi.useFakeTimers();
     const game = mountGame();
     await choose(game, true);
     expect(game.find('[data-testid="score"]').text()).toBe('1');

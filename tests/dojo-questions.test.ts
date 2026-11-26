@@ -6,7 +6,9 @@ import {
   dojoPools,
   isDojoOpen,
   MIN_DOJO_WORDS,
+  judgeCards,
   nextQuestion,
+  roundOfWord,
   wordQuestion,
 } from '../src/dojo/dojo-questions.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
@@ -96,5 +98,37 @@ describe('what the dojo asks', () => {
       if (question.kind === 'grammar') expect(question.tale.lines).toHaveLength(1);
     }
     expect(kinds).toEqual(new Set(['kanji', 'grammar']));
+  });
+});
+
+describe('a card question', () => {
+  const round = {
+    kanji: '生',
+    meanings: [],
+    cards: [
+      { text: 'セイ', isRight: true },
+      { text: 'ガク', isRight: false },
+      { text: 'う(まれる)', isRight: true },
+    ],
+  };
+
+  it('is a miss as soon as one wrong card is thrown', () => {
+    expect(judgeCards(round, [0, 1])).toBe(false);
+  });
+
+  it('is right once every right card is thrown, and open until then', () => {
+    expect(judgeCards(round, [0])).toBeNull();
+    expect(judgeCards(round, [0, 2])).toBe(true);
+  });
+
+  it('lays a word question out as the word over its readings, without its meaning', () => {
+    const word = DECK.words[0];
+    if (word === undefined) throw new Error('the test deck has no words');
+    const laidOut = roundOfWord(wordQuestion(word, DECK.words, seededRandom(5)));
+    expect(laidOut.kanji).toBe('先生');
+    expect(laidOut.meanings).toEqual([]);
+    expect(laidOut.cards.filter((card) => card.isRight).map((card) => card.text)).toEqual([
+      'せんせい',
+    ]);
   });
 });

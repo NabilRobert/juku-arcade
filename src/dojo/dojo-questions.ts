@@ -145,3 +145,21 @@ export function nextQuestion(pools: DojoPools, random: RandomSource): DojoQuesti
   if (word === undefined) throw new Error('The dojo has no words to ask: the deck is empty.');
   return wordQuestion(word, pools.allWords, random);
 }
+
+/** A word question laid out as a hand of cards, so it plays on the kanji board: the word on top, its readings below. */
+export function roundOfWord(question: WordQuestion): KanjiRound {
+  const cards = question.choices.map((text) => ({ text, isRight: text === question.word.reading }));
+  // No meanings: the question is the reading, and the meaning would give it away too easily.
+  return { kanji: question.word.word, meanings: [], cards };
+}
+
+/**
+ * A card question after the thrown cards land: wrong as soon as one wrong
+ * card is thrown, right once every right card is, or still open (null).
+ */
+export function judgeCards(round: KanjiRound, thrown: readonly number[]): boolean | null {
+  const isWrongThrown = thrown.some((index) => round.cards[index]?.isRight === false);
+  if (isWrongThrown) return false;
+  const rights = round.cards.flatMap((card, index) => (card.isRight ? [index] : []));
+  return rights.every((index) => thrown.includes(index)) ? true : null;
+}

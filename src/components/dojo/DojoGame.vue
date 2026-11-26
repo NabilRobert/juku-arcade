@@ -8,6 +8,7 @@
  * wellbeing screens stand in front of the question.
  */
 import { computed } from 'vue';
+import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../dojo/dojo-run.ts';
 import { pickQuote } from '../../dojo/quotes.ts';
@@ -29,7 +30,7 @@ import QuoteCard from './QuoteCard.vue';
 
 const props = defineProps<{
   pools: DojoPools;
-  level: string;
+  level: JlptLevel;
   settings: Settings;
   isAway: boolean;
 }>();
@@ -119,6 +120,8 @@ function dismiss(isStopping: boolean): void {
         <DojoQuestionView
           :key="state.answered"
           :question="question"
+          :level="level"
+          :combo="state.combo"
           :is-locked="isLocked"
           :is-paused="isPaused"
           :time-left="timeLeft"
