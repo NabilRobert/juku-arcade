@@ -23,12 +23,8 @@ import PlayCard from '../cards/PlayCard.vue';
 import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
 import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 
-/**
- * Eight cards overlap more than word mode's six, to fit the same width. On
- * a phone-width screen they overlap less (5vw is the smaller), so each
- * reading still shows.
- */
-const HAND_OVERLAP = 'max(-4dvh, -5vw)';
+/** Eight cards overlap more than word mode's six, to fit the same width (on a phone they're a grid instead). */
+const HAND_OVERLAP = '-4dvh';
 
 const props = withDefaults(
   defineProps<{
@@ -141,7 +137,7 @@ watch(
     </div>
     <div class="flex items-start gap-2 pt-4 sm:gap-4">
       <div
-        class="flex flex-1 justify-center [--card-height:min(20dvh,19vw)] lg:[--card-height:20dvh]"
+        class="grid flex-1 grid-cols-4 justify-items-center gap-2 [--card-height:min(20dvh,25vw)] [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div

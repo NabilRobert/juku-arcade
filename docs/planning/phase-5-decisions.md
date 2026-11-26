@@ -1183,8 +1183,10 @@ desktop unchanged.
   edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
   tablets; word mode's set timer also shows above its cards.
 - **Cards and tiles:** card rows cap their height by the window's width
-  as well as its height, so a hand fits across; the kanji hand overlaps
-  less; Bunpou's tiles shrink with their text. The calendar shows 12
+  as well as its height. On a phone the hand is a grid of cards side by
+  side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2), so
+  each reading is big enough to read and tap (playtest: the fan was hard
+  to read and too small to tap). Bunpou's tiles shrink with their text. The calendar shows 12
   weeks.
 - **Not yet checked on a real phone:** touch drags (throwing a card) work
   in a phone emulator, but a playtest on a real device is still to come.

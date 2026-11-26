@@ -210,7 +210,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
     </div>
     <div class="flex items-start gap-2 pt-4 sm:gap-4">
       <div
-        class="flex flex-1 justify-center [--card-height:min(24dvh,24vw)] lg:[--card-height:24dvh]"
+        class="grid flex-1 grid-cols-3 justify-items-center gap-2 [--card-height:min(24dvh,33vw)] [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div

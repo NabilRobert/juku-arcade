@@ -34,12 +34,17 @@ export function floatStyle(kind: 'word' | 'reading', index: number): Record<stri
   };
 }
 
-/** A reading card's place in the row: overlapping the card before it, with its own small turn and raise. A bigger hand overlaps more, to fit. */
+/**
+ * A reading card's place in the row: overlapping the card before it, with
+ * its own small turn and raise. A bigger hand overlaps more, to fit. The
+ * row can switch the overlap off with `--hand-overlap: 0` (on a phone the
+ * hand is a grid of cards side by side, big enough to read and tap).
+ */
 export function handStyle(index: number, overlap: string = HAND_OVERLAP): Record<string, string> {
   const tilt = HAND_TILTS_DEG[index % HAND_TILTS_DEG.length] ?? 0;
   const raise = HAND_RAISES_PX[index % HAND_RAISES_PX.length] ?? 0;
   return {
     transform: `translateY(${-raise}px) rotate(${tilt}deg)`,
-    marginLeft: index === 0 ? '0' : overlap,
+    marginLeft: index === 0 ? '0' : `calc(${overlap} * var(--hand-overlap, 1))`,
   };
 }
