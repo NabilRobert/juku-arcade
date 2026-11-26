@@ -1191,8 +1191,8 @@ desktop unchanged.
 - **One screen, no scrolling during play:** on phones and tablets each
   board's cards are capped by the screen's height too, so the cards you
   play fit on one screen (checked at 375×812, 375×667 and 768×1024);
-  Bunpou's stage is shorter on a phone. On a phone the deck is gone and
-  each card slides up from under the screen; tablets keep the deck. Card
+  Bunpou's stage is shorter on a phone. On phones and tablets the deck is
+  gone and each card slides up from under the screen; desktop keeps it. Card
   text always stays on one line, shrinking to fit.
 - **Not yet checked on a real phone:** touch drags (throwing a card) work
   in a phone emulator, but a playtest on a real device is still to come.

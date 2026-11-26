@@ -3,8 +3,8 @@
  * set comes off the deck one card after another (card-motion.ts staggers
  * them). Measured from the slots (useTableSlots.ts); null until the board
  * is on the page, and the board waits for it before drawing cards. On a
- * phone the deck is hidden, and each card slides up from under the screen
- * instead (playtest decision, 2026-11-26).
+ * phone or a tablet the deck is hidden, and each card slides up from under
+ * the screen instead (playtest decision, 2026-11-26).
  */
 import { computed, type Ref } from 'vue';
 import { placementBetween, type Box, type Placement } from '../components/cards/throw-geometry.ts';
@@ -22,7 +22,7 @@ export function belowScreen(slot: Box, screenHeight: number): Box {
   return { ...slot, top: screenHeight };
 }
 
-/** A hidden deck (display: none, on a phone) measures nothing. */
+/** A hidden deck (display: none, on a phone or a tablet) measures nothing. */
 const isShown = (box: Box | null): box is Box => box !== null && box.width > 0;
 
 function fromDeck(slots: Map<number, Element>, deck: Element | null): (Placement | undefined)[] {

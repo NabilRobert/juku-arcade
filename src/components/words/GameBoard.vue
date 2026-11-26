@@ -209,7 +209,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         Play ▶
       </PixelButton>
     </div>
-    <!-- No deck on a phone (cards slide up from under the screen); under the hand on a tablet; beside it on desktop. -->
+    <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
         class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16dvh,36vw)] sm:grid-cols-6 sm:[--card-height:min(20dvh,20vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
@@ -249,7 +249,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       </div>
       <div
         :ref="registerDeck"
-        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] sm:block lg:[--card-height:22dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] lg:block lg:[--card-height:22dvh]"
       >
         <CardDeck />
       </div>
