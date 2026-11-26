@@ -605,7 +605,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days, counting only the level's official kanji list), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
 | **Official kanji list** | The kanji a JLPT level's list names (79 for N5), as OpenJLPT tags them. A level's words also use harder kanji (欲 in ほしい); those are played but not counted by the goal (D67) | `deck/types.ts: KanjiNote.listLevel`, `kanji/kanji-round.ts: kanjiPool` |
 | **Sheet mix** | Which kind of kanji each round of kanji mode draws: every third a mastered one, for review; the rest still being learned, from the official list 3 times in 4 (D67) | `kanji/sheet-mix.ts` |
-| **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; the timer tightens by stage to a floor | `dojo/`, `components/dojo/` |
+| **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; not timed (D69) | `dojo/`, `components/dojo/` |
 | **Total board** | The leaderboard that adds up your best run in each mode | `leaderboard/leaderboard.ts: boardBests` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
@@ -676,8 +676,8 @@ fields. They stay in memory until slice 3 stores them.
   `KANJI_PER_SHEET` in `kanji/useKanjiSheet.ts`; a Bunpou show's length is
   `TALES_PER_CHAPTER` in `grammar/performance.ts`; the goals, their stamps
   and the rakugo ranks are in `memory/level-goals.ts`.
-- **Change practice mode (the dojo):** lanterns, the stage length and each kind's
-  seconds per stage are at the top of `dojo/dojo-run.ts`; what it asks,
+- **Change practice mode (the dojo):** the lanterns are at the top of
+  `dojo/dojo-run.ts` (there's no timer, D69); what it asks,
   and when it opens (`MIN_DOJO_WORDS`), is in `dojo/dojo-questions.ts`;
   the game-over quotes are `QUOTES` in `dojo/quotes.ts`.
 - **Change a leaderboard:** the sample players and how your bests are

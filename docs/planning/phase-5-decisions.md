@@ -1302,3 +1302,20 @@ name, then keyboard focus by hand.
 - Not covered: a screen reader run with VoiceOver, and playing a whole run
   by keyboard alone; both are worth a session on a real device.
 
+### D69: Practice mode has no timer (2026-11-26)
+
+Practice mode's questions aren't timed. They had a timer that tightened
+through five stages to a floor (D62's table: word 20 s down to 12 s, kanji
+60 s to 36 s, grammar 30 s to 18 s). Playtest decision: "no timer on
+practice mode thats just cruel".
+
+- A run still ends after three misses, or at End run. The score is still
+  the right answers, so the board ranks how much a player knows, not how
+  long they play.
+- The stages went with the timer, since tightening it was all they did.
+  So did the timeout handling: there's nothing left to run out.
+- Pause stays. It hides the question and stops play time counting toward
+  the nudges and the daily cap.
+- Trade-off: with no clock, a player could look answers up. The board
+  ranks sample players for now; revisit this with real leaderboards.
+

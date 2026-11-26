@@ -48,18 +48,6 @@ function play(): void {
   }, THROW_S * MS_PER_SECOND);
 }
 
-/**
- * As the question's time runs out (useDojoRun): the cards picked are thrown
- * too, and everything thrown is judged now, rather than lost (playtest,
- * 2026-11-26). Right only if every right reading is in, with no wrong one.
- */
-function judgeNow(): boolean {
-  thrown.value = [...thrown.value, ...picked.value];
-  picked.value = [];
-  return judgeCards(props.round, thrown.value) === true;
-}
-defineExpose({ judgeNow });
-
 function statusOf(index: number): CardStatus {
   const isRight = props.round.cards[index]?.isRight === true;
   if (thrown.value.includes(index)) return isRight ? 'matched' : 'wrong';

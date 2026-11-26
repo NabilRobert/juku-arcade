@@ -111,7 +111,7 @@ export const SOURCE_GROUPS: readonly SourceGroup[] = [
         venue: 'Harper & Row (book)',
         url: null,
         finding: 'People stay absorbed when the challenge matches their skill.',
-        inGame: 'Levels that speed up with the combo, and the timer stages.',
+        inGame: "Word mode's levels, which speed up with the combo.",
       },
       {
         citation:
