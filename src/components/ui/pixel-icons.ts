@@ -1,13 +1,13 @@
 /**
  * The game's small icons as pixel art (D43): a magnifying glass for Scout,
- * a speaker with and without sound for the sound switch, a gold coin for
- * the bank run's pot, wallet and prices, and a flame for the streak. Each icon is a
+ * a speaker with and without sound for the sound switch, and a gold coin for
+ * the bank run's pot, wallet and prices. Each icon is a
  * grid of letters, one per pixel, so it reads like the sprite it draws;
  * `iconPaths` turns a grid into one SVG path per colour, and PixelIcon.vue
  * draws them. Drawn for this game in the style of classic pixel icons.
  */
 
-export type IconName = 'scout' | 'soundOn' | 'soundOff' | 'coin' | 'flame';
+export type IconName = 'scout' | 'soundOn' | 'soundOff' | 'coin';
 
 /** What each letter in a grid is painted; '.' is see-through. */
 const PALETTE: Record<string, string> = {
@@ -20,8 +20,7 @@ const PALETTE: Record<string, string> = {
   b: '#3cc8f0', // lens
   y: '#ffc93c', // speaker cone, coin face
   h: '#fff1a8', // coin's lit rim
-  o: '#f08c1a', // speaker box and shade, coin's ring and sign, flame
-  r: '#e8302a', // flame's outer fire
+  o: '#f08c1a', // speaker box and shade, coin's ring and sign
 };
 
 /** A speaker facing right; the sound or the cross goes in columns 10 to 15. */
@@ -112,22 +111,6 @@ export const ICONS: Record<IconName, readonly string[]> = {
     '..kooyyyyyyook..',
     '...kkooooookk...',
     '.....kkkkkk.....',
-  ],
-  flame: [
-    '.......r....',
-    '........r...',
-    '.......rr...',
-    '......ror...',
-    '.....roor...',
-    '....rooor.r.',
-    '...rooyorrr.',
-    '..rooyyoorrr',
-    '..royyyyoorr',
-    '.royyhyyyoor',
-    '.royhhhhyyor',
-    '.royhwwhhyor',
-    '..royhwwhor.',
-    '...rrrrrrr..',
   ],
 };
 

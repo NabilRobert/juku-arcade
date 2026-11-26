@@ -1,8 +1,10 @@
 // The streak on the start screen: the calendar's days, a day's summary, and the reminder.
 import 'fake-indexeddb/auto';
 import { flushPromises, mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import DayDetail from '../src/components/streak/DayDetail.vue';
+import FlameSprite from '../src/components/streak/FlameSprite.vue';
+import { FLAME_FRAMES } from '../src/components/streak/flame-frames.ts';
 import PlayCalendar from '../src/components/streak/PlayCalendar.vue';
 import StreakPanel from '../src/components/streak/StreakPanel.vue';
 import { localDay } from '../src/game/events.ts';
@@ -144,5 +146,24 @@ describe('the streak panel', () => {
     expect(panel.find('[data-testid="streak-message"]').text()).toContain(
       '2-day streak! Play today',
     );
+  });
+});
+
+describe('the streak flame', () => {
+  it('flickers through its frames and starts over', async () => {
+    vi.useFakeTimers();
+    const flame = mount(FlameSprite);
+    const frames: string[] = [];
+    for (let step = 0; step <= FLAME_FRAMES.length; step += 1) {
+      frames.push(flame.find('svg').attributes('data-frame') ?? '');
+      await vi.advanceTimersByTimeAsync(160);
+    }
+    vi.useRealTimers();
+    expect(frames).toEqual(['0', '1', '2', '3', '0']);
+  });
+
+  it('draws every frame the same size, so it flickers in place', () => {
+    const sizes = new Set(FLAME_FRAMES.map((frame) => `${frame[0]?.length}x${frame.length}`));
+    expect(sizes).toEqual(new Set(['16x16']));
   });
 });
