@@ -55,8 +55,8 @@ The build downloads the pinned OpenJLPT file and builds the decks itself,
 so nothing else is needed. Every other branch gets its own preview URL:
 use one to try a tuning change before it reaches the class.
 
-**Check after the first deploy:** open the site on a laptop (the layout
-isn't made for phones yet), play a set, pause and flip a card, and use
+**Check after the first deploy:** open the site on a laptop and on a
+phone held upright, play a set, pause and flip a card, and use
 **Settings → Export my data**. On Cloudflare, also run `curl -sI <site>`
 and check the `content-security-policy` header is there.
 

@@ -14,7 +14,7 @@
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import { FIRST_LEVEL, levelAfterMatch, levelAfterMiss } from '../game/levels.ts';
 import { MISSED_TRAY_SIZE } from '../game/tuning.ts';
-import { rankFor, type RankLetter } from '../components/ui/combo-ranks.ts';
+import { rankFor, type RankLetter } from '../game/combo-ranks.ts';
 import type { Sentence } from './fill.ts';
 import { closestFix, isRightOrder, type Fix } from './order-check.ts';
 import type { Tale } from './tale.ts';

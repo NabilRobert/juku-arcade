@@ -10,7 +10,7 @@
  * the modes, and each mode's card shows its level goal (level-goals.ts).
  * The play history is read once here for both.
  */
-import { LANTERNS } from '../dojo/dojo-run.ts';
+import { LANTERNS } from '../game/lanterns.ts';
 import { computed } from 'vue';
 import type { Deck } from '../deck/types.ts';
 import { readBestScore } from '../bank-run/useBankRun.ts';
@@ -66,7 +66,7 @@ const cards: readonly Card[] = [
     colour: 'steel',
     name: MODE_NAMES.kanji,
     example: '生 → セイ・う(まれる)…',
-    description: `Find every reading of a kanji among ${CARDS_PER_ROUND} cards. Doesn't count toward your reviews.`,
+    description: `Find every reading of a kanji among ${CARDS_PER_ROUND} cards, with ${LANTERNS} lanterns a sheet. Doesn't count toward your reviews.`,
   },
   {
     mode: 'bunpou',

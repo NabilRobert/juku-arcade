@@ -1345,3 +1345,19 @@ of the total since it has no timer". Since D69 its questions aren't
 timed, so a player could take as long as they like, or look answers up,
 and its scores aren't on the same footing as the timed modes'.
 
+### D72: Kanji mode gets lanterns (2026-11-26)
+
+Kanji mode had no way to fail: a sheet always ran its 10 kanji. It now
+has 3 lanterns, like practice mode (`game/lanterns.ts`, shared). A kanji
+whose answers are revealed with readings still unfound puts one out.
+Wrong picks alone don't, if every reading is still found, which is the
+rule the applause follows. The sheet ends early when the last one goes
+out, and its results say "Lanterns out".
+
+- Kept untimed, in line with D69 (no timers that rush slow readers).
+- On a phone or a tablet, both modes show a compact lantern row above the
+  board, so the lives are in sight without opening the side drawer
+  (playtest decision).
+- Considered: a timer per kanji (rejected, as above), and failing a kanji
+  on any wrong pick (too harsh next to "3 wrong picks allowed").
+

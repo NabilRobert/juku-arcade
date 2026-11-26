@@ -6,8 +6,9 @@
  * when another fits, since a fresh message works better than a repeated
  * one. The milestones are celebrated on the day they're reached.
  */
+import { pickOne } from '../game/random.ts';
 import type { RandomSource } from '../game/deal.ts';
-import { addDays } from './leitner.ts';
+import { addDays } from './days.ts';
 import type { Streak } from './streak.ts';
 
 /** Streak lengths celebrated on the day they're reached. */
@@ -99,6 +100,6 @@ export function streakMessage(
   const fitting = TEMPLATES.filter((template) => template.fits(context));
   const fresh = fitting.filter((template) => template.id !== lastId);
   const choices = fresh.length > 0 ? fresh : fitting;
-  const template = choices[Math.floor(random() * choices.length)] ?? START;
+  const template = pickOne(choices, random) ?? START;
   return { id: template.id, text: template.text(context) };
 }

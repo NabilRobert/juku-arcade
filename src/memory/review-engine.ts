@@ -11,8 +11,8 @@ import type { WordHistory } from '../game/run.ts';
 import type { TagTable } from '../game/tags.ts';
 import { dailyProgress, poolForNextSet, type DailyProgress } from './daily-deck.ts';
 import { learnedTags } from './difficulty.ts';
-import { addDays } from './leitner.ts';
-import { applyEvent, deriveMemory, isWordKnown, localDayOf, type Memory } from './word-memory.ts';
+import { addDays, daysBetween, localDayOf } from './days.ts';
+import { applyEvent, deriveMemory, isWordKnown, type Memory } from './word-memory.ts';
 
 export const CALENDAR_DAYS = 7;
 
@@ -34,12 +34,6 @@ export interface ReviewEngine {
   getProgress(today: string): Progress;
   tags(): TagTable;
   history(wordId: string, today: string): WordHistory;
-}
-
-function daysBetween(fromDay: string, toDay: string): number {
-  return Math.round(
-    (Date.parse(`${toDay}T00:00:00Z`) - Date.parse(`${fromDay}T00:00:00Z`)) / 86_400_000,
-  );
 }
 
 function daysPlayedSince(memory: Memory, today: string): number {

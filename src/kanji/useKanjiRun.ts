@@ -12,14 +12,15 @@
  * hand over to show them, and a crested card adds or takes points when
  * it's thrown.
  *
- * Kanji mode is practice (D37): nothing here is logged or reviewed. Which
- * kanji come up balances learning with review (sheet-mix.ts, D67).
+ * Kanji mode doesn't feed the reviews (D37): its rounds go only to the play
+ * log, for the streak, the calendar and the kanji goal (useKanjiSheet.ts).
+ * Which kanji come up balances learning with review (sheet-mix.ts, D67).
  */
 import { computed, ref, shallowRef } from 'vue';
 import type { CardStatus } from '../game/card-status.ts';
 import type { RandomSource } from '../game/deal.ts';
 import type { Deck } from '../deck/types.ts';
-import { THROW_S } from '../components/cards/card-motion.ts';
+import { THROW_MS } from '../game/tuning.ts';
 import { PLAY_STEP_MS } from '../composables/useHand.ts';
 import { useLater } from '../composables/useLater.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
@@ -39,8 +40,6 @@ import { loadKanjiRounds } from '../memory/storage.ts';
 
 export type KanjiPhase = 'picking' | 'playing' | 'revealed';
 
-/** A thrown card reaches the kanji this long after it leaves the hand. */
-const THROW_MS = THROW_S * 1000;
 /** A scored round, with what its crests added or took. */
 export interface PlayedRound extends RoundResult {
   crestPoints: number;

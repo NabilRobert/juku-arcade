@@ -9,7 +9,7 @@ import PlayCalendar from '../src/components/streak/PlayCalendar.vue';
 import ModePicker from '../src/components/ModePicker.vue';
 import { localDay } from '../src/game/events.ts';
 import type { DaySummary } from '../src/memory/day-summary.ts';
-import { addDays } from '../src/memory/leitner.ts';
+import { addDays } from '../src/memory/days.ts';
 import { calendarWeeks } from '../src/memory/play-calendar.ts';
 import { deleteAllData, saveRun } from '../src/memory/storage.ts';
 

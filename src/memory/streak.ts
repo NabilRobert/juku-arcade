@@ -8,7 +8,7 @@
  *
  * Today never breaks the streak: the player still has until midnight.
  */
-import { addDays } from './leitner.ts';
+import { addDays, weekStartOf } from './days.ts';
 
 export interface Streak {
   /** Days played in the streak, not counting rest days. */
@@ -19,13 +19,6 @@ export interface Streak {
 }
 
 const NO_STREAK: Streak = { days: 0, restDays: [], isTodayPlayed: false };
-
-/** The Monday that starts `day`'s week, YYYY-MM-DD. */
-export function weekStartOf(day: string): string {
-  const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
-  const daysSinceMonday = (weekday + 6) % 7;
-  return addDays(day, -daysSinceMonday);
-}
 
 function earliestOf(days: ReadonlySet<string>): string | null {
   let earliest: string | null = null;

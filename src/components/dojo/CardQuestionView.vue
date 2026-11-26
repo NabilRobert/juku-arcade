@@ -13,7 +13,7 @@ import type { CardStatus } from '../../game/card-status.ts';
 import type { KanjiRound } from '../../kanji/kanji-round.ts';
 import { useLater } from '../../composables/useLater.ts';
 import { playSound } from '../../sound/sfx.ts';
-import { THROW_S } from '../cards/card-motion.ts';
+import { THROW_MS } from '../../game/tuning.ts';
 import KanjiBoard from '../kanji/KanjiBoard.vue';
 
 const props = defineProps<{
@@ -24,7 +24,6 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ answer: [isRight: boolean] }>();
 
-const MS_PER_SECOND = 1000;
 const NO_CRESTS = new Map();
 const picked = shallowRef<number[]>([]);
 const thrown = shallowRef<number[]>([]);
@@ -45,7 +44,7 @@ function play(): void {
   later(() => {
     const verdict = judgeCards(props.round, thrown.value);
     if (verdict !== null) emit('answer', verdict);
-  }, THROW_S * MS_PER_SECOND);
+  }, THROW_MS);
 }
 
 function statusOf(index: number): CardStatus {

@@ -72,7 +72,8 @@ export function takeCoins(run: BankRun, coins: number): BankRun {
   return { ...run, coins: Math.max(0, run.coins - coins) };
 }
 
-export function useScout(run: BankRun): BankRun {
+/** Spends one scout, if any are left. */
+export function spendScout(run: BankRun): BankRun {
   return run.scoutsLeft > 0 ? { ...run, scoutsLeft: run.scoutsLeft - 1 } : run;
 }
 

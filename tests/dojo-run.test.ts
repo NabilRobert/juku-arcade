@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { afterAnswer, FRESH_DOJO, LANTERNS } from '../src/dojo/dojo-run.ts';
+import { afterAnswer, FRESH_DOJO } from '../src/dojo/dojo-run.ts';
+import { LANTERNS } from '../src/game/lanterns.ts';
 
 describe('the dojo', () => {
   it('puts out a lantern for each miss, and ends when the last one goes out', () => {

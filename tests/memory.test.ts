@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { dailyProgress, poolForNextSet } from '../src/memory/daily-deck.ts';
 import { learnedMissChance } from '../src/memory/difficulty.ts';
-import { addDays, afterAnswer, NEW_WORD } from '../src/memory/leitner.ts';
+import { addDays } from '../src/memory/days.ts';
+import { afterAnswer, NEW_WORD } from '../src/memory/leitner.ts';
 import { createLocalEngine } from '../src/memory/review-engine.ts';
 import { applyEvent, deriveMemory, emptyMemory } from '../src/memory/word-memory.ts';
 import { answer } from './helpers/events.ts';

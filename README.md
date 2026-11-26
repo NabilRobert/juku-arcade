@@ -5,11 +5,12 @@ Japanese learners. Match 5 kanji word cards (学校) to their readings
 (がっこう), with a decoy in the mix; combos raise the level and fill a pot
 you can bank or lose. A second mode asks for every reading of one kanji,
 and a third, Bunpou, has you put grammar tiles in order to build a short
-generated tale.
+generated tale. Practice mixes the words, kanji and grammar you've already
+met, with no timer, until your lanterns run out.
 It's a static web app with no server: progress stays in the browser.
 
-**Play it:** <https://nabilrobert.github.io/juku-arcade/> (on a laptop or
-desktop; the layout isn't made for phones yet).
+**Play it:** <https://nabilrobert.github.io/juku-arcade/> (on a laptop, a
+tablet, or a phone held upright).
 
 An optional daily check-up is designed to measure whether playing improves
 recall. No learners have been measured yet, so there's no result to report.

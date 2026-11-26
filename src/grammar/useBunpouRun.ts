@@ -10,6 +10,7 @@
  * Keys, for a laptop: 1–5 put the offered tile with that number in the
  * first empty box, Backspace takes the rightmost tile back (Esc pauses, usePauseKey).
  */
+import { CLOCK_TICK_MS } from '../game/tuning.ts';
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch, type ShallowRef } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import { useLater } from '../composables/useLater.ts';
@@ -22,8 +23,6 @@ import { CURRICULUM, TEMPLATES } from './templates.ts';
 const RIGHT_SHOWN_MS = 700;
 /** How long a wrong line shows, with the wrong tiles marked and the fix, before the next. */
 const WRONG_SHOWN_MS = 3000;
-/** Often enough for a smooth timer bar and a prompt timeout. */
-const TICK_MS = 100;
 
 export interface BunpouRunOptions {
   random?: RandomSource;
@@ -57,7 +56,7 @@ function useLineClock(run: RunRef) {
   const timer = setInterval(() => {
     nowMs.value = Date.now();
     run.value = rules.checkTime(run.value, nowMs.value);
-  }, TICK_MS);
+  }, CLOCK_TICK_MS);
   onUnmounted(() => clearInterval(timer));
   return computed(() => {
     const { deadlineMs, pausedAtMs, lineDurationMs } = run.value;

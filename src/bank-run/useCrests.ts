@@ -7,7 +7,7 @@
 import { computed, ref, shallowRef, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import type { RunState } from '../game/run.ts';
-import { addCoins, takeCoins, useScout, type BankRun } from './bank-run.ts';
+import { addCoins, takeCoins, spendScout, type BankRun } from './bank-run.ts';
 import { CRESTS, CURSE_COST, dealCrests, drawOmikuji, type CrestKind } from './crests.ts';
 
 type Notify = (text: string, isGood: boolean) => void;
@@ -26,7 +26,7 @@ export function useScouting(state: () => RunState, run: Ref<BankRun>) {
       const canScout =
         run.value.scoutsLeft > 0 && now.phase === 'playing' && now.pausedAtMs === null;
       if (!canScout) return false;
-      run.value = useScout(run.value);
+      run.value = spendScout(run.value);
       isScouting.value = true;
       isRevealed.value = true;
       return true;

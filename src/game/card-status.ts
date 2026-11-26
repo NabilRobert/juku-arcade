@@ -3,6 +3,7 @@
  * right after a miss, or idle. Pure functions of the run state and the
  * clock, so the board component only draws what these return.
  */
+import { isReadingMatched } from './hand.ts';
 import type { RunState } from './run.ts';
 
 /** 'hidden': the card shows its back while the game is paused (D8). */
@@ -26,11 +27,6 @@ function readingFlashStatus(state: RunState, index: number, nowMs: number): Card
   if (flash === null || !isFlashing(state, nowMs)) return null;
   if (flash.correctIndex === index) return 'correct';
   return flash.wrongIndex === index ? 'wrong' : null;
-}
-
-function isReadingMatched(state: RunState, index: number): boolean {
-  const wordId = state.set.readings[index]?.wordId ?? null;
-  return wordId !== null && state.matchedWordIds.includes(wordId);
 }
 
 export function readingCardStatus(state: RunState, index: number, nowMs: number): CardStatus {

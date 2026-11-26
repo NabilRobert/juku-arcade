@@ -10,8 +10,7 @@
 import type { GameEvent } from '../../src/game/events.ts';
 import { MAX_LEVEL } from '../../src/game/tuning.ts';
 import { isCheckUpEvent } from '../../src/memory/check-up.ts';
-import { addDays } from '../../src/memory/leitner.ts';
-import { localDayOf } from '../../src/memory/word-memory.ts';
+import { addDays, localDayOf } from '../../src/memory/days.ts';
 import { eventsByPlayer, groupEvents, isRight, isWrong } from './answers.ts';
 
 /** S1: the window "days played out of the first 14" looks at. */

@@ -11,11 +11,11 @@
  * system asks for reduced motion (App.vue), and a matched card then
  * vanishes at once.
  */
+import { THROW_S } from '../../game/tuning.ts';
 import type { CardStatus } from '../../game/card-status.ts';
 import type { Offset, Placement } from './throw-geometry.ts';
 
-/** How long the thrown card flies before it hits, and how long the hit's jolt then takes to settle. */
-export const THROW_S = 0.36;
+/** How long the thrown card flies before it hits (THROW_S, game/tuning.ts), and how long the hit's jolt then takes to settle. */
 export const FALL_S = 0.34;
 /** Whole turns the thrown card spins in flight, so it lands square on the word card. */
 const THROW_TURNS = 2;

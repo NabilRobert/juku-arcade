@@ -5,10 +5,11 @@
  * missed most, and the kinds of mistake (the rule a wrong order broke).
  * Nothing here is sent anywhere.
  */
+import { tally } from './tally.ts';
 import type { BrokenRule } from '../grammar/broken-rule.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import type { AnswerCounts } from './stats.ts';
-import { localDayOf } from './word-memory.ts';
+import { localDayOf } from './days.ts';
 
 /** How many most-missed grammar points the page lists. */
 export const MOST_MISSED_POINTS_SHOWN = 5;
@@ -36,12 +37,6 @@ function countOutcomes(events: readonly GrammarEvent[]): AnswerCounts {
     if (event.outcome === 'timeout') counts.timedOut += 1;
   }
   return counts;
-}
-
-function tally<T>(items: readonly T[]): [T, number][] {
-  const counts = new Map<T, number>();
-  for (const item of items) counts.set(item, (counts.get(item) ?? 0) + 1);
-  return [...counts].sort((a, b) => b[1] - a[1]);
 }
 
 export function grammarStats(events: readonly GrammarEvent[], today: string): GrammarStats {

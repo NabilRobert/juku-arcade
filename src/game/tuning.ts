@@ -45,3 +45,10 @@ export const ENDLESS_NEW_WORDS = 1;
 
 /** A pool smaller than this can't always deal a valid set (L2), so it's topped up. */
 export const MIN_POOL_SIZE = 8;
+
+/** How long a thrown card flies before it hits; sounds, scoring and judging wait for it. */
+export const THROW_S = 0.36;
+export const THROW_MS = THROW_S * 1000;
+
+/** How often a timed screen's clock ticks: often enough for a smooth timer bar, rarely enough for phones. */
+export const CLOCK_TICK_MS = 100;

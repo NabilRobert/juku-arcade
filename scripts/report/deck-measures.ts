@@ -16,7 +16,8 @@ import type { Deck, DeckWord } from '../../src/deck/types.ts';
 import type { GameEvent } from '../../src/game/events.ts';
 import { dailyProgress } from '../../src/memory/daily-deck.ts';
 import { learnedMissChance } from '../../src/memory/difficulty.ts';
-import { applyEvent, emptyMemory, localDayOf } from '../../src/memory/word-memory.ts';
+import { localDayOf } from '../../src/memory/days.ts';
+import { applyEvent, emptyMemory } from '../../src/memory/word-memory.ts';
 import { eventsByPlayer, groupEvents, isRight, isWrong } from './answers.ts';
 import type { Share } from './play-measures.ts';
 

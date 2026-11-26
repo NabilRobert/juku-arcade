@@ -6,8 +6,9 @@
  * (a local copy, the GitHub Pages demo) and off otherwise; a switch in
  * Settings changes it, remembered in this browser.
  */
+import { PREFERENCE_KEYS } from './preference-keys.ts';
 import { storedFlag } from './stored-flag.ts';
 
-const samplePlay = storedFlag('juku-arcade:sample-play', import.meta.env.VITE_SAMPLE_PLAY === '1');
+const samplePlay = storedFlag(PREFERENCE_KEYS.samplePlay, import.meta.env.VITE_SAMPLE_PLAY === '1');
 export const isSamplePlayShown = samplePlay.isOn;
 export const setSamplePlayShown = samplePlay.set;

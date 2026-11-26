@@ -26,6 +26,7 @@ import {
 } from './memory/storage.ts';
 import { provideGoToPage, type PageTarget } from './composables/usePageLinks.ts';
 import { usePhoneLandscape } from './composables/usePhoneLandscape.ts';
+import { useToday } from './composables/useToday.ts';
 import type { PlayMode } from './memory/play-log.ts';
 import AppFooter from './components/AppFooter.vue';
 import RotateNotice from './components/ui/RotateNotice.vue';
@@ -61,6 +62,8 @@ const mode = ref<PlayMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
 const isPhoneLandscape = usePhoneLandscape();
+/** The start screen rebuilds when the day changes, so its streak and goals move on at midnight. */
+const today = useToday();
 /** True while the game is covered: another page is open, or a phone is turned sideways. The run pauses. */
 const isAway = computed(() => page.value !== 'game' || isPhoneLandscape.value);
 const checkUpQuestions = shallowRef<readonly Question[]>([]);
@@ -265,7 +268,7 @@ onMounted(async () => {
           <ModePicker
             v-else-if="page === 'mode' || (page !== 'game' && returnPage === 'mode')"
             v-show="page === 'mode'"
-            :key="`menu-${runKey}`"
+            :key="`menu-${runKey}-${today}`"
             :deck="deck"
             @choose="chooseMode"
           />

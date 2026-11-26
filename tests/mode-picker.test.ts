@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { LANTERNS } from '../src/dojo/dojo-run.ts';
+import { LANTERNS } from '../src/game/lanterns.ts';
 import { CARDS_PER_ROUND } from '../src/kanji/kanji-round.ts';
 import ModePicker from '../src/components/ModePicker.vue';
 

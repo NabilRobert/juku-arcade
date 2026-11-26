@@ -11,7 +11,8 @@
 import { m } from 'motion-v';
 import { computed, watch } from 'vue';
 import { playSound } from '../../sound/sfx.ts';
-import { rankFor } from './combo-ranks.ts';
+import { rankFor } from '../../game/combo-ranks.ts';
+import { RANK_COLOURS } from './combo-rank-colours.ts';
 
 const props = defineProps<{ combo: number; brokenCombo: number | null }>();
 defineEmits<{ brokenShown: [] }>();
@@ -46,7 +47,7 @@ watch(
       <m.span
         :key="rank.letter"
         class="text-[7svh] leading-none font-bold"
-        :class="rank.colour"
+        :class="RANK_COLOURS[rank.letter]"
         :initial="{ scale: 2.2, rotate: -12, opacity: 0 }"
         :animate="{ scale: 1, rotate: 0, opacity: 1 }"
         :transition="{ type: 'spring', stiffness: 420, damping: 13 }"
@@ -56,7 +57,7 @@ watch(
       <span class="flex flex-col gap-1">
         <span
           class="text-[3svh] leading-none font-bold"
-          :class="rank.colour"
+          :class="RANK_COLOURS[rank.letter]"
           lang="ja"
           :title="rank.meaning"
           >{{ rank.praise }}</span
@@ -64,7 +65,7 @@ watch(
         <m.span
           :key="combo"
           class="text-[2svh] leading-none tracking-widest uppercase"
-          :class="rank.colour"
+          :class="RANK_COLOURS[rank.letter]"
           lang="en"
           :initial="{ scale: 1.4 }"
           :animate="{ scale: 1 }"

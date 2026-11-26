@@ -10,6 +10,7 @@
  * - a word moves up at most once per local day, so extra play the same day
  *   can't skip the spacing (decision D10).
  */
+import { addDays } from './days.ts';
 
 /** LE6: Leitner boxes 1–5; a word waits this many days before it's due again. */
 export const LEITNER_INTERVAL_DAYS: Readonly<Record<number, number>> = {
@@ -41,13 +42,6 @@ export const NEW_WORD: LeitnerState = {
   box: null,
   dueDay: null,
 };
-
-/** The local date `days` after `day`, both YYYY-MM-DD. */
-export function addDays(day: string, days: number): string {
-  const date = new Date(`${day}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
 
 function nextBox(state: LeitnerState, isCorrect: boolean, day: string): number {
   if (!isCorrect) return FIRST_BOX;

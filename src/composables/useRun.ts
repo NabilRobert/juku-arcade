@@ -18,14 +18,11 @@ import {
 } from '../game/run.ts';
 import type { TagTable } from '../game/tags.ts';
 import { throwReading } from '../game/taps.ts';
-import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
+import { CLEARED_PAUSE_MS, CLOCK_TICK_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
 import { tickPlayClock, withPlayTime, type PlayClock } from '../game/wellbeing.ts';
 import { playTimeSaver, type PlayTimeSaver } from '../memory/play-time-saver.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
 import { appendEvents, updateSavedSettings, type Settings } from '../memory/storage.ts';
-
-/** Often enough for a smooth timer bar, rarely enough to stay cheap on phones. */
-const TICK_MS = 100;
 
 export interface RunSetup {
   words: readonly DeckWord[];
@@ -182,7 +179,7 @@ export function useRun(setup: RunSetup) {
     view.state.value = change(view.state.value, driver.context);
     afterChange(driver, view);
   };
-  const timer = setInterval(() => tick(driver, view, setup.beforeTimeUp), TICK_MS);
+  const timer = setInterval(() => tick(driver, view, setup.beforeTimeUp), CLOCK_TICK_MS);
   onUnmounted(() => {
     clearInterval(timer);
     // Leaving word mode saves the play since the last save, which used to be lost.

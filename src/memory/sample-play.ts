@@ -7,7 +7,7 @@
  * today's date, so it moves with the calendar, and it's only shown, never
  * saved: turning it off leaves the real play log as it was.
  */
-import { addDays } from './leitner.ts';
+import { addDays } from './days.ts';
 import type { KanjiRoundRecord, PlayMode, PlayedRun } from './play-log.ts';
 
 const MS_PER_MINUTE = 60_000;

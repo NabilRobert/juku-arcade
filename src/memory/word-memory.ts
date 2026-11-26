@@ -8,6 +8,7 @@
  * - matches after a miss or a peek, and timeouts, aren't answers. A timeout
  *   measures reading speed more than memory (D4).
  */
+import { localDayOf } from './days.ts';
 import type { GameEvent } from '../game/events.ts';
 import { applyCheckUp, type CheckRecord } from './check-up.ts';
 import { afterAnswer, NEW_WORD, type LeitnerState } from './leitner.ts';
@@ -49,11 +50,6 @@ export function emptyMemory(): Memory {
 /** Known through play (right on two separate days) or known before play, in the check-up. */
 export function isWordKnown(memory: Memory, wordId: string): boolean {
   return memory.words.get(wordId)?.isKnown === true || memory.knownAtCheckUp.has(wordId);
-}
-
-/** The local date of an event: its `at` is local time with an offset, so the first 10 characters. */
-export function localDayOf(at: string): string {
-  return at.slice(0, 10);
 }
 
 function answerOf(event: GameEvent): boolean | null {

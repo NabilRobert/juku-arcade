@@ -2,7 +2,8 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import PlayCard from '../src/components/cards/PlayCard.vue';
-import { cardPose, dealtFrom, THROW_S } from '../src/components/cards/card-motion.ts';
+import { cardPose, dealtFrom } from '../src/components/cards/card-motion.ts';
+import { THROW_S } from '../src/game/tuning.ts';
 import { SNAP_FRAMES } from '../src/components/cards/pixel-snap.ts';
 import { centreOffset, placementBetween } from '../src/components/cards/throw-geometry.ts';
 import type { CardStatus } from '../src/game/card-status.ts';

@@ -5,7 +5,8 @@
  * timed (D69): the player takes as long as they need. Pausing hides the
  * question and stops the play time counting toward the daily limits.
  * Each answer goes to the play log for the streak, the calendar and the
- * boards; nothing goes to the reviews, since a test isn't practice.
+ * boards; nothing goes to the reviews: it tests what's already known, so it
+ * doesn't move words through their review boxes.
  */
 import { ref, shallowRef } from 'vue';
 import { useLater } from '../composables/useLater.ts';

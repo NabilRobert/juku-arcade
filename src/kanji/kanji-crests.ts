@@ -6,6 +6,7 @@
  * over. A koban picked right doubles that card's points, an omikuji picked
  * right adds a random bonus, and a cursed card picked costs points.
  */
+import { pickOne } from '../game/random.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { CRESTS, type CrestKind } from '../bank-run/crests.ts';
 import { POINTS_PER_HIT, type KanjiRound } from './kanji-round.ts';
@@ -28,10 +29,6 @@ export const KANJI_CREST_EFFECTS: Record<CrestKind, string> = {
   omikuji: `Picked right: a bonus of ${OMIKUJI_MIN} to ${OMIKUJI_MAX} points.`,
   cursed: `Picked: lose ${CURSE_POINTS} points. It's always a wrong reading.`,
 };
-
-function pickOne(indexes: number[], random: RandomSource): number | undefined {
-  return indexes[Math.floor(random() * indexes.length)];
-}
 
 /** Which of a round's cards carry a crest, by their place in the hand. */
 export function dealKanjiCrests(round: KanjiRound, random: RandomSource): Map<number, CrestKind> {

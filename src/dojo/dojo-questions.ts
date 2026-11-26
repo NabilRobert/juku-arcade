@@ -6,6 +6,7 @@
  * Bunpou sentence. Repeats are allowed. Each question's kind is picked at
  * random among the kinds the player has something for.
  */
+import { pickOne } from '../game/random.ts';
 import type { DeckWord } from '../deck/types.ts';
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import type { GameEvent } from '../game/events.ts';
@@ -89,10 +90,6 @@ export function availableKinds(pools: DojoPools): QuestionKind[] {
   if (pools.kanji.size > 0) kinds.push('kanji');
   if (pools.templates.length > 0) kinds.push('grammar');
   return kinds;
-}
-
-function pickOne<T>(items: readonly T[], random: RandomSource): T | undefined {
-  return items[Math.floor(random() * items.length)];
 }
 
 /** The word's reading and three wrong ones: its own decoys first (they test error types), then other words'. */

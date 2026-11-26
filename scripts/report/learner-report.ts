@@ -4,12 +4,14 @@
  * wrong reading, error types, recall speed by week, and how well words are
  * held after about 1, 4 and 8 days.
  */
+import { tally } from '../../src/memory/tally.ts';
 import type { GameEvent } from '../../src/game/events.ts';
+import { MS_PER_DAY } from '../../src/memory/days.ts';
 import { deriveMemory } from '../../src/memory/word-memory.ts';
 import { isRight, isWrong, pickedReading, wordSpellings } from './answers.ts';
 
 const WEAK_WORDS_SHOWN = 5;
-const MS_PER_WEEK = 7 * 86_400_000;
+const MS_PER_WEEK = 7 * MS_PER_DAY;
 /** Retention buckets: days since the word was last seen, as [label, from, to]. */
 const RETENTION_BUCKETS: readonly [string, number, number][] = [
   ['1 day', 1, 1],
@@ -29,9 +31,7 @@ export interface LearnerReport {
 }
 
 function mostCommon(values: readonly string[]): string | null {
-  const counts = new Map<string, number>();
-  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
-  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  return tally(values)[0]?.[0] ?? null;
 }
 
 function weakWords(events: readonly GameEvent[]): LearnerReport['weakWords'] {

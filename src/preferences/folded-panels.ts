@@ -4,12 +4,13 @@
  * browser so the start screen opens the way the player left it. Both open
  * by default.
  */
+import { PREFERENCE_KEYS } from './preference-keys.ts';
 import { storedFlag } from './stored-flag.ts';
 
-const leaderboard = storedFlag('juku-arcade:leaderboard-folded', false);
+const leaderboard = storedFlag(PREFERENCE_KEYS.leaderboardFolded, false);
 export const isLeaderboardFolded = leaderboard.isOn;
 export const setLeaderboardFolded = leaderboard.set;
 
-const streak = storedFlag('juku-arcade:streak-folded', false);
+const streak = storedFlag(PREFERENCE_KEYS.streakFolded, false);
 export const isStreakFolded = streak.isOn;
 export const setStreakFolded = streak.set;

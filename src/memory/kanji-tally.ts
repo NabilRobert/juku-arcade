@@ -6,7 +6,7 @@
  */
 import type { GameEvent } from '../game/events.ts';
 import type { KanjiRoundRecord } from './play-log.ts';
-import { localDayOf } from './word-memory.ts';
+import { localDayOf } from './days.ts';
 
 const KANJI = /\p{Script=Han}/gu;
 

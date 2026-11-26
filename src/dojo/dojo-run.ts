@@ -5,11 +5,9 @@
  * when the player tires, and its board compares knowledge.
  *
  * There's no timer (D69, playtest decision 2026-11-26: "no timer on
- * practice mode thats just cruel"). An earlier version had one that
- * tightened through five stages.
+ * practice mode thats just cruel").
  */
-
-export const LANTERNS = 3;
+import { LANTERNS, lanternsAfter } from '../game/lanterns.ts';
 
 export type QuestionKind = 'word' | 'kanji' | 'grammar';
 
@@ -35,7 +33,7 @@ export const FRESH_DOJO: DojoState = {
 /** The run after an answer. The last lantern out ends it. */
 export function afterAnswer(state: DojoState, isRight: boolean): DojoState {
   if (state.isOver) return state;
-  const lanterns = isRight ? state.lanterns : state.lanterns - 1;
+  const lanterns = lanternsAfter(state.lanterns, !isRight);
   const combo = isRight ? state.combo + 1 : 0;
   return {
     lanterns,

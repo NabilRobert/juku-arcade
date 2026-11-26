@@ -28,8 +28,7 @@ function remainingDue(words: readonly DeckWord[], memory: Memory, today: string)
   });
 }
 
-/** Words never answered, easiest guess first, so a new player starts gently. */
-/** Words never answered, minus any held back by the check-up (C2), easiest first. */
+/** Words never answered, minus any held back by the check-up (C2), easiest guess first, so a new player starts gently. */
 function unseen(words: readonly DeckWord[], memory: Memory, today: string): DeckWord[] {
   return words
     .filter((word) => !memory.words.has(word.id) && !isOnHold(memory.checkUps, word.id, today))

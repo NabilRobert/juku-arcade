@@ -131,7 +131,6 @@ export function dealKanjiRound(
   };
 }
 
-/** Scores the cards the player picked, by their place in the hand. */
 /** How many more wrong picks the player can make on this kanji. */
 export function wrongPicksLeft(round: KanjiRound, played: readonly number[]): number {
   const wrongPicks = played.filter((index) => round.cards[index]?.isRight === false).length;
@@ -145,6 +144,7 @@ export function isRoundOver(round: KanjiRound, played: readonly number[]): boole
   return found === rights || wrongPicksLeft(round, played) === 0;
 }
 
+/** Scores the cards the player picked, by their place in the hand. */
 export function scoreRound(round: KanjiRound, picked: readonly number[]): RoundResult {
   const hits = picked.filter((index) => round.cards[index]?.isRight === true).length;
   const wrongPicks = picked.length - hits;

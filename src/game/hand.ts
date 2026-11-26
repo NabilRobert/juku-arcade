@@ -28,7 +28,8 @@ function isWordMatched(state: RunState, position: number): boolean {
   return wordId !== undefined && state.matchedWordIds.includes(wordId);
 }
 
-function isReadingMatched(state: RunState, readingIndex: number): boolean {
+/** True once the word a reading card belongs to is matched (the decoy never is). */
+export function isReadingMatched(state: RunState, readingIndex: number): boolean {
   const wordId = state.set.readings[readingIndex]?.wordId ?? null;
   return wordId !== null && state.matchedWordIds.includes(wordId);
 }
