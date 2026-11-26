@@ -7,7 +7,7 @@
  * streak's length (folded-panels.ts), so the streak stays in sight.
  */
 import { computed, ref, toRef } from 'vue';
-import { IS_SAMPLE_PLAY } from '../../composables/usePlayHistory.ts';
+import { isSamplePlayShown } from '../../preferences/sample-play.ts';
 import { useStreak } from '../../composables/useStreak.ts';
 import type { KanjiNote } from '../../deck/types.ts';
 import { summariseDay, type PlayHistory } from '../../memory/day-summary.ts';
@@ -39,7 +39,7 @@ const summary = computed(() => summariseDay(selected.value, props.history));
         :days="streak.days"
         :milestone="isStreakFolded ? null : milestone"
         :message="isStreakFolded ? null : message"
-        :is-sample="IS_SAMPLE_PLAY"
+        :is-sample="isSamplePlayShown"
       />
       <FoldButton
         :is-folded="isStreakFolded"

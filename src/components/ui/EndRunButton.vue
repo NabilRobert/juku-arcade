@@ -9,6 +9,7 @@
  * at random each time: stopping for a while is fine.
  */
 import { ref, shallowRef } from 'vue';
+import { injectSidePanelClose } from '../../composables/useSidePanelClose.ts';
 import { pickQuote, REST_QUOTES } from '../../dojo/quotes.ts';
 import ArcadeButton from './ArcadeButton.vue';
 import CardOverlay from './CardOverlay.vue';
@@ -26,9 +27,13 @@ function setAsking(next: boolean): void {
   emit('toggle', next);
 }
 
+const closeSidePanel = injectSidePanelClose();
+
+/** Ends the run, then closes the side drawer it was asked from, so the results show at once. */
 function confirmEnd(): void {
   setAsking(false);
   emit('end');
+  closeSidePanel?.();
 }
 </script>
 

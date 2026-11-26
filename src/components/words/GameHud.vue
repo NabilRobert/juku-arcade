@@ -4,11 +4,13 @@
  * the pause button, the sound switch, and what's happening (L5, L6, L9,
  * L12).
  */
+import TimerBar from '../ui/TimerBar.vue';
+import { themeColour } from '../ui/theme-colour.ts';
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import { timeShareLeft, type RunState } from '../../game/run.ts';
 import { MAX_LEVEL } from '../../game/tuning.ts';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 
@@ -17,7 +19,9 @@ defineEmits<{ pause: []; resume: [] }>();
 
 const isPaused = computed(() => props.state.pausedAtMs !== null);
 const timeShare = computed(() => timeShareLeft(props.state, props.nowMs));
-const isTimeLow = computed(() => timeShare.value < 0.25);
+/** A new level flashes aqua, then settles to the panel's white (palette tokens, read once). */
+const LEVEL_UP_COLOUR = themeColour('aqua');
+const LEVEL_COLOUR = themeColour('washi');
 </script>
 
 <template>
@@ -28,8 +32,8 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
           :key="state.level"
           class="inline-block text-3xl font-bold"
           data-testid="level"
-          :initial="{ scale: 1.8, color: '#a8dadc' }"
-          :animate="{ scale: 1, color: '#f6efdf' }"
+          :initial="{ scale: 1.8, color: LEVEL_UP_COLOUR }"
+          :animate="{ scale: 1, color: LEVEL_COLOUR }"
           :transition="{ type: 'spring', stiffness: 400, damping: 15 }"
           >{{ state.level }}</m.span
         >
@@ -47,28 +51,14 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
         >
       </StatPanel>
     </div>
-    <div
-      class="h-2.5 overflow-hidden bg-lacquer"
-      role="progressbar"
-      aria-label="Time left in this set"
-      :aria-valuenow="Math.round(timeShare * 100)"
-    >
-      <div
-        class="h-full transition-[width] duration-100"
-        :class="isTimeLow ? 'bg-crimson' : 'bg-aqua'"
-        :style="{ width: `${timeShare * 100}%` }"
-      />
-    </div>
-    <PixelButton
-      :colour="isPaused ? 'crimson' : 'steel'"
-      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50 max-lg:hidden"
-      :disabled="state.phase !== 'playing'"
-      :aria-pressed="isPaused"
-      @click="isPaused ? $emit('resume') : $emit('pause')"
-    >
-      {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      <span class="ml-1 text-xs" aria-hidden="true">Esc</span>
-    </PixelButton>
+    <TimerBar :time-left="timeShare" label="Time left in this set" />
+    <PauseButton
+      class="max-lg:hidden"
+      :is-paused="isPaused"
+      :is-disabled="state.phase !== 'playing'"
+      @pause="$emit('pause')"
+      @resume="$emit('resume')"
+    />
     <SoundToggle />
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
     <p v-if="state.phase === 'timedOut'" class="text-center text-sm text-crimson" role="status">

@@ -23,7 +23,7 @@ import FloatingPause from '../ui/FloatingPause.vue';
 import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
@@ -41,7 +41,7 @@ const props = defineProps<{
 const emit = defineEmits<{ leave: []; again: [] }>();
 
 const dojo = useDojoRun(props.pools);
-const { state, question, isLocked, isPaused } = dojo;
+const { state, question, questionNumber, isLocked, isPaused } = dojo;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -88,20 +88,18 @@ function dismiss(isStopping: boolean): void {
       <StatPanel label="Score">
         <span class="text-3xl font-bold" data-testid="score">{{ state.right }}</span>
       </StatPanel>
-      <PixelButton
+      <PauseButton
         v-if="!state.isOver"
-        :colour="isPaused ? 'crimson' : 'steel'"
-        class="min-h-9 px-4 text-sm max-lg:hidden"
-        :aria-pressed="isPaused"
-        @click="isPaused ? dojo.resume() : dojo.pause()"
-      >
-        {{ isPaused ? 'Resume' : 'Pause' }}
-      </PixelButton>
+        class="max-lg:hidden"
+        :is-paused="isPaused"
+        @pause="dojo.pause"
+        @resume="dojo.resume"
+      />
       <SoundToggle />
       <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
-        Words, kanji and grammar you've met, until three misses. Take as long as you need. Esc
-        pauses.
+        Words, kanji and grammar you've met, until {{ LANTERNS }} misses. Take as long as you need.
+        Esc pauses.
       </p>
     </SidePanel>
     <FloatingPause
@@ -123,16 +121,20 @@ function dismiss(isStopping: boolean): void {
       >
         <QuoteCard :quote="quote" />
       </RunResults>
-      <p
-        v-else-if="isPaused"
-        class="pixel-panel bg-wood/80 p-10 text-center text-xl"
-        data-testid="dojo-paused"
-      >
-        Paused
-      </p>
-      <div v-else class="flex flex-col gap-6">
+      <!-- Paused covers the question rather than replacing it, so the cards picked or tiles placed are
+           still there on resume. -->
+      <div v-else class="relative flex flex-col gap-6">
+        <p
+          v-if="isPaused"
+          class="pixel-panel absolute inset-0 z-20 flex items-center justify-center bg-wood p-10 text-center text-xl"
+          data-testid="dojo-paused"
+        >
+          Paused
+        </p>
+        <!-- Keyed on the question asked, not the answers given: an answer stays on screen until the next
+             question comes, and each new question gets a fresh board. -->
         <DojoQuestionView
-          :key="state.answered"
+          :key="questionNumber"
           :question="question"
           :level="level"
           :combo="state.combo"

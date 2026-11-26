@@ -6,6 +6,7 @@
  * your best run and its place on the Bunpou leaderboard (D59; ★ when this
  * run is the new best). The curtain call and haiku come before it.
  */
+import { CORRECT_DAYS_TO_KNOW } from '../../memory/leitner.ts';
 import { computed } from 'vue';
 import type { GrammarProgress } from '../../grammar/grammar-reviews.ts';
 import RunResults from '../ui/RunResults.vue';
@@ -49,7 +50,7 @@ const panels = computed(() => [
   <RunResults
     title="Run results"
     :panels="panels"
-    note="A grammar point is known once you build it right on two separate days. Points you miss come back sooner."
+    :note="`A grammar point is known once you build it right on ${CORRECT_DAYS_TO_KNOW} separate days. Points you miss come back sooner.`"
     again-label="Play again"
     @again="$emit('again')"
     @leave="$emit('leave')"

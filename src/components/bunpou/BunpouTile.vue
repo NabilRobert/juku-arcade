@@ -9,6 +9,10 @@
  * size so nothing on the table moves (D8). A line's tiles are dealt in
  * like word mode's cards (D58): one after another from above, each with
  * the card-landing tap, a little higher than the one before.
+ * On a wide screen (lg) a tile is at most a fifth of the board's width, less
+ * the gaps and the boxes' padding (cqw: the board is a size container), so a
+ * sentence of five tiles always fits on one row, even on a 4:3 tablet in
+ * landscape, where 12rem tiles wrapped and the screen scrolled.
  */
 import { m, type PanInfo } from 'motion-v';
 import { parseFurigana } from '../../deck/furigana.ts';
@@ -99,7 +103,7 @@ function onRelease(info: PanInfo): void {
   >
     <button
       type="button"
-      class="pixel-button flex h-16 w-38 items-center justify-center px-2 text-sumi sm:h-24 sm:w-48"
+      class="pixel-button flex h-16 w-38 items-center justify-center px-2 text-sumi sm:h-24 sm:w-48 lg:w-[min(12rem,calc((100cqw-4rem)/5))]"
       :class="[faceClass, textSize]"
       :data-wrong="isWrong === true ? '' : undefined"
       :disabled="isFaceDown"

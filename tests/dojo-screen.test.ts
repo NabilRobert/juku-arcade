@@ -136,15 +136,40 @@ describe('the dojo on screen', () => {
     expect(game.find('[data-testid="timer"]').exists()).toBe(false);
   });
 
-  it('hides the question while paused', async () => {
+  it('covers the question while paused, keeping the cards picked for when play resumes', async () => {
     vi.useFakeTimers();
     const game = mountGame();
-    await game
-      .findAll('button')
-      .find((button) => button.text() === 'Pause')
-      ?.trigger('click');
+    await nextTick();
+    // Looked up fresh each time: a board rebuilt on resume would lose the pick.
+    const readings = () =>
+      game
+        .findComponent(CardQuestionView)
+        .findAllComponents(PlayCard)
+        .filter((card) => card.props('kind') === 'reading');
+    readings()[0]?.vm.$emit('tap');
+    await nextTick();
+    const pauseButton = () =>
+      game
+        .findAll('button')
+        .find((button) => button.text().includes('Pause') || button.text().includes('Resume'));
+    await pauseButton()?.trigger('click');
     expect(game.find('[data-testid="dojo-paused"]').exists()).toBe(true);
-    expect(game.findComponent(CardQuestionView).exists()).toBe(false);
+    await pauseButton()?.trigger('click');
+    expect(game.find('[data-testid="dojo-paused"]').exists()).toBe(false);
+    expect(readings()[0]?.props('status')).toBe('selected');
+  });
+
+  it('keeps an answer on screen until the next question, then deals a fresh board', async () => {
+    vi.useFakeTimers();
+    const game = mountGame();
+    await choose(game, false);
+    const wrongCards = () =>
+      game.findAllComponents(PlayCard).filter((card) => card.props('status') === 'wrong');
+    expect(wrongCards()).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(wrongCards()).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(wrongCards()).toHaveLength(0);
   });
 });
 

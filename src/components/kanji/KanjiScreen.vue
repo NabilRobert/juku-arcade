@@ -16,6 +16,8 @@ import { computed } from 'vue';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
 import { KANJI_PER_SHEET, useKanjiSheet } from '../../kanji/useKanjiSheet.ts';
+import { MAX_WRONG_PICKS } from '../../kanji/kanji-round.ts';
+import { CORRECT_DAYS_TO_KNOW } from '../../memory/leitner.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
@@ -105,8 +107,8 @@ function dismiss(isStopping: boolean): void {
       <EndRunButton v-if="!isSheetDone" @end="sheet.endNow" />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji. It
-        doesn't change your reviews.
+        Pick every reading of the kanji, then press Play. You can make {{ MAX_WRONG_PICKS }} wrong
+        picks per kanji. It doesn't change your reviews.
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">
@@ -115,7 +117,7 @@ function dismiss(isStopping: boolean): void {
           v-if="isSheetDone"
           :title="sheet.isEndedEarly.value ? 'Run ended' : 'Sheet done'"
           :panels="sheetPanels"
-          note="A sheet is 10 kanji. A kanji counts as mastered once you find all its readings with no wrong pick on two separate days."
+          :note="`A sheet is ${KANJI_PER_SHEET} kanji. A kanji counts as mastered once you find all its readings with no wrong pick on ${CORRECT_DAYS_TO_KNOW} separate days.`"
           again-label="Another sheet"
           :comparison="{ score, previousBest }"
           @again="emit('again')"

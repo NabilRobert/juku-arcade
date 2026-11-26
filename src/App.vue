@@ -25,10 +25,13 @@ import {
   type Settings,
 } from './memory/storage.ts';
 import { provideGoToPage, type PageTarget } from './composables/usePageLinks.ts';
+import { usePhoneLandscape } from './composables/usePhoneLandscape.ts';
+import type { PlayMode } from './memory/play-log.ts';
 import AppFooter from './components/AppFooter.vue';
+import RotateNotice from './components/ui/RotateNotice.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
-import ModePicker, { type GameMode } from './components/ModePicker.vue';
+import ModePicker from './components/ModePicker.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
@@ -54,10 +57,12 @@ const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
 /** Word mode, kanji mode (D37), Bunpou (D56) or the dojo (D62), picked on the start screen each time. */
-const mode = ref<GameMode>('words');
+const mode = ref<PlayMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
-const isAway = computed(() => page.value !== 'game');
+const isPhoneLandscape = usePhoneLandscape();
+/** True while the game is covered: another page is open, or a phone is turned sideways. The run pauses. */
+const isAway = computed(() => page.value !== 'game' || isPhoneLandscape.value);
 const checkUpQuestions = shallowRef<readonly Question[]>([]);
 const checkUpIdentity = computed(() => ({
   playerId: settings.value?.playerId ?? '',
@@ -157,7 +162,7 @@ function closePage(): void {
 }
 provideGoToPage(goTo);
 
-async function chooseMode(next: GameMode): Promise<void> {
+async function chooseMode(next: PlayMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
   if (next === 'bunpou') grammarEvents.value = await orFallback(loadGrammarEvents, []);
@@ -174,9 +179,9 @@ async function exportData(): Promise<void> {
   downloadExport(buildExport(events, settings.value, new Date(), grammar));
 }
 
+/** A level change (or other settings) restarts the game on the start screen, with the new deck. */
 async function useSettings(updated: Settings): Promise<void> {
   await orFallback(() => saveSettings(updated), undefined);
-  page.value = 'game';
   await startGame(updated);
 }
 
@@ -218,6 +223,7 @@ onMounted(async () => {
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
       <TableBackground />
+      <RotateNotice v-if="isPhoneLandscape" />
       <!-- Clipped, so cards dealt up from under the screen never make the page scrollable mid-deal;
            clip, unlike hidden, makes no scroll box, so the side panel stays sticky. -->
       <main class="flex min-h-svh flex-col gap-4 overflow-clip px-4 py-4 sm:px-8">
@@ -257,8 +263,9 @@ onMounted(async () => {
           />
           <!-- A page opened from the start screen keeps it underneath, so no run starts behind the page. -->
           <ModePicker
-            v-else-if="page === 'mode' || (isAway && returnPage === 'mode')"
+            v-else-if="page === 'mode' || (page !== 'game' && returnPage === 'mode')"
             v-show="page === 'mode'"
+            :key="`menu-${runKey}`"
             :deck="deck"
             @choose="chooseMode"
           />

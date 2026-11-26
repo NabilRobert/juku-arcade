@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto';
 import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import { LANTERNS } from '../src/dojo/dojo-run.ts';
+import { CARDS_PER_ROUND } from '../src/kanji/kanji-round.ts';
 import ModePicker from '../src/components/ModePicker.vue';
 
 const deck = { level: 'N4' as const, sourceCommit: 'test', words: [], kanji: {} };
@@ -14,6 +16,13 @@ describe('the start screen', () => {
       expect(cards[index]?.text()).toContain(name),
     );
     expect(cards[0]?.text()).toContain('Match each N4 word');
+  });
+
+  it('takes the numbers in its descriptions from the rules, not typed-in copies', () => {
+    const text = mount(ModePicker, { props: { deck } }).text();
+    expect(text).toContain(`among ${CARDS_PER_ROUND} cards`);
+    expect(text).toContain(`until ${LANTERNS} misses`);
+    expect(text).toContain(`提灯 ×${LANTERNS}`);
   });
 
   it('notes that Bunpou is N5 only and still in development', () => {

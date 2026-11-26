@@ -9,11 +9,10 @@
  * splits the ranking into pages the panel flips through with Back and
  * Next.
  */
-import type { PlayMode, PlayedRun } from '../memory/play-log.ts';
+import { PLAY_MODES, type PlayMode, type PlayedRun } from '../memory/play-log.ts';
 import { BUNPOU_BEST_KEY } from '../memory/progress-keys.ts';
 
 export type BoardId = PlayMode | 'total';
-export const MODE_BOARDS: readonly PlayMode[] = ['words', 'kanji', 'bunpou', 'dojo'];
 /** The boards the Total adds up: every mode but practice mode, which isn't timed (D71). */
 export const TOTAL_BOARDS: readonly PlayMode[] = ['words', 'kanji', 'bunpou'];
 type Samples = readonly { name: string; score: number }[];
@@ -141,7 +140,7 @@ export function boardBests(
   legacy: Partial<Record<PlayMode, number>> = {},
 ): Record<BoardId, number> {
   const bests = { words: 0, kanji: 0, bunpou: 0, dojo: 0, total: 0 };
-  for (const mode of MODE_BOARDS) {
+  for (const mode of PLAY_MODES) {
     const logged = runs.filter((run) => run.mode === mode).map((run) => run.score);
     bests[mode] = Math.max(legacy[mode] ?? 0, ...logged);
   }

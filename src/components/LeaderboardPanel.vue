@@ -17,6 +17,7 @@ import {
   rankedPlayers,
   type BoardId,
 } from '../leaderboard/leaderboard.ts';
+import { MODE_NAMES, PLAY_MODES } from '../memory/play-log.ts';
 import { isLeaderboardFolded, setLeaderboardFolded } from '../preferences/folded-panels.ts';
 import ArcadeButton from './ui/ArcadeButton.vue';
 import FoldButton from './ui/FoldButton.vue';
@@ -26,10 +27,7 @@ import PixelIcon from './ui/PixelIcon.vue';
 const props = defineProps<{ bests: Readonly<Record<BoardId, number>> }>();
 
 const BOARDS: readonly { board: BoardId; label: string }[] = [
-  { board: 'words', label: 'Words' },
-  { board: 'kanji', label: 'Kanji' },
-  { board: 'bunpou', label: 'Bunpou' },
-  { board: 'dojo', label: 'Practice' },
+  ...PLAY_MODES.map((mode) => ({ board: mode, label: MODE_NAMES[mode] })),
   { board: 'total', label: 'Total' },
 ];
 
@@ -55,7 +53,7 @@ function turn(by: number): void {
     <!-- Three columns keep the title centred, moving it aside only on a screen too narrow for both. -->
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <h2
-        class="col-start-2 text-center text-3xl tracking-widest text-[#ffd84a] drop-shadow-[0_3px_0_var(--color-sumi)]"
+        class="col-start-2 text-center text-3xl tracking-widest text-gold drop-shadow-[0_3px_0_var(--color-sumi)]"
       >
         Leaderboard
       </h2>

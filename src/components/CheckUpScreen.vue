@@ -4,6 +4,7 @@
  * question shows a word and 4 readings, with 8 seconds to answer; running
  * out of time counts as wrong. Emits the answers as events when done.
  */
+import TimerBar from './ui/TimerBar.vue';
 import { computed, onUnmounted, ref } from 'vue';
 import type { GameEvent, SessionIdentity } from '../game/events.ts';
 import { checkUpEvent, SECONDS_PER_QUESTION, type Question } from '../memory/check-up.ts';
@@ -75,9 +76,7 @@ onUnmounted(() => clearInterval(timer));
       <p class="pixel-panel washi mx-auto w-48 py-6 text-4xl font-semibold text-sumi" lang="ja">
         {{ question.word.word }}
       </p>
-      <div class="h-2 overflow-hidden bg-lacquer" role="progressbar" aria-label="Time left">
-        <div class="h-full bg-aqua" :style="{ width: `${timeShare * 100}%` }" />
-      </div>
+      <TimerBar :time-left="timeShare" label="Time left for this word" />
       <div class="grid grid-cols-2 gap-3">
         <PixelButton
           v-for="option in question.options"

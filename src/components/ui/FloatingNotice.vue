@@ -18,7 +18,7 @@ const FADE_S = 1.3;
   <m.p
     v-if="notice"
     :key="notice.key"
-    class="pointer-events-none absolute inset-x-0 top-full font-bold drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
+    class="pointer-events-none absolute inset-x-0 top-full font-bold drop-shadow-[0_0_6px_color-mix(in_srgb,var(--color-washi)_90%,transparent)]"
     :class="notice.isGood ? 'text-aqua' : 'text-crimson'"
     :initial="{ y: 0, opacity: 1 }"
     :animate="{ y: DRIFT_PX, opacity: 0 }"

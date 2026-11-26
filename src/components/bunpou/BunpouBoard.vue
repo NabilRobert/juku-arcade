@@ -21,7 +21,7 @@ import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import TimerBar from '../ui/TimerBar.vue';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
 import SentenceFix from './SentenceFix.vue';
@@ -110,7 +110,8 @@ function dropAt(tile: string, point: Point): void {
 </script>
 
 <template>
-  <section class="relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
+  <!-- A size container, so a row of tiles can be sized to fit its width (MAX_TILES = 5). -->
+  <section class="@container relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? SHELF_NAMES[line.shelf] : ''
@@ -126,16 +127,14 @@ function dropAt(tile: string, point: Point): void {
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
       <TimerBar v-if="timeLeft !== undefined" class="flex-1" :time-left="timeLeft" />
-      <PixelButton
-        :colour="isPaused ? 'crimson' : 'steel'"
-        class="px-4 py-1 text-sm max-lg:hidden"
-        :aria-pressed="isPaused"
-        :disabled="run.phase !== 'building'"
+      <PauseButton
+        class="max-lg:hidden"
+        :is-paused="isPaused"
+        :is-disabled="run.phase !== 'building'"
         data-testid="pause"
-        @click="isPaused ? emit('resume') : emit('pause')"
-      >
-        {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      </PixelButton>
+        @pause="emit('pause')"
+        @resume="emit('resume')"
+      />
     </header>
 
     <div
@@ -148,7 +147,7 @@ function dropAt(tile: string, point: Point): void {
         <div
           v-for="(tile, index) in run.boxes"
           :key="index"
-          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48"
+          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48 lg:w-[min(12rem,calc((100cqw-4rem)/5))]"
           :class="tile === null ? 'outline-washi/30 outline-dashed' : 'outline-transparent'"
           data-box
         >

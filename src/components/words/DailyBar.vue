@@ -5,6 +5,7 @@
  * played this week (L12): days played, not a streak, so missing a day
  * costs nothing.
  */
+import { CALENDAR_DAYS } from '../../memory/review-engine.ts';
 import { computed } from 'vue';
 import type { DailyProgress } from '../../memory/daily-deck.ts';
 
@@ -36,7 +37,7 @@ const share = computed(() => (props.daily.total === 0 ? 1 : props.daily.done / p
       <div class="h-full bg-aqua" :style="{ width: `${share * 100}%` }" />
     </div>
     <p v-if="daysPlayedThisWeek !== undefined" class="text-xs text-washi/60">
-      Played {{ daysPlayedThisWeek }} of the last 7 days
+      Played {{ daysPlayedThisWeek }} of the last {{ CALENDAR_DAYS }} days
     </p>
   </section>
 </template>

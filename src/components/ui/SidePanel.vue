@@ -12,6 +12,7 @@
 import { computed, ref } from 'vue';
 import { useIsWide } from '../../composables/useIsWide.ts';
 import { injectGoToPage, type PageTarget } from '../../composables/usePageLinks.ts';
+import { provideSidePanelClose } from '../../composables/useSidePanelClose.ts';
 import PageLinks from './PageLinks.vue';
 import PixelButton from './PixelButton.vue';
 
@@ -36,6 +37,8 @@ function leaveFor(target: PageTarget): void {
   isOpen.value = false;
   goToPage?.(target);
 }
+// A control inside (End run) can close the drawer: ending a run shouldn't leave it covering the results.
+provideSidePanelClose(() => setOpen(false));
 </script>
 
 <template>

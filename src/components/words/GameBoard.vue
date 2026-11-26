@@ -134,7 +134,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
 <template>
   <section ref="tableElement" class="relative flex flex-col gap-y-3" aria-label="Board">
     <div
-      class="pointer-events-none absolute -inset-2 -z-10 rounded-[3rem] lg:-inset-8 bg-[radial-gradient(ellipse_at_50%_50%,rgb(168_218_220/0.3),rgb(155_27_48/0.2)_45%,transparent_72%)] transition-opacity duration-500 ease-[ease-out]"
+      class="pointer-events-none absolute -inset-2 -z-10 rounded-[3rem] lg:-inset-8 bg-[radial-gradient(ellipse_at_50%_50%,color-mix(in_srgb,var(--color-aqua)_30%,transparent),color-mix(in_srgb,var(--color-crimson)_20%,transparent)_45%,transparent_72%)] transition-opacity duration-500 ease-[ease-out]"
       :class="{ 'animate-glow motion-reduce:animate-none': heat >= 1 }"
       :style="{ opacity: heat }"
       aria-hidden="true"

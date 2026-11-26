@@ -9,11 +9,10 @@
 import type { GameEvent } from '../game/events.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import { kanjiOfDay, type KanjiDay } from './kanji-tally.ts';
-import type { KanjiRoundRecord, PlayMode, PlayedRun } from './play-log.ts';
+import { PLAY_MODES, type KanjiRoundRecord, type PlayMode, type PlayedRun } from './play-log.ts';
 import { localDayOf } from './word-memory.ts';
 
 const MS_PER_MINUTE = 60_000;
-const MODES: readonly PlayMode[] = ['words', 'kanji', 'bunpou', 'dojo'];
 
 export interface PlayHistory {
   runs: readonly PlayedRun[];
@@ -55,7 +54,7 @@ const bestScore = (runs: readonly PlayedRun[]): number =>
 
 function scoresOn(day: string, runs: readonly PlayedRun[]): ModeScores[] {
   const month = day.slice(0, 7);
-  return MODES.flatMap((mode) => {
+  return PLAY_MODES.flatMap((mode) => {
     const ofMode = runs.filter((run) => run.mode === mode);
     const onDay = ofMode.filter((run) => run.day === day);
     if (onDay.length === 0) return [];

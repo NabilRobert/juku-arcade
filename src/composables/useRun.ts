@@ -20,8 +20,9 @@ import type { TagTable } from '../game/tags.ts';
 import { throwReading } from '../game/taps.ts';
 import { CLEARED_PAUSE_MS, TIMED_OUT_PAUSE_MS } from '../game/tuning.ts';
 import { tickPlayClock, withPlayTime, type PlayClock } from '../game/wellbeing.ts';
+import { playTimeSaver, type PlayTimeSaver } from '../memory/play-time-saver.ts';
 import { createLocalEngine, type Progress, type ReviewEngine } from '../memory/review-engine.ts';
-import { appendEvents, saveSettings, type Settings } from '../memory/storage.ts';
+import { appendEvents, updateSavedSettings, type Settings } from '../memory/storage.ts';
 
 /** Often enough for a smooth timer bar, rarely enough to stay cheap on phones. */
 const TICK_MS = 100;
@@ -71,9 +72,12 @@ function syncEvents(state: RunState, syncedCount: number, engine: ReviewEngine):
 /** Saves a new best combo, so it survives the visit (L12). */
 function saveBests(state: RunState, settings: Settings): Settings {
   if (state.bestCombo <= settings.bestCombo) return settings;
-  const updated = { ...settings, bestCombo: state.bestCombo };
-  saveSettings(updated).catch((error: unknown) => console.warn('Could not save bests:', error));
-  return updated;
+  const { bestCombo } = state;
+  updateSavedSettings((saved) => ({
+    ...saved,
+    bestCombo: Math.max(saved.bestCombo, bestCombo),
+  })).catch((error: unknown) => console.warn('Could not save bests:', error));
+  return { ...settings, bestCombo };
 }
 
 /** The parts of a run that change outside the pure game state. */
@@ -84,6 +88,7 @@ interface Driver {
   syncedCount: number;
   setEndedAtMs: number | null;
   clock: PlayClock;
+  playTime: PlayTimeSaver;
 }
 
 /** The Vue state a run shows. */
@@ -119,6 +124,7 @@ function createDriver(setup: RunSetup): Driver {
     syncedCount: 0,
     setEndedAtMs: null,
     clock: { lastTickMs: Date.now(), lastSaveMs: Date.now() },
+    playTime: playTimeSaver(today),
   };
 }
 
@@ -149,10 +155,8 @@ function countPlayTime(driver: Driver, view: RunView): void {
   driver.settings = played.record;
   view.sessionPlayMs.value += played.playedMs;
   view.playMsToday.value = driver.settings.playMsToday;
-  if (!played.isSaveDue) return;
-  saveSettings(driver.settings).catch((error: unknown) =>
-    console.warn('Could not save play time:', error),
-  );
+  driver.playTime.add(played.playedMs);
+  if (played.isSaveDue) driver.playTime.flush();
 }
 
 function tick(driver: Driver, view: RunView, beforeTimeUp?: () => void): void {
@@ -179,7 +183,11 @@ export function useRun(setup: RunSetup) {
     afterChange(driver, view);
   };
   const timer = setInterval(() => tick(driver, view, setup.beforeTimeUp), TICK_MS);
-  onUnmounted(() => clearInterval(timer));
+  onUnmounted(() => {
+    clearInterval(timer);
+    // Leaving word mode saves the play since the last save, which used to be lost.
+    driver.playTime.flush();
+  });
   usePauseWhenHidden(() => act((current, context) => pause(current, context, Date.now())));
   return {
     ...view,

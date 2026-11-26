@@ -8,6 +8,7 @@ import { JLPT_LEVELS, type JlptLevel } from '../deck/types.ts';
 import type { Settings } from '../memory/storage.ts';
 import { isFuriganaShown, setFuriganaShown } from '../preferences/furigana.ts';
 import { areHintsShown, setHintsShown } from '../preferences/hints.ts';
+import { isSamplePlayShown, setSamplePlayShown } from '../preferences/sample-play.ts';
 import OnOffButton from './ui/OnOffButton.vue';
 import PixelButton from './ui/PixelButton.vue';
 import SoundSliders from './ui/SoundSliders.vue';
@@ -67,6 +68,17 @@ function confirmDelete(): void {
     <div class="space-y-2">
       <p class="text-sm">Bunpou hint: shows each sentence's grammar point, like 人＋と</p>
       <OnOffButton label="Hints" :is-on="areHintsShown" @change="setHintsShown" />
+    </div>
+    <div class="space-y-2">
+      <p class="text-sm">
+        Sample data: a filled-in week on the streak calendar, for demos. Shown, never saved.
+      </p>
+      <OnOffButton
+        label="Sample data"
+        :is-on="isSamplePlayShown"
+        data-testid="sample-play-toggle"
+        @change="setSamplePlayShown"
+      />
     </div>
     <div class="space-y-2">
       <PixelButton colour="aqua" class="px-4 py-2" @click="emit('exportData')">

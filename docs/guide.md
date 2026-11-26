@@ -712,6 +712,13 @@ fields. They stay in memory until slice 3 stores them.
   (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
   length in sight, and on a wide screen the start screen drops to one
   column, with the leaderboard as a bar across the top (`ModePicker.vue`).
+- **Change the landscape layouts:** a tablet in landscape (1024 px wide and
+  up) gets the desktop layout, which must fit with nothing to scroll. On a
+  4:3 tablet the kanji hand's cards are capped at `13vw`
+  (`kanji/KanjiBoard.vue`), and Bunpou's tiles and boxes at a fifth of the
+  board's width (`cqw`, `bunpou/BunpouTile.vue`), so each stays one row. A
+  phone turned sideways is covered by `ui/RotateNotice.vue`
+  (`composables/usePhoneLandscape.ts`), and the run pauses behind it.
 - **Change End run:** every mode's side panel has `ui/EndRunButton.vue`,
   which asks "End this run?" (in `ui/CardOverlay.vue`) before it ends the
   run, and pauses the clock while it asks (`usePanelPause`). What ending
@@ -733,9 +740,10 @@ fields. They stay in memory until slice 3 stores them.
   the rest day is in `memory/streak.ts`; the reminders and milestones are
   `TEMPLATES` and `MILESTONES` in `memory/streak-messages.ts`; the
   calendar's weeks and shades are `CALENDAR_WEEKS` and `SHADE_THRESHOLDS`
-  in `memory/play-calendar.ts`. Placeholder play for a local copy is
-  `memory/sample-play.ts`, turned on by `VITE_SAMPLE_PLAY` (see
-  `.env.example`).
+  in `memory/play-calendar.ts`. The sample week of play is
+  `memory/sample-play.ts`, shown while Settings' "Sample data" switch is on
+  (`preferences/sample-play.ts`); `VITE_SAMPLE_PLAY` sets where the switch
+  starts (see `.env.example`; the GitHub Pages deploy starts it on).
 - **Change the daily deck or endless mix:** edit `memory/daily-deck.ts`; its
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
