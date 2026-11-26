@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useRunLog } from '../src/composables/useRunLog.ts';
-import { tallyWordEvents } from '../src/memory/play-log.ts';
+import { tallyWordEvents, withAnswer } from '../src/memory/play-log.ts';
 import { deleteAllData, loadRuns } from '../src/memory/storage.ts';
 import { answer } from './helpers/events.ts';
 
@@ -11,14 +11,21 @@ const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve,
 describe('the play log', () => {
   beforeEach(() => deleteAllData());
 
-  it('counts a match as right, and a miss or a timeout as wrong', () => {
+  it('counts a match as right and a miss as wrong, but not a timeout the player never answered', () => {
     const events = [
       answer('w1', '2026-11-26', 'clean'),
       answer('w2', '2026-11-26', 'miss'),
       answer('w3', '2026-11-26', 'timeout'),
       answer('w4', '2026-11-26', 'peek'),
     ];
-    expect(tallyWordEvents(events)).toEqual({ answered: 3, right: 1 });
+    expect(tallyWordEvents(events)).toEqual({ answered: 2, right: 1 });
+  });
+
+  it('counts only answers the player gave, in any mode', () => {
+    const start = { answered: 0, right: 0 };
+    expect(withAnswer(start, 'right')).toEqual({ answered: 1, right: 1 });
+    expect(withAnswer(start, 'wrong')).toEqual({ answered: 1, right: 0 });
+    expect(withAnswer(start, 'timeout')).toEqual(start);
   });
 
   it('records nothing before the first answer', async () => {
@@ -35,5 +42,14 @@ describe('the play log', () => {
     const runs = await loadRuns();
     expect(runs).toHaveLength(1);
     expect(runs[0]).toMatchObject({ mode: 'kanji', score: 10, answered: 2, right: 1 });
+  });
+
+  it('keeps the haiku a show closed on with its run', async () => {
+    const log = useRunLog('bunpou');
+    log.addHaiku('park');
+    log.record({ score: 100, answered: 1, right: 1 });
+    log.addHaiku('park');
+    await settle();
+    expect(await loadRuns()).toMatchObject([{ mode: 'bunpou', haikuId: 'park' }]);
   });
 });

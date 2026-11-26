@@ -20,10 +20,11 @@ import { playSound } from '../../sound/sfx.ts';
 import type { GrammarEvent } from '../../grammar/grammar-events.ts';
 import { CURRICULUM } from '../../grammar/templates.ts';
 import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
-import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
+import { outcomeOf, useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { useRunEnd } from '../../grammar/useRunEnd.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
+import { withAnswer, type Answers } from '../../memory/play-log.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
@@ -53,7 +54,7 @@ const emit = defineEmits<{ leave: []; again: [] }>();
 
 const reviews = useGrammarReviews(CURRICULUM, props.settings, props.pastGrammarEvents);
 const runLog = useRunLog('bunpou');
-const lineTally = { answered: 0, right: 0 };
+let lineTally: Answers = { answered: 0, right: 0 };
 const game = useBunpouRun({
   pointsByPriority: reviews.pointsByPriority,
   onJudged: (result, msTaken) => {
@@ -66,10 +67,9 @@ const isPaused = (): boolean => run.value.pausedAtMs !== null;
 const runEnd = useRunEnd();
 const isEnded = computed(() => runEnd.step.value !== 'playing');
 
-/** Each judged line goes to the play log, for the streak and the calendar. */
+/** Each line goes to the play log, for the streak and the calendar (a timeout isn't counted). */
 function logLine(result: LineResult): void {
-  lineTally.answered += 1;
-  if (result.isRight) lineTally.right += 1;
+  lineTally = withAnswer(lineTally, outcomeOf(result));
   runLog.record({ score: game.run.value.score, ...lineTally });
 }
 
@@ -77,6 +77,7 @@ function logLine(result: LineResult): void {
 function endRun(): void {
   game.pause();
   runEnd.end(run.value);
+  if (runEnd.pick.value !== null) runLog.addHaiku(runEnd.pick.value.haiku.id);
 }
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.

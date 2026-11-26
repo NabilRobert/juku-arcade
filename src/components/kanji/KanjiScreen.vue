@@ -16,6 +16,7 @@ import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
+import { withAnswer, type Answers } from '../../memory/play-log.ts';
 import { localDay } from '../../game/events.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import { appendKanjiRound, type Settings } from '../../memory/storage.ts';
@@ -40,11 +41,10 @@ const { wrongPicksLeft } = run;
 const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
 
 const runLog = useRunLog('kanji');
-const roundTally = { answered: 0, right: 0 };
+let roundTally: Answers = { answered: 0, right: 0 };
 watch(lastResult, (result) => {
   if (result === null) return;
-  roundTally.answered += 1;
-  if (result.isPerfect) roundTally.right += 1;
+  roundTally = withAnswer(roundTally, result.isPerfect ? 'right' : 'wrong');
   runLog.record({ score: score.value, ...roundTally });
   const record = {
     day: localDay(new Date()),
