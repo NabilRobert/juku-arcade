@@ -57,6 +57,33 @@ describe('the play calendar on screen', () => {
 });
 
 describe("a day's summary on screen", () => {
+  it('says today has no play yet, and an earlier quiet day had none that day', () => {
+    const today = mount(DayDetail, {
+      props: { day: TODAY, today: TODAY, summary: quietDay, isRestDay: false },
+    });
+    const earlier = mount(DayDetail, {
+      props: { day: '2026-11-20', today: TODAY, summary: quietDay, isRestDay: false },
+    });
+    expect(today.text()).toContain('No play today yet.');
+    expect(earlier.text()).toContain('No play that day.');
+  });
+
+  it("heads today's scores Today, and an earlier day's That day", () => {
+    const summary = {
+      ...quietDay,
+      runs: 1,
+      scores: [{ mode: 'words' as const, dayBest: 1, monthBest: 1, everBest: 1 }],
+    };
+    const today = mount(DayDetail, {
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false },
+    });
+    const earlier = mount(DayDetail, {
+      props: { day: '2026-11-20', today: TODAY, summary, isRestDay: false },
+    });
+    expect(today.find('th:nth-child(2)').text()).toBe('Today');
+    expect(earlier.find('th:nth-child(2)').text()).toBe('That day');
+  });
+
   it('says when a quiet day was a rest day the streak forgave', () => {
     const detail = mount(DayDetail, {
       props: { day: '2026-11-24', today: TODAY, summary: quietDay, isRestDay: true },
