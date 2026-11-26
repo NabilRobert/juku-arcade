@@ -96,6 +96,11 @@ export function secondsLeft(state: RunState, nowMs: number): number {
   return Math.max(0, (state.setShownAtMs + state.setDurationMs - clockMs) / 1000);
 }
 
+/** True once a set in play (not paused) has run out of time, so timeUp would end it. */
+export function isOutOfTime(state: RunState, nowMs: number): boolean {
+  return state.phase === 'playing' && state.pausedAtMs === null && secondsLeft(state, nowMs) <= 0;
+}
+
 /** How much of the set's time is left, 1 to 0, for a timer bar. */
 export function timeShareLeft(state: RunState, nowMs: number): number {
   return secondsLeft(state, nowMs) / (state.setDurationMs / 1000);
@@ -209,8 +214,7 @@ export function nextSet(state: RunState, context: RunContext, nowMs: number): Ru
  * so the review engine won't treat them as forgotten.
  */
 export function timeUp(state: RunState, context: RunContext, nowMs: number): RunState {
-  if (state.phase !== 'playing' || state.pausedAtMs !== null) return state;
-  if (secondsLeft(state, nowMs) > 0) return state;
+  if (!isOutOfTime(state, nowMs)) return state;
   const unmatched = state.set.words.filter((word) => !state.matchedWordIds.includes(word.id));
   const timeouts = unmatched.map((word) =>
     makeEvent(context.identity, new Date(nowMs), {

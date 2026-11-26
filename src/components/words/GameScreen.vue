@@ -9,7 +9,7 @@
  * player can keep practising. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
@@ -46,10 +46,13 @@ const props = defineProps<{
   /** True while another page covers the game: it pauses. */
   isAway: boolean;
 }>();
+const board = useTemplateRef<InstanceType<typeof GameBoard>>('board');
 const run = useRun({
   words: props.deck.words,
   settings: props.settings,
   pastEvents: props.pastEvents,
+  // Cards laid when time runs out are played, not lost.
+  beforeTimeUp: () => board.value?.playLaidCards(),
 });
 const { state, nowMs, progress, throwReading, pause, resume } = run;
 
@@ -173,6 +176,7 @@ const onPanelToggle = usePanelPause(pauseControls);
         <!-- Hidden, not removed, while a card's back shows: rebuilding it would re-deal the set. -->
         <GameBoard
           v-show="!state.flippedWord && !finish.isShown.value"
+          ref="board"
           :state="state"
           :now-ms="nowMs"
           :level="deck.level"

@@ -107,6 +107,9 @@ function throwCard({ readingIndex, wordId }: PlayedPair): void {
   emit('throw', readingIndex, wordId);
 }
 
+/** GameScreen asks for this as the set's time runs out (useRun's beforeTimeUp). */
+defineExpose({ playLaidCards: hand.playNow });
+
 function onWordTap(word: DeckWord): void {
   if (props.state.pausedAtMs !== null) emit('flip', word);
 }
