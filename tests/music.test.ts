@@ -49,7 +49,7 @@ describe('the music track', () => {
     const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
     startMusicOnFirstPress();
     expect(played).toHaveLength(0);
-    window.dispatchEvent(new Event('pointerdown'));
+    window.dispatchEvent(new Event('click'));
     expect(played).toHaveLength(1);
     expect(played[0]?.loop).toBe(true);
     expect(played[0]?.src).toContain('music/france-instrumental.m4a');
