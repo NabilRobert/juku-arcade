@@ -21,7 +21,7 @@ const PALETTE: Record<string, string> = {
   y: '#ffc93c', // speaker cone, coin face
   h: '#fff1a8', // coin's lit rim
   o: '#f08c1a', // speaker box and shade, coin's ring and sign, flame
-  r: '#e04b3a', // flame's outer fire
+  r: '#e8302a', // flame's outer fire
 };
 
 /** A speaker facing right; the sound or the cross goes in columns 10 to 15. */
@@ -114,22 +114,20 @@ export const ICONS: Record<IconName, readonly string[]> = {
     '.....kkkkkk.....',
   ],
   flame: [
-    '.......kk.......',
-    '......krk.......',
-    '......krrk......',
-    '.....krrrk......',
-    '.....krrrrk..k..',
-    '....krrorrk.krk.',
-    '.k..krroorrkkrk.',
-    'krk.krooorrrrrk.',
-    'krrkrrooyoorrrk.',
-    'krrrrooyyyoorrk.',
-    '.krrooyyhyyoork.',
-    '.krooyyhhhyyork.',
-    '.kroyyhhhhhyork.',
-    '..kroyyhhhyyok..',
-    '...kkooyyyookk..',
-    '.....kkkkkkk....',
+    '.......r....',
+    '........r...',
+    '.......rr...',
+    '......ror...',
+    '.....roor...',
+    '....rooor.r.',
+    '...rooyorrr.',
+    '..rooyyoorrr',
+    '..royyyyoorr',
+    '.royyhyyyoor',
+    '.royhhhhyyor',
+    '.royhwwhhyor',
+    '..royhwwhor.',
+    '...rrrrrrr..',
   ],
 };
 
