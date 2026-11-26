@@ -3,7 +3,8 @@
  * The app shell: loads the player's settings and history from the browser,
  * shows first-launch setup if there are none, then loads the level's deck
  * and starts a run. The game stays mounted (v-show) under the About and
- * Settings pages, and pauses while they cover it.
+ * Settings pages, and pauses while they cover it. Screens other than the
+ * start screen and word mode load on demand (lazy-screens.ts).
  */
 import { domMax, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
@@ -23,19 +24,24 @@ import {
   saveSettings,
   type Settings,
 } from './memory/storage.ts';
-import AboutData from './components/AboutData.vue';
-import AppFooter, { type FooterTarget } from './components/AppFooter.vue';
+import { provideGoToPage, type PageTarget } from './composables/usePageLinks.ts';
+import AppFooter from './components/AppFooter.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
-import KanjiScreen from './components/kanji/KanjiScreen.vue';
-import BunpouScreen from './components/bunpou/BunpouScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
-import SettingsPanel from './components/SettingsPanel.vue';
-import StatsPage from './components/StatsPage.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
-import ResearchPage from './components/ResearchPage.vue';
+import {
+  AboutData,
+  BunpouScreen,
+  DojoScreen,
+  KanjiScreen,
+  prefetchScreens,
+  ResearchPage,
+  SettingsPanel,
+  StatsPage,
+} from './lazy-screens.ts';
 
 type Page = 'game' | 'about' | 'research' | 'settings' | 'checkUp' | 'mode' | 'stats';
 
@@ -47,7 +53,7 @@ const grammarEvents = shallowRef<readonly GrammarEvent[]>([]);
 const isLoaded = ref(false);
 const loadError = ref<string | null>(null);
 const page = ref<Page>('game');
-/** Word mode, kanji mode (D37) or Bunpou (D56), picked on the start screen each time the game opens. */
+/** Word mode, kanji mode (D37), Bunpou (D56) or the dojo (D62), picked on the start screen each time. */
 const mode = ref<GameMode>('words');
 /** Changes whenever the run must start over: a new level, or deleted data. */
 const runKey = ref(0);
@@ -128,16 +134,18 @@ async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
 /** Opens the stats page with the latest events and settings, saved since the game started. */
 async function openStats(): Promise<void> {
   pastEvents.value = await orFallback(loadEvents, pastEvents.value);
+  grammarEvents.value = await orFallback(loadGrammarEvents, grammarEvents.value);
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
   page.value = 'stats';
 }
 
 /** A footer link: the stats page loads the latest first; the rest just open. */
-function goTo(target: FooterTarget): void {
+function goTo(target: PageTarget): void {
   if (target === 'stats') void openStats();
   else page.value = target;
 }
+provideGoToPage(goTo);
 
 async function chooseMode(next: GameMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
@@ -148,11 +156,12 @@ async function chooseMode(next: GameMode): Promise<void> {
   runKey.value += 1;
 }
 
-/** A1: downloads this browser's events as an anonymous file. */
+/** A1: downloads this browser's word and grammar events as an anonymous file. */
 async function exportData(): Promise<void> {
   if (settings.value === null) return;
   const events = await orFallback(loadEvents, pastEvents.value);
-  downloadExport(buildExport(events, settings.value, new Date()));
+  const grammar = await orFallback(loadGrammarEvents, grammarEvents.value);
+  downloadExport(buildExport(events, settings.value, new Date(), grammar));
 }
 
 async function useSettings(updated: Settings): Promise<void> {
@@ -190,6 +199,7 @@ onMounted(async () => {
   const saved = await orFallback(loadSettings, null);
   isLoaded.value = true;
   if (saved) await startGame(saved);
+  prefetchScreens();
 });
 </script>
 
@@ -198,7 +208,9 @@ onMounted(async () => {
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
       <TableBackground />
-      <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
+      <!-- Clipped, so cards dealt up from under the screen never make the page scrollable mid-deal;
+           clip, unlike hidden, makes no scroll box, so the side panel stays sticky. -->
+      <main class="flex min-h-svh flex-col gap-4 overflow-clip px-4 py-4 sm:px-8">
         <h1
           class="flex items-center justify-center gap-3 text-2xl font-bold tracking-wide text-aqua"
         >
@@ -215,6 +227,7 @@ onMounted(async () => {
             :deck="deck"
             :settings="settings"
             :events="pastEvents"
+            :grammar-events="grammarEvents"
             @close="page = 'game'"
           />
           <SettingsPanel
@@ -242,6 +255,18 @@ onMounted(async () => {
             :settings="settings"
             :is-away="isAway"
             @leave="page = 'mode'"
+            @again="chooseMode('kanji')"
+          />
+          <DojoScreen
+            v-else-if="mode === 'dojo'"
+            v-show="!isAway"
+            :key="`dojo-${runKey}`"
+            class="my-auto"
+            :deck="deck"
+            :settings="settings"
+            :is-away="isAway"
+            @leave="page = 'mode'"
+            @again="chooseMode('dojo')"
           />
           <BunpouScreen
             v-else-if="mode === 'bunpou'"
@@ -264,10 +289,11 @@ onMounted(async () => {
             :settings="settings"
             :past-events="pastEvents"
             :is-away="isAway"
+            @leave="page = 'mode'"
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
-        <AppFooter :is-nav-shown="settings !== null && page === 'game'" @go="goTo" />
+        <AppFooter :is-in-game="settings !== null && page === 'game'" @go="goTo" />
       </main>
     </MotionConfig>
   </LazyMotion>

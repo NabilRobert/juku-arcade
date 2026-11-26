@@ -59,6 +59,12 @@ export function accuracy({ right, wrong, timedOut }: AnswerCounts): number | nul
   return answered === 0 ? null : right / answered;
 }
 
+/** The share right as the stats page shows it: "84%", or "–" before any answer. */
+export function percentRight(counts: AnswerCounts): string {
+  const share = accuracy(counts);
+  return share === null ? '–' : `${Math.round(share * 100)}%`;
+}
+
 function mostMissed(misses: readonly GameEvent[], words: readonly DeckWord[]): MissedWord[] {
   const byWord = new Map<string, number>();
   for (const miss of misses) {

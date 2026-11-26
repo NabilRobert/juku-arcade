@@ -5,7 +5,12 @@ import type { PlayMode } from '../../memory/play-log.ts';
 
 defineProps<{ scores: readonly ModeScores[]; isToday: boolean }>();
 
-const MODE_NAMES: Record<PlayMode, string> = { words: 'Words', kanji: 'Kanji', bunpou: 'Bunpou' };
+const MODE_NAMES: Record<PlayMode, string> = {
+  words: 'Words',
+  kanji: 'Kanji',
+  bunpou: 'Bunpou',
+  dojo: 'Practice',
+};
 </script>
 
 <template>

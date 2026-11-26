@@ -37,6 +37,7 @@ import { hoverPitch, playHoverSound, playSound } from '../../sound/sfx.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
+import { cardFontSize } from './card-text.ts';
 import { isDrag, type Offset, type Placement, type Point } from './throw-geometry.ts';
 
 const props = defineProps<{
@@ -83,21 +84,6 @@ const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 const { tiltStyle, follow, settle } = useCardTilt();
 usePixelSnap('snapLayer', () => props.status === 'matched', THROW_S * 1000);
 
-/** Largest text size (rem): short words are big, as on a printed card. */
-const MAX_TEXT_REM = { word: 3.5, reading: 2.6 } as const;
-/**
- * Share of the card's width (cqw) a line of text may fill inside the frame:
- * across the card for a word, down it for a reading (the card is 4/3 as
- * tall as it is wide).
- */
-const TEXT_LENGTH_CQW = { word: 74, reading: 96 } as const;
-/**
- * Text longer than this goes on two lines rather than shrinking past
- * reading. The longest N5–N4 entries are 6-character words and 9-kana
- * readings (こうとうがっこう), measured on the slice 0 decks.
- */
-const ONE_LINE_MAX = 6;
-
 const SUITS = { word: '言', reading: '音' } as const;
 
 const STATUS_CLASSES: Partial<Record<CardStatus, string>> = {
@@ -131,20 +117,8 @@ let pressPoint: Point | null = null;
 
 const isFaceDown = computed(() => props.status === 'hidden');
 
-/** The text, split in two halves when it's too long for one line (or column). */
-const lines = computed(() => {
-  const chars = [...props.text];
-  if (chars.length <= ONE_LINE_MAX) return [props.text];
-  const half = Math.ceil(chars.length / 2);
-  return [chars.slice(0, half).join(''), chars.slice(half).join('')];
-});
-
-/** As big as the card allows: the longest line fills the card, up to the maximum. */
-const textStyle = computed(() => {
-  const longest = Math.max(...lines.value.map((line) => [...line].length));
-  const fitted = TEXT_LENGTH_CQW[props.kind] / longest;
-  return { fontSize: `min(${MAX_TEXT_REM[props.kind]}rem, ${fitted}cqw)` };
-});
+/** Always one line, shrinking to fit (card-text.ts). */
+const textStyle = computed(() => ({ fontSize: cardFontSize(props.text, props.kind) }));
 
 const frame = computed<FrameColour>(() =>
   props.isTargeted === true ? 'lit' : (STATUS_FRAMES[props.status] ?? 'crimson'),
@@ -259,12 +233,11 @@ function onClick(event: MouseEvent): void {
           >{{ level }}</span
         >
         <span
-          class="relative flex flex-col items-center leading-tight"
+          class="relative leading-tight whitespace-nowrap"
           :class="kind === 'reading' ? '[writing-mode:vertical-rl]' : ''"
           :style="textStyle"
+          >{{ text }}</span
         >
-          <span v-for="line in lines" :key="line">{{ line }}</span>
-        </span>
         <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
         <span
           v-if="(order ?? queuedAs) !== undefined"

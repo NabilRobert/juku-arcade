@@ -6,7 +6,7 @@ import DayDetail from '../src/components/streak/DayDetail.vue';
 import FlameSprite from '../src/components/streak/FlameSprite.vue';
 import { FLAME_FRAMES } from '../src/components/streak/flame-frames.ts';
 import PlayCalendar from '../src/components/streak/PlayCalendar.vue';
-import StreakPanel from '../src/components/streak/StreakPanel.vue';
+import ModePicker from '../src/components/ModePicker.vue';
 import { localDay } from '../src/game/events.ts';
 import type { DaySummary } from '../src/memory/day-summary.ts';
 import { addDays } from '../src/memory/leitner.ts';
@@ -61,10 +61,16 @@ describe('the play calendar on screen', () => {
 describe("a day's summary on screen", () => {
   it('says today has no play yet, and an earlier quiet day had none that day', () => {
     const today = mount(DayDetail, {
-      props: { day: TODAY, today: TODAY, summary: quietDay, isRestDay: false },
+      props: { day: TODAY, today: TODAY, summary: quietDay, isRestDay: false, kanjiNotes: {} },
     });
     const earlier = mount(DayDetail, {
-      props: { day: '2026-11-20', today: TODAY, summary: quietDay, isRestDay: false },
+      props: {
+        day: '2026-11-20',
+        today: TODAY,
+        summary: quietDay,
+        isRestDay: false,
+        kanjiNotes: {},
+      },
     });
     expect(today.text()).toContain('No play today yet.');
     expect(earlier.text()).toContain('No play that day.');
@@ -77,10 +83,10 @@ describe("a day's summary on screen", () => {
       scores: [{ mode: 'words' as const, dayBest: 1, monthBest: 1, everBest: 1 }],
     };
     const today = mount(DayDetail, {
-      props: { day: TODAY, today: TODAY, summary, isRestDay: false },
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: {} },
     });
     const earlier = mount(DayDetail, {
-      props: { day: '2026-11-20', today: TODAY, summary, isRestDay: false },
+      props: { day: '2026-11-20', today: TODAY, summary, isRestDay: false, kanjiNotes: {} },
     });
     expect(today.find('th:nth-child(2)').text()).toBe('Today');
     expect(earlier.find('th:nth-child(2)').text()).toBe('That day');
@@ -88,7 +94,13 @@ describe("a day's summary on screen", () => {
 
   it('says when a quiet day was a rest day the streak forgave', () => {
     const detail = mount(DayDetail, {
-      props: { day: '2026-11-24', today: TODAY, summary: quietDay, isRestDay: true },
+      props: {
+        day: '2026-11-24',
+        today: TODAY,
+        summary: quietDay,
+        isRestDay: true,
+        kanjiNotes: {},
+      },
     });
     expect(detail.text()).toContain('Rest day: your streak was kept.');
   });
@@ -96,7 +108,7 @@ describe("a day's summary on screen", () => {
   it('shows every haiku the day closed on, saying it was today', () => {
     const summary = { ...quietDay, runs: 2, haikuIds: ['old-pond', 'park-cat'] };
     const detail = mount(DayDetail, {
-      props: { day: TODAY, today: TODAY, summary, isRestDay: false },
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: {} },
     });
     expect(detail.text()).toContain('Today you got these 2 haiku');
     expect(detail.find('[data-testid="day-haiku"]').findAll('article')).toHaveLength(2);
@@ -112,15 +124,64 @@ describe("a day's kanji and scores on screen", () => {
       kanji: { mostRecognised: { kanji: '学', count: 3 }, mostMissed: { kanji: '先', count: 2 } },
     };
     const detail = mount(DayDetail, {
-      props: { day: TODAY, today: TODAY, summary, isRestDay: false },
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: {} },
     });
     expect(detail.find('[data-testid="most-recognised"]').text()).toContain('学 ×3');
     expect(detail.find('[data-testid="most-missed"]').text()).toContain('先 ×2');
     expect(detail.find('[data-mode="kanji"]').text()).toBe('Kanji90120300');
   });
+
+  it("opens a kanji's card back when it's clicked, and turns it over again", async () => {
+    const summary: DaySummary = {
+      ...quietDay,
+      runs: 1,
+      kanji: { mostRecognised: null, mostMissed: { kanji: '気', count: 1 } },
+    };
+    const note = {
+      onyomi: ['キ', 'ケ'],
+      kunyomi: [],
+      meanings: ['spirit', 'mind'],
+      words: [{ word: '天気', reading: 'てんき' }],
+    };
+    const detail = mount(DayDetail, {
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: { 気: note } },
+      attachTo: document.body,
+    });
+    await detail.find('[data-testid="most-missed"] [data-testid="kanji-open"]').trigger('click');
+    const card = document.querySelector('[data-testid="card-overlay"]');
+    expect(card?.textContent).toContain('spirit; mind');
+    expect(card?.textContent).toContain('天気 てんき');
+    expect(card?.querySelectorAll('[data-testid="kanji-reading"]')).toHaveLength(2);
+    const turnOver = [...(card?.querySelectorAll('button') ?? [])].find((button) =>
+      button.textContent?.includes('Turn over'),
+    );
+    turnOver?.click();
+    await detail.vm.$nextTick();
+    expect(document.querySelector('[data-testid="card-overlay"]')).toBeNull();
+    detail.unmount();
+  });
+
+  it('closes an open kanji card with Esc', async () => {
+    const summary: DaySummary = {
+      ...quietDay,
+      runs: 1,
+      kanji: { mostRecognised: { kanji: '学', count: 1 }, mostMissed: null },
+    };
+    const note = { onyomi: ['ガク'], kunyomi: ['まな.ぶ'], meanings: ['study'], words: [] };
+    const detail = mount(DayDetail, {
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: { 学: note } },
+      attachTo: document.body,
+    });
+    await detail.find('[data-testid="kanji-open"]').trigger('click');
+    expect(document.querySelector('[data-testid="card-overlay"]')).not.toBeNull();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await detail.vm.$nextTick();
+    expect(document.querySelector('[data-testid="card-overlay"]')).toBeNull();
+    detail.unmount();
+  });
 });
 
-describe('the streak panel', () => {
+describe('the streak on the start screen', () => {
   beforeEach(async () => {
     await deleteAllData();
   });
@@ -140,7 +201,7 @@ describe('the streak panel', () => {
         right: 2,
       });
     }
-    const panel = mount(StreakPanel, { props: { deck: emptyDeck } });
+    const panel = mount(ModePicker, { props: { deck: emptyDeck } });
     await flushPromises();
     expect(panel.find('[data-testid="streak-days"]').text()).toBe('2-day streak');
     expect(panel.find('[data-testid="streak-message"]').text()).toContain(

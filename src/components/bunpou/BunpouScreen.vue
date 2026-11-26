@@ -4,8 +4,9 @@
  * reviews, score, level and best combo, the hint and sound switches, End
  * run) beside the stage and the table (D58: the storyteller keeps each
  * built line as a sealed slip, and forgets a line that times out), the
- * tale's performance after its last line, the chapter's scroll after every
- * third tale, or the results once the player ends the run. Every judged line goes to the
+ * tale's performance after its last line, the chapter's scroll after the
+ * third tale, then the curtain call and results: a show is one chapter
+ * (D61), though the player can end it sooner. Every judged line goes to the
  * grammar log and reviews (useGrammarReviews, D57), which also pick each
  * tale's points. Like kanji mode, its play time counts toward the nudges
  * and the school's daily cap (usePlayClock), the wellbeing screens stand
@@ -22,7 +23,8 @@ import { CURRICULUM } from '../../grammar/templates.ts';
 import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
 import { outcomeOf, useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { useRunEnd } from '../../grammar/useRunEnd.ts';
-import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { usePanelPause } from '../../composables/usePanelPause.ts';
+import { usePauseKey, type PauseKeyInput } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
 import { withAnswer, type Answers } from '../../memory/play-log.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
@@ -30,6 +32,8 @@ import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
 import DailyBar from '../words/DailyBar.vue';
+import FloatingPause from '../ui/FloatingPause.vue';
+import SidePanel from '../ui/SidePanel.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
@@ -92,12 +96,15 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   isAway: () => props.isAway,
   pause: game.pause,
 });
-usePauseKey({
+const pauseControls: PauseKeyInput = {
   isPaused,
   isAvailable: () => !props.isAway && !isEnded.value && run.value.phase === 'building',
   pause: game.pause,
   resume: game.resume,
-});
+};
+usePauseKey(pauseControls);
+/** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
+const onPanelToggle = usePanelPause(pauseControls);
 
 const panels = computed(() => [
   { label: 'Score', value: run.value.score },
@@ -118,9 +125,10 @@ function afterTale(): void {
   game.nextTale();
 }
 
+/** A show is one chapter (D61): after its scroll comes the curtain call. */
 function afterChapter(): void {
   chapterShown.value = null;
-  game.nextTale();
+  endRun();
 }
 
 /** The line just judged, while its result shows. */
@@ -142,8 +150,8 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-3" aria-label="Bunpou run">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Bunpou run" @toggle="onPanelToggle">
       <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
         :daily="reviews.progress.value.daily"
@@ -180,7 +188,14 @@ function dismiss(isStopping: boolean): void {
         Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
         tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
-    </aside>
+    </SidePanel>
+    <FloatingPause
+      v-if="!isEnded"
+      :is-paused="isPaused()"
+      :is-disabled="run.phase !== 'building'"
+      @pause="game.pause"
+      @resume="game.resume"
+    />
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <CurtainCall
         v-if="runEnd.step.value === 'curtain' && runEnd.pick.value"

@@ -96,6 +96,11 @@ export function secondsLeft(state: RunState, nowMs: number): number {
   return Math.max(0, (state.setShownAtMs + state.setDurationMs - clockMs) / 1000);
 }
 
+/** How much of the set's time is left, 1 to 0, for a timer bar. */
+export function timeShareLeft(state: RunState, nowMs: number): number {
+  return secondsLeft(state, nowMs) / (state.setDurationMs / 1000);
+}
+
 function withExposure(exposure: DecoyExposure, set: DealtSet): DecoyExposure {
   const decoyType = set.readings.find((card) => card.wordId === null)?.decoyType;
   return decoyType ? { ...exposure, [decoyType]: exposure[decoyType] + 1 } : exposure;

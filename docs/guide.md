@@ -596,6 +596,10 @@ fields. They stay in memory until slice 3 stores them.
 | **Streak** | Days in a row with a run played, in any mode. One missed day a week (Monday to Sunday) is forgiven as a **rest day**; a second breaks it. Today never breaks it | `memory/streak.ts` |
 | **Play calendar** | The start screen's grid of days, like a contribution graph: a column per week, each day brighter the more was answered. Clicking a day shows its summary | `memory/play-calendar.ts`, `memory/day-summary.ts`, `components/streak/` |
 | **Streak reminder** | The start screen's message about the streak, picked from templates that fit (after Duolingo's reminders); milestones (3, 7, 14, 30… days) are celebrated once | `memory/streak-messages.ts`, `composables/useStreak.ts` |
+| **Finish line** | Where a run ends (D61): word mode when today's deck is cleared, kanji mode after a sheet of 10, Bunpou after one chapter; each ends on the same results card | `composables/useDeckFinish.ts`, `kanji/useKanjiSheet.ts`, `ui/RunResults.vue` |
+| **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
+| **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; the timer tightens by stage to a floor | `dojo/`, `components/dojo/` |
+| **Total board** | The leaderboard that adds up your best run in each mode | `leaderboard/leaderboard.ts: boardBests` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
 | **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |
@@ -661,6 +665,49 @@ fields. They stay in memory until slice 3 stores them.
   `tests/memory.test.ts`.
 - **Add a source to the research page:** add it to `SOURCE_GROUPS` in
   `research/sources.ts`, with what it found and where the game uses it.
+- **Change a finish line or a level goal:** the kanji sheet's size is
+  `KANJI_PER_SHEET` in `kanji/useKanjiSheet.ts`; a Bunpou show's length is
+  `TALES_PER_CHAPTER` in `grammar/performance.ts`; the goals, their stamps
+  and the rakugo ranks are in `memory/level-goals.ts`.
+- **Change practice mode (the dojo):** lanterns, the stage length and each kind's
+  seconds per stage are at the top of `dojo/dojo-run.ts`; what it asks,
+  and when it opens (`MIN_DOJO_WORDS`), is in `dojo/dojo-questions.ts`;
+  the game-over quotes are `QUOTES` in `dojo/quotes.ts`.
+- **Change a leaderboard:** the sample players and how your bests are
+  worked out are in `leaderboard/leaderboard.ts`.
+- **Change the phone layout:** below Tailwind's `lg` breakpoint each
+  mode's side panel is a drawer that slides in from the left
+  (`ui/SidePanel.vue`), the pause button floats at the top right
+  (`ui/FloatingPause.vue`), and cards deal up from under the screen
+  (`composables/useDeal.ts: belowScreen`); card sizes there are
+  the `min(…svh, …vw)` values on each card row in `words/GameBoard.vue`
+  and `kanji/KanjiBoard.vue`. Sizes use `svh` (the screen's height with
+  the browser's address bar showing), not `dvh`: `dvh` changes as the bar
+  slides away, which resized the cards mid-scroll and made the page jump.
+  During a game the footer is hidden there, and its links (change mode,
+  stats, settings, about, research) sit at the bottom of the drawer
+  (`composables/usePageLinks.ts`, `ui/PageLinks.vue`), so the board fits
+  the screen with nothing to scroll.
+  Opening the drawer pauses a timed run, and closing it resumes the run if
+  the drawer paused it (`composables/usePanelPause.ts`, wired to
+  SidePanel's `toggle` event in each mode screen).
+- **Add a screen:** if it isn't needed on the start screen, add it to
+  `lazy-screens.ts` so it loads on demand (and is prefetched when idle).
+- **Change the stats page:** word numbers come from `memory/stats.ts`, grammar
+  numbers from `memory/grammar-stats.ts` (its section is
+  `components/GrammarStats.vue`); each list is a `ui/RankedList.vue`.
+- **Fold a start-screen panel:** the leaderboard and the streak each have a
+  Hide/Show button (`ui/FoldButton.vue`, which is the leaderboard's Back and
+  Next button, `ui/ArcadeButton.vue`); whether each is folded is remembered in this browser
+  (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
+  length in sight, and on a wide screen the start screen drops to one
+  column, with the leaderboard as a bar across the top (`ModePicker.vue`).
+- **Change a card back:** a word's back is `words/CardBack.vue` and a
+  kanji's is `words/KanjiCardBack.vue`; both are built from
+  `words/CardBackPanel.vue` (the paper panel and Turn over) and
+  `words/KanjiNoteSection.vue` (one kanji's readings and words). The
+  streak's day detail opens a kanji's back over the start screen in
+  `ui/CardOverlay.vue` when its kanji is clicked (`streak/KanjiHighlight.vue`).
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are

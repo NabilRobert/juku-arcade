@@ -1105,3 +1105,159 @@ the native check.
   meet them in kana); plain-form から clauses (one politeness level per
   tale, as the plan says).
 
+
+### D61: A finish line for every run, and a goal for every level (2026-11-26)
+
+From playtesting: "don't just make it endless". Endless runs ranked by
+total score rewarded whoever played longest, which works against the
+15- and 30-minute nudges and the daily cap (D19).
+
+- **Finish lines:** a word-mode run ends when today's deck is cleared
+  (the reviews due plus the day's new words): the pot is banked and the
+  results show, and the player can keep practising
+  (`composables/useDeckFinish.ts`). A kanji run is a sheet of 10 kanji
+  (`kanji/useKanjiSheet.ts`). A Bunpou show is one chapter of three tales,
+  then the curtain call (D59); "End run" still leaves early. All three end
+  on one results card (`ui/RunResults.vue`).
+- **Level goals,** on each mode's card on the start screen
+  (`memory/level-goals.ts`): words known; kanji mastered (every reading
+  found with no wrong pick on two separate days, like a known word); and
+  Bunpou's rakugo ranks, 前座, then 二ツ目 from a third of the grammar,
+  then 真打 for all of it. A tick lights at each quarter, after the
+  goal-gradient effect (Kivetz, Urminsky & Zheng 2006).
+- **Kanji mastery needs a record:** kanji rounds go to the play log
+  (`memory/play-log.ts`), not to the review events, so D37 still holds:
+  the reviews and the school's measures don't read kanji mode.
+- **Beat:** a fixed 30-match word run (it wouldn't follow the day's
+  reviews); a ranked total for each mode (ranking moves to the game-over
+  mode); sheets weighted toward kanji not yet mastered (left for later).
+
+### D62: The dojo, a game-over mode, and a board for every mode (2026-11-26)
+
+From playtesting: "make another mode that has a game over". On screen it's
+called **Practice mode** (renamed in playtesting); the code keeps the
+name `dojo`. Kanji mode's card no longer says "practice only", to avoid
+the clash.
+
+- **What it asks:** only what the player has met, so it tests rather
+  than teaches (`dojo/dojo-questions.ts`): words matched before (the
+  reading among four, the word's own decoys first), kanji found perfectly
+  at least once (a hand of eight readings), and grammar points built right
+  (one Bunpou sentence). Repeats are allowed. It opens once 10 words have
+  been matched, and says so until then.
+- **Reused boards:** word and kanji questions are dealt as cards on kanji
+  mode's board, and grammar questions on Bunpou's tile board, as asked in
+  playtesting; one wrong card is a miss.
+- **Three lanterns:** a miss or a timeout puts one out
+  (`dojo/dojo-run.ts`); the score is the right answers. Lit and dim
+  lanterns are drawn in the game's palette after a reference from
+  playtesting.
+- **The timer** tightens every 10 right answers through five stages,
+  then holds: words 20, 17, 15, 13, 12 s; kanji 60, 52, 45, 40, 36 s; a
+  grammar sentence 30, 26, 23, 20, 18 s (the whole sentence). The floor
+  is sized for a slow reader who knows the answer: the game should help
+  people learn, not shut out slow readers.
+- **Game over** recaps the score, the best combo and the stage, with a
+  quote from a historic figure or a well-known character, each with its
+  source (`dojo/quotes.ts`), then Restart or Quit to main menu.
+- **Logging:** runs go to the play log (streak, calendar, boards);
+  nothing goes to the reviews, since a timed test isn't practice.
+- **Leaderboards:** a board for each mode, ranking its best run (word
+  mode's coins, kanji mode's best sheet, Bunpou's best show, the dojo's
+  best run), and a Total board, the sum of each mode's best, which
+  rewards being good at everything rather than playing longest
+  (`leaderboard/leaderboard.ts: boardBests`). Bests kept before the play
+  log existed still count.
+- **Beat:** one board for the dojo only (asked for a board per mode and
+  a total instead); a total of every point ever scored (rewards time
+  played); a speed-up with no floor (unfair to slow readers); new
+  question screens of its own (the other modes' boards look and feel the
+  same).
+
+### D63: The game fits a phone (2026-11-26)
+
+The game was laptop-only (D30). From playtesting, and since the school's
+students may play on phones, it now fits a phone-width screen too, with
+desktop unchanged.
+
+- **Below the lg breakpoint:** the start screen stacks (leaderboard,
+  streak, modes); each mode's board fills the screen and its side panel is
+  a drawer folded away to the left, slid open or closed by a tab on its
+  edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
+  tablets; word mode's set timer also shows above its cards, and the
+  pause button sits fixed at the top right (`ui/FloatingPause.vue`).
+- **Cards and tiles:** card rows cap their height by the window's width
+  as well as its height. On a phone the hand is a grid of cards side by
+  side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2, on
+  tablets too, with bigger cards), so
+  each reading is big enough to read and tap (playtest: the fan was hard
+  to read and too small to tap). Bunpou's tiles shrink with their text. The calendar shows 12
+  weeks.
+- **One screen, no scrolling during play:** on phones and tablets each
+  board's cards are capped by the screen's height too, so the cards you
+  play fit on one screen (checked at 375×812, 375×667 and 768×1024);
+  Bunpou's stage is shorter on a phone. On phones and tablets the deck is
+  gone and each card slides up from under the screen; desktop keeps it. Card
+  text always stays on one line, shrinking to fit.
+- **Not yet checked on a real phone:** touch drags (throwing a card) work
+  in a phone emulator, but a playtest on a real device is still to come.
+- **Beat:** a separate phone app (more to keep in step); hiding modes on a
+  phone (every mode fits).
+
+### D64: A light first load, other screens on demand (2026-11-26)
+
+From playtesting: "since it's a game the components need to be light and
+load fast". Measured on the local build: the game's code was one 535 KB
+file (181 KB compressed), parsed before the start screen showed.
+
+- **Screens on demand** (`lazy-screens.ts`): kanji mode, Bunpou (with its
+  templates and stage), the dojo, and the stats, settings, research and
+  about pages are their own chunks. The first load is the start screen and
+  word mode: 385 KB of code (130 KB compressed) plus the shared animation
+  library (28 KB compressed).
+- **Prefetched when idle:** once the start screen is up, the other chunks
+  are fetched while the browser is free, so opening a mode stays instant:
+  measured at 13–83 ms from the tap to the first card, and 11–25 ms back
+  to the start screen.
+- **The curriculum stands alone** (`grammar/curriculum.ts`), so the start
+  screen counts the level's grammar without loading every template.
+- **Already light:** the music streams on the first tap; the Japanese font
+  comes in about 120 small pieces, of which a page loads only the ones its
+  characters need; built files are cached for a year (`public/_headers`).
+- **Beat:** splitting word mode too (the most played mode; it would only
+  add a fetch to its first tap); a service worker for offline play (more
+  to keep in step than the gain for now).
+
+### D65: Grammar on the stats page and in the export; the check-up stays words (2026-11-26)
+
+- **Stats page:** a Grammar section (`components/GrammarStats.vue`,
+  `memory/grammar-stats.ts`): points known and seen, sentences right
+  today and overall, the points missed most by their pattern, and the
+  kinds of mistake (the rule a wrong order broke).
+- **Export:** format 2 adds the grammar log (`memory/export.ts`), so a
+  teacher sees Bunpou too; the report reads both formats.
+- **Check-up:** stays words only (playtest decision). Grammar there would
+  either measure only before and after, or hold new grammar points back
+  from Bunpou for 3 days to compare, which slows a player's grammar. The
+  stats page and the export already show grammar.
+- **Beat:** grammar in the check-up, before and after only; the full
+  design with hold-backs.
+
+### D66: Results against the best, a head start, and a fair word board (2026-11-26)
+
+Three things the research page claimed, or the boards needed, that the
+game didn't yet do:
+
+- **How close a run came** (the near-miss effect, Clark et al. 2009): the
+  results card says "New best! Up from 20.", "That ties your best" or
+  "3 away from your best (20).", on practice mode, kanji mode's sheet and
+  word mode's deck (`memory/best-comparison.ts`,
+  `composables/usePreviousBest.ts`).
+- **A head start** (the endowed-progress effect, Nunes & Drèze 2006):
+  words answered right in their check-up before first play count as known,
+  on the start screen's goal and in word mode alike
+  (`word-memory.ts: isWordKnown`). Display only: the review schedule still
+  ignores check-ups (C4).
+- **A fair word board:** a word run counts toward the best and the board
+  only until today's deck is cleared, the pot banked at that moment
+  included (`useDeckFinish.isRanked`); practice after it doesn't count.

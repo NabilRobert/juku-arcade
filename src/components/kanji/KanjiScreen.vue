@@ -2,7 +2,8 @@
 /**
  * Kanji mode on screen (D37): a side panel (the mode, score, combo and
  * round, the last round's result, the sound switch) beside the kanji
- * board. It's practice: nothing is reviewed, and each round goes only to
+ * board. A run is a sheet of 10 kanji, then its results (useKanjiSheet.ts,
+ * D61). It's practice: nothing is reviewed, and each round goes only to
  * the play log, for the streak and the calendar (play-log.ts). Its play time still
  * counts toward the nudges and the school's daily cap (usePlayClock), and
  * the same wellbeing screens stand in front of the board (WellbeingGate);
@@ -11,18 +12,19 @@
  * Crests (D42) hide on some cards: the scout panel flips the hand over to
  * show them (KanjiScoutPanel.vue).
  */
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
+import { KANJI_PER_SHEET, useKanjiSheet } from '../../kanji/useKanjiSheet.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
-import { useRunLog } from '../../composables/useRunLog.ts';
-import { withAnswer, type Answers } from '../../memory/play-log.ts';
-import { localDay } from '../../game/events.ts';
+import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
-import { appendKanjiRound, type Settings } from '../../memory/storage.ts';
+import type { Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
+import SidePanel from '../ui/SidePanel.vue';
+import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
 import WellbeingGate from '../WellbeingGate.vue';
@@ -34,33 +36,21 @@ const props = defineProps<{
   /** True while another page covers the game: its play clock stops. */
   isAway: boolean;
 }>();
-const emit = defineEmits<{ leave: [] }>();
+const emit = defineEmits<{ leave: []; again: [] }>();
 
 const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
 const { wrongPicksLeft } = run;
 const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
 
-const runLog = useRunLog('kanji');
-let roundTally: Answers = { answered: 0, right: 0 };
-watch(lastResult, (result) => {
-  if (result === null) return;
-  roundTally = withAnswer(roundTally, result.isPerfect ? 'right' : 'wrong');
-  runLog.record({ score: score.value, ...roundTally });
-  const record = {
-    day: localDay(new Date()),
-    kanji: round.value.kanji,
-    isPerfect: result.isPerfect,
-  };
-  appendKanjiRound(record).catch((error: unknown) =>
-    console.warn('Could not save the round:', error),
-  );
-});
+const sheet = useKanjiSheet(run);
+const previousBest = usePreviousBest('kanji');
+const { isDone: isSheetDone, kanjiNumber } = sheet;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
   props.settings,
-  () => props.isAway || isCapped.value || nudge.value !== null,
+  () => props.isAway || isSheetDone.value || isCapped.value || nudge.value !== null,
 );
 const { nudge, isCapped, dismissNudge } = useWellbeing({
   sessionPlayMs: clock.sessionPlayMs,
@@ -69,6 +59,12 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
   // Kanji mode has no timer to stop; the clock stops while a wellbeing screen shows.
   pause: () => undefined,
 });
+
+const sheetPanels = computed(() => [
+  { label: 'Perfect', value: `${sheet.tally.value.right} / ${KANJI_PER_SHEET}` },
+  { label: 'Score', value: String(score.value) },
+  { label: 'Best combo', value: String(bestCombo.value) },
+]);
 
 const panels = computed(() => [
   { label: 'Score', value: score.value },
@@ -82,10 +78,12 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-3" aria-label="Kanji run">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Kanji run">
       <ModeHeader :title="`Kanji mode · ${deck.level}`">
-        <p class="text-sm text-washi/70">Round {{ roundNumber }}</p>
+        <p class="text-sm text-washi/70" data-testid="sheet-progress">
+          Kanji {{ kanjiNumber }} / {{ KANJI_PER_SHEET }}
+        </p>
       </ModeHeader>
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
@@ -105,13 +103,24 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji.
-        Practice only: it doesn't change your reviews.
+        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji. It
+        doesn't change your reviews.
       </p>
-    </aside>
+    </SidePanel>
     <div class="flex flex-col gap-5">
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
+        <RunResults
+          v-if="isSheetDone"
+          title="Sheet done"
+          :panels="sheetPanels"
+          note="A sheet is 10 kanji. A kanji counts as mastered once you find all its readings with no wrong pick on two separate days."
+          again-label="Another sheet"
+          :comparison="{ score, previousBest }"
+          @again="emit('again')"
+          @leave="emit('leave')"
+        />
         <KanjiBoard
+          v-else
           :round="round"
           :round-number="roundNumber"
           :level="deck.level"

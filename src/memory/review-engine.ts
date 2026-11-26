@@ -12,7 +12,7 @@ import type { TagTable } from '../game/tags.ts';
 import { dailyProgress, poolForNextSet, type DailyProgress } from './daily-deck.ts';
 import { learnedTags } from './difficulty.ts';
 import { addDays } from './leitner.ts';
-import { applyEvent, deriveMemory, localDayOf, type Memory } from './word-memory.ts';
+import { applyEvent, deriveMemory, isWordKnown, localDayOf, type Memory } from './word-memory.ts';
 
 const CALENDAR_DAYS = 7;
 
@@ -56,7 +56,7 @@ export function createLocalEngine(
     recordEvents: (events) => events.forEach((event) => applyEvent(memory, event)),
     recommendWords: (today, random) => poolForNextSet(words, memory, today, random),
     getProgress: (today) => ({
-      wordsKnown: words.filter((word) => memory.words.get(word.id)?.isKnown).length,
+      wordsKnown: words.filter((word) => isWordKnown(memory, word.id)).length,
       deckSize: words.length,
       daily: dailyProgress(words, memory, today),
       daysPlayedThisWeek: daysPlayedSince(memory, today),

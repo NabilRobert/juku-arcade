@@ -20,6 +20,7 @@ import { markedTile } from '../../grammar/fill.ts';
 import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
+import TimerBar from '../ui/TimerBar.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
@@ -104,7 +105,7 @@ function dropAt(tile: string, point: Point): void {
 </script>
 
 <template>
-  <section class="relative flex flex-col gap-4" aria-label="Bunpou table">
+  <section class="relative flex flex-col gap-2 lg:gap-4" aria-label="Bunpou table">
     <header class="flex items-center gap-4">
       <span class="text-3xl font-bold text-aqua" lang="ja" data-testid="part">{{
         line ? SHELF_NAMES[line.shelf] : ''
@@ -119,12 +120,10 @@ function dropAt(tile: string, point: Point): void {
         data-testid="hint"
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
-      <span class="pixel-panel h-3 flex-1 bg-lacquer" aria-hidden="true">
-        <span class="block h-full bg-aqua" :style="{ width: `${timeLeft * 100}%` }" />
-      </span>
+      <TimerBar class="flex-1" :time-left="timeLeft" />
       <PixelButton
         :colour="isPaused ? 'crimson' : 'steel'"
-        class="px-4 py-1 text-sm"
+        class="px-4 py-1 text-sm max-lg:hidden"
         :aria-pressed="isPaused"
         :disabled="run.phase !== 'building'"
         data-testid="pause"
@@ -136,7 +135,7 @@ function dropAt(tile: string, point: Point): void {
 
     <div
       ref="strip"
-      class="pixel-panel flex min-h-32 flex-wrap items-center justify-center gap-2 bg-wood/80 p-4"
+      class="pixel-panel flex min-h-32 flex-wrap items-center justify-center gap-2 bg-wood/80 p-2 sm:p-4"
       data-testid="strip"
     >
       <SentenceFix v-if="judged && !judged.isRight" :result="judged" />
@@ -144,7 +143,7 @@ function dropAt(tile: string, point: Point): void {
         <div
           v-for="(tile, index) in run.boxes"
           :key="index"
-          class="flex h-24 w-48 items-center justify-center outline-2 -outline-offset-2"
+          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48"
           :class="tile === null ? 'outline-washi/30 outline-dashed' : 'outline-transparent'"
           data-box
         >
@@ -162,8 +161,9 @@ function dropAt(tile: string, point: Point): void {
         <span v-if="judged?.isRight" class="text-4xl text-aqua" aria-label="right">◯</span>
       </template>
     </div>
-    <div class="relative">
-      <div :class="{ invisible: isPaused }">
+    <!-- On a phone or a tablet the combo shows at half size in a short row, so the tiles sit close to the boxes. -->
+    <div class="relative max-lg:flex max-lg:h-10 max-lg:items-center max-lg:justify-center">
+      <div class="max-lg:scale-[0.55]" :class="{ invisible: isPaused }">
         <ComboMeter
           :combo="run.combo"
           :broken-combo="brokenCombo"
@@ -179,7 +179,7 @@ function dropAt(tile: string, point: Point): void {
         Paused. The tiles stay face down until you resume.
       </p>
     </div>
-    <div class="flex min-h-24 flex-wrap justify-center gap-4" data-testid="offered">
+    <div class="flex min-h-24 flex-wrap justify-center gap-2 sm:gap-4" data-testid="offered">
       <BunpouTile
         v-for="(tile, index) in unplaced"
         :key="`${run.lineIndex}-${tile}`"
@@ -194,7 +194,7 @@ function dropAt(tile: string, point: Point): void {
     </div>
     <div
       v-if="isPaused && run.missed.length > 0"
-      class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35dvh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
+      class="pixel-panel absolute inset-x-0 top-full z-10 mt-4 flex max-h-[35svh] flex-col gap-4 overflow-y-auto bg-wood/95 p-4"
       data-testid="paused"
     >
       <p class="text-sm text-aqua">Missed so far</p>

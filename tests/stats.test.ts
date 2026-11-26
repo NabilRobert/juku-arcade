@@ -1,5 +1,6 @@
 // The stats page's numbers, worked out from the event log.
 import { mount } from '@vue/test-utils';
+import { sentence } from './helpers/grammar-events.ts';
 import { afterEach, describe, expect, it } from 'vitest';
 import StatsPage from '../src/components/StatsPage.vue';
 import { makeEvent, type GameEvent } from '../src/game/events.ts';
@@ -61,9 +62,32 @@ describe('the stats page on screen', () => {
       checkUpOfferedDay: null,
     };
     const deck = { level: 'N5' as const, sourceCommit: 'test', words: WORDS, kanji: {} };
-    const page = mount(StatsPage, { props: { deck, settings, events: EVENTS } });
+    const page = mount(StatsPage, { props: { deck, settings, events: EVENTS, grammarEvents: [] } });
     expect(page.text()).toContain('Best score');
     expect(page.text()).toContain('840');
     expect(page.text()).not.toContain('Best set');
+  });
+
+  it('shows the grammar too: points known, sentences right, and the points missed most by pattern', () => {
+    const settings = {
+      playerId: 'p',
+      level: 'N5' as const,
+      classCode: null,
+      bestCombo: 0,
+      playDay: null,
+      playMsToday: 0,
+      checkUpOfferedDay: null,
+    };
+    const deck = { level: 'N5' as const, sourceCommit: 'test', words: WORDS, kanji: {} };
+    const grammarEvents = [
+      sentence('wa', '2026-11-25', 'right'),
+      sentence('o', '2026-11-25', 'wrong'),
+    ];
+    const page = mount(StatsPage, { props: { deck, settings, events: [], grammarEvents } });
+    const grammar = page.find('[data-testid="grammar-stats"]');
+    expect(grammar.text()).toContain('Grammar known0 / 20');
+    expect(grammar.text()).toContain('Grammar missed most');
+    expect(grammar.text()).toContain('1×');
+    expect(grammar.text()).toContain('The verb not at the end');
   });
 });

@@ -16,7 +16,7 @@ export const SLOT_SIZE = 'mx-auto aspect-[3/4] w-[min(100%,calc(var(--card-heigh
 const HAND_TILTS_DEG = [-1.5, 1, -0.5, 1.5, -1, 0.5, 1.2, -0.8];
 const HAND_RAISES_PX = [2, 0, 3, 1, 0, 2, 1, 3];
 /** How far each card overlaps the one before it. */
-const HAND_OVERLAP = '-3dvh';
+const HAND_OVERLAP = '-3svh';
 
 /** How far a card floats up (px) and sways (degrees): the held reading cards more than the word cards. */
 const FLOAT = { word: { px: 4, deg: 0.6 }, reading: { px: 7, deg: 1.2 } } as const;
@@ -34,12 +34,17 @@ export function floatStyle(kind: 'word' | 'reading', index: number): Record<stri
   };
 }
 
-/** A reading card's place in the row: overlapping the card before it, with its own small turn and raise. A bigger hand overlaps more, to fit. */
+/**
+ * A reading card's place in the row: overlapping the card before it, with
+ * its own small turn and raise. A bigger hand overlaps more, to fit. The
+ * row can switch the overlap off with `--hand-overlap: 0` (on a phone the
+ * hand is a grid of cards side by side, big enough to read and tap).
+ */
 export function handStyle(index: number, overlap: string = HAND_OVERLAP): Record<string, string> {
   const tilt = HAND_TILTS_DEG[index % HAND_TILTS_DEG.length] ?? 0;
   const raise = HAND_RAISES_PX[index % HAND_RAISES_PX.length] ?? 0;
   return {
     transform: `translateY(${-raise}px) rotate(${tilt}deg)`,
-    marginLeft: index === 0 ? '0' : overlap,
+    marginLeft: index === 0 ? '0' : `calc(${overlap} * var(--hand-overlap, 1))`,
   };
 }

@@ -2,7 +2,10 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it } from 'vitest';
 import LeaderboardPanel from '../src/components/LeaderboardPanel.vue';
+import type { PlayedRun } from '../src/memory/play-log.ts';
 import {
+  BOARD_SAMPLES,
+  boardBests,
   BUNPOU_SAMPLE_PLAYERS,
   pageCount,
   pageOf,
@@ -14,6 +17,21 @@ import {
 } from '../src/leaderboard/leaderboard.ts';
 
 const scoreAt = (index: number): number => SAMPLE_PLAYERS[index]?.score ?? 0;
+const NO_BESTS = { words: 0, kanji: 0, bunpou: 0, dojo: 0, total: 0 };
+const mountPanel = (bests = NO_BESTS) => mount(LeaderboardPanel, { props: { bests } });
+
+function run(mode: PlayedRun['mode'], score: number): PlayedRun {
+  return {
+    id: `${mode}-${score}`,
+    mode,
+    day: '2026-11-26',
+    startedAtMs: 0,
+    lastPlayedAtMs: 0,
+    score,
+    answered: 1,
+    right: 1,
+  };
+}
 
 describe('the leaderboard ranking', () => {
   it('puts a top score first', () => {
@@ -43,7 +61,7 @@ describe('the leaderboard panel', () => {
   afterEach(() => localStorage.clear());
 
   it('shows the first page, and Back and Next turn the pages within bounds', async () => {
-    const panel = mount(LeaderboardPanel);
+    const panel = mountPanel();
     const pages = pageCount(rankedPlayers(0));
     expect(panel.find('[data-testid="leaderboard-page"]').text()).toBe(`1 / ${pages}`);
     expect(panel.find('[data-testid="leaderboard-back"]').attributes('disabled')).toBeDefined();
@@ -57,8 +75,7 @@ describe('the leaderboard panel', () => {
   });
 
   it('shows your best from this browser, and says the other players are samples', () => {
-    localStorage.setItem('juku-arcade:best-bank-score', String(scoreAt(0) + 10));
-    const panel = mount(LeaderboardPanel);
+    const panel = mountPanel({ ...NO_BESTS, words: scoreAt(0) + 10 });
     expect(panel.find('[data-testid="leaderboard-you"]').text()).toContain(String(scoreAt(0) + 10));
     expect(panel.text()).toContain('Sample players');
   });
@@ -80,9 +97,42 @@ describe('the Bunpou board', () => {
   });
 
   it('switches the start screen’s panel to Bunpou’s board', async () => {
-    const panel = mount(LeaderboardPanel);
+    const panel = mountPanel();
     await panel.find('[data-testid="board-bunpou"]').trigger('click');
     const firstRow = panel.find('[data-testid="leaderboard-rows"] li').text();
     expect(firstRow).toContain(String(BUNPOU_SAMPLE_PLAYERS[0]?.score));
+  });
+});
+
+describe('the boards for every mode, and the Total', () => {
+  it('takes each mode’s best run from the play log, or an older best if higher', () => {
+    const runs = [run('words', 300), run('words', 120), run('kanji', 210), run('dojo', 12)];
+    expect(boardBests(runs, { words: 450, bunpou: 900 })).toEqual({
+      words: 450,
+      kanji: 210,
+      bunpou: 900,
+      dojo: 12,
+      total: 450 + 210 + 900 + 12,
+    });
+  });
+
+  it('adds up each sample player’s scores for the Total board, highest first', () => {
+    const total = BOARD_SAMPLES.total;
+    const kitsune = ['words', 'kanji', 'bunpou', 'dojo'].reduce((sum, board) => {
+      const samples = BOARD_SAMPLES[board as keyof typeof BOARD_SAMPLES];
+      return sum + (samples.find((player) => player.name === 'Kitsune')?.score ?? 0);
+    }, 0);
+    expect(total.find((player) => player.name === 'Kitsune')?.score).toBe(kitsune);
+    expect(total.map((player) => player.score)).toEqual(
+      [...total.map((player) => player.score)].sort((a, b) => b - a),
+    );
+  });
+
+  it('switches to each board, ranking your best there', async () => {
+    const panel = mountPanel({ ...NO_BESTS, dojo: 50, total: 99_999 });
+    await panel.find('[data-testid="board-dojo"]').trigger('click');
+    expect(panel.find('[data-testid="leaderboard-you"]').text()).toContain('50');
+    await panel.find('[data-testid="board-total"]').trigger('click');
+    expect(panel.find('[data-testid="leaderboard-you"]').text()).toMatch(/^1\./);
   });
 });
