@@ -86,11 +86,11 @@ defineEmits<{ choose: [mode: GameMode] }>();
 </script>
 
 <template>
-  <!-- The leaderboard fills the left of the screen; the streak, then the modes, sit on the right. -->
+  <!-- The leaderboard fills the left of the screen, the streak then the modes on the right; on a phone or a tablet they stack in that order, leaderboard on top. -->
   <div
     class="flex w-full flex-1 flex-col gap-6 lg:grid lg:grid-cols-[minmax(20rem,30%)_1fr] lg:gap-10"
   >
-    <LeaderboardPanel class="order-last lg:order-none" :bests="bests" />
+    <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" />
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Choose a mode">

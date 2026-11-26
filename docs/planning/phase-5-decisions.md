@@ -1177,8 +1177,8 @@ The game was laptop-only (D30). From playtesting, and since the school's
 students may play on phones, it now fits a phone-width screen too, with
 desktop unchanged.
 
-- **Below the lg breakpoint:** the start screen stacks (streak, modes,
-  leaderboard); each mode's board fills the screen and its side panel is
+- **Below the lg breakpoint:** the start screen stacks (leaderboard,
+  streak, modes); each mode's board fills the screen and its side panel is
   a drawer folded away to the left, slid open or closed by a tab on its
   edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
   tablets; word mode's set timer also shows above its cards, and the
