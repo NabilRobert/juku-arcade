@@ -1,8 +1,8 @@
 /**
  * How a finished run compares with the player's best, for the results
- * card: a new best, a tie, or how close it came. Showing how near a run
- * came to the best makes another try appealing (the near-miss effect,
- * Clark et al. 2009), so a miss reads as "3 away", not as a loss. The text
+ * card: a new best, a tie, or how close it came. People try harder as
+ * they near a goal (Kivetz et al. 2006, on the research page), so a miss
+ * reads as "3 away", not as a loss. The text
  * is in the interface language, so RunResults calls it while rendering.
  */
 import { translate } from '../i18n/index.ts';

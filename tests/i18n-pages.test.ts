@@ -27,11 +27,10 @@ const researchKeys = [
   ...SOURCE_GROUPS.map((group) => `pages.research.groups.${group.id}`),
   ...sources.flatMap((source) => [
     `pages.research.sources.${source.id}.finding`,
+    `pages.research.sources.${source.id}.summary`,
+    `pages.research.sources.${source.id}.where`,
     `pages.research.sources.${source.id}.inGame`,
   ]),
-  ...sources.flatMap((source) =>
-    source.venueNote === undefined ? [] : [`pages.research.venueNotes.${source.venueNote}`],
-  ),
 ];
 
 /** `<i18n-t keypath="…">` in AboutData.vue. */

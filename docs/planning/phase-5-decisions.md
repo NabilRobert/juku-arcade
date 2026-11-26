@@ -1386,6 +1386,40 @@ browser like the other preferences. The page's `lang` attribute follows it.
     glosses (the client's own database can supply them);
   - the research papers' titles.
 
+### D74: The research page cites the quote's 8 checked sources (2026-11-26)
+
+The research page listed 19 sources, many of them never checked against
+their full text. It now cites exactly the 8 that the client quote's
+section 2f keeps, each checked against a free copy of the full text.
+Each card shows:
+
+- the claim;
+- a plain-English paragraph on what the study did and found;
+- where in the paper the claim is, with a link to the free copy;
+- where the game uses it.
+
+The intro adds the quote's disclaimer: the research explains the design
+and is no guarantee of learning results or exam scores.
+
+- **Removed by the owner:**
+  - Kahneman & Tversky (1979): no free copy;
+  - Csikszentmihalyi (1990): a book, only partly checkable;
+  - Landers et al. (2017): abstract only.
+  The features they backed stay: the pot, levels that speed up, and a board
+  per mode. Sailer & Homner covers leaderboards in general.
+- **Also off the page:** the 14 other sources the quote doesn't cite, among
+  them the gambling and dopamine studies. They no longer back a claim the
+  page makes.
+- **Caveats kept, as in the quote:**
+  - Cepeda backs spacing in general, not the game's growing gaps;
+  - the weekly rest day is like Silverman & Barasch's repair, but not what
+    they tested;
+  - Moreno & Mayer used narrated lessons.
+- **Ryan et al. (2006):** the printed issue is pages 344–360 (the DOI
+  registry). The free copy is Springer's early online version, numbered
+  347–363, so the card gives both, as it does for Silverman & Barasch's
+  manuscript. The quote was corrected to match.
+
 ### D75: Kanji get their own reviews (2026-11-26)
 
 Kanji mode used to change no reviews (D37), so a missed kanji came back

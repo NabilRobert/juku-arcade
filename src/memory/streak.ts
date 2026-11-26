@@ -1,10 +1,10 @@
 /**
  * The streak (playtest decision, 2026-11-26): days in a row with a run played, in any
- * mode, however it ended (play-log.ts). It works on loss aversion: a
- * streak is something to lose (Kahneman & Tversky 1979). To keep that from
- * punishing a busy day, one missed day a calendar week (Monday to Sunday)
- * is a rest day: it doesn't break the streak, though it doesn't count
- * toward it either. A second missed day in the same week breaks it.
+ * mode, however it ended (play-log.ts). An unbroken streak keeps people
+ * coming back and a broken one makes them stop (Silverman & Barasch 2023,
+ * on the research page). To keep that from punishing a busy day, one
+ * missed day a calendar week (Monday to Sunday) is a rest day: it doesn't
+ * break the streak, though it doesn't count toward it either. A second missed day in the same week breaks it.
  *
  * Today never breaks the streak: the player still has until midnight.
  */
