@@ -1,5 +1,5 @@
 /**
- * The streak (Arthur, 2026-11-26): days in a row with a run played, in any
+ * The streak (playtest decision, 2026-11-26): days in a row with a run played, in any
  * mode, however it ended (play-log.ts). It works on loss aversion: a
  * streak is something to lose (Kahneman & Tversky 1979). To keep that from
  * punishing a busy day, one missed day a calendar week (Monday to Sunday)

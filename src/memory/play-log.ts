@@ -5,7 +5,7 @@
  * counts for its day even when the player just closes the game. Only an
  * answer the player gave counts, right or wrong: a set or a sentence that
  * just timed out doesn't, so opening a mode and leaving it doesn't keep a
- * streak (Arthur, 2026-11-26).
+ * streak (playtest decision, 2026-11-26).
  *
  * Neither record is a review event: the reviews and the school's measures
  * never read them (D37), and they stay in this browser.
