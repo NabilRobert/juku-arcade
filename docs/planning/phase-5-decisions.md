@@ -1336,3 +1336,12 @@ and undoes D66's fair word board.
   and keeping the results screen. Arthur chose the banner, and counting
   every coin.
 
+### D71: The Total board leaves practice mode out (2026-11-26)
+
+The Total board adds up the best runs of Words, Kanji and Bunpou only
+(`TOTAL_BOARDS`). Practice mode keeps its own board but no longer counts
+toward the Total. Playtest decision: "leave the practice leaderboard out
+of the total since it has no timer". Since D69 its questions aren't
+timed, so a player could take as long as they like, or look answers up,
+and its scores aren't on the same footing as the timed modes'.
+
