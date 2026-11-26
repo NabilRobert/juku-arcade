@@ -1,5 +1,8 @@
 <script setup lang="ts">
-/** A quote on paper (quotes.ts): the words, then who said them and where. */
+/**
+ * A quote on paper (quotes.ts): the words, then who said them and where.
+ * Practice mode's game over shows one, and so does End run's question.
+ */
 import type { Quote } from '../../dojo/quotes.ts';
 
 defineProps<{ quote: Quote }>();

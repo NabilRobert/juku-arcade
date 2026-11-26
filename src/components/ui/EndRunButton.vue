@@ -5,18 +5,23 @@
  * back, End run ends it (`end`). It tells the mode when the question opens
  * and closes (`toggle`), so the mode can pause while it's asked
  * (usePanelPause.ts). The question shows over the screen in CardOverlay,
- * like a kanji's card back.
+ * like a kanji's card back, with a quote on resting (REST_QUOTES), picked
+ * at random each time: stopping for a while is fine.
  */
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
+import { pickQuote, REST_QUOTES } from '../../dojo/quotes.ts';
 import ArcadeButton from './ArcadeButton.vue';
 import CardOverlay from './CardOverlay.vue';
 import PixelButton from './PixelButton.vue';
+import QuoteCard from './QuoteCard.vue';
 
 const emit = defineEmits<{ end: []; toggle: [isOpen: boolean] }>();
 
 const isAsking = ref(false);
+const quote = shallowRef(pickQuote(Math.random, REST_QUOTES));
 
 function setAsking(next: boolean): void {
+  if (next) quote.value = pickQuote(Math.random, REST_QUOTES);
   isAsking.value = next;
   emit('toggle', next);
 }
@@ -37,6 +42,7 @@ function confirmEnd(): void {
       data-testid="end-run-confirm"
     >
       <p class="text-2xl font-bold text-aqua">End this run?</p>
+      <QuoteCard class="text-left" :quote="quote" />
       <p class="text-sm text-washi">Your score so far is kept.</p>
       <div class="flex gap-4">
         <PixelButton

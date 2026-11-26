@@ -12,7 +12,7 @@ import LanternRow from '../src/components/dojo/LanternRow.vue';
 import type { Deck } from '../src/deck/types.ts';
 import { dojoPools } from '../src/dojo/dojo-questions.ts';
 import { STAGE_SECONDS } from '../src/dojo/dojo-run.ts';
-import { QUOTES } from '../src/dojo/quotes.ts';
+import { QUOTES, REST_QUOTES } from '../src/dojo/quotes.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
 import { deleteAllData, type Settings } from '../src/memory/storage.ts';
 import { playSound } from '../src/sound/sfx.ts';
@@ -173,9 +173,9 @@ describe('the lanterns', () => {
   });
 });
 
-describe('the game-over quotes', () => {
+describe('the game-over and resting quotes', () => {
   it('each name who said it and where, so it can be checked', () => {
-    for (const quote of QUOTES) {
+    for (const quote of [...QUOTES, ...REST_QUOTES]) {
       expect(quote.text.length).toBeGreaterThan(0);
       expect(quote.by.length).toBeGreaterThan(0);
       expect(quote.source.length).toBeGreaterThan(0);

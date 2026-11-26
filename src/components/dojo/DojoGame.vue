@@ -31,7 +31,7 @@ import TimerBar from '../ui/TimerBar.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import DojoQuestionView from './DojoQuestionView.vue';
 import LanternRow from './LanternRow.vue';
-import QuoteCard from './QuoteCard.vue';
+import QuoteCard from '../ui/QuoteCard.vue';
 
 const props = defineProps<{
   pools: DojoPools;
