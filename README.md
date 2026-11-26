@@ -57,4 +57,6 @@ Kenney's Casino Audio pack (CC0), and the applause is "Applause from 40
 People #5" by Joseph Sardin, from [BigSoundBank](https://bigsoundbank.com/applause-from-40-people-5-s3521.html) (CC0). The music is "France Instrumental" by
 Sub_Clair, from [Pixabay](https://pixabay.com/music/france-france-instrumental-633138/)
 (Pixabay Content License). The classic haiku in Bunpou (Bashō, Buson,
-Issa) are in the public domain; the others were written for the game. No licence yet for the code.
+Issa) are in the public domain; the others were written for the game.
+The code itself is all rights reserved: it's public to read, not to reuse
+(see [LICENSE](LICENSE)).
