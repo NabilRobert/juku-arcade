@@ -137,13 +137,14 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       aria-hidden="true"
     />
     <div
-      class="grid grid-cols-5 gap-x-2 [--card-height:min(32dvh,22vw)] lg:[--card-height:32dvh] sm:gap-x-10"
+      class="flex flex-wrap justify-center gap-2 [--card-height:min(32dvh,33vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32dvh]"
       data-testid="word-row"
     >
+      <!-- On a phone the cards wrap three to a row, the last row centred; on desktop they're a row of five. -->
       <div
         v-for="(word, position) in state.set.words"
         :key="position"
-        class="flex flex-col items-center gap-1"
+        class="flex w-[calc(var(--card-height)*0.75)] flex-col items-center gap-1 lg:w-auto"
       >
         <div :ref="registerWord(position)" :class="SLOT_SIZE">
           <div
@@ -208,9 +209,10 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         Play ▶
       </PixelButton>
     </div>
-    <div class="flex items-start gap-2 pt-4 sm:gap-4">
+    <!-- On a phone the deck sits under the hand, centred; on desktop it's beside it. -->
+    <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid flex-1 grid-cols-3 justify-items-center gap-2 [--card-height:min(24dvh,33vw)] [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(24dvh,36vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div

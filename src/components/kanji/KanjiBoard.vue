@@ -135,9 +135,10 @@ watch(
         Play ▶
       </PixelButton>
     </div>
-    <div class="flex items-start gap-2 pt-4 sm:gap-4">
+    <!-- On a phone the deck sits under the hand, centred; on desktop it's beside it. -->
+    <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid flex-1 grid-cols-4 justify-items-center gap-2 [--card-height:min(20dvh,25vw)] [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(20dvh,27vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
