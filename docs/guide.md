@@ -740,9 +740,10 @@ fields. They stay in memory until slice 3 stores them.
   the rest day is in `memory/streak.ts`; the reminders and milestones are
   `TEMPLATES` and `MILESTONES` in `memory/streak-messages.ts`; the
   calendar's weeks and shades are `CALENDAR_WEEKS` and `SHADE_THRESHOLDS`
-  in `memory/play-calendar.ts`. Placeholder play for a local copy and the
-  GitHub Pages demo is `memory/sample-play.ts`, turned on by
-  `VITE_SAMPLE_PLAY` (see `.env.example`; the deploy workflow sets it).
+  in `memory/play-calendar.ts`. The sample week of play is
+  `memory/sample-play.ts`, shown while Settings' "Sample data" switch is on
+  (`preferences/sample-play.ts`); `VITE_SAMPLE_PLAY` sets where the switch
+  starts (see `.env.example`; the GitHub Pages deploy starts it on).
 - **Change the daily deck or endless mix:** edit `memory/daily-deck.ts`; its
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
