@@ -26,7 +26,12 @@ import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
 import SentenceFix from './SentenceFix.vue';
 
-const props = defineProps<{ run: BunpouRun; unplaced: readonly string[]; timeLeft: number }>();
+const props = defineProps<{
+  run: BunpouRun;
+  unplaced: readonly string[];
+  /** How much of the line's time is left, 1 to 0; left out where lines aren't timed (practice mode, D69). */
+  timeLeft?: number;
+}>();
 const emit = defineEmits<{
   place: [tile: string, at?: number];
   takeBack: [tile: string];
@@ -120,7 +125,7 @@ function dropAt(tile: string, point: Point): void {
         data-testid="hint"
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
-      <TimerBar class="flex-1" :time-left="timeLeft" />
+      <TimerBar v-if="timeLeft !== undefined" class="flex-1" :time-left="timeLeft" />
       <PixelButton
         :colour="isPaused ? 'crimson' : 'steel'"
         class="px-4 py-1 text-sm max-lg:hidden"

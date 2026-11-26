@@ -1,4 +1,4 @@
-// The dojo on screen: closed until enough is learned, answering, timeouts, and game over.
+// The dojo on screen: closed until enough is learned, answering, no timer, and game over.
 import 'fake-indexeddb/auto';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -11,7 +11,6 @@ import DojoScreen from '../src/components/dojo/DojoScreen.vue';
 import LanternRow from '../src/components/dojo/LanternRow.vue';
 import type { Deck } from '../src/deck/types.ts';
 import { dojoPools } from '../src/dojo/dojo-questions.ts';
-import { STAGE_SECONDS } from '../src/dojo/dojo-run.ts';
 import { QUOTES, REST_QUOTES } from '../src/dojo/quotes.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
 import { deleteAllData, type Settings } from '../src/memory/storage.ts';
@@ -97,21 +96,6 @@ describe('the dojo on screen', () => {
     expect(playSound).toHaveBeenCalledWith('applauseShort');
   });
 
-  it('judges the cards picked when time runs out, rather than counting a miss', async () => {
-    vi.useFakeTimers();
-    const game = mountGame();
-    await nextTick();
-    const board = game.findComponent(CardQuestionView);
-    const index = board.props('round').cards.findIndex((card) => card.isRight);
-    const readings = board
-      .findAllComponents(PlayCard)
-      .filter((card) => card.props('kind') === 'reading');
-    readings[index]?.vm.$emit('tap');
-    await vi.advanceTimersByTimeAsync((STAGE_SECONDS.word[0] ?? 0) * 1000 + 200);
-    expect(game.find('[data-testid="score"]').text()).toBe('1');
-    expect(game.findComponent(LanternRow).props('lit')).toBe(3);
-  });
-
   it('ends the run after three misses, with the results', async () => {
     vi.useFakeTimers();
     const game = mountGame();
@@ -144,14 +128,15 @@ describe('the dojo on screen', () => {
     expect(results.text()).toContain('Quit to main menu');
   });
 
-  it('counts a question left until its time runs out as a miss', async () => {
+  it('waits as long as the player needs: a question left alone puts out no lantern', async () => {
     vi.useFakeTimers();
     const game = mountGame();
-    await vi.advanceTimersByTimeAsync(20_500);
-    expect(game.findComponent(LanternRow).props('lit')).toBe(2);
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(game.findComponent(LanternRow).props('lit')).toBe(3);
+    expect(game.find('[data-testid="timer"]').exists()).toBe(false);
   });
 
-  it('hides the question while paused, and stops its clock', async () => {
+  it('hides the question while paused', async () => {
     vi.useFakeTimers();
     const game = mountGame();
     await game
@@ -159,8 +144,7 @@ describe('the dojo on screen', () => {
       .find((button) => button.text() === 'Pause')
       ?.trigger('click');
     expect(game.find('[data-testid="dojo-paused"]').exists()).toBe(true);
-    await vi.advanceTimersByTimeAsync(60_000);
-    expect(game.findComponent(LanternRow).props('lit')).toBe(3);
+    expect(game.findComponent(CardQuestionView).exists()).toBe(false);
   });
 });
 

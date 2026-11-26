@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
- * A dojo run on screen (D62): a side panel (the mode and stage, the
- * lanterns, the score, Pause, the sound switch) beside the question, with
- * its timer, or, once the last lantern is out, a recap (the score, the
- * best combo, the stage) with a quote, Restart and Quit to main menu. Like the other
+ * A dojo run on screen (D62): a side panel (the mode, the lanterns, the
+ * score, Pause, the sound switch, End run) beside the question, which
+ * isn't timed (D69), or, once the last lantern is out, a recap (the score
+ * and the best combo) with a quote, Restart and Quit to main menu. Like the other
  * modes, its play time counts toward the nudges and the daily cap, and the
  * wellbeing screens stand in front of the question.
  */
-import { computed, useTemplateRef } from 'vue';
+import { computed } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../dojo/dojo-run.ts';
@@ -27,7 +27,6 @@ import PixelButton from '../ui/PixelButton.vue';
 import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
-import TimerBar from '../ui/TimerBar.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import DojoQuestionView from './DojoQuestionView.vue';
 import LanternRow from './LanternRow.vue';
@@ -41,12 +40,8 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
 
-const questionView = useTemplateRef<InstanceType<typeof DojoQuestionView>>('questionView');
-// Cards picked or in the air when time runs out are judged, not lost.
-const dojo = useDojoRun(props.pools, {
-  settleOnTimeUp: () => questionView.value?.judgeNow() ?? null,
-});
-const { state, question, isLocked, stage, isPaused, timeLeft } = dojo;
+const dojo = useDojoRun(props.pools);
+const { state, question, isLocked, isPaused } = dojo;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -74,7 +69,6 @@ const onEndRunToggle = usePanelPause(pauseControls);
 const resultPanels = computed(() => [
   { label: 'Your score was', value: String(state.value.right) },
   { label: 'Your best combo was', value: String(state.value.bestCombo) },
-  { label: 'Stage reached', value: `${stage.value} / 5` },
 ]);
 const previousBest = usePreviousBest('dojo');
 /** Picked once per run, for its game-over screen. */
@@ -89,9 +83,7 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
     <SidePanel label="Dojo run" @toggle="onPanelToggle">
-      <ModeHeader :title="`Practice mode · ${level}`">
-        <p class="text-sm text-washi/70" data-testid="stage">Stage {{ stage }} / 5</p>
-      </ModeHeader>
+      <ModeHeader :title="`Practice mode · ${level}`" />
       <LanternRow :lit="state.lanterns" :total="LANTERNS" />
       <StatPanel label="Score">
         <span class="text-3xl font-bold" data-testid="score">{{ state.right }}</span>
@@ -108,8 +100,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
-        Words, kanji and grammar you've met, until three misses. The timer tightens every 10 right
-        answers. Esc pauses.
+        Words, kanji and grammar you've met, until three misses. Take as long as you need. Esc
+        pauses.
       </p>
     </SidePanel>
     <FloatingPause
@@ -139,16 +131,13 @@ function dismiss(isStopping: boolean): void {
         Paused
       </p>
       <div v-else class="flex flex-col gap-6">
-        <TimerBar v-if="question.kind !== 'grammar'" :time-left="timeLeft" />
         <DojoQuestionView
           :key="state.answered"
-          ref="questionView"
           :question="question"
           :level="level"
           :combo="state.combo"
           :is-locked="isLocked"
           :is-paused="isPaused"
-          :time-left="timeLeft"
           @answer="dojo.answer"
           @pause="dojo.pause"
           @resume="dojo.resume"
