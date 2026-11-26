@@ -598,7 +598,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Streak reminder** | The start screen's message about the streak, picked from templates that fit (after Duolingo's reminders); milestones (3, 7, 14, 30… days) are celebrated once | `memory/streak-messages.ts`, `composables/useStreak.ts` |
 | **Finish line** | Where a run ends (D61): word mode when today's deck is cleared, kanji mode after a sheet of 10, Bunpou after one chapter; each ends on the same results card | `composables/useDeckFinish.ts`, `kanji/useKanjiSheet.ts`, `ui/RunResults.vue` |
 | **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
-| **Dojo** | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; the timer tightens by stage to a floor | `dojo/`, `components/dojo/` |
+| **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; the timer tightens by stage to a floor | `dojo/`, `components/dojo/` |
 | **Total board** | The leaderboard that adds up your best run in each mode | `leaderboard/leaderboard.ts: boardBests` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
@@ -669,7 +669,7 @@ fields. They stay in memory until slice 3 stores them.
   `KANJI_PER_SHEET` in `kanji/useKanjiSheet.ts`; a Bunpou show's length is
   `TALES_PER_CHAPTER` in `grammar/performance.ts`; the goals, their stamps
   and the rakugo ranks are in `memory/level-goals.ts`.
-- **Change the dojo:** lanterns, the stage length and each kind's
+- **Change practice mode (the dojo):** lanterns, the stage length and each kind's
   seconds per stage are at the top of `dojo/dojo-run.ts`; what it asks,
   and when it opens (`MIN_DOJO_WORDS`), is in `dojo/dojo-questions.ts`;
   the game-over quotes are `QUOTES` in `dojo/quotes.ts`.

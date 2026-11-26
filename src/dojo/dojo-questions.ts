@@ -142,7 +142,7 @@ export function nextQuestion(pools: DojoPools, random: RandomSource): DojoQuesti
     if (question !== null) return question;
   }
   const word = pickOne(pools.words, random) ?? pools.allWords[0];
-  if (word === undefined) throw new Error('The dojo has no words to ask: the deck is empty.');
+  if (word === undefined) throw new Error('Practice mode has no words to ask: the deck is empty.');
   return wordQuestion(word, pools.allWords, random);
 }
 

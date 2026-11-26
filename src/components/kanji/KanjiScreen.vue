@@ -101,8 +101,8 @@ function dismiss(isStopping: boolean): void {
       <SoundToggle />
       <p class="text-center text-xs text-washi/60">Best combo {{ bestCombo }}</p>
       <p class="text-center text-xs text-washi/60">
-        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji.
-        Practice only: it doesn't change your reviews.
+        Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji. It
+        doesn't change your reviews.
       </p>
     </SidePanel>
     <div class="flex flex-col gap-5">

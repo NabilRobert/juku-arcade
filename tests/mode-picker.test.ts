@@ -10,7 +10,7 @@ describe('the start screen', () => {
     const picker = mount(ModePicker, { props: { deck } });
     const cards = picker.find('[aria-label="Choose a mode"]').findAll('button');
     expect(cards).toHaveLength(4);
-    ['Words', 'Kanji', 'Bunpou', 'Dojo'].forEach((name, index) =>
+    ['Words', 'Kanji', 'Bunpou', 'Practice'].forEach((name, index) =>
       expect(cards[index]?.text()).toContain(name),
     );
     expect(cards[0]?.text()).toContain('Match each N4 word');

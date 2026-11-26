@@ -76,7 +76,7 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
     <SidePanel label="Dojo run">
-      <ModeHeader :title="`Dojo · ${level}`">
+      <ModeHeader :title="`Practice mode · ${level}`">
         <p class="text-sm text-washi/70" data-testid="stage">Stage {{ stage }} / 5</p>
       </ModeHeader>
       <LanternRow :lit="state.lanterns" :total="LANTERNS" />

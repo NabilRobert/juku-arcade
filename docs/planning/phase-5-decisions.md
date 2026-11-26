@@ -1134,7 +1134,10 @@ total score rewarded whoever played longest, which works against the
 
 ### D62: The dojo, a game-over mode, and a board for every mode (2026-11-26)
 
-From playtesting: "make another mode that has a game over".
+From playtesting: "make another mode that has a game over". On screen it's
+called **Practice mode** (renamed in playtesting); the code keeps the
+name `dojo`. Kanji mode's card no longer says "practice only", to avoid
+the clash.
 
 - **What it asks:** only what the player has met, so it tests rather
   than teaches (`dojo/dojo-questions.ts`): words matched before (the

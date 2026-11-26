@@ -26,7 +26,7 @@ const BOARDS: readonly { board: BoardId; label: string }[] = [
   { board: 'words', label: 'Words' },
   { board: 'kanji', label: 'Kanji' },
   { board: 'bunpou', label: 'Bunpou' },
-  { board: 'dojo', label: 'Dojo' },
+  { board: 'dojo', label: 'Practice' },
   { board: 'total', label: 'Total' },
 ];
 

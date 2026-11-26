@@ -63,7 +63,7 @@ const cards: readonly Card[] = [
     colour: 'steel',
     name: 'Kanji',
     example: '生 → セイ・う(まれる)…',
-    description: 'Find every reading of a kanji among 8 cards. Practice only.',
+    description: "Find every reading of a kanji among 8 cards. Doesn't count toward your reviews.",
   },
   {
     mode: 'bunpou',
@@ -77,7 +77,7 @@ const cards: readonly Card[] = [
   {
     mode: 'dojo',
     colour: 'paper',
-    name: 'Dojo',
+    name: 'Practice',
     example: '提灯 ×3',
     description: "Words, kanji and grammar you've met, until three misses. Ranked.",
   },
