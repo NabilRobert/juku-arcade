@@ -11,6 +11,7 @@ import DojoScreen from '../src/components/dojo/DojoScreen.vue';
 import LanternRow from '../src/components/dojo/LanternRow.vue';
 import type { Deck } from '../src/deck/types.ts';
 import { dojoPools } from '../src/dojo/dojo-questions.ts';
+import { STAGE_SECONDS } from '../src/dojo/dojo-run.ts';
 import { QUOTES } from '../src/dojo/quotes.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
 import { deleteAllData, type Settings } from '../src/memory/storage.ts';
@@ -94,6 +95,21 @@ describe('the dojo on screen', () => {
     await vi.advanceTimersByTimeAsync(2500);
     await choose(game, true);
     expect(playSound).toHaveBeenCalledWith('applauseShort');
+  });
+
+  it('judges the cards picked when time runs out, rather than counting a miss', async () => {
+    vi.useFakeTimers();
+    const game = mountGame();
+    await nextTick();
+    const board = game.findComponent(CardQuestionView);
+    const index = board.props('round').cards.findIndex((card) => card.isRight);
+    const readings = board
+      .findAllComponents(PlayCard)
+      .filter((card) => card.props('kind') === 'reading');
+    readings[index]?.vm.$emit('tap');
+    await vi.advanceTimersByTimeAsync((STAGE_SECONDS.word[0] ?? 0) * 1000 + 200);
+    expect(game.find('[data-testid="score"]').text()).toBe('1');
+    expect(game.findComponent(LanternRow).props('lit')).toBe(3);
   });
 
   it('ends the run after three misses, with the results', async () => {

@@ -7,7 +7,7 @@
  * modes, its play time counts toward the nudges and the daily cap, and the
  * wellbeing screens stand in front of the question.
  */
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../dojo/dojo-run.ts';
@@ -40,7 +40,11 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
 
-const dojo = useDojoRun(props.pools);
+const questionView = useTemplateRef<InstanceType<typeof DojoQuestionView>>('questionView');
+// Cards picked or in the air when time runs out are judged, not lost.
+const dojo = useDojoRun(props.pools, {
+  settleOnTimeUp: () => questionView.value?.judgeNow() ?? null,
+});
 const { state, question, isLocked, stage, isPaused, timeLeft } = dojo;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -134,6 +138,7 @@ function dismiss(isStopping: boolean): void {
         <TimerBar v-if="question.kind !== 'grammar'" :time-left="timeLeft" />
         <DojoQuestionView
           :key="state.answered"
+          ref="questionView"
           :question="question"
           :level="level"
           :combo="state.combo"

@@ -62,7 +62,24 @@ function useQuestionClock(isWaiting: () => boolean, onTimeUp: () => void) {
   };
 }
 
-export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random) {
+/** A right answer chimes up the scale with a short burst of applause; a miss sounds a miss. */
+function playAnswerSound(isRight: boolean, rightSoFar: number): void {
+  if (!isRight) return playSound('miss');
+  playSound('chime', comboPitch(rightSoFar));
+  playSound('applauseShort');
+}
+
+export interface DojoRunOptions {
+  random?: RandomSource;
+  /**
+   * Asked as a question's time runs out: the verdict on the cards the
+   * player picked and threw, or null to count it as timed out (a miss).
+   */
+  settleOnTimeUp?: () => boolean | null;
+}
+
+export function useDojoRun(pools: DojoPools, options: DojoRunOptions = {}) {
+  const { random = Math.random, settleOnTimeUp = () => null } = options;
   const state = ref<DojoState>(FRESH_DOJO);
   const question = shallowRef<DojoQuestion>(nextQuestion(pools, random));
   const isLocked = ref(false);
@@ -70,7 +87,7 @@ export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random)
   const runLog = useRunLog('dojo');
   const clock = useQuestionClock(
     () => !isLocked.value && !state.value.isOver,
-    () => answer(false),
+    () => answer(settleOnTimeUp() ?? false),
   );
   clock.start(secondsFor(question.value.kind, 0));
 
@@ -86,10 +103,7 @@ export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random)
     state.value = afterAnswer(state.value, isRight);
     const { right, answered } = state.value;
     runLog.record({ score: right, answered, right });
-    if (isRight) {
-      playSound('chime', comboPitch(right));
-      playSound('applauseShort');
-    } else playSound('miss');
+    playAnswerSound(isRight, right);
     if (!state.value.isOver) later(ask, isRight ? RIGHT_SHOWN_MS : WRONG_SHOWN_MS);
   }
 
