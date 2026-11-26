@@ -20,6 +20,7 @@ import { markedTile } from '../../grammar/fill.ts';
 import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
+import TimerBar from '../ui/TimerBar.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
@@ -119,9 +120,7 @@ function dropAt(tile: string, point: Point): void {
         data-testid="hint"
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
-      <span class="pixel-panel h-3 flex-1 bg-lacquer" aria-hidden="true">
-        <span class="block h-full bg-aqua" :style="{ width: `${timeLeft * 100}%` }" />
-      </span>
+      <TimerBar :time-left="timeLeft" />
       <PixelButton
         :colour="isPaused ? 'crimson' : 'steel'"
         class="px-4 py-1 text-sm"
