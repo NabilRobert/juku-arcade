@@ -13,6 +13,8 @@ import PixelButton from './PixelButton.vue';
 import StatPanel from './StatPanel.vue';
 
 export interface ResultPanel {
+  /** A stable name for the panel's test id (`result-<id>`), the same in every language. */
+  id: string;
   label: string;
   value: string;
 }
@@ -36,7 +38,7 @@ defineEmits<{ again: []; leave: [] }>();
 <template>
   <section
     class="pixel-panel flex flex-col gap-5 bg-wood/80 p-6"
-    aria-label="Run results"
+    :aria-label="$t('game.results.label')"
     data-testid="results"
   >
     <h2 class="text-2xl font-bold text-aqua">{{ title }}</h2>
@@ -44,8 +46,8 @@ defineEmits<{ again: []; leave: [] }>();
       {{ comparisonText }}
     </p>
     <div class="grid grid-cols-4 gap-3">
-      <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
-        <span class="text-2xl font-bold" :data-testid="`result-${panel.label}`">{{
+      <StatPanel v-for="panel in panels" :key="panel.id" :label="panel.label">
+        <span class="text-2xl font-bold" :data-testid="`result-${panel.id}`">{{
           panel.value
         }}</span>
       </StatPanel>
@@ -54,7 +56,7 @@ defineEmits<{ again: []; leave: [] }>();
     <slot />
     <div class="flex justify-end gap-3">
       <PixelButton colour="steel" class="px-6 py-2" data-testid="leave" @click="$emit('leave')">{{
-        leaveLabel ?? 'Change mode'
+        leaveLabel ?? $t('game.results.changeMode')
       }}</PixelButton>
       <PixelButton
         colour="aqua"
@@ -62,7 +64,7 @@ defineEmits<{ again: []; leave: [] }>();
         data-testid="play-again"
         @click="$emit('again')"
       >
-        {{ againLabel }} ▶
+        {{ $t('game.results.again', { label: againLabel }) }}
       </PixelButton>
     </div>
   </section>

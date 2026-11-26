@@ -89,7 +89,7 @@ watch(
 </script>
 
 <template>
-  <section class="flex flex-col gap-y-3" aria-label="Kanji board">
+  <section class="flex flex-col gap-y-3" :aria-label="$t('kanji.board')">
     <div
       class="flex flex-col items-center gap-2 [--card-height:min(24svh,45vw)] sm:[--card-height:min(20svh,24vw)] lg:[--card-height:34svh]"
       data-testid="kanji-row"
@@ -128,7 +128,7 @@ watch(
         v-else
         class="absolute top-1/2 left-0 flex -translate-y-1/2 gap-1.5"
         role="img"
-        :aria-label="`${wrongPicksLeft} of ${maxWrongPicks} wrong picks left`"
+        :aria-label="$t('kanji.wrongPicksLeft', { left: wrongPicksLeft, max: maxWrongPicks })"
         data-testid="wrong-picks"
       >
         <span
@@ -147,7 +147,7 @@ watch(
         data-testid="play"
         @click="$emit('play')"
       >
-        Play ▶
+        {{ $t('game.play') }}
       </PixelButton>
     </div>
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->

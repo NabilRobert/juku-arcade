@@ -10,6 +10,7 @@
  * panel says so. It folds down to its title (folded-panels.ts).
  */
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
   BOARD_SAMPLES,
   pageCount,
@@ -17,7 +18,7 @@ import {
   rankedPlayers,
   type BoardId,
 } from '../leaderboard/leaderboard.ts';
-import { MODE_NAMES, PLAY_MODES } from '../memory/play-log.ts';
+import { modeName, PLAY_MODES } from '../memory/play-log.ts';
 import { isLeaderboardFolded, setLeaderboardFolded } from '../preferences/folded-panels.ts';
 import ArcadeButton from './ui/ArcadeButton.vue';
 import FoldButton from './ui/FoldButton.vue';
@@ -25,11 +26,13 @@ import PixelButton from './ui/PixelButton.vue';
 import PixelIcon from './ui/PixelIcon.vue';
 
 const props = defineProps<{ bests: Readonly<Record<BoardId, number>> }>();
+const { t } = useI18n();
 
-const BOARDS: readonly { board: BoardId; label: string }[] = [
-  ...PLAY_MODES.map((mode) => ({ board: mode, label: MODE_NAMES[mode] })),
-  { board: 'total', label: 'Total' },
-];
+/** A computed, so the board names follow a language change. */
+const boards = computed<readonly { board: BoardId; label: string }[]>(() => [
+  ...PLAY_MODES.map((mode) => ({ board: mode, label: modeName(mode) })),
+  { board: 'total', label: t('leaderboard.total') },
+]);
 
 const board = ref<BoardId>('words');
 const page = ref(0);
@@ -49,25 +52,32 @@ function turn(by: number): void {
 </script>
 
 <template>
-  <section class="pixel-panel flex flex-col gap-4 bg-steel p-6 uppercase" aria-label="Leaderboard">
+  <section
+    class="pixel-panel flex flex-col gap-4 bg-steel p-6 uppercase"
+    :aria-label="t('leaderboard.title')"
+  >
     <!-- Three columns keep the title centred, moving it aside only on a screen too narrow for both. -->
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <h2
         class="col-start-2 text-center text-3xl tracking-widest text-gold drop-shadow-[0_3px_0_var(--color-sumi)]"
       >
-        Leaderboard
+        {{ t('leaderboard.title') }}
       </h2>
       <FoldButton
         class="justify-self-end"
         :is-folded="isLeaderboardFolded"
-        label="leaderboard"
+        :label="t('leaderboard.foldName')"
         @toggle="setLeaderboardFolded(!isLeaderboardFolded)"
       />
     </div>
     <template v-if="!isLeaderboardFolded">
-      <div class="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Which board">
+      <div
+        class="flex flex-wrap justify-center gap-1.5"
+        role="group"
+        :aria-label="t('leaderboard.whichBoard')"
+      >
         <PixelButton
-          v-for="choice in BOARDS"
+          v-for="choice in boards"
           :key="choice.board"
           :colour="board === choice.board ? 'aqua' : 'steel'"
           class="min-h-9 px-2 text-xs font-bold uppercase"
@@ -87,14 +97,14 @@ function turn(by: number): void {
           :data-testid="row.isYou ? 'leaderboard-you' : undefined"
         >
           <span class="w-10 shrink-0 text-right">{{ row.rank }}.</span>
-          <span class="flex-1 truncate">{{ row.name }}</span>
+          <span class="flex-1 truncate">{{ row.isYou ? t('leaderboard.you') : row.name }}</span>
           <PixelIcon v-if="board === 'words'" name="coin" />
           <span class="w-16 text-right font-bold">{{ row.score }}</span>
         </li>
       </ol>
       <div class="flex items-center justify-center gap-4">
         <ArcadeButton :disabled="page === 0" data-testid="leaderboard-back" @click="turn(-1)">
-          Back
+          {{ t('common.back') }}
         </ArcadeButton>
         <span class="text-sm text-washi" data-testid="leaderboard-page"
           >{{ page + 1 }} / {{ pages }}</span
@@ -104,10 +114,10 @@ function turn(by: number): void {
           data-testid="leaderboard-next"
           @click="turn(1)"
         >
-          Next
+          {{ t('leaderboard.next') }}
         </ArcadeButton>
       </div>
-      <p class="text-center text-xs text-washi normal-case">Sample players for now.</p>
+      <p class="text-center text-xs text-washi normal-case">{{ t('leaderboard.samples') }}</p>
     </template>
   </section>
 </template>

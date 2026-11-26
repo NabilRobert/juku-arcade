@@ -7,6 +7,7 @@
  */
 import ArcadeButton from './ArcadeButton.vue';
 
+/** `label` is the panel's name, already in the interface language, put into "Show the …". */
 defineProps<{ isFolded: boolean; label: string }>();
 defineEmits<{ toggle: [] }>();
 </script>
@@ -14,10 +15,14 @@ defineEmits<{ toggle: [] }>();
 <template>
   <ArcadeButton
     :aria-expanded="!isFolded"
-    :aria-label="isFolded ? `Show the ${label}` : `Hide the ${label}`"
+    :aria-label="
+      isFolded
+        ? $t('menu.fold.showPanel', { panel: label })
+        : $t('menu.fold.hidePanel', { panel: label })
+    "
     data-testid="fold-button"
     @click="$emit('toggle')"
   >
-    {{ isFolded ? 'Show' : 'Hide' }}
+    {{ isFolded ? $t('menu.fold.show') : $t('menu.fold.hide') }}
   </ArcadeButton>
 </template>

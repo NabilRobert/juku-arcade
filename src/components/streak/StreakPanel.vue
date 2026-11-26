@@ -32,7 +32,7 @@ const summary = computed(() => summariseDay(selected.value, props.history));
 </script>
 
 <template>
-  <section class="pixel-panel flex flex-col gap-3 bg-wood/80 p-4" aria-label="Streak">
+  <section class="pixel-panel flex flex-col gap-3 bg-wood/80 p-4" :aria-label="$t('streak.label')">
     <div class="flex items-start gap-3">
       <StreakHeader
         class="flex-1"
@@ -43,7 +43,7 @@ const summary = computed(() => summariseDay(selected.value, props.history));
       />
       <FoldButton
         :is-folded="isStreakFolded"
-        label="streak calendar"
+        :label="$t('streak.foldName')"
         @toggle="setStreakFolded(!isStreakFolded)"
       />
     </div>

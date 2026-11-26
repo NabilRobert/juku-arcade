@@ -20,15 +20,17 @@ defineProps<{
   <div class="flex flex-col gap-2">
     <header class="flex items-center gap-3">
       <FlameSprite class="h-10" />
-      <p class="text-2xl font-bold" data-testid="streak-days">{{ days }}-day streak</p>
-      <span v-if="isSample" class="ml-auto text-xs text-washi/60">sample data</span>
+      <p class="text-2xl font-bold" data-testid="streak-days">
+        {{ $t('streak.days', { days }) }}
+      </p>
+      <span v-if="isSample" class="ml-auto text-xs text-washi/60">{{ $t('streak.sample') }}</span>
     </header>
     <p
       v-if="milestone"
       class="bg-lamp px-3 py-1 text-center font-bold text-sumi"
       data-testid="streak-milestone"
     >
-      {{ milestone }}-day streak! Keep it up!
+      {{ $t('streak.milestone', { days: milestone }) }}
     </p>
     <p v-if="message" class="text-washi/80" data-testid="streak-message">{{ message.text }}</p>
   </div>

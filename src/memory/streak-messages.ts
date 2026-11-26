@@ -4,9 +4,12 @@
  * written template that only shows when it fits the player's streak, one
  * is picked among those that fit, and the one shown last time is skipped
  * when another fits, since a fresh message works better than a repeated
- * one. The milestones are celebrated on the day they're reached.
+ * one. The milestones are celebrated on the day they're reached. The text
+ * is looked up in the interface language (streakMessageText), so the start
+ * screen can write the picked message again after a language change.
  */
 import { pickOne } from '../game/random.ts';
+import { translate } from '../i18n/index.ts';
 import type { RandomSource } from '../game/deal.ts';
 import { addDays } from './days.ts';
 import type { Streak } from './streak.ts';
@@ -51,7 +54,7 @@ const daysToMilestone = ({ streak }: StreakContext): number =>
 const START: Template = {
   id: 'start',
   fits: ({ hasPlayed }) => !hasPlayed,
-  text: () => 'Play a run today to start a streak.',
+  text: () => translate('streak.messages.start'),
 };
 
 const TEMPLATES: readonly Template[] = [
@@ -59,35 +62,38 @@ const TEMPLATES: readonly Template[] = [
   {
     id: 'restart',
     fits: ({ hasPlayed, streak }) => hasPlayed && streak.days === 0,
-    text: () => 'Start a new streak today: one run is enough.',
+    text: () => translate('streak.messages.restart'),
   },
   {
     id: 'keep-going',
     fits: isOpen,
-    text: ({ streak }) => `${streak.days}-day streak! Play today to make it ${streak.days + 1}.`,
+    text: ({ streak }) =>
+      translate('streak.messages.keepGoing', { days: streak.days, next: streak.days + 1 }),
   },
   {
     id: 'dont-lose',
     fits: (context) => isOpen(context) && context.streak.days >= MILESTONES[0],
-    text: ({ streak }) => `Don't lose your ${streak.days}-day streak: one run keeps it going.`,
+    text: ({ streak }) => translate('streak.messages.dontLose', { days: streak.days }),
   },
   {
     id: 'rest-saved',
     fits: (context) => isOpen(context) && context.streak.restDays[0] === addDays(context.today, -1),
-    text: ({ streak }) =>
-      `Your rest day saved your ${streak.days}-day streak. Play today to keep it.`,
+    text: ({ streak }) => translate('streak.messages.restSaved', { days: streak.days }),
   },
   {
     id: 'done-today',
     fits: ({ streak }) => streak.isTodayPlayed,
-    text: ({ streak }) => `Today ✓ · ${streak.days}-day streak. See you tomorrow!`,
+    text: ({ streak }) => translate('streak.messages.doneToday', { days: streak.days }),
   },
   {
     id: 'milestone-near',
     fits: (context) =>
       context.streak.isTodayPlayed && daysToMilestone(context) <= MILESTONE_HINT_DAYS,
     text: (context) =>
-      `Today ✓ · ${daysToMilestone(context)} more to a ${nextMilestone(context.streak.days) ?? ''}-day streak.`,
+      translate('streak.messages.milestoneNear', {
+        left: daysToMilestone(context),
+        milestone: nextMilestone(context.streak.days) ?? '',
+      }),
   },
 ];
 
@@ -102,4 +108,10 @@ export function streakMessage(
   const choices = fresh.length > 0 ? fresh : fitting;
   const template = pickOne(choices, random) ?? START;
   return { id: template.id, text: template.text(context) };
+}
+
+/** A picked message's text again, in the interface language now. */
+export function streakMessageText(id: string, context: StreakContext): string {
+  const template = TEMPLATES.find((candidate) => candidate.id === id) ?? START;
+  return template.text(context);
 }

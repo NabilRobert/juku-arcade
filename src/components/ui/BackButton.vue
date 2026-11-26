@@ -9,5 +9,7 @@ import PixelButton from './PixelButton.vue';
 </script>
 
 <template>
-  <PixelButton colour="steel" class="px-4 py-2" data-testid="back">Back</PixelButton>
+  <PixelButton colour="steel" class="px-4 py-2" data-testid="back">{{
+    $t('common.back')
+  }}</PixelButton>
 </template>

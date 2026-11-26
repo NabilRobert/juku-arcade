@@ -22,7 +22,7 @@ const isCleared = computed(() => props.goal.total > 0 && props.goal.done >= prop
         <span v-if="goal.title" class="mr-1 bg-sumi px-1 font-bold text-aqua" lang="ja">{{
           goal.title
         }}</span>
-        {{ isCleared ? 'Level cleared ✓' : goal.label }}
+        {{ isCleared ? $t('game.levelCleared') : goal.label }}
       </span>
       <span>{{ goal.done }} / {{ goal.total }}</span>
     </span>

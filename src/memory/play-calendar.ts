@@ -2,8 +2,11 @@
  * The play calendar on the start screen, laid out like a contribution
  * graph: a column per week (Monday at the top), the last column holding
  * today. Each day is shaded by how much was played: answers given in every
- * run that day (play-log.ts), so a busy day glows brighter.
+ * run that day (play-log.ts), so a busy day glows brighter. Dates are
+ * written in the interface language, looked up each time they're shown.
  */
+import { language, translate } from '../i18n/index.ts';
+import type { Language } from '../i18n/languages.ts';
 import { addDays, weekStartOf } from './days.ts';
 import type { PlayedRun } from './play-log.ts';
 
@@ -57,16 +60,21 @@ export function calendarWeeks(
   );
 }
 
-const DAY_FORMAT = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-});
+/** The locale each interface language writes dates in: British English's "Mon 24 Nov", Indonesian's "Sen, 24 Nov". */
+export const DATE_LOCALES: Readonly<Record<Language, string>> = { en: 'en-GB', id: 'id-ID' };
+
+/** A calendar day (YYYY-MM-DD) in the interface language; UTC, so the day never shifts with the time zone. */
+export function formatDay(day: string, options: Intl.DateTimeFormatOptions): string {
+  const format = new Intl.DateTimeFormat(DATE_LOCALES[language.value], {
+    ...options,
+    timeZone: 'UTC',
+  });
+  return format.format(new Date(`${day}T00:00:00Z`));
+}
 
 /** A day as the calendar names it: Today, Yesterday, or the date (Mon 24 Nov). */
 export function dayLabel(day: string, today: string): string {
-  if (day === today) return 'Today';
-  if (day === addDays(today, -1)) return 'Yesterday';
-  return DAY_FORMAT.format(new Date(`${day}T00:00:00Z`));
+  if (day === today) return translate('streak.calendar.today');
+  if (day === addDays(today, -1)) return translate('streak.calendar.yesterday');
+  return formatDay(day, { weekday: 'short', day: 'numeric', month: 'short' });
 }

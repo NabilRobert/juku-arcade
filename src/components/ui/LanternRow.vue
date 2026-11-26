@@ -17,7 +17,7 @@ defineProps<{ lit: number; total: number; isCompact?: boolean }>();
     class="flex justify-center"
     :class="isCompact ? 'gap-2' : 'gap-3'"
     role="img"
-    :aria-label="`${lit} of ${total} lanterns lit`"
+    :aria-label="$t('game.lanternsLit', { lit, total })"
   >
     <PixelSprite
       v-for="index in total"

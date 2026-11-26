@@ -16,6 +16,6 @@ defineEmits<{ change: [isOn: boolean] }>();
     :aria-pressed="isOn"
     @click="$emit('change', !isOn)"
   >
-    {{ label }} {{ isOn ? 'on' : 'off' }}
+    {{ $t(isOn ? 'common.switchOn' : 'common.switchOff', { label }) }}
   </PixelButton>
 </template>

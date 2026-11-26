@@ -1,0 +1,15 @@
+Copyright (c) 2026 NabilRobert. All rights reserved.
+
+The source code of juku-arcade is published so it can be read and
+reviewed. No licence is granted to copy, modify, distribute, host or
+otherwise use it, in whole or in part, without written permission from the
+copyright holder.
+
+This notice covers the code only. The parts below keep their own licences,
+listed in README.md under "Data and licences":
+
+- the word and kanji decks built from OpenJLPT: CC BY-SA 4.0;
+- the fonts balatro and Kuronuri: SIL Open Font License;
+- the card sounds (Kenney) and the applause (BigSoundBank): CC0;
+- the music: Pixabay Content License;
+- the classic haiku by Bashō, Buson and Issa: public domain.

@@ -11,8 +11,11 @@ defineEmits<{ flip: [word: DeckWord] }>();
 </script>
 
 <template>
-  <section v-if="words.length" class="space-y-2" aria-label="Missed words">
-    <p class="text-xs text-washi/60">Missed {{ isPaused ? '(tap to flip)' : '(pause to flip)' }}</p>
+  <section v-if="words.length" class="space-y-2" :aria-label="$t('game.words.missedWords')">
+    <p class="text-xs text-washi/60">
+      {{ isPaused ? $t('game.words.missedTapToFlip') : $t('game.words.missedPauseToFlip') }}
+    </p>
+
     <div class="flex flex-wrap gap-2" data-testid="missed-tray">
       <PixelButton
         v-for="word in words"

@@ -7,16 +7,18 @@
  * injects it, so the four mode screens don't each pass it down.
  */
 import { inject, provide, type InjectionKey } from 'vue';
+import { translate } from '../i18n/index.ts';
 
 export type PageTarget = 'mode' | 'stats' | 'settings' | 'about' | 'research';
 export type GoToPage = (target: PageTarget) => void;
 
-export const PAGE_LINKS: readonly { target: PageTarget; label: string }[] = [
-  { target: 'mode', label: 'Change mode' },
-  { target: 'stats', label: 'Stats' },
-  { target: 'settings', label: 'Settings' },
-  { target: 'about', label: 'About the data' },
-  { target: 'research', label: 'The research' },
+/** Each label is looked up when the links render, so it follows a language change. */
+export const PAGE_LINKS: readonly { target: PageTarget; label: () => string }[] = [
+  { target: 'mode', label: () => translate('menu.links.mode') },
+  { target: 'stats', label: () => translate('menu.links.stats') },
+  { target: 'settings', label: () => translate('menu.links.settings') },
+  { target: 'about', label: () => translate('menu.links.about') },
+  { target: 'research', label: () => translate('menu.links.research') },
 ];
 
 export const GO_TO_PAGE_KEY: InjectionKey<GoToPage> = Symbol('go-to-page');

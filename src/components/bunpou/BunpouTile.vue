@@ -107,7 +107,7 @@ function onRelease(info: PanInfo): void {
       :class="[faceClass, textSize]"
       :data-wrong="isWrong === true ? '' : undefined"
       :disabled="isFaceDown"
-      :aria-label="isFaceDown ? 'Face-down tile' : undefined"
+      :aria-label="isFaceDown ? $t('bunpou.faceDownTile') : undefined"
       @pointerdown="onPress"
       @click="onClick"
     >

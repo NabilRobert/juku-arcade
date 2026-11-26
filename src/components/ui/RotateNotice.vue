@@ -16,11 +16,9 @@
   >
     <section class="pixel-panel flex max-w-md flex-col items-center gap-3 bg-wood p-6 text-center">
       <p id="rotate-notice-title" class="text-2xl font-bold text-aqua">
-        Please turn your phone back to portrait
+        {{ $t('menu.rotate.title') }}
       </p>
-      <p class="text-washi">
-        The game doesn't support landscape on phones. Any run in progress is paused.
-      </p>
+      <p class="text-washi">{{ $t('menu.rotate.body') }}</p>
     </section>
   </div>
 </template>

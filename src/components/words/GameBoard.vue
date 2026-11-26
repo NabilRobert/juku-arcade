@@ -132,7 +132,11 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
 </script>
 
 <template>
-  <section ref="tableElement" class="relative flex flex-col gap-y-3" aria-label="Board">
+  <section
+    ref="tableElement"
+    class="relative flex flex-col gap-y-3"
+    :aria-label="$t('game.words.board')"
+  >
     <div
       class="pointer-events-none absolute -inset-2 -z-10 rounded-[3rem] lg:-inset-8 bg-[radial-gradient(ellipse_at_50%_50%,color-mix(in_srgb,var(--color-aqua)_30%,transparent),color-mix(in_srgb,var(--color-crimson)_20%,transparent)_45%,transparent_72%)] transition-opacity duration-500 ease-[ease-out]"
       :class="{ 'animate-glow motion-reduce:animate-none': heat >= 1 }"
@@ -200,7 +204,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         role="status"
         data-testid="pause-hint"
       >
-        Paused. Tap a word card to flip it. A card you peek at won't score.
+        {{ $t('game.words.pauseHint') }}
       </p>
       <PixelButton
         colour="crimson"
@@ -209,7 +213,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         data-testid="play"
         @click="hand.play"
       >
-        Play ▶
+        {{ $t('game.play') }}
       </PixelButton>
     </div>
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop.

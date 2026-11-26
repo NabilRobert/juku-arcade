@@ -31,12 +31,12 @@ function onInput(event: Event): void {
       step="5"
       :value="percent"
       class="h-3 min-w-0 flex-1 cursor-pointer accent-aqua"
-      :aria-label="`${label} volume`"
+      :aria-label="$t('menu.sound.volumeOf', { label })"
       :data-testid="testId"
       @input="onInput"
     />
     <span class="w-12 shrink-0 text-right text-washi/70">{{
-      percent === 0 ? 'off' : `${percent}%`
+      percent === 0 ? $t('menu.sound.off') : `${percent}%`
     }}</span>
   </label>
 </template>

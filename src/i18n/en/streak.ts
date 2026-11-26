@@ -1,0 +1,53 @@
+/** The streak panel on the start screen: its headline, reminders, play calendar and a day's summary. */
+export const streak = {
+  label: 'Streak',
+  /** The panel's name inside "Show the …" and "Hide the …" (FoldButton.vue). */
+  foldName: 'streak calendar',
+  days: '{days}-day streak',
+  milestone: '{days}-day streak! Keep it up!',
+  sample: 'sample data',
+  /** The reminders (streak-messages.ts); one fits the streak and shows each visit. */
+  messages: {
+    start: 'Play a run today to start a streak.',
+    restart: 'Start a new streak today: one run is enough.',
+    keepGoing: '{days}-day streak! Play today to make it {next}.',
+    dontLose: "Don't lose your {days}-day streak: one run keeps it going.",
+    restSaved: 'Your rest day saved your {days}-day streak. Play today to keep it.',
+    doneToday: 'Today ✓ · {days}-day streak. See you tomorrow!',
+    milestoneNear: 'Today ✓ · {left} more to a {milestone}-day streak.',
+  },
+  calendar: {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    noPlay: 'no play',
+    answers: '{count} answers',
+    cell: '{day}: {played}',
+    less: 'Less',
+    more: 'More',
+  },
+  day: {
+    label: '{day}: what you played',
+    noPlayToday: 'No play today yet.',
+    restDay: 'Rest day: your streak was kept.',
+    noPlay: 'No play that day.',
+    sessions: '1 session played | {n} sessions played',
+    minutes: '{minutes} min',
+    words: 'Words: {answered} answered, {share}% right',
+    wordsWithNew: 'Words: {answered} answered, {share}% right, {count} new',
+    grammar: 'Grammar: {answered} sentences, {share}% right',
+    grammarWithPoints: 'Grammar: {answered} sentences, {share}% right, {count} points',
+    mostRecognised: 'Most recognised kanji',
+    mostMissed: 'Most missed kanji',
+    openKanji: 'What is {kanji}? Open its card',
+    cardFor: 'The card for {kanji}',
+    haikuToday: 'Today you got this haiku | Today you got these {n} haiku',
+    haikuThatDay: 'That day you got this haiku | That day you got these {n} haiku',
+  },
+  scores: {
+    highest: 'Highest score',
+    today: 'Today',
+    thatDay: 'That day',
+    thisMonth: 'This month',
+    ever: 'Ever',
+  },
+};

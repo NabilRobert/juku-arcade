@@ -37,7 +37,7 @@ watch(told, async () => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-4" aria-label="The tale" data-testid="tale">
+  <section class="flex flex-col gap-4" :aria-label="$t('bunpou.tale')" data-testid="tale">
     <StoryStage
       :pose="pose"
       :slips="results.length - told"
@@ -62,7 +62,7 @@ watch(told, async () => {
           data-testid="skip"
           @click="skip"
         >
-          Skip ▶▶
+          {{ $t('bunpou.skip') }}
         </PixelButton>
         <PixelButton
           v-else
@@ -71,7 +71,7 @@ watch(told, async () => {
           data-testid="next-tale"
           @click="$emit('next')"
         >
-          {{ endsChapter ? 'Read the chapter ▶' : 'Next tale ▶' }}
+          {{ endsChapter ? $t('bunpou.readChapter') : $t('bunpou.nextTale') }}
         </PixelButton>
       </div>
     </div>

@@ -57,17 +57,21 @@ onUnmounted(() => clearInterval(timer));
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-md space-y-5 text-center" aria-label="Daily check-up">
+  <section
+    class="mx-auto w-full max-w-md space-y-5 text-center"
+    :aria-label="$t('pages.checkUp.title')"
+  >
     <template v-if="index < 0">
-      <h2 class="text-2xl font-semibold text-aqua">Daily check-up</h2>
+      <h2 class="text-2xl font-semibold text-aqua">{{ $t('pages.checkUp.title') }}</h2>
       <p class="text-washi/80">
-        {{ questions.length }} quick questions, about a minute. It shows what's sticking. It doesn't
-        change your score or your reviews.
+        {{ $t('pages.checkUp.intro', { count: questions.length }) }}
       </p>
       <div class="flex justify-center gap-3">
-        <PixelButton colour="crimson" class="min-h-11 px-5" @click="start"> Start </PixelButton>
+        <PixelButton colour="crimson" class="min-h-11 px-5" @click="start">
+          {{ $t('pages.checkUp.start') }}
+        </PixelButton>
         <PixelButton colour="steel" class="min-h-11 px-5" @click="emit('skip')">
-          Skip today
+          {{ $t('pages.checkUp.skip') }}
         </PixelButton>
       </div>
     </template>
@@ -76,7 +80,7 @@ onUnmounted(() => clearInterval(timer));
       <p class="pixel-panel washi mx-auto w-48 py-6 text-4xl font-semibold text-sumi" lang="ja">
         {{ question.word.word }}
       </p>
-      <TimerBar :time-left="timeShare" label="Time left for this word" />
+      <TimerBar :time-left="timeShare" :label="$t('pages.checkUp.timeLeft')" />
       <div class="grid grid-cols-2 gap-3">
         <PixelButton
           v-for="option in question.options"

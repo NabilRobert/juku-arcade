@@ -6,43 +6,36 @@
  * against the flat 10 coins a match pays (D46), so an item costs a few
  * sets' play.
  */
+import { translate } from '../i18n/index.ts';
+
 export type ItemId = 'maneki' | 'koi' | 'omamori' | 'tsuru' | 'sensu' | 'take';
 
+/** An item's name and effect are messages (game.items), looked up by its id as it's shown. */
 export interface Item {
   id: ItemId;
   kanji: string;
-  name: string;
   price: number;
-  effect: string;
 }
 
 export const ITEMS: readonly Item[] = [
-  { id: 'maneki', kanji: '招', name: 'Lucky cat', price: 80, effect: '+3 coins for every match.' },
-  {
-    id: 'koi',
-    kanji: '鯉',
-    name: 'Koi',
-    price: 180,
-    effect: 'Matches from 10 combo up earn double.',
-  },
-  { id: 'omamori', kanji: '守', name: 'Omamori', price: 140, effect: 'A miss keeps half the pot.' },
-  {
-    id: 'tsuru',
-    kanji: '鶴',
-    name: 'Crane',
-    price: 120,
-    effect: 'Once, a miss keeps the whole pot. Then it flies off.',
-  },
-  { id: 'sensu', kanji: '扇', name: 'Fan', price: 120, effect: 'Banking adds 20% to the pot.' },
-  {
-    id: 'take',
-    kanji: '竹',
-    name: 'Bamboo',
-    price: 100,
-    effect: 'When the shop comes, +1 coin per 10 saved (up to 50).',
-  },
+  { id: 'maneki', kanji: '招', price: 80 },
+  { id: 'koi', kanji: '鯉', price: 180 },
+  { id: 'omamori', kanji: '守', price: 140 },
+  { id: 'tsuru', kanji: '鶴', price: 120 },
+  { id: 'sensu', kanji: '扇', price: 120 },
+  { id: 'take', kanji: '竹', price: 100 },
 ];
 
 export function itemById(id: ItemId): Item | undefined {
   return ITEMS.find((item) => item.id === id);
+}
+
+/** An item's name, in the interface language; call it while rendering. */
+export function itemName(id: ItemId): string {
+  return translate(`game.items.${id}.name`);
+}
+
+/** What an item does, in the interface language; call it while rendering. */
+export function itemEffect(id: ItemId): string {
+  return translate(`game.items.${id}.effect`);
 }

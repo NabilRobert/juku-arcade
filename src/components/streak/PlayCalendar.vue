@@ -4,10 +4,17 @@
  * a column per week, Monday at the top, each day a square that glows
  * brighter the more was played. A rest day the streak forgave has a
  * dashed outline. Clicking a day selects it for the day's summary beside
- * the grid.
+ * the grid. Month and weekday names follow the interface language.
  */
 import { computed } from 'vue';
-import { dayLabel, SHADE_THRESHOLDS, type CalendarDay } from '../../memory/play-calendar.ts';
+import { useI18n } from 'vue-i18n';
+import { addDays } from '../../memory/days.ts';
+import {
+  dayLabel,
+  formatDay,
+  SHADE_THRESHOLDS,
+  type CalendarDay,
+} from '../../memory/play-calendar.ts';
 
 const props = defineProps<{
   weeks: readonly (readonly CalendarDay[])[];
@@ -16,11 +23,19 @@ const props = defineProps<{
   today: string;
 }>();
 defineEmits<{ select: [day: string] }>();
+const { t } = useI18n();
 
 /** Each shade's fill, from no play to the busiest days. */
 // Lamp yellow, the flame's colour, reads better than aqua on the panel's blue.
 const SHADES = ['bg-lacquer', 'bg-lamp/30', 'bg-lamp/55', 'bg-lamp/80', 'bg-lamp'] as const;
-const WEEKDAYS = ['Mon', '', 'Wed', '', 'Fri', '', ''] as const;
+/** A Monday, to name the weekdays down the side from; only Monday, Wednesday and Friday are named. */
+const A_MONDAY = '2026-11-23';
+const NAMED_WEEKDAYS = new Set([0, 2, 4]);
+const weekdays = computed(() =>
+  Array.from({ length: 7 }, (_, index) =>
+    NAMED_WEEKDAYS.has(index) ? formatDay(addDays(A_MONDAY, index), { weekday: 'short' }) : '',
+  ),
+);
 /** Weeks a phone-width screen shows (the latest); wider screens show them all. */
 const PHONE_WEEKS = 12;
 
@@ -28,13 +43,11 @@ const PHONE_WEEKS = 12;
 function weekClass(index: number): string {
   return index < props.weeks.length - PHONE_WEEKS ? 'hidden sm:flex' : 'flex';
 }
-const MONTH_FORMAT = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
-
 /** A month's name above the week its first day falls in. */
 const monthLabels = computed(() =>
   props.weeks.map((week) => {
     const first = week.find((day) => day.day.endsWith('-01'));
-    return first ? MONTH_FORMAT.format(new Date(`${first.day}T00:00:00Z`)) : '';
+    return first ? formatDay(first.day, { month: 'short' }) : '';
   }),
 );
 
@@ -47,8 +60,11 @@ function cellClass(day: CalendarDay): string[] {
 }
 
 function cellLabel(day: CalendarDay): string {
-  const played = day.answers === 0 ? 'no play' : `${day.answers} answers`;
-  return `${dayLabel(day.day, props.today)}: ${played}`;
+  const played =
+    day.answers === 0
+      ? t('streak.calendar.noPlay')
+      : t('streak.calendar.answers', { count: day.answers });
+  return t('streak.calendar.cell', { day: dayLabel(day.day, props.today), played });
 }
 </script>
 
@@ -56,7 +72,7 @@ function cellLabel(day: CalendarDay): string {
   <div class="flex flex-col gap-2 text-xs text-washi/60" data-testid="play-calendar">
     <div class="flex gap-1">
       <div class="flex w-7 flex-col gap-1 pt-5">
-        <span v-for="(weekday, index) in WEEKDAYS" :key="index" class="h-5 leading-5">{{
+        <span v-for="(weekday, index) in weekdays" :key="index" class="h-5 leading-5">{{
           weekday
         }}</span>
       </div>
@@ -83,14 +99,14 @@ function cellLabel(day: CalendarDay): string {
       </div>
     </div>
     <p class="flex items-center gap-1 self-end" aria-hidden="true">
-      Less
+      {{ t('streak.calendar.less') }}
       <span
         v-for="shade in SHADE_THRESHOLDS.length + 1"
         :key="shade"
         class="size-4"
         :class="SHADES[shade - 1]"
       />
-      More
+      {{ t('streak.calendar.more') }}
     </p>
   </div>
 </template>

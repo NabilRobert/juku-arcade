@@ -24,12 +24,13 @@ defineEmits<{ go: [target: PageTarget] }>();
       :is-mode-link-hidden="!isInGame"
       @go="(target) => $emit('go', target)"
     />
-    <p class="text-xs text-washi/80">
-      made by
-      <a class="underline" href="https://github.com/NabilRobert" target="_blank" rel="noopener"
-        >@nabilrobert</a
-      >
-      · 2026
-    </p>
+    <!-- The link sits inside the sentence, where each language puts it (vue-i18n's i18n-t). -->
+    <i18n-t keypath="menu.madeBy" tag="p" class="text-xs text-washi/80">
+      <template #author>
+        <a class="underline" href="https://github.com/NabilRobert" target="_blank" rel="noopener"
+          >@nabilrobert</a
+        >
+      </template>
+    </i18n-t>
   </footer>
 </template>

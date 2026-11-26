@@ -25,7 +25,11 @@ function toggleSound(): void {
     >
       <span class="inline-flex items-center gap-2">
         <PixelIcon :name="isMuted ? 'soundOff' : 'soundOn'" />
-        {{ isMuted ? 'Sound off' : 'Sound on' }}
+        {{
+          isMuted
+            ? $t('common.switchOff', { label: $t('menu.sound.sound') })
+            : $t('common.switchOn', { label: $t('menu.sound.sound') })
+        }}
       </span>
     </PixelButton>
     <SoundSliders />

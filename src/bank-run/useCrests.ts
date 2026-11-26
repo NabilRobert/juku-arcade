@@ -2,13 +2,22 @@
  * The crests on a bank run's word cards (crests.ts): which cards
  * carry one this set, scouting (a limited pause that shows them), and what
  * a marked card does when it's matched or missed. useBankRun calls these
- * from its watch on the run.
+ * from its watch on the run. Its notices are translated as they happen.
  */
 import { computed, ref, shallowRef, type Ref } from 'vue';
 import type { RandomSource } from '../game/deal.ts';
 import type { RunState } from '../game/run.ts';
 import { addCoins, takeCoins, spendScout, type BankRun } from './bank-run.ts';
-import { CRESTS, CURSE_COST, dealCrests, drawOmikuji, type CrestKind } from './crests.ts';
+import {
+  CRESTS,
+  CURSE_COST,
+  dealCrests,
+  drawOmikuji,
+  type CrestKind,
+  type OmikujiGift,
+} from './crests.ts';
+
+import { translate } from '../i18n/index.ts';
 
 type Notify = (text: string, isGood: boolean) => void;
 
@@ -34,6 +43,19 @@ export function useScouting(state: () => RunState, run: Ref<BankRun>) {
   };
 }
 
+/** What a koban or a cursed card says as it pays out or costs, in the interface language. */
+function crestNotice(kind: 'koban' | 'cursed'): string {
+  const symbol = CRESTS[kind].symbol;
+  if (kind === 'koban') return translate('game.notices.koban', { symbol });
+  return translate('game.notices.cursed', { symbol, cost: CURSE_COST });
+}
+
+/** What an omikuji's gift says, in the interface language. */
+function omikujiNotice(gift: OmikujiGift): string {
+  const message = gift.to === 'pot' ? 'game.notices.omikujiPot' : 'game.notices.omikujiBanked';
+  return translate(message, { symbol: CRESTS.omikuji.symbol, coins: gift.coins });
+}
+
 export function useCrests(
   state: () => RunState,
   run: Ref<BankRun>,
@@ -53,12 +75,11 @@ export function useCrests(
   /** A marked card matched right: the koban doubles its coins (the caller adds them), the omikuji gives a gift. */
   function multiplierFor(wordId: string | undefined): number {
     const crest = wordId === undefined ? undefined : crests.value.get(wordId);
-    if (crest === 'koban') notify(`${CRESTS.koban.symbol} Koban! Double coins`, true);
+    if (crest === 'koban') notify(crestNotice('koban'), true);
     if (crest !== 'omikuji') return crest === 'koban' ? 2 : 1;
     const gift = drawOmikuji(random);
     run.value = addCoins(run.value, gift.to, gift.coins);
-    const where = gift.to === 'pot' ? 'to the pot' : 'banked';
-    notify(`${CRESTS.omikuji.symbol} Omikuji: +${gift.coins} ${where}`, true);
+    notify(omikujiNotice(gift), true);
     return 1;
   }
 
@@ -66,7 +87,7 @@ export function useCrests(
   function onMiss(wordId: string): void {
     if (crests.value.get(wordId) !== 'cursed') return;
     run.value = takeCoins(run.value, CURSE_COST);
-    notify(`${CRESTS.cursed.symbol} Cursed! −${CURSE_COST} coins`, false);
+    notify(crestNotice('cursed'), false);
   }
 
   return {

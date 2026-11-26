@@ -18,8 +18,11 @@ const haiku = computed(() =>
 <template>
   <section v-if="haiku.length > 0" class="flex flex-col gap-2" data-testid="day-haiku">
     <h4 class="text-sm text-washi/70">
-      {{ isToday ? 'Today you got' : 'That day you got' }}
-      {{ haiku.length === 1 ? 'this haiku' : `these ${haiku.length} haiku` }}
+      {{
+        isToday
+          ? $t('streak.day.haikuToday', haiku.length)
+          : $t('streak.day.haikuThatDay', haiku.length)
+      }}
     </h4>
     <article
       v-for="(poem, index) in haiku"

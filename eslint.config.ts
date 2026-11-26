@@ -25,6 +25,27 @@ export default tseslint.config(
     },
   },
   {
+    // Every visible word goes through the translator (D73): bare text in a
+    // template is an error. Allowed as-is: punctuation and symbols, names that
+    // don't translate (the brand, data sources, the licence), and Japanese,
+    // which is what the game teaches.
+    files: ['src/**/*.vue'],
+    rules: {
+      'vue/no-bare-strings-in-template': [
+        'error',
+        {
+          allowlist: [
+            ...['(', ')', ',', '.', '&', '+', '-', '=', '*', '/', '#', '%', '!', '?', ':'],
+            ...['[', ']', '{', '}', '<', '>', '·', '•', '‐', '–', '—', '−', '|'],
+            ...['×', '◯', '→', '―', '“', '”'],
+            ...['juku-arcade', 'OpenJLPT', 'CC BY-SA 4.0', 'Tatoeba', '@nabilrobert'],
+            '/^[\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー・！？…、。 ]+$/u',
+          ],
+        },
+      ],
+    },
+  },
+  {
     // A test file is one describe() block of small cases; the function-length
     // limit would count the whole block as one function.
     files: ['tests/**/*.ts'],

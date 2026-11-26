@@ -4,7 +4,8 @@
  * shows first-launch setup if there are none, then loads the level's deck
  * and starts a run. The game stays mounted (v-show) under the About and
  * Settings pages, and pauses while they cover it. Screens other than the
- * start screen and word mode load on demand (lazy-screens.ts).
+ * start screen and word mode load on demand (lazy-screens.ts); the mode
+ * being played is drawn by ModeScreen.vue.
  */
 import { domMax, LazyMotion, MotionConfig } from 'motion-v';
 import { computed, onMounted, ref, shallowRef } from 'vue';
@@ -31,16 +32,13 @@ import type { PlayMode } from './memory/play-log.ts';
 import AppFooter from './components/AppFooter.vue';
 import RotateNotice from './components/ui/RotateNotice.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
-import GameScreen from './components/words/GameScreen.vue';
 import ModePicker from './components/ModePicker.vue';
 import SetupScreen from './components/SetupScreen.vue';
 import TableBackground from './components/TableBackground.vue';
 import PixelSeal from './components/ui/PixelSeal.vue';
+import ModeScreen from './components/ModeScreen.vue';
 import {
   AboutData,
-  BunpouScreen,
-  DojoScreen,
-  KanjiScreen,
   prefetchScreens,
   ResearchPage,
   SettingsPanel,
@@ -134,11 +132,6 @@ async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
   page.value = 'mode';
 }
 
-/**
- * Starts the chosen mode. Settings are read again first: the mode that
- * just closed saved today's play time, and the next one must count on
- * from it (W2).
- */
 /** Opens the stats page with the latest events and settings, saved since the game started. */
 async function openStats(): Promise<void> {
   pastEvents.value = await orFallback(loadEvents, pastEvents.value);
@@ -148,10 +141,10 @@ async function openStats(): Promise<void> {
   page.value = 'stats';
 }
 
-/** A footer link: the stats page loads the latest first; the rest just open. */
 /** Where a page opened from the footer or the drawer goes back to: the game, or the start screen. */
 const returnPage = ref<Page>('game');
 
+/** A footer link: the stats page loads the latest first; the rest just open. */
 function goTo(target: PageTarget): void {
   if (target !== 'mode' && (page.value === 'game' || page.value === 'mode')) {
     returnPage.value = page.value;
@@ -165,6 +158,11 @@ function closePage(): void {
 }
 provideGoToPage(goTo);
 
+/**
+ * Starts the chosen mode. Settings are read again first: the mode that
+ * just closed saved today's play time, and the next one must count on
+ * from it (W2).
+ */
 async function chooseMode(next: PlayMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
@@ -272,53 +270,22 @@ onMounted(async () => {
             :deck="deck"
             @choose="chooseMode"
           />
-          <KanjiScreen
-            v-else-if="mode === 'kanji'"
-            v-show="!isAway"
-            :key="`kanji-${runKey}`"
-            class="my-auto"
-            :deck="deck"
-            :settings="settings"
-            :is-away="isAway"
-            @leave="page = 'mode'"
-            @again="chooseMode('kanji')"
-          />
-          <DojoScreen
-            v-else-if="mode === 'dojo'"
-            v-show="!isAway"
-            :key="`dojo-${runKey}`"
-            class="my-auto"
-            :deck="deck"
-            :settings="settings"
-            :is-away="isAway"
-            @leave="page = 'mode'"
-            @again="chooseMode('dojo')"
-          />
-          <BunpouScreen
-            v-else-if="mode === 'bunpou'"
-            v-show="!isAway"
-            :key="`bunpou-${runKey}`"
-            class="my-auto"
-            :level="deck.level"
-            :settings="settings"
-            :past-grammar-events="grammarEvents"
-            :is-away="isAway"
-            @leave="page = 'mode'"
-            @again="chooseMode('bunpou')"
-          />
-          <GameScreen
+          <ModeScreen
             v-else
             v-show="!isAway"
-            :key="runKey"
             class="my-auto"
+            :mode="mode"
+            :run-key="runKey"
             :deck="deck"
             :settings="settings"
             :past-events="pastEvents"
+            :past-grammar-events="grammarEvents"
             :is-away="isAway"
             @leave="page = 'mode'"
+            @again="chooseMode"
           />
         </template>
-        <p v-else class="text-center text-washi/60">Loading…</p>
+        <p v-else class="text-center text-washi/60">{{ $t('menu.loading') }}</p>
         <AppFooter
           :is-in-game="settings !== null && page === 'game'"
           :is-on-start-screen="settings !== null && page === 'mode'"

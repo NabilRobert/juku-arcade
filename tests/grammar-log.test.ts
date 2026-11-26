@@ -83,12 +83,12 @@ describe('the results screen', () => {
         rank: 13,
       },
     });
-    const value = (label: string): string => results.find(`[data-testid="result-${label}"]`).text();
-    expect(value('Lines right')).toBe('5 / 6');
-    expect(value('Grammar known')).toBe('1 / 10');
-    expect(value('Today')).toBe('2 / 5');
-    expect(value('Best run')).toBe('450 ★');
-    expect(value('Board rank')).toBe('#13');
+    const value = (id: string): string => results.find(`[data-testid="result-${id}"]`).text();
+    expect(value('lines-right')).toBe('5 / 6');
+    expect(value('grammar-known')).toBe('1 / 10');
+    expect(value('today')).toBe('2 / 5');
+    expect(value('best-run')).toBe('450 ★');
+    expect(value('board-rank')).toBe('#13');
     await results.find('[data-testid="play-again"]').trigger('click');
     expect(results.emitted('again')).toHaveLength(1);
   });

@@ -5,66 +5,91 @@
  * for a while is fine (playtest decision, 2026-11-26).
  * Only quotes with a known source are here (a book, a letter, a film),
  * never the popular misattributions. Each is short, and the translations
- * are in plain English.
+ * are in plain English and Indonesian (i18n/en/practice.ts, i18n/id/).
+ *
+ * `text` is a getter, so the words are looked up in the interface language
+ * each time a card shows them, and follow a language change. The names and
+ * sources are titles and citations, so they stay as written.
  */
 import { pickOne } from '../game/random.ts';
 import type { RandomSource } from '../game/deal.ts';
+import { translate } from '../i18n/index.ts';
 
 export interface Quote {
-  text: string;
-  by: string;
+  readonly text: string;
+  readonly by: string;
   /** Where the words come from, so each can be checked. */
   source: string;
 }
 
 export const QUOTES: readonly Quote[] = [
   {
-    text: 'A journey of a thousand miles begins with a single step.',
+    get text() {
+      return translate('practice.quotes.journey');
+    },
     by: 'Lao Tzu',
     source: 'Tao Te Ching, chapter 64',
   },
   {
-    text: 'Is it not a pleasure to learn, and to practise what you have learned?',
+    get text() {
+      return translate('practice.quotes.pleasureToLearn');
+    },
     by: 'Confucius',
     source: 'Analects 1.1',
   },
   {
-    text: 'To know what you know, and to know what you do not know: that is knowledge.',
+    get text() {
+      return translate('practice.quotes.knowWhatYouKnow');
+    },
     by: 'Confucius',
     source: 'Analects 2.17',
   },
   {
-    text: 'To make a mistake and not correct it: that is the real mistake.',
+    get text() {
+      return translate('practice.quotes.realMistake');
+    },
     by: 'Confucius',
     source: 'Analects 15.30',
   },
   {
-    text: 'Even while they teach, people learn.',
+    get text() {
+      return translate('practice.quotes.teachAndLearn');
+    },
     by: 'Seneca',
     source: 'Letters to Lucilius, 7',
   },
   {
-    text: 'If I have seen further, it is by standing on the shoulders of giants.',
+    get text() {
+      return translate('practice.quotes.shoulders');
+    },
     by: 'Isaac Newton',
     source: 'Letter to Robert Hooke, 1675',
   },
   {
-    text: 'First learn stand, then learn fly.',
+    get text() {
+      return translate('practice.quotes.standThenFly');
+    },
     by: 'Mr. Miyagi',
     source: 'The Karate Kid (1984)',
   },
   {
-    text: 'Do. Or do not. There is no try.',
+    get text() {
+      return translate('practice.quotes.doOrDoNot');
+    },
     by: 'Yoda',
     source: 'The Empire Strikes Back (1980)',
   },
   {
-    text: 'All we have to decide is what to do with the time that is given us.',
+    get text() {
+      return translate('practice.quotes.timeGiven');
+    },
     by: 'Gandalf',
     source: 'The Fellowship of the Ring (1954)',
   },
   {
-    text: 'Genius is one per cent inspiration and ninety-nine per cent perspiration.',
+    get text() {
+      return translate('practice.quotes.genius');
+    },
     by: 'Thomas Edison',
     source: "Quoted in Harper's Monthly, 1932",
   },
@@ -72,28 +97,40 @@ export const QUOTES: readonly Quote[] = [
 
 export const REST_QUOTES: readonly Quote[] = [
   {
-    text: "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day, listening to the murmur of the water, or watching the clouds float across the sky, is by no means a waste of time.",
+    get text() {
+      return translate('practice.restQuotes.notIdleness');
+    },
     by: 'John Lubbock',
     source: 'The Use of Life (1894)',
   },
   {
-    text: 'Take rest; a field that has rested gives a bountiful crop.',
+    get text() {
+      return translate('practice.restQuotes.restedField');
+    },
     by: 'Ovid',
     source: 'The Art of Love, book 2',
   },
   {
-    text: 'Almost everything will work again if you unplug it for a few minutes, including you.',
+    get text() {
+      return translate('practice.restQuotes.unplug');
+    },
     by: 'Anne Lamott',
     source: '12 Truths I Learned from Life and Writing, TED (2017)',
   },
   {
-    text: 'Doing nothing often leads to the very best something.',
+    get text() {
+      return translate('practice.restQuotes.doingNothing');
+    },
     by: 'Winnie the Pooh',
     source: 'Christopher Robin (2018)',
   },
   {
-    text: 'Fall seven times, stand up eight.',
-    by: 'Japanese proverb',
+    get text() {
+      return translate('practice.restQuotes.fallSeven');
+    },
+    get by() {
+      return translate('practice.japaneseProverb');
+    },
     source: '七転び八起き',
   },
 ];

@@ -8,6 +8,7 @@
  */
 import { CORRECT_DAYS_TO_KNOW } from '../../memory/leitner.ts';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { GrammarProgress } from '../../grammar/grammar-reviews.ts';
 import RunResults from '../ui/RunResults.vue';
 
@@ -22,25 +23,37 @@ const props = defineProps<{
   rank: number;
 }>();
 defineEmits<{ again: []; leave: [] }>();
+const { t } = useI18n();
 
 const panels = computed(() => [
-  { label: 'Score', value: String(props.score) },
-  { label: 'Best run', value: props.isNewBest ? `${props.best} ★` : String(props.best) },
-  { label: 'Board rank', value: `#${props.rank}` },
-  { label: 'Best combo', value: String(props.bestCombo) },
-  { label: 'Lines right', value: `${props.lines.right} / ${props.lines.played}` },
+  { id: 'score', label: t('bunpou.score'), value: String(props.score) },
   {
-    label: 'Grammar seen',
+    id: 'best-run',
+    label: t('bunpou.results.bestRun'),
+    value: props.isNewBest ? `${props.best} ★` : String(props.best),
+  },
+  { id: 'board-rank', label: t('bunpou.results.boardRank'), value: `#${props.rank}` },
+  { id: 'best-combo', label: t('bunpou.results.bestCombo'), value: String(props.bestCombo) },
+  {
+    id: 'lines-right',
+    label: t('bunpou.results.linesRight'),
+    value: `${props.lines.right} / ${props.lines.played}`,
+  },
+  {
+    id: 'grammar-seen',
+    label: t('bunpou.results.grammarSeen'),
     value: `${props.progress.pointsSeen} / ${props.progress.pointCount}`,
   },
   {
-    label: 'Grammar known',
+    id: 'grammar-known',
+    label: t('bunpou.grammarKnown'),
     value: `${props.progress.pointsKnown} / ${props.progress.pointCount}`,
   },
   {
-    label: 'Today',
+    id: 'today',
+    label: t('bunpou.results.today'),
     value: props.progress.daily.isCleared
-      ? 'Cleared ✓'
+      ? t('bunpou.results.cleared')
       : `${props.progress.daily.done} / ${props.progress.daily.total}`,
   },
 ]);
@@ -48,10 +61,10 @@ const panels = computed(() => [
 
 <template>
   <RunResults
-    title="Run results"
+    :title="t('bunpou.results.title')"
     :panels="panels"
-    :note="`A grammar point is known once you build it right on ${CORRECT_DAYS_TO_KNOW} separate days. Points you miss come back sooner.`"
-    again-label="Play again"
+    :note="t('bunpou.results.note', { days: CORRECT_DAYS_TO_KNOW })"
+    :again-label="t('bunpou.results.playAgain')"
     @again="$emit('again')"
     @leave="$emit('leave')"
   />

@@ -25,9 +25,9 @@ const LEVEL_COLOUR = themeColour('washi');
 </script>
 
 <template>
-  <section class="flex flex-col gap-3" aria-label="Run">
+  <section class="flex flex-col gap-3" :aria-label="$t('game.words.hud')">
     <div class="grid grid-cols-2 gap-3">
-      <StatPanel label="Level">
+      <StatPanel :label="$t('game.level')">
         <m.span
           :key="state.level"
           class="inline-block text-3xl font-bold"
@@ -39,7 +39,7 @@ const LEVEL_COLOUR = themeColour('washi');
         >
         <span class="text-sm text-washi/60"> / {{ MAX_LEVEL }}</span>
       </StatPanel>
-      <StatPanel label="Combo">
+      <StatPanel :label="$t('game.combo')">
         <m.span
           :key="state.combo"
           class="inline-block text-3xl font-bold text-aqua"
@@ -51,7 +51,7 @@ const LEVEL_COLOUR = themeColour('washi');
         >
       </StatPanel>
     </div>
-    <TimerBar :time-left="timeShare" label="Time left in this set" />
+    <TimerBar :time-left="timeShare" :label="$t('game.words.timeLeftInSet')" />
     <PauseButton
       class="max-lg:hidden"
       :is-paused="isPaused"
@@ -60,9 +60,11 @@ const LEVEL_COLOUR = themeColour('washi');
       @resume="$emit('resume')"
     />
     <SoundToggle />
-    <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
+    <p class="text-center text-xs text-washi/60">
+      {{ $t('game.bestComboIs', { count: state.bestCombo }) }}
+    </p>
     <p v-if="state.phase === 'timedOut'" class="text-center text-sm text-crimson" role="status">
-      Time's up: here are the answers
+      {{ $t('game.words.timesUp') }}
     </p>
   </section>
 </template>

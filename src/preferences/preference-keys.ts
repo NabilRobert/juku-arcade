@@ -14,4 +14,5 @@ export const PREFERENCE_KEYS = {
   musicVolume: 'juku-arcade:music-volume',
   effectsVolume: 'juku-arcade:effects-volume',
   muted: 'juku-arcade:muted',
+  language: 'juku-arcade:language',
 } as const;

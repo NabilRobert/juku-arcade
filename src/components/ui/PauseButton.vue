@@ -19,7 +19,7 @@ defineEmits<{ pause: []; resume: [] }>();
     :aria-pressed="isPaused"
     @click="isPaused ? $emit('resume') : $emit('pause')"
   >
-    {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-    <span class="ml-1 text-xs max-lg:hidden" aria-hidden="true">Esc</span>
+    {{ isPaused ? $t('game.resume') : $t('game.pause') }}
+    <span class="ml-1 text-xs max-lg:hidden" aria-hidden="true">{{ $t('game.escKey') }}</span>
   </PixelButton>
 </template>

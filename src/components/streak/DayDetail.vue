@@ -7,6 +7,7 @@
  * back over the screen (KanjiCardBack.vue).
  */
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { KanjiNote } from '../../deck/types.ts';
 import type { DaySummary } from '../../memory/day-summary.ts';
 import { dayLabel } from '../../memory/play-calendar.ts';
@@ -16,6 +17,7 @@ import KanjiHighlight from './KanjiHighlight.vue';
 import CardOverlay from '../ui/CardOverlay.vue';
 import KanjiCardBack from '../words/KanjiCardBack.vue';
 
+const { t } = useI18n();
 const props = defineProps<{
   day: string;
   today: string;
@@ -35,27 +37,31 @@ const isToday = computed(() => props.day === props.today);
 
 /** A day without play: today can still be played; an earlier one was missed or rested. */
 const quietLine = computed(() => {
-  if (isToday.value) return 'No play today yet.';
-  return props.isRestDay ? 'Rest day: your streak was kept.' : 'No play that day.';
+  if (isToday.value) return t('streak.day.noPlayToday');
+  return props.isRestDay ? t('streak.day.restDay') : t('streak.day.noPlay');
 });
 
 const percent = (right: number, answered: number): number =>
   answered === 0 ? 0 : Math.round((right / answered) * 100);
 
-/** "3 new", "2 points": left out when there are none. */
-const extra = (count: number, label: string): string => (count > 0 ? `, ${count} ${label}` : '');
-
+// "3 new" and "2 points" are left out when there are none: each line has a message with and without them.
 const answerLines = computed(() => {
   const { words, grammar, newWords, grammarPoints } = props.summary;
   const lines: string[] = [];
   if (words.answered > 0) {
-    const share = percent(words.right, words.answered);
-    lines.push(`Words: ${words.answered} answered, ${share}% right${extra(newWords, 'new')}`);
+    const counts = { answered: words.answered, share: percent(words.right, words.answered) };
+    lines.push(
+      newWords > 0
+        ? t('streak.day.wordsWithNew', { ...counts, count: newWords })
+        : t('streak.day.words', counts),
+    );
   }
   if (grammar.answered > 0) {
-    const share = percent(grammar.right, grammar.answered);
+    const counts = { answered: grammar.answered, share: percent(grammar.right, grammar.answered) };
     lines.push(
-      `Grammar: ${grammar.answered} sentences, ${share}% right${extra(grammarPoints, 'points')}`,
+      grammarPoints > 0
+        ? t('streak.day.grammarWithPoints', { ...counts, count: grammarPoints })
+        : t('streak.day.grammar', counts),
     );
   }
   return lines;
@@ -70,7 +76,7 @@ const answerLines = computed(() => {
     class="flex max-h-72 min-w-64 flex-1 flex-col gap-3 overflow-y-auto pr-2 text-sm [scrollbar-color:var(--color-steel)_transparent] [scrollbar-width:thin]"
     tabindex="0"
     aria-live="polite"
-    :aria-label="`${dayLabel(day, today)}: what you played`"
+    :aria-label="t('streak.day.label', { day: dayLabel(day, today) })"
     data-testid="day-detail"
   >
     <h3 class="text-lg font-bold text-aqua">{{ dayLabel(day, today) }}</h3>
@@ -79,22 +85,22 @@ const answerLines = computed(() => {
     </p>
     <template v-else>
       <p data-testid="day-runs">
-        {{ summary.runs }} {{ summary.runs === 1 ? 'session' : 'sessions' }} played ·
-        {{ summary.minutes }} min
+        {{ t('streak.day.sessions', summary.runs) }} ·
+        {{ t('streak.day.minutes', { minutes: summary.minutes }) }}
       </p>
       <DayScores :scores="summary.scores" :is-today="isToday" />
       <p v-for="line in answerLines" :key="line" class="text-washi/80">{{ line }}</p>
       <div class="flex gap-6">
         <KanjiHighlight
           v-if="summary.kanji.mostRecognised"
-          label="Most recognised kanji"
+          :label="t('streak.day.mostRecognised')"
           :count="summary.kanji.mostRecognised"
           data-testid="most-recognised"
           @open="openKanji = summary.kanji.mostRecognised.kanji"
         />
         <KanjiHighlight
           v-if="summary.kanji.mostMissed"
-          label="Most missed kanji"
+          :label="t('streak.day.mostMissed')"
           :count="summary.kanji.mostMissed"
           is-missed
           data-testid="most-missed"
@@ -105,7 +111,7 @@ const answerLines = computed(() => {
     </template>
     <CardOverlay
       v-if="openKanji !== null && openNote"
-      :label="`The card for ${openKanji}`"
+      :label="t('streak.day.cardFor', { kanji: openKanji })"
       @close="openKanji = null"
     >
       <KanjiCardBack :char="openKanji" :note="openNote" @close="openKanji = null" />

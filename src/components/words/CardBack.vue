@@ -47,7 +47,7 @@ const kanjiInWord = computed(() =>
       <a
         class="text-xs text-sumi/60 underline"
         :href="`https://tatoeba.org/sentences/show/${word.example.tatoebaId}`"
-        >Tatoeba #{{ word.example.tatoebaId }}</a
+        >{{ $t('game.card.tatoeba', { id: word.example.tatoebaId }) }}</a
       >
     </section>
     <KanjiNoteSection
