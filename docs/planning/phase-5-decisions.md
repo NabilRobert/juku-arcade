@@ -1361,3 +1361,27 @@ out, and its results say "Lanterns out".
 - Considered: a timer per kanji (rejected, as above), and failing a kanji
   on any wrong pick (too harsh next to "3 wrong picks allowed").
 
+
+### D73: The interface in English and Indonesian, with vue-i18n (2026-11-26)
+
+The school's players read Indonesian first, and the client quote's
+acceptance tests need the interface in Indonesian and English. Every
+interface word now comes from message files (`src/i18n/en/`, `src/i18n/id/`),
+one file per part of the game. The language switch is in Settings. A first
+visit follows the browser's language, and the choice is remembered in this
+browser like the other preferences. The page's `lang` attribute follows it.
+
+- **Library: vue-i18n** (MIT, the Vue team's own i18n library, Composition
+  API mode). Arthur's OK, 2026-11-26.
+  - Rejected: a hand-written dictionary. It's lighter, but plurals,
+    placeholders and fallbacks would be ours to maintain: the kind of
+    hand-rolled framework the workspace rules warn against.
+- **Messages are TypeScript, not JSON.** The Indonesian files are typed
+  against the English ones, so a missing key fails `typecheck`. A test
+  checks that every key the code names exists, and that each translation
+  keeps its English `{placeholders}`.
+- **What stays as it is:**
+  - the Japanese being learned;
+  - word meanings, which come from JMdict, and JMdict has no Indonesian
+    glosses (the client's own database can supply them);
+  - the research papers' titles.
