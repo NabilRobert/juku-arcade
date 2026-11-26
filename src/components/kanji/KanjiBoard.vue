@@ -84,7 +84,7 @@ watch(
 <template>
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
     <div
-      class="flex flex-col items-center gap-2 [--card-height:min(34dvh,45vw)] lg:[--card-height:34dvh]"
+      class="flex flex-col items-center gap-2 [--card-height:min(24dvh,45vw)] sm:[--card-height:min(28dvh,35vw)] lg:[--card-height:34dvh]"
       data-testid="kanji-row"
     >
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
@@ -135,10 +135,10 @@ watch(
         Play ▶
       </PixelButton>
     </div>
-    <!-- On a phone the deck sits under the hand, centred; on desktop it's beside it. -->
+    <!-- No deck on a phone (cards slide up from under the screen); under the hand on a tablet; beside it on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(20dvh,27vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-4 justify-items-center gap-2 [--card-height:min(15dvh,27vw)] sm:grid-cols-8 sm:[--card-height:min(18dvh,15vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
@@ -172,7 +172,7 @@ watch(
       </div>
       <div
         :ref="table.registerDeck"
-        class="w-[calc(var(--card-height)*0.75)] [--card-height:min(20dvh,8vw)] lg:[--card-height:20dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20dvh,8vw)] sm:block lg:[--card-height:20dvh]"
       >
         <CardDeck />
       </div>

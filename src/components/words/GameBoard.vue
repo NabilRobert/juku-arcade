@@ -137,10 +137,10 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       aria-hidden="true"
     />
     <div
-      class="flex flex-wrap justify-center gap-2 [--card-height:min(32dvh,33vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32dvh]"
+      class="flex flex-wrap justify-center gap-2 [--card-height:min(16dvh,33vw)] sm:[--card-height:min(20dvh,17vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32dvh]"
       data-testid="word-row"
     >
-      <!-- On a phone the cards wrap three to a row, the last row centred; on desktop they're a row of five. -->
+      <!-- On a phone the cards wrap three to a row, the last row centred; on a tablet or desktop they're a row of five. -->
       <div
         v-for="(word, position) in state.set.words"
         :key="position"
@@ -209,10 +209,10 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         Play ▶
       </PixelButton>
     </div>
-    <!-- On a phone the deck sits under the hand, centred; on desktop it's beside it. -->
+    <!-- No deck on a phone (cards slide up from under the screen); under the hand on a tablet; beside it on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(24dvh,36vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16dvh,36vw)] sm:grid-cols-6 sm:[--card-height:min(20dvh,20vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24dvh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
@@ -249,7 +249,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       </div>
       <div
         :ref="registerDeck"
-        class="w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] lg:[--card-height:22dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] sm:block lg:[--card-height:22dvh]"
       >
         <CardDeck />
       </div>
