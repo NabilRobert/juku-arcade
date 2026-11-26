@@ -23,6 +23,8 @@ const SHAMISEN_PITCHES = [1, 4 / 3, 3 / 2] as const;
 const PLUCK_GAP_MS = 180;
 const OPENING_MS = 900;
 const COUGH_GAP_MS = 600;
+/** The applause comes in as the laugh peaks. */
+const APPLAUSE_AFTER_LAUGH_MS = 400;
 /** What the storyteller says on a line he forgets, and into a silent room. */
 export const FORGOT_LINE = 'えーと…';
 const SILENT_ROOM = '…';
@@ -32,13 +34,16 @@ function playReaction(
   isLouder: boolean,
   later: ReturnType<typeof useLater>,
 ) {
-  if (reaction === 'roar') playSound('laughBig', isLouder ? 1.2 : 1);
-  else if (reaction === 'laugh') playSound('laugh');
-  else if (reaction === 'chuckle') playSound('chuckle');
-  else {
+  if (reaction === 'silence') {
     playSound('cough');
     later(() => playSound('cough', 0.9), COUGH_GAP_MS);
+    return;
   }
+  if (reaction === 'roar') playSound('laughBig', isLouder ? 1.2 : 1);
+  else if (reaction === 'laugh') playSound('laugh');
+  else playSound('chuckle');
+  // A told tale gets applause after its laugh; one that fell flat only gets coughs.
+  later(() => playSound('applause'), APPLAUSE_AFTER_LAUGH_MS);
 }
 
 function playLine(result: LineResult): void {

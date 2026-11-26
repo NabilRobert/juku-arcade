@@ -83,6 +83,17 @@ describe('the game answering a match', () => {
     expect(playSound).not.toHaveBeenCalledWith('miss');
   });
 
+  it('applauds a cleared set, after its chime', async () => {
+    const { state } = feelFor(start().state);
+    state.value = { ...state.value, phase: 'cleared' };
+    await nextTick();
+    vi.advanceTimersByTime(THROW_MS * 2);
+    expect(playSound).toHaveBeenCalledWith('cleared');
+    expect(playSound).not.toHaveBeenCalledWith('applause');
+    vi.advanceTimersByTime(1000);
+    expect(playSound).toHaveBeenCalledWith('applause');
+  });
+
   it('plays the level-up sound when a match raises the level', async () => {
     const { state } = feelFor(start().state);
     state.value = withMatch(state.value, 10, state.value.level + 1);

@@ -109,6 +109,8 @@ function useTally() {
     score.value = Math.max(0, score.value + result.points + result.crestPoints);
     if (result.misses > 0) combo.value = 0;
     if (result.isPerfect) playSound('cleared');
+    // Applause for a kanji whose readings were all found, wrong picks or not.
+    if (result.misses === 0) playSound('applause');
   }
   return { score, combo, bestCombo, impacts, land, finish };
 }

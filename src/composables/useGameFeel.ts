@@ -18,6 +18,8 @@ import { useLater } from './useLater.ts';
 export const STREAK_COMBO = 3;
 
 const THROW_MS = THROW_S * 1000;
+/** A cleared set's applause starts as its chime rings out. */
+const APPLAUSE_AFTER_CHIME_MS = 300;
 
 export interface Impact {
   /** Counts up on every hit, so the table knows to shake. */
@@ -58,6 +60,7 @@ export function useGameFeel(state: () => RunState) {
     if (now.combo === 0 && before.combo > 0) endCombo(now, before);
     if (now.phase === 'cleared' && before.phase !== 'cleared') {
       later(() => playSound('cleared'), THROW_MS * 2);
+      later(() => playSound('applause'), THROW_MS * 2 + APPLAUSE_AFTER_CHIME_MS);
     }
   });
 

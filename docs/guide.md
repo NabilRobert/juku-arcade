@@ -486,7 +486,11 @@ pinned OpenJLPT build.
   cards), and the deck's JLPT level (N5 to N1) in the bottom-left. The text sizes itself to the card with container
   units, and a reading longer than 6 kana goes in two columns.
 - **Sound and the combo (feeling involved):** every move gets an answer.
-  `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
+  `sound/sfx.ts` plays them. Applause (a CC0 recording from BigSoundBank,
+  in `public/sounds/` with its licence note; a slice of it, `RECORDING_STARTS_S`
+  and `RECORDING_MAX_S`) plays when a word set is cleared, when a kanji's
+  readings are all found, after a Bunpou tale the crowd enjoyed, and at the
+  curtain call. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   soft tap of a card landing as each card comes off the deck, one card
   every 150 ms, left to right and the top row first, rising along each

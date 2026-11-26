@@ -4,8 +4,9 @@
  * a set is dealt, a short flick of it when a card is picked, a slap when
  * it lands)
  * are recordings from Kenney's Casino Audio pack (CC0, public/sounds/),
- * because paper is hard to fake; if a recording can't load or play, its
- * synth sound plays instead.
+ * because paper is hard to fake, and the applause is a recording of about
+ * 40 people clapping (Joseph Sardin, BigSoundBank, CC0); if a recording
+ * can't load or play, its synth sound plays instead.
  *
  * ZzFX opens an AudioContext as soon as it loads, and browsers only allow
  * sound after the player has touched the page, so it's loaded on the first
@@ -59,6 +60,12 @@ const SOUNDS = {
   shamisen: [0.5, 0, 220, 0.002, 0.02, 0.35, 2, 2.5, , , , , , , , , , 0.3, 0.1],
   /** The crowd roaring: a long warbling swell of noise. */
   laughBig: [0.8, 0.2, 400, 0.1, 1.2, 0.6, 4, 1, , , , , , 0.5, 12],
+  /**
+   * Applause (recorded; this is the fallback, the roar a little lower): a
+   * word set cleared, a kanji's readings all found, a tale told, the show's
+   * end (playtest decision, 2026-11-26).
+   */
+  applause: [0.8, 0.2, 340, 0.1, 1.2, 0.6, 4, 1, , , , , , 0.5, 12],
   /** The crowd laughing. */
   laugh: [0.6, 0.2, 420, 0.05, 0.6, 0.4, 4, 1, , , , , , 0.5, 12],
   /** A polite chuckle. */
@@ -76,6 +83,7 @@ export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   pickUp: ['card-shuffle.ogg'],
   hover: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
+  applause: ['applause.ogg'],
 };
 /**
  * How loud the effects play. They must sit clearly above the background
@@ -100,9 +108,14 @@ const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
   deal: 0.07,
   pickUp: 0.25,
   hover: 0.12,
+  applause: 3.5,
 };
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
-const RECORDING_GAINS: Partial<Record<SoundName, number>> = { hover: 0.35, deal: 0.3 };
+const RECORDING_GAINS: Partial<Record<SoundName, number>> = {
+  hover: 0.35,
+  deal: 0.3,
+  applause: 0.7,
+};
 /** Recordings played higher than they were made: a dealt card's landing becomes a light tap. */
 const RECORDING_PITCHES: Partial<Record<SoundName, number>> = { deal: 1.4 };
 /**
@@ -110,15 +123,20 @@ const RECORDING_PITCHES: Partial<Record<SoundName, number>> = { deal: 1.4 };
  * first 0.17 s is the card barely moving (peaks under 0.03); its flick
  * comes right after, so a short slice from the start would be silent, and
  * a longer one would sound late. A pick-up starts just before the flick.
- * The card landing (card-place) hits about 0.13 s in.
+ * The card landing (card-place) hits about 0.13 s in. The applause
+ * recording runs 8 s: room tone, then clapping that swells from 1.5 s, is
+ * full from 2 s to 5 s and dies away; its slice starts on the swell.
  */
 const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = {
   deal: 0.12,
   hover: 0.17,
   pickUp: 0.15,
+  applause: 1.5,
 };
 const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
+/** Recordings that fade out more slowly: applause dies away rather than stopping. */
+const RECORDING_FADES_S: Partial<Record<SoundName, number>> = { applause: 1 };
 
 /**
  * Steps of the major pentatonic scale, in semitones: each match in a combo
@@ -164,6 +182,8 @@ interface Playback {
   startS: number;
   /** A share of the usual recording volume (RECORDING_GAINS). */
   gain: number;
+  /** How long the end fades out (RECORDING_FADES_S), at most half the slice. */
+  fadeS: number;
 }
 
 function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playback): void {
@@ -173,7 +193,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, playback: Playba
   source.buffer = buffer;
   source.playbackRate.value = pitch;
   const length = Math.min(buffer.duration - startS, maxS);
-  const fade = Math.min(FADE_OUT_S, length / 2);
+  const fade = Math.min(playback.fadeS, length / 2);
   const now = context.currentTime;
   const volume = RECORDING_VOLUME * playback.gain * effectsVolume.value;
   gain.gain.setValueAtTime(volume, now);
@@ -205,7 +225,8 @@ async function loadPlayer(): Promise<Player> {
       const gain = RECORDING_GAINS[name] ?? 1;
       const startS = RECORDING_STARTS_S[name] ?? 0;
       const playbackPitch = pitch * (RECORDING_PITCHES[name] ?? 1);
-      const playback = { pitch: playbackPitch, maxS, gain, startS };
+      const fadeS = RECORDING_FADES_S[name] ?? FADE_OUT_S;
+      const playback = { pitch: playbackPitch, maxS, gain, startS, fadeS };
       playBuffer(ZZFX.audioContext, await loadRecording(file), playback);
     } catch {
       playSynth(name, pitch);
