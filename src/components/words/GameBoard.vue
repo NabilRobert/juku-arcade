@@ -140,7 +140,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       aria-hidden="true"
     />
     <div
-      class="flex flex-wrap justify-center gap-2 [--card-height:min(16svh,33vw)] sm:[--card-height:min(20svh,24vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32svh]"
+      class="flex flex-wrap justify-center gap-2 [--card-height:min(15.5svh,33vw)] sm:[--card-height:min(20svh,24vw)] lg:grid lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0 lg:[--card-height:32svh]"
       data-testid="word-row"
     >
       <!-- On a phone the cards wrap three to a row, the last row centred; on a tablet or desktop they're a row of five. Below lg every card on the board is the same size. -->
@@ -215,10 +215,13 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop.
          On a tablet the hand's three columns sit together, spaced like the table's row, rather than
          spread across the width: the cards can't grow, as they match the table's, whose row of 5
-         already fills the width. -->
-    <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
+         already fills the width. On a phone or a tablet the hand sits further below Play, so a
+         thumb on Play doesn't land on a card (playtest decision). -->
+    <div
+      class="flex flex-col items-center gap-3 pt-4 max-lg:pt-[4svh] lg:flex-row lg:items-start lg:gap-4"
+    >
       <div
-        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(16svh,33vw)] sm:w-auto sm:grid-cols-[repeat(3,auto)] sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24svh] lg:[--hand-overlap:1]"
+        class="grid w-full grid-cols-3 justify-items-center gap-2 [--card-height:min(15.5svh,33vw)] sm:w-auto sm:grid-cols-[repeat(3,auto)] sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:24svh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
