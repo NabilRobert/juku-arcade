@@ -4,7 +4,9 @@
  * desktop screen, the only kind the game supports: a side panel (today's
  * progress, the run's numbers, the bank run) beside the table. The
  * table shows the board,
- * or a flipped card's back while paused, then the missed tray. Also shows
+ * or a flipped card's back while paused, then the missed tray. Clearing
+ * today's deck ends the run with its results (useDeckFinish.ts, D61); the
+ * player can keep practising. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
 import { computed, watch } from 'vue';
@@ -14,6 +16,7 @@ import { useRun } from '../../composables/useRun.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
+import { useDeckFinish } from '../../composables/useDeckFinish.ts';
 import { tallyWordEvents } from '../../memory/play-log.ts';
 import type { Settings } from '../../memory/storage.ts';
 import CardBack from './CardBack.vue';
@@ -24,10 +27,12 @@ import MissedTray from './MissedTray.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
+import RunResults from '../ui/RunResults.vue';
 import { useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
 import { playSound } from '../../sound/sfx.ts';
 
+const emit = defineEmits<{ leave: [] }>();
 const props = defineProps<{
   deck: Deck;
   settings: Settings;
@@ -60,6 +65,25 @@ watch([() => state.value.events.length, () => bank.value.coins], () =>
   runLog.record({ score: bank.value.coins, ...tallyWordEvents(state.value.events) }),
 );
 
+// Clearing today's deck ends the run: the pot is banked and the results show.
+const finish = useDeckFinish(
+  () => progress.value.daily.isCleared,
+  () => {
+    bankRun.bank();
+    pause();
+  },
+);
+const finishPanels = computed(() => [
+  { label: 'Coins', value: String(bank.value.coins) },
+  { label: 'Today', value: `${progress.value.daily.done} / ${progress.value.daily.total}` },
+  { label: 'Words known', value: `${progress.value.wordsKnown} / ${progress.value.deckSize}` },
+]);
+
+function keepPractising(): void {
+  finish.keepPractising();
+  resume();
+}
+
 const { nudge, isCapped, dismissNudge } = useWellbeing({
   sessionPlayMs: run.sessionPlayMs,
   playMsToday: run.playMsToday,
@@ -69,7 +93,7 @@ const { nudge, isCapped, dismissNudge } = useWellbeing({
 
 usePauseKey({
   isPaused: () => state.value.pausedAtMs !== null,
-  isAvailable: () => !props.isAway && state.value.phase === 'playing',
+  isAvailable: () => !props.isAway && !finish.isShown.value && state.value.phase === 'playing',
   pause,
   resume,
 });
@@ -98,15 +122,24 @@ usePauseKey({
     </aside>
     <div class="flex flex-col gap-5">
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
+        <RunResults
+          v-if="finish.isShown.value"
+          title="Today's deck done"
+          :panels="finishPanels"
+          note="Today's reviews and new words are done. Come back tomorrow for the next ones, or keep practising now."
+          again-label="Keep practising"
+          @again="keepPractising"
+          @leave="emit('leave')"
+        />
         <CardBack
-          v-if="state.flippedWord"
+          v-else-if="state.flippedWord"
           :word="state.flippedWord"
           :kanji="deck.kanji"
           @close="inspect(state.flippedWord)"
         />
         <!-- Hidden, not removed, while a card's back shows: rebuilding it would re-deal the set. -->
         <GameBoard
-          v-show="!state.flippedWord"
+          v-show="!state.flippedWord && !finish.isShown.value"
           :state="state"
           :now-ms="nowMs"
           :level="deck.level"

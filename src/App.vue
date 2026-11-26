@@ -265,6 +265,7 @@ onMounted(async () => {
             :settings="settings"
             :past-events="pastEvents"
             :is-away="isAway"
+            @leave="page = 'mode'"
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
