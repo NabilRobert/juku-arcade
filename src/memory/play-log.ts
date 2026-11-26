@@ -10,7 +10,7 @@
  * Neither record is a review event: the reviews and the school's measures
  * never read them (D37), and they stay in this browser.
  */
-import type { GameEvent } from '../game/events.ts';
+import { wordAnswerScore, type GameEvent } from '../game/events.ts';
 
 /** Every mode, in the order the start screen, the boards and a day's scores list them. */
 export const PLAY_MODES = ['words', 'kanji', 'bunpou', 'dojo'] as const;
@@ -62,12 +62,16 @@ export function withAnswer(answers: Answers, outcome: AnswerOutcome): Answers {
   return { answered: answers.answered + 1, right: answers.right + (outcome === 'right' ? 1 : 0) };
 }
 
-/** Word mode's answers in a run: a match is right, a miss wrong; timeouts aren't counted. */
+/**
+ * Word mode's answers in a run, scored as the stats page scores them
+ * (wordAnswerScore): a match is right and a miss wrong; a peeked match and
+ * a timeout aren't counted.
+ */
 export function tallyWordEvents(events: readonly GameEvent[]): Answers {
   let answers: Answers = { answered: 0, right: 0 };
   for (const event of events) {
-    if (event.kind === 'match') answers = withAnswer(answers, 'right');
-    if (event.kind === 'miss') answers = withAnswer(answers, 'wrong');
+    const score = wordAnswerScore(event);
+    if (score !== null) answers = withAnswer(answers, score);
   }
   return answers;
 }

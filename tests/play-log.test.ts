@@ -1,7 +1,9 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useRunLog } from '../src/composables/useRunLog.ts';
+import { makeEvent } from '../src/game/events.ts';
 import { tallyWordEvents, withAnswer } from '../src/memory/play-log.ts';
+import { countAnswers } from '../src/memory/stats.ts';
 import { deleteAllData, loadRuns } from '../src/memory/storage.ts';
 import { answer } from './helpers/events.ts';
 
@@ -19,6 +21,25 @@ describe('the play log', () => {
       answer('w4', '2026-11-26', 'peek'),
     ];
     expect(tallyWordEvents(events)).toEqual({ answered: 2, right: 1 });
+  });
+
+  it('scores a peeked match as the stats page does: not right, and not counted (L9)', () => {
+    const peekedMatch = makeEvent(
+      { playerId: 'player-1', sessionId: 'session-1', classCode: null },
+      new Date(),
+      {
+        kind: 'match',
+        outcome: 'peeked',
+        word_id: 'w1',
+        at: '2026-11-26T10:00:00+07:00',
+        level: 1,
+        set_index: 0,
+      },
+    );
+    const events = [peekedMatch, answer('w2', '2026-11-26', 'clean')];
+    expect(tallyWordEvents(events)).toEqual({ answered: 1, right: 1 });
+    const stats = countAnswers(events);
+    expect(stats.right + stats.wrong).toBe(tallyWordEvents(events).answered);
   });
 
   it('counts only answers the player gave, in any mode', () => {

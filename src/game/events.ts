@@ -111,3 +111,16 @@ export function makeEvent(
     ...fields,
   };
 }
+
+/**
+ * How a word answer scores for the player's tallies (the stats page, the
+ * play log behind the calendar): a match is right, unless the word was
+ * peeked at, which scores nothing (L9), so it's neither right nor wrong;
+ * a miss is wrong. Anything else isn't an answer. The review schedule
+ * judges more strictly (word-memory.ts: a peek counts as forgotten).
+ */
+export function wordAnswerScore(event: GameEvent): 'right' | 'wrong' | null {
+  if (event.kind === 'match') return event.outcome === 'peeked' ? null : 'right';
+  if (event.kind === 'miss') return 'wrong';
+  return null;
+}

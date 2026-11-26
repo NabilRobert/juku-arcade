@@ -4,7 +4,7 @@
  * anywhere. Kanji mode logs nothing, so these are word mode's numbers.
  */
 import type { DeckWord, DecoyType } from '../deck/types.ts';
-import type { ErrorType, GameEvent } from '../game/events.ts';
+import { wordAnswerScore, type ErrorType, type GameEvent } from '../game/events.ts';
 
 /** How many most-missed words the page lists. */
 export const MOST_MISSED_SHOWN = 5;
@@ -46,8 +46,9 @@ const isDay = (event: GameEvent, day: string): boolean => event.at.startsWith(da
 export function countAnswers(events: readonly GameEvent[]): AnswerCounts {
   const counts: AnswerCounts = { right: 0, wrong: 0, timedOut: 0 };
   for (const event of events) {
-    if (event.kind === 'match' && event.outcome !== 'peeked') counts.right += 1;
-    if (event.kind === 'miss') counts.wrong += 1;
+    const score = wordAnswerScore(event);
+    if (score === 'right') counts.right += 1;
+    if (score === 'wrong') counts.wrong += 1;
     if (event.kind === 'timeout') counts.timedOut += 1;
   }
   return counts;
