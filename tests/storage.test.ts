@@ -1,16 +1,32 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
+import type { PlayedRun } from '../src/memory/play-log.ts';
 import {
   appendEvents,
   appendGrammarEvents,
+  appendKanjiRound,
   deleteAllData,
   loadEvents,
   loadGrammarEvents,
+  loadKanjiRounds,
+  loadRuns,
   loadSettings,
+  saveRun,
   saveSettings,
 } from '../src/memory/storage.ts';
 import { answer } from './helpers/events.ts';
 import { sentence } from './helpers/grammar-events.ts';
+
+const run: PlayedRun = {
+  id: 'run-1',
+  mode: 'words',
+  day: '2026-11-26',
+  startedAtMs: 1000,
+  lastPlayedAtMs: 2000,
+  score: 10,
+  answered: 1,
+  right: 1,
+};
 
 describe('browser storage', () => {
   it('keeps events in the order they were added', async () => {
@@ -59,6 +75,27 @@ describe('browser storage', () => {
     await appendGrammarEvents([grammar]);
     expect(await loadGrammarEvents()).toEqual([grammar]);
     expect(await loadEvents()).toEqual([]);
+  });
+
+  it('keeps one copy of a run, the latest saved', async () => {
+    await deleteAllData();
+    await saveRun(run);
+    await saveRun({ ...run, score: 30, answered: 3, right: 3 });
+    expect(await loadRuns()).toEqual([{ ...run, score: 30, answered: 3, right: 3 }]);
+  });
+
+  it('keeps kanji rounds in the order they were played', async () => {
+    await deleteAllData();
+    await appendKanjiRound({ day: '2026-11-26', kanji: '生', isPerfect: false });
+    await appendKanjiRound({ day: '2026-11-26', kanji: '学', isPerfect: true });
+    expect((await loadKanjiRounds()).map((round) => round.kanji)).toEqual(['生', '学']);
+  });
+
+  it('deletes the play log with the rest', async () => {
+    await saveRun(run);
+    await appendKanjiRound({ day: '2026-11-26', kanji: '生', isPerfect: true });
+    await deleteAllData();
+    expect([await loadRuns(), await loadKanjiRounds()]).toEqual([[], []]);
   });
 
   it('deletes every event, setting, best score and the haiku collection, but keeps preferences', async () => {
