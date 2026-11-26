@@ -7,7 +7,7 @@ export const kanji = {
   wrongPicksLeft: '{left} of {max} wrong picks left',
   perfect: 'Perfect',
   howToPlay:
-    "Pick every reading of the kanji, then press Play. You can make {maxWrong} wrong picks per kanji; a kanji left with readings unfound puts out a lantern, and the sheet ends when all {lanterns} are out. It doesn't change your reviews.",
+    'Pick every reading of the kanji, then press Play. You can make {maxWrong} wrong picks per kanji; a kanji left with readings unfound puts out a lantern, and the sheet ends when all {lanterns} are out. A kanji you miss comes back tomorrow; one you get perfect waits longer.',
   sheetNote:
     'A sheet is {perSheet} kanji, or ends when all {lanterns} lanterns are out. A kanji counts as mastered once you find all its readings with no wrong pick on {days} separate days.',
   anotherSheet: 'Another sheet',

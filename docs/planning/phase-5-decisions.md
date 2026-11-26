@@ -1419,3 +1419,32 @@ and is no guarantee of learning results or exam scores.
   registry). The free copy is Springer's early online version, numbered
   347–363, so the card gives both, as it does for Silverman & Barasch's
   manuscript. The quote was corrected to match.
+
+### D75: Kanji get their own reviews (2026-11-26)
+
+Kanji mode used to change no reviews (D37), so a missed kanji came back
+only by chance. Now each kanji has spaced reviews on the same Leitner
+schedule as words and grammar points (`memory/leitner.ts: afterAnswer`),
+rebuilt from the kanji rounds the play log already keeps. Nothing new is
+stored, and no migration is needed.
+
+- **The answer:** a perfect round is right and moves the kanji up a box.
+  Any other round is wrong and sends it back to box 1, so it's due
+  tomorrow.
+- **The sheet (D67 kept):**
+  - every third round still reviews, now drawing kanji that are due;
+  - the other rounds draw kanji never played, from the official list 3
+    times in 4;
+  - played kanji that aren't due rest, and so does any kanji already
+    dealt in this run. They come up only when nothing else is left.
+- **Still apart from the school's data (D37 kept):** kanji rounds go to
+  the play log only, never to the word events the reports and the export
+  read. The word reviews don't change.
+- **The kanji goal is unchanged:** a kanji counts as mastered after
+  perfect rounds on 2 separate days (`level-goals.ts: masteredKanji`).
+- Owner's request (2026-11-26).
+- **Considered:**
+  - letting due kanji take more than every third round. Rejected: it would
+    undo D67's balance, and a backlog could crowd out new kanji;
+  - counting kanji answers toward the words that use them. Rejected: it
+    mixes the two and changes what the school measures.

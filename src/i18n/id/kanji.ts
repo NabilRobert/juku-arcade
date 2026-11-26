@@ -8,7 +8,7 @@ export const kanji: Messages['kanji'] = {
   wrongPicksLeft: 'Sisa {left} dari {max} salah pilih',
   perfect: 'Sempurna',
   howToPlay:
-    'Pilih setiap cara baca kanji itu, lalu tekan Mainkan. Kamu boleh salah pilih {maxWrong} kali per kanji; kanji yang cara bacanya belum ketemu semua memadamkan satu lentera, dan lembar berakhir saat semua {lanterns} lentera padam. Ini tidak mengubah ulasanmu.',
+    'Pilih setiap cara baca kanji itu, lalu tekan Mainkan. Kamu boleh salah pilih {maxWrong} kali per kanji; kanji yang cara bacanya belum ketemu semua memadamkan satu lentera, dan lembar berakhir saat semua {lanterns} lentera padam. Kanji yang meleset kembali besok; yang sempurna menunggu lebih lama.',
   sheetNote:
     'Satu lembar berisi {perSheet} kanji, atau berakhir saat semua {lanterns} lentera padam. Sebuah kanji dianggap dikuasai setelah kamu menemukan semua cara bacanya tanpa salah pilih pada {days} hari yang berbeda.',
   anotherSheet: 'Lembar lagi',

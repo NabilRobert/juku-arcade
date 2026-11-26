@@ -114,8 +114,9 @@ flowchart LR
 ## The flow, part 2b: kanji mode
 
 Each time the game opens (after the daily check-up), and from "Change
-mode", **`ModePicker.vue`** offers Words or Kanji (D37). Kanji mode is
-practice: it logs nothing and changes no reviews. Beside the choice, a
+mode", **`ModePicker.vue`** offers Words or Kanji (D37). Kanji mode logs
+no events for the school's reports, but each kanji has its own reviews
+(**`kanji/kanji-reviews.ts`**, D75), rebuilt from its rounds in the play log. Beside the choice, a
 leaderboard (**`LeaderboardPanel.vue`**, **`leaderboard/leaderboard.ts`**),
 drawn like an arcade high-score table, ranks your best score among
 sample players until real scores can be shared (D47), 8 to a page, with
@@ -614,7 +615,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Review engine** | The interface the game asks for words and progress; shaped like Juku's API so Juku can replace it | `memory/review-engine.ts` |
 | **Combo meter / rank / heat** | The combo shown between the card rows as a letter rank (F to SSS), and the glow behind the cards that warms with it | `ComboMeter.vue`, `useGameFeel.ts`, `.table-glow` in `style.css` |
 | **ZzFX** | A tiny library that synthesises sound effects from a list of numbers | `sound/sfx.ts` |
-| **Kanji mode** | Practice at finding every reading of one kanji among 8 cards; logs nothing (D37) | `src/kanji/`, `KanjiScreen.vue` |
+| **Kanji mode** | Practice at finding every reading of one kanji among 8 cards. It logs no events for the school's reports (D37); its rounds feed the kanji's own reviews (D75) | `src/kanji/`, `KanjiScreen.vue` |
+| **Kanji review** | Each kanji's place on the same Leitner schedule as words: a perfect round moves it up a box, a miss sends it back to tomorrow. Played kanji that aren't due rest (D75) | `kanji/kanji-reviews.ts` |
 | **Pot / bank / score** | The bank run's coins: the pot gains 10 per match and is lost on a miss; banking moves it to your coins, the only score, which also buy items (D46) | `bank-run/bank-run.ts` |
 | **Shop** | Turns up at random for one set (its button shows in the side panel); opening it pauses the game | `bank-run.ts: endSet`, `ShopOffer.vue` |
 | **Wrong picks** | Kanji mode allows three per kanji before the answers show (D45) | `kanji-round.ts: MAX_WRONG_PICKS` |
@@ -645,7 +647,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Finish line** | Where a run ends (D61): kanji mode after a sheet of 10 or once its 3 lanterns are out (D72), Bunpou after one chapter, each on the same results card. Word mode doesn't stop when today's deck is cleared: a banner shows and play goes on, and its results come from End run (D70) | `composables/useDeckFinish.ts`, `kanji/useKanjiSheet.ts`, `ui/RunResults.vue`, `ui/FloatingBanner.vue` |
 | **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days, counting only the level's official kanji list), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
 | **Official kanji list** | The kanji a JLPT level's list names (79 for N5), as OpenJLPT tags them. A level's words also use harder kanji (欲 in ほしい); those are played but not counted by the goal (D67) | `deck/types.ts: KanjiNote.listLevel`, `kanji/kanji-round.ts: kanjiPool` |
-| **Sheet mix** | Which kind of kanji each round of kanji mode draws: every third a mastered one, for review; the rest still being learned, from the official list 3 times in 4 (D67) | `kanji/sheet-mix.ts` |
+| **Sheet mix** | Which kind of kanji each round of kanji mode draws: every third one due for review; the rest new ones, from the official list 3 times in 4 (D67, D75) | `kanji/sheet-mix.ts` |
 | **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; not timed (D69) | `dojo/`, `components/dojo/` |
 | **Lanterns** | A run's lives (提灯), shared by practice mode (a miss puts one out) and kanji mode (a kanji left with readings unfound does, D72); the last one out ends the run. On a phone they show above the board | `game/lanterns.ts`, `ui/LanternRow.vue` |
 | **Total board** | The leaderboard that adds up your best run in each timed mode: Words, Kanji and Bunpou. Practice mode is left out, as it has no timer (D71) | `leaderboard/leaderboard.ts: TOTAL_BOARDS, boardBests` |
