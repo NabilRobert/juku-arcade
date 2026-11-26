@@ -490,7 +490,8 @@ pinned OpenJLPT build.
   in `public/sounds/` with its licence note; a slice of it, `RECORDING_STARTS_S`
   and `RECORDING_MAX_S`) plays when a word set is cleared, when a kanji's
   readings are all found, after a Bunpou tale the crowd enjoyed, and at the
-  curtain call. The card sounds are recordings from Kenney's
+  curtain call; practice mode's right answers get a short burst of it
+  (`applauseShort`), as they come every second or so. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   soft tap of a card landing as each card comes off the deck, one card
   every 150 ms, left to right and the top row first, rising along each

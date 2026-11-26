@@ -66,6 +66,11 @@ const SOUNDS = {
    * end (playtest decision, 2026-11-26).
    */
   applause: [0.8, 0.2, 340, 0.1, 1.2, 0.6, 4, 1, , , , , , 0.5, 12],
+  /**
+   * A short burst of the same applause (recorded; this fallback is a short
+   * roar), for practice mode's right answers, which come every second or so.
+   */
+  applauseShort: [0.6, 0.2, 340, 0.05, 0.4, 0.3, 4, 1, , , , , , 0.5, 12],
   /** The crowd laughing. */
   laugh: [0.6, 0.2, 420, 0.05, 0.6, 0.4, 4, 1, , , , , , 0.5, 12],
   /** A polite chuckle. */
@@ -84,6 +89,7 @@ export const RECORDINGS: Partial<Record<SoundName, string[]>> = {
   hover: ['card-shuffle.ogg'],
   slap: ['card-place-1.ogg', 'card-place-2.ogg'],
   applause: ['applause.ogg'],
+  applauseShort: ['applause.ogg'],
 };
 /**
  * How loud the effects play. They must sit clearly above the background
@@ -109,12 +115,14 @@ const RECORDING_MAX_S: Partial<Record<SoundName, number>> = {
   pickUp: 0.25,
   hover: 0.12,
   applause: 3.5,
+  applauseShort: 1.2,
 };
 /** Recordings that play softer than the rest: a hover is a brush of the card, not a pick-up. */
 const RECORDING_GAINS: Partial<Record<SoundName, number>> = {
   hover: 0.35,
   deal: 0.3,
   applause: 0.7,
+  applauseShort: 0.5,
 };
 /** Recordings played higher than they were made: a dealt card's landing becomes a light tap. */
 const RECORDING_PITCHES: Partial<Record<SoundName, number>> = { deal: 1.4 };
@@ -125,18 +133,20 @@ const RECORDING_PITCHES: Partial<Record<SoundName, number>> = { deal: 1.4 };
  * a longer one would sound late. A pick-up starts just before the flick.
  * The card landing (card-place) hits about 0.13 s in. The applause
  * recording runs 8 s: room tone, then clapping that swells from 1.5 s, is
- * full from 2 s to 5 s and dies away; its slice starts on the swell.
+ * full from 2 s to 5 s and dies away; its slice starts on the swell, and
+ * the short burst starts once it's full.
  */
 const RECORDING_STARTS_S: Partial<Record<SoundName, number>> = {
   deal: 0.12,
   hover: 0.17,
   pickUp: 0.15,
   applause: 1.5,
+  applauseShort: 2,
 };
 const DEFAULT_RECORDING_MAX_S = 1.2;
 const FADE_OUT_S = 0.25;
 /** Recordings that fade out more slowly: applause dies away rather than stopping. */
-const RECORDING_FADES_S: Partial<Record<SoundName, number>> = { applause: 1 };
+const RECORDING_FADES_S: Partial<Record<SoundName, number>> = { applause: 1, applauseShort: 0.5 };
 
 /**
  * Steps of the major pentatonic scale, in semitones: each match in a combo

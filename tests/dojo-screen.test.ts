@@ -14,8 +14,14 @@ import { dojoPools } from '../src/dojo/dojo-questions.ts';
 import { QUOTES } from '../src/dojo/quotes.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
 import { deleteAllData, type Settings } from '../src/memory/storage.ts';
+import { playSound } from '../src/sound/sfx.ts';
 import { answer } from './helpers/events.ts';
 import { deckWord } from './helpers/fixtures.ts';
+
+vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/sound/sfx.ts')>()),
+  playSound: vi.fn(),
+}));
 
 const DECK: Deck = {
   level: 'N5',
@@ -77,6 +83,17 @@ describe('the dojo on screen', () => {
     await choose(game, true);
     expect(game.find('[data-testid="score"]').text()).toBe('1');
     expect(game.findComponent(LanternRow).props('lit')).toBe(3);
+  });
+
+  it('applauds each right answer with a short burst, and a miss with none', async () => {
+    vi.useFakeTimers();
+    vi.mocked(playSound).mockClear();
+    const game = mountGame();
+    await choose(game, false);
+    expect(playSound).not.toHaveBeenCalledWith('applauseShort');
+    await vi.advanceTimersByTimeAsync(2500);
+    await choose(game, true);
+    expect(playSound).toHaveBeenCalledWith('applauseShort');
   });
 
   it('ends the run after three misses, with the results', async () => {

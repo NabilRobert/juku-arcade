@@ -86,8 +86,10 @@ export function useDojoRun(pools: DojoPools, random: RandomSource = Math.random)
     state.value = afterAnswer(state.value, isRight);
     const { right, answered } = state.value;
     runLog.record({ score: right, answered, right });
-    if (isRight) playSound('chime', comboPitch(right));
-    else playSound('miss');
+    if (isRight) {
+      playSound('chime', comboPitch(right));
+      playSound('applauseShort');
+    } else playSound('miss');
     if (!state.value.isOver) later(ask, isRight ? RIGHT_SHOWN_MS : WRONG_SHOWN_MS);
   }
 
