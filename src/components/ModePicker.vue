@@ -12,6 +12,7 @@
  */
 import { LANTERNS } from '../game/lanterns.ts';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Deck } from '../deck/types.ts';
 import { readBestScore } from '../bank-run/useBankRun.ts';
 import { usePlayHistory } from '../composables/usePlayHistory.ts';
@@ -20,7 +21,7 @@ import { CURRICULUM } from '../grammar/curriculum.ts';
 import { CARDS_PER_ROUND, kanjiPool } from '../kanji/kanji-round.ts';
 import { isLeaderboardFolded } from '../preferences/folded-panels.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
-import { MODE_NAMES, type PlayMode } from '../memory/play-log.ts';
+import { modeName, type PlayMode } from '../memory/play-log.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
 import ModeCard from './ModeCard.vue';
@@ -28,6 +29,7 @@ import SettingsButton from './ui/SettingsButton.vue';
 import type { ButtonColour } from './ui/PixelButton.vue';
 
 const props = defineProps<{ deck: Deck }>();
+const { t } = useI18n();
 
 interface Card {
   mode: PlayMode;
@@ -53,38 +55,39 @@ const bests = computed(() =>
   boardBests(history.value.runs, { words: readBestScore(), bunpou: readBunpouBest() }),
 );
 
-const cards: readonly Card[] = [
+// A computed, so the cards' text follows a language change.
+const cards = computed<readonly Card[]>(() => [
   {
     mode: 'words',
     colour: 'crimson',
-    name: MODE_NAMES.words,
+    name: modeName('words'),
     example: '学校 → がっこう',
-    description: `Match each ${level} word to its reading. Counts toward your reviews.`,
+    description: t('modes.words.description', { level }),
   },
   {
     mode: 'kanji',
     colour: 'steel',
-    name: MODE_NAMES.kanji,
+    name: modeName('kanji'),
     example: '生 → セイ・う(まれる)…',
-    description: `Find every reading of a kanji among ${CARDS_PER_ROUND} cards, with ${LANTERNS} lanterns a sheet. Doesn't count toward your reviews.`,
+    description: t('modes.kanji.description', { cards: CARDS_PER_ROUND, lanterns: LANTERNS }),
   },
   {
     mode: 'bunpou',
     colour: 'aqua',
-    name: MODE_NAMES.bunpou,
+    name: modeName('bunpou'),
     example: '行く・駅・に → 駅に行く',
-    description: 'Put each sentence in order, then watch the tale. Counts toward grammar reviews.',
+    description: t('modes.bunpou.description'),
     // The grammar content is N5's only (D60); other levels are still to write.
-    note: 'N5 only for now · still in development',
+    note: t('modes.bunpou.note'),
   },
   {
     mode: 'dojo',
     colour: 'paper',
-    name: MODE_NAMES.dojo,
+    name: modeName('dojo'),
     example: `提灯 ×${LANTERNS}`,
-    description: `Words, kanji and grammar you've met, until ${LANTERNS} misses. Ranked.`,
+    description: t('modes.dojo.description', { lanterns: LANTERNS }),
   },
-];
+]);
 defineEmits<{ choose: [mode: PlayMode] }>();
 </script>
 
@@ -105,13 +108,15 @@ defineEmits<{ choose: [mode: PlayMode] }>();
     <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
       <StreakPanel :history="history" :today="today" :kanji-notes="deck.kanji" />
-      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Choose a mode">
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2" :aria-label="t('menu.chooseMode')">
         <ModeCard
           v-for="card in cards"
           :key="card.mode"
           v-bind="card"
           :goal="goals[card.mode]"
-          :stat="card.mode === 'dojo' ? { label: 'Best run', value: bests.dojo } : undefined"
+          :stat="
+            card.mode === 'dojo' ? { label: t('modes.dojo.bestRun'), value: bests.dojo } : undefined
+          "
           @click="$emit('choose', card.mode)"
         />
       </section>

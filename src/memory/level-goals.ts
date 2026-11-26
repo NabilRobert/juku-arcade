@@ -14,6 +14,7 @@ import type { DeckWord } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
 import { createGrammarReviews } from '../grammar/grammar-reviews.ts';
+import { translate } from '../i18n/index.ts';
 import { CORRECT_DAYS_TO_KNOW } from './leitner.ts';
 import type { KanjiRoundRecord } from './play-log.ts';
 import { deriveMemory, isWordKnown } from './word-memory.ts';
@@ -22,7 +23,11 @@ import { deriveMemory, isWordKnown } from './word-memory.ts';
 export const GOAL_STAMPS = [0.25, 0.5, 0.75, 1] as const;
 
 export interface LevelGoal {
-  /** What's counted, as the card says it: "Words known". */
+  /**
+   * What's counted, as the card says it: "Words known". Looked up in the
+   * interface language; the start screen works goals out in a computed,
+   * so a language change looks it up again.
+   */
   label: string;
   done: number;
   total: number;
@@ -45,7 +50,7 @@ export function stampsReached(goal: LevelGoal): number {
 export function wordGoal(words: readonly DeckWord[], wordEvents: readonly GameEvent[]): LevelGoal {
   const memory = deriveMemory(wordEvents);
   const known = words.filter((word) => isWordKnown(memory, word.id)).length;
-  return { label: 'Words known', done: known, total: words.length };
+  return { label: translate('modes.goals.wordsKnown'), done: known, total: words.length };
 }
 
 /** Kanji found perfectly on enough separate days to count as mastered. */
@@ -67,7 +72,7 @@ export function kanjiGoal(
 ): LevelGoal {
   const mastered = masteredKanji(rounds);
   const done = levelKanji.filter((kanji) => mastered.has(kanji)).length;
-  return { label: 'Kanji mastered', done, total: levelKanji.length };
+  return { label: translate('modes.goals.kanjiMastered'), done, total: levelKanji.length };
 }
 
 export function rakugoRank(known: number, total: number): string {
@@ -84,7 +89,7 @@ export function grammarGoal(
 ): LevelGoal {
   const { pointsKnown, pointCount } = createGrammarReviews(points, grammarEvents).progress(today);
   return {
-    label: 'Grammar known',
+    label: translate('modes.goals.grammarKnown'),
     done: pointsKnown,
     total: pointCount,
     title: rakugoRank(pointsKnown, pointCount),

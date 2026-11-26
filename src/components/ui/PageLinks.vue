@@ -25,7 +25,7 @@ const links = computed(() =>
       class="underline"
       @click="$emit('go', link.target)"
     >
-      {{ link.label }}
+      {{ link.label() }}
     </button>
   </nav>
 </template>

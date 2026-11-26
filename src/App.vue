@@ -318,7 +318,7 @@ onMounted(async () => {
             @leave="page = 'mode'"
           />
         </template>
-        <p v-else class="text-center text-washi/60">Loading…</p>
+        <p v-else class="text-center text-washi/60">{{ $t('menu.loading') }}</p>
         <AppFooter
           :is-in-game="settings !== null && page === 'game'"
           :is-on-start-screen="settings !== null && page === 'mode'"

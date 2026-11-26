@@ -19,7 +19,7 @@ defineEmits<{ open: [] }>();
       class="inline-flex size-[1.4em] cursor-pointer items-center justify-center align-middle text-3xl leading-none underline-offset-4 hover:underline"
       :class="isMissed ? 'bg-crimson text-washi' : 'text-aqua'"
       lang="ja"
-      :aria-label="`What is ${count.kanji}? Open its card`"
+      :aria-label="$t('streak.day.openKanji', { kanji: count.kanji })"
       data-testid="kanji-open"
       @click="$emit('open')"
     >

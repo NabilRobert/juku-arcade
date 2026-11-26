@@ -19,6 +19,6 @@ const goToPage = injectGoToPage();
     data-testid="settings-button"
     @click="goToPage('settings')"
   >
-    Settings
+    {{ $t('menu.links.settings') }}
   </PixelButton>
 </template>

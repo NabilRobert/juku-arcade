@@ -11,7 +11,7 @@ const classCode = ref('');
 
 <template>
   <section class="mx-auto max-w-sm space-y-6 text-center">
-    <h2 class="text-xl font-semibold">Which JLPT level are you studying?</h2>
+    <h2 class="text-xl font-semibold">{{ $t('menu.setup.question') }}</h2>
     <div class="grid grid-cols-5 gap-2">
       <PixelButton
         v-for="level in JLPT_LEVELS"
@@ -24,7 +24,7 @@ const classCode = ref('');
       </PixelButton>
     </div>
     <label class="block space-y-1 text-left text-sm text-washi/80">
-      <span>Class code (optional, from your teacher)</span>
+      <span>{{ $t('menu.setup.classCode') }}</span>
       <input
         v-model="classCode"
         class="pixel-panel w-full bg-lacquer-light px-3 py-2 text-washi"
@@ -32,6 +32,6 @@ const classCode = ref('');
         autocomplete="off"
       />
     </label>
-    <p class="text-xs text-washi/60">Your progress stays in this browser. No account, no name.</p>
+    <p class="text-xs text-washi/60">{{ $t('menu.setup.privacy') }}</p>
   </section>
 </template>

@@ -1,3 +1,53 @@
 import type { Messages } from '../en/index.ts';
 
-export const streak: Messages['streak'] = {};
+export const streak: Messages['streak'] = {
+  label: 'Streak',
+  foldName: 'kalender streak',
+  days: 'Streak {days} hari',
+  milestone: 'Streak {days} hari! Pertahankan!',
+  sample: 'data contoh',
+  messages: {
+    start: 'Mainkan satu permainan hari ini untuk memulai streak.',
+    restart: 'Mulai streak baru hari ini: satu permainan sudah cukup.',
+    keepGoing: 'Streak {days} hari! Main hari ini supaya jadi {next}.',
+    dontLose: 'Jangan sampai streak {days} harimu hilang: satu permainan sudah cukup.',
+    restSaved:
+      'Hari istirahat menyelamatkan streak {days} harimu. Main hari ini supaya tetap terjaga.',
+    doneToday: 'Hari ini ✓ · streak {days} hari. Sampai besok!',
+    milestoneNear: 'Hari ini ✓ · {left} hari lagi menuju streak {milestone} hari.',
+  },
+  calendar: {
+    today: 'Hari ini',
+    yesterday: 'Kemarin',
+    noPlay: 'tidak main',
+    answers: '{count} jawaban',
+    cell: '{day}: {played}',
+    less: 'Sedikit',
+    more: 'Banyak',
+  },
+  day: {
+    label: '{day}: yang kamu mainkan',
+    noPlayToday: 'Belum main hari ini.',
+    restDay: 'Hari istirahat: streak-mu tetap terjaga.',
+    noPlay: 'Tidak main hari itu.',
+    sessions: '{n} sesi dimainkan',
+    minutes: '{minutes} menit',
+    words: 'Kata: {answered} dijawab, {share}% benar',
+    wordsWithNew: 'Kata: {answered} dijawab, {share}% benar, {count} baru',
+    grammar: 'Tata bahasa: {answered} kalimat, {share}% benar',
+    grammarWithPoints: 'Tata bahasa: {answered} kalimat, {share}% benar, {count} pola',
+    mostRecognised: 'Kanji paling dikenali',
+    mostMissed: 'Kanji paling sering salah',
+    openKanji: 'Apa itu {kanji}? Buka kartunya',
+    cardFor: 'Kartu untuk {kanji}',
+    haikuToday: 'Hari ini kamu dapat {n} haiku',
+    haikuThatDay: 'Hari itu kamu dapat {n} haiku',
+  },
+  scores: {
+    highest: 'Skor tertinggi',
+    today: 'Hari ini',
+    thatDay: 'Hari itu',
+    thisMonth: 'Bulan ini',
+    ever: 'Sepanjang masa',
+  },
+};

@@ -11,18 +11,24 @@
  * never read them (D37), and they stay in this browser.
  */
 import { wordAnswerScore, type GameEvent } from '../game/events.ts';
+import { translate } from '../i18n/index.ts';
 
 /** Every mode, in the order the start screen, the boards and a day's scores list them. */
 export const PLAY_MODES = ['words', 'kanji', 'bunpou', 'dojo'] as const;
 export type PlayMode = (typeof PLAY_MODES)[number];
 
-/** Each mode's name on screen; the dojo is "Practice" to players (D62). */
-export const MODE_NAMES: Readonly<Record<PlayMode, string>> = {
-  words: 'Words',
-  kanji: 'Kanji',
-  bunpou: 'Bunpou',
-  dojo: 'Practice',
+// Each key is written out, not built from the mode, so the message check (i18n-messages.test.ts) sees it.
+const MODE_NAMES: Readonly<Record<PlayMode, () => string>> = {
+  words: () => translate('modes.words.name'),
+  kanji: () => translate('modes.kanji.name'),
+  bunpou: () => translate('modes.bunpou.name'),
+  dojo: () => translate('modes.dojo.name'),
 };
+
+/** A mode's name on screen, in the interface language; the dojo is "Practice" to players (D62). */
+export function modeName(mode: PlayMode): string {
+  return MODE_NAMES[mode]();
+}
 
 /** One run, as it stood after its last answer. */
 export interface PlayedRun {

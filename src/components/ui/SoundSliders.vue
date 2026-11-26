@@ -12,13 +12,13 @@ import VolumeSlider from './VolumeSlider.vue';
 <template>
   <div class="flex flex-col gap-2.5 py-1">
     <VolumeSlider
-      label="Effects"
+      :label="$t('menu.sound.effects')"
       :volume="effectsVolume"
       test-id="effects-volume"
       @change="setEffectsVolume"
     />
     <VolumeSlider
-      label="Music"
+      :label="$t('menu.sound.music')"
       :volume="musicVolume"
       test-id="music-volume"
       @change="setMusicVolume"
