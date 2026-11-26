@@ -14,6 +14,7 @@ import { LANTERNS } from '../../dojo/dojo-run.ts';
 import { pickQuote } from '../../dojo/quotes.ts';
 import { useDojoRun } from '../../dojo/useDojoRun.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
@@ -64,6 +65,7 @@ const resultPanels = computed(() => [
   { label: 'Your best combo was', value: String(state.value.bestCombo) },
   { label: 'Stage reached', value: `${stage.value} / 5` },
 ]);
+const previousBest = usePreviousBest('dojo');
 /** Picked once per run, for its game-over screen. */
 const quote = pickQuote(Math.random);
 
@@ -111,6 +113,7 @@ function dismiss(isStopping: boolean): void {
         :panels="resultPanels"
         again-label="Restart"
         leave-label="Quit to main menu"
+        :comparison="{ score: state.right, previousBest }"
         @again="emit('again')"
         @leave="emit('leave')"
       >

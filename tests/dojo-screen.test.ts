@@ -91,6 +91,7 @@ describe('the dojo on screen', () => {
   });
 
   it('recaps the score and best combo with a quote, then restarts or quits', async () => {
+    await deleteAllData();
     vi.useFakeTimers();
     const game = mountGame();
     for (const isRight of [true, true, false, true, false, false]) {
@@ -101,6 +102,8 @@ describe('the dojo on screen', () => {
     expect(results.find('[data-testid="result-Your score was"]').text()).toBe('3');
     expect(results.find('[data-testid="result-Your best combo was"]').text()).toBe('2');
     expect(results.find('[data-testid="quote"]').text()).toMatch(/― .+, .+/);
+    // No earlier run in this browser: the first best is greeted.
+    expect(results.find('[data-testid="best-comparison"]').text()).toContain('Your first best');
     await results.find('[data-testid="play-again"]').trigger('click');
     await results.find('[data-testid="leave"]').trigger('click');
     expect([game.emitted('again'), game.emitted('leave')]).toEqual([[[]], [[]]]);
