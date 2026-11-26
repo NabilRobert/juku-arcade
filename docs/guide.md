@@ -719,6 +719,9 @@ fields. They stay in memory until slice 3 stores them.
   (`useDeckFinish.endNow`), kanji mode ends the sheet (`useKanjiSheet.endNow`),
   practice mode ends as if the last lantern went out (`dojo-run.ts:
   endedEarly`), and Bunpou plays its curtain call.
+- **Change how a peeked card looks:** a word card flipped while paused
+  won't score (L9); `cards/PlayCard.vue` tints its border and back cedar
+  brown (`PEEKED_TINT`) and shows `cards/PeekedMark.vue`'s "no score" band.
 - **Change a card back:** a word's back is `words/CardBack.vue` and a
   kanji's is `words/KanjiCardBack.vue`; both are built from
   `words/CardBackPanel.vue` (the paper panel and Turn over) and
