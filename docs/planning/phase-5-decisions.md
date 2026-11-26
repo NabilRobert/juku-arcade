@@ -1105,3 +1105,29 @@ the native check.
   meet them in kana); plain-form から clauses (one politeness level per
   tale, as the plan says).
 
+
+### D61: A finish line for every run, and a goal for every level (2026-11-26)
+
+From playtesting: "don't just make it endless". Endless runs ranked by
+total score rewarded whoever played longest, which works against the
+15- and 30-minute nudges and the daily cap (D19).
+
+- **Finish lines:** a word-mode run ends when today's deck is cleared
+  (the reviews due plus the day's new words): the pot is banked and the
+  results show, and the player can keep practising
+  (`composables/useDeckFinish.ts`). A kanji run is a sheet of 10 kanji
+  (`kanji/useKanjiSheet.ts`). A Bunpou show is one chapter of three tales,
+  then the curtain call (D59); "End run" still leaves early. All three end
+  on one results card (`ui/RunResults.vue`).
+- **Level goals,** on each mode's card on the start screen
+  (`memory/level-goals.ts`): words known; kanji mastered (every reading
+  found with no wrong pick on two separate days, like a known word); and
+  Bunpou's rakugo ranks, 前座, then 二ツ目 from a third of the grammar,
+  then 真打 for all of it. A tick lights at each quarter, after the
+  goal-gradient effect (Kivetz, Urminsky & Zheng 2006).
+- **Kanji mastery needs a record:** kanji rounds go to the play log
+  (`memory/play-log.ts`), not to the review events, so D37 still holds:
+  the reviews and the school's measures don't read kanji mode.
+- **Beat:** a fixed 30-match word run (it wouldn't follow the day's
+  reviews); a ranked total for each mode (ranking moves to the game-over
+  mode); sheets weighted toward kanji not yet mastered (left for later).

@@ -596,6 +596,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Streak** | Days in a row with a run played, in any mode. One missed day a week (Monday to Sunday) is forgiven as a **rest day**; a second breaks it. Today never breaks it | `memory/streak.ts` |
 | **Play calendar** | The start screen's grid of days, like a contribution graph: a column per week, each day brighter the more was answered. Clicking a day shows its summary | `memory/play-calendar.ts`, `memory/day-summary.ts`, `components/streak/` |
 | **Streak reminder** | The start screen's message about the streak, picked from templates that fit (after Duolingo's reminders); milestones (3, 7, 14, 30… days) are celebrated once | `memory/streak-messages.ts`, `composables/useStreak.ts` |
+| **Finish line** | Where a run ends (D61): word mode when today's deck is cleared, kanji mode after a sheet of 10, Bunpou after one chapter; each ends on the same results card | `composables/useDeckFinish.ts`, `kanji/useKanjiSheet.ts`, `ui/RunResults.vue` |
+| **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
 | **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |
@@ -661,6 +663,10 @@ fields. They stay in memory until slice 3 stores them.
   `tests/memory.test.ts`.
 - **Add a source to the research page:** add it to `SOURCE_GROUPS` in
   `research/sources.ts`, with what it found and where the game uses it.
+- **Change a finish line or a level goal:** the kanji sheet's size is
+  `KANJI_PER_SHEET` in `kanji/useKanjiSheet.ts`; a Bunpou show's length is
+  `TALES_PER_CHAPTER` in `grammar/performance.ts`; the goals, their stamps
+  and the rakugo ranks are in `memory/level-goals.ts`.
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are
