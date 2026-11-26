@@ -24,6 +24,7 @@ import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
+import ModeHeader from '../ui/ModeHeader.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import StatPanel from '../ui/StatPanel.vue';
 
@@ -83,10 +84,9 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
     <aside class="sticky top-6 flex flex-col gap-3" aria-label="Kanji run">
-      <section class="pixel-panel bg-wood/80 p-3 text-center">
-        <p class="text-xs tracking-widest text-aqua/80 uppercase">Kanji mode · {{ deck.level }}</p>
+      <ModeHeader :title="`Kanji mode · ${deck.level}`">
         <p class="text-sm text-washi/70">Round {{ roundNumber }}</p>
-      </section>
+      </ModeHeader>
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{

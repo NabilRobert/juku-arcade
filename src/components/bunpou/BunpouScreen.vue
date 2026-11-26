@@ -33,6 +33,7 @@ import DailyBar from '../words/DailyBar.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
+import ModeHeader from '../ui/ModeHeader.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
@@ -143,9 +144,7 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
     <aside class="sticky top-6 flex flex-col gap-3" aria-label="Bunpou run">
-      <section class="pixel-panel bg-wood/80 p-3 text-center">
-        <p class="text-xs tracking-widest text-aqua/80 uppercase">Bunpou · {{ level }}</p>
-      </section>
+      <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
         :daily="reviews.progress.value.daily"
         known-label="Grammar known"
