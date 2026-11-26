@@ -141,7 +141,7 @@ describe('the dojo on screen', () => {
     const game = mountGame();
     await game
       .findAll('button')
-      .find((button) => button.text() === 'Pause')
+      .find((button) => button.text().includes('Pause'))
       ?.trigger('click');
     expect(game.find('[data-testid="dojo-paused"]').exists()).toBe(true);
     expect(game.findComponent(CardQuestionView).exists()).toBe(false);

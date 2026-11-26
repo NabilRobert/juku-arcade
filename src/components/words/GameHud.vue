@@ -8,7 +8,7 @@ import { m } from 'motion-v';
 import { computed } from 'vue';
 import { timeShareLeft, type RunState } from '../../game/run.ts';
 import { MAX_LEVEL } from '../../game/tuning.ts';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
 
@@ -59,16 +59,13 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
         :style="{ width: `${timeShare * 100}%` }"
       />
     </div>
-    <PixelButton
-      :colour="isPaused ? 'crimson' : 'steel'"
-      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50 max-lg:hidden"
-      :disabled="state.phase !== 'playing'"
-      :aria-pressed="isPaused"
-      @click="isPaused ? $emit('resume') : $emit('pause')"
-    >
-      {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      <span class="ml-1 text-xs" aria-hidden="true">Esc</span>
-    </PixelButton>
+    <PauseButton
+      class="max-lg:hidden"
+      :is-paused="isPaused"
+      :is-disabled="state.phase !== 'playing'"
+      @pause="$emit('pause')"
+      @resume="$emit('resume')"
+    />
     <SoundToggle />
     <p class="text-center text-xs text-washi/60">Best combo {{ state.bestCombo }}</p>
     <p v-if="state.phase === 'timedOut'" class="text-center text-sm text-crimson" role="status">

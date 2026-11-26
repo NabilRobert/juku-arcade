@@ -21,7 +21,7 @@ import { POINT_PATTERNS, SHELF_NAMES } from '../../grammar/templates.ts';
 import type { Point } from '../cards/throw-geometry.ts';
 import ComboMeter from '../ui/ComboMeter.vue';
 import TimerBar from '../ui/TimerBar.vue';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import FuriganaText from '../words/FuriganaText.vue';
 import BunpouTile from './BunpouTile.vue';
 import SentenceFix from './SentenceFix.vue';
@@ -127,16 +127,14 @@ function dropAt(tile: string, point: Point): void {
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
       <TimerBar v-if="timeLeft !== undefined" class="flex-1" :time-left="timeLeft" />
-      <PixelButton
-        :colour="isPaused ? 'crimson' : 'steel'"
-        class="px-4 py-1 text-sm max-lg:hidden"
-        :aria-pressed="isPaused"
-        :disabled="run.phase !== 'building'"
+      <PauseButton
+        class="max-lg:hidden"
+        :is-paused="isPaused"
+        :is-disabled="run.phase !== 'building'"
         data-testid="pause"
-        @click="isPaused ? emit('resume') : emit('pause')"
-      >
-        {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-      </PixelButton>
+        @pause="emit('pause')"
+        @resume="emit('resume')"
+      />
     </header>
 
     <div

@@ -6,21 +6,19 @@
  * never sits over the board or the timer, even when the page scrolls. Wide screens keep each mode's own
  * pause button, so this one hides there.
  */
-import PixelButton from './PixelButton.vue';
+import PauseButton from './PauseButton.vue';
 
 defineProps<{ isPaused: boolean; isDisabled?: boolean }>();
 defineEmits<{ pause: []; resume: [] }>();
 </script>
 
 <template>
-  <PixelButton
-    :colour="isPaused ? 'crimson' : 'steel'"
-    class="absolute top-3 right-3 z-30 min-h-11 px-4 text-sm font-semibold disabled:opacity-50 lg:hidden"
-    :disabled="isDisabled"
-    :aria-pressed="isPaused"
+  <PauseButton
+    class="absolute top-3 right-3 z-30 lg:hidden"
+    :is-paused="isPaused"
+    :is-disabled="isDisabled"
     data-testid="floating-pause"
-    @click="isPaused ? $emit('resume') : $emit('pause')"
-  >
-    {{ isPaused ? '▶ Resume' : '⏸ Pause' }}
-  </PixelButton>
+    @pause="$emit('pause')"
+    @resume="$emit('resume')"
+  />
 </template>

@@ -23,7 +23,7 @@ import FloatingPause from '../ui/FloatingPause.vue';
 import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
-import PixelButton from '../ui/PixelButton.vue';
+import PauseButton from '../ui/PauseButton.vue';
 import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import StatPanel from '../ui/StatPanel.vue';
@@ -88,15 +88,13 @@ function dismiss(isStopping: boolean): void {
       <StatPanel label="Score">
         <span class="text-3xl font-bold" data-testid="score">{{ state.right }}</span>
       </StatPanel>
-      <PixelButton
+      <PauseButton
         v-if="!state.isOver"
-        :colour="isPaused ? 'crimson' : 'steel'"
-        class="min-h-9 px-4 text-sm max-lg:hidden"
-        :aria-pressed="isPaused"
-        @click="isPaused ? dojo.resume() : dojo.pause()"
-      >
-        {{ isPaused ? 'Resume' : 'Pause' }}
-      </PixelButton>
+        class="max-lg:hidden"
+        :is-paused="isPaused"
+        @pause="dojo.pause"
+        @resume="dojo.resume"
+      />
       <SoundToggle />
       <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
