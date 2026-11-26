@@ -82,7 +82,7 @@ watch(
     <m.p
       v-else-if="brokenCombo !== null"
       :key="`broken-${brokenCombo}`"
-      class="font-bold text-crimson drop-shadow-[0_0_6px_rgb(241_250_238/0.9)]"
+      class="font-bold text-crimson drop-shadow-[0_0_6px_color-mix(in_srgb,var(--color-washi)_90%,transparent)]"
       :initial="{ y: 0, opacity: 1, rotate: 0 }"
       :animate="{ y: 30, opacity: 0, rotate: -8 }"
       :transition="{ duration: 0.9, ease: 'easeIn' }"

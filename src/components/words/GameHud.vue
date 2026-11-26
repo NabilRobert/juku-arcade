@@ -4,6 +4,7 @@
  * the pause button, the sound switch, and what's happening (L5, L6, L9,
  * L12).
  */
+import { themeColour } from '../ui/theme-colour.ts';
 import { m } from 'motion-v';
 import { computed } from 'vue';
 import { timeShareLeft, type RunState } from '../../game/run.ts';
@@ -18,6 +19,9 @@ defineEmits<{ pause: []; resume: [] }>();
 const isPaused = computed(() => props.state.pausedAtMs !== null);
 const timeShare = computed(() => timeShareLeft(props.state, props.nowMs));
 const isTimeLow = computed(() => timeShare.value < 0.25);
+/** A new level flashes aqua, then settles to the panel's white (palette tokens, read once). */
+const LEVEL_UP_COLOUR = themeColour('aqua');
+const LEVEL_COLOUR = themeColour('washi');
 </script>
 
 <template>
@@ -28,8 +32,8 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
           :key="state.level"
           class="inline-block text-3xl font-bold"
           data-testid="level"
-          :initial="{ scale: 1.8, color: '#a8dadc' }"
-          :animate="{ scale: 1, color: '#f6efdf' }"
+          :initial="{ scale: 1.8, color: LEVEL_UP_COLOUR }"
+          :animate="{ scale: 1, color: LEVEL_COLOUR }"
           :transition="{ type: 'spring', stiffness: 400, damping: 15 }"
           >{{ state.level }}</m.span
         >

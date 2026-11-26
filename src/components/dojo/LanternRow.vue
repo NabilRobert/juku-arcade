@@ -16,7 +16,7 @@ defineProps<{ lit: number; total: number }>();
       v-for="index in total"
       :key="index"
       class="h-14"
-      :class="index <= lit ? 'drop-shadow-[0_0_6px_#f4c86a]' : ''"
+      :class="index <= lit ? 'drop-shadow-[0_0_6px_var(--color-lamp)]' : ''"
       :grid="LANTERN_GRID"
       :palette="index <= lit ? LIT_PALETTE : DIM_PALETTE"
       :name="index <= lit ? 'lantern-lit' : 'lantern-dim'"

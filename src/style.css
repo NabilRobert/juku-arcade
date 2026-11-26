@@ -39,6 +39,8 @@
   --color-cedar: #7a5230;
   /* Warm stage light, for the spotlight on Bunpou's storyteller (D58). */
   --color-lamp: #f4c86a;
+  /* Arcade gold, for the leaderboard's title and a crest's bonus points. */
+  --color-gold: #ffd84a;
 
   /* A wrong tap shakes both cards (L4). */
   --animate-shake: shake 0.35s ease-in-out;

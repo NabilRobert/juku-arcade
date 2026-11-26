@@ -23,7 +23,7 @@ defineProps<{ result: PlayedRound | null }>();
       </template>
       <p
         v-if="result.crestPoints !== 0"
-        :class="result.crestPoints > 0 ? 'text-[#e9c46a]' : 'text-crimson'"
+        :class="result.crestPoints > 0 ? 'text-gold' : 'text-crimson'"
         data-testid="crest-points"
       >
         Crests {{ result.crestPoints > 0 ? '+' : '−' }}{{ Math.abs(result.crestPoints) }}

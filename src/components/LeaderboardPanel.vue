@@ -53,7 +53,7 @@ function turn(by: number): void {
     <!-- Three columns keep the title centred, moving it aside only on a screen too narrow for both. -->
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <h2
-        class="col-start-2 text-center text-3xl tracking-widest text-[#ffd84a] drop-shadow-[0_3px_0_var(--color-sumi)]"
+        class="col-start-2 text-center text-3xl tracking-widest text-gold drop-shadow-[0_3px_0_var(--color-sumi)]"
       >
         Leaderboard
       </h2>
