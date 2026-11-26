@@ -133,6 +133,7 @@ async function finishCheckUp(answers: readonly GameEvent[]): Promise<void> {
 /** Opens the stats page with the latest events and settings, saved since the game started. */
 async function openStats(): Promise<void> {
   pastEvents.value = await orFallback(loadEvents, pastEvents.value);
+  grammarEvents.value = await orFallback(loadGrammarEvents, grammarEvents.value);
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
   page.value = 'stats';
@@ -222,6 +223,7 @@ onMounted(async () => {
             :deck="deck"
             :settings="settings"
             :events="pastEvents"
+            :grammar-events="grammarEvents"
             @close="page = 'game'"
           />
           <SettingsPanel

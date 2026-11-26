@@ -684,6 +684,9 @@ fields. They stay in memory until slice 3 stores them.
   and `kanji/KanjiBoard.vue`.
 - **Add a screen:** if it isn't needed on the start screen, add it to
   `lazy-screens.ts` so it loads on demand (and is prefetched when idle).
+- **Change the stats page:** word numbers come from `memory/stats.ts`, grammar
+  numbers from `memory/grammar-stats.ts` (its section is
+  `components/GrammarStats.vue`); each list is a `ui/RankedList.vue`.
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are
