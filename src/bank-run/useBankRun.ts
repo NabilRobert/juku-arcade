@@ -125,6 +125,8 @@ export function useBankRun(
   state: () => RunState,
   actions: BankRunActions,
   random: RandomSource = Math.random,
+  /** False once the run is only practice: its coins no longer count toward the best. */
+  isRanked: () => boolean = () => true,
 ) {
   const run = shallowRef<BankRun>(startBankRun());
   const { notice, notify } = useNotice();
@@ -141,7 +143,12 @@ export function useBankRun(
     if (now.phase !== 'playing' && before.phase === 'playing')
       run.value = endSet(run.value, random);
   });
-  watch(() => run.value.coins, best.record);
+  watch(
+    () => run.value.coins,
+    (coins) => {
+      if (isRanked()) best.record(coins);
+    },
+  );
 
   return {
     run,

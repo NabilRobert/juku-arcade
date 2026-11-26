@@ -9,7 +9,7 @@
  * player can keep practising. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
@@ -18,6 +18,7 @@ import { useWellbeing } from '../../composables/useWellbeing.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { useRunLog } from '../../composables/useRunLog.ts';
 import { useDeckFinish } from '../../composables/useDeckFinish.ts';
+import { usePreviousBest } from '../../composables/usePreviousBest.ts';
 import { tallyWordEvents } from '../../memory/play-log.ts';
 import type { Settings } from '../../memory/storage.ts';
 import CardBack from './CardBack.vue';
@@ -32,7 +33,7 @@ import FloatingPause from '../ui/FloatingPause.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import TimerBar from '../ui/TimerBar.vue';
 import RunResults from '../ui/RunResults.vue';
-import { useBankRun } from '../../bank-run/useBankRun.ts';
+import { readBestScore, useBankRun } from '../../bank-run/useBankRun.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
 import { playSound } from '../../sound/sfx.ts';
 
@@ -56,17 +57,16 @@ function inspect(word: DeckWord): void {
   playSound('pickUp');
   run.flip(word);
 }
-const bankRun = useBankRun(() => state.value, { endCombo: run.endCombo, pause, resume });
+const bankRun = useBankRun(
+  () => state.value,
+  { endCombo: run.endCombo, pause, resume },
+  Math.random,
+  () => finish.isRanked.value,
+);
 const { run: bank, notice, shownCrests } = bankRun;
 /** The scouted crests, marked on the word cards until the set ends. */
 const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
-);
-
-// Every answer or bank goes to the play log, for the streak and the calendar.
-const runLog = useRunLog('words');
-watch([() => state.value.events.length, () => bank.value.coins], () =>
-  runLog.record({ score: bank.value.coins, ...tallyWordEvents(state.value.events) }),
 );
 
 // Clearing today's deck ends the run: the pot is banked and the results show.
@@ -77,6 +77,22 @@ const finish = useDeckFinish(
     pause();
   },
 );
+const previousBest = usePreviousBest('words', readBestScore);
+/** The coins that count toward the best and the board: none after today's deck is cleared. */
+const rankedCoins = ref(0);
+watch(
+  () => bank.value.coins,
+  (coins) => {
+    if (finish.isRanked.value) rankedCoins.value = coins;
+  },
+);
+
+// Every answer or bank goes to the play log, for the streak, the calendar and the board.
+const runLog = useRunLog('words');
+watch([() => state.value.events.length, rankedCoins], () =>
+  runLog.record({ score: rankedCoins.value, ...tallyWordEvents(state.value.events) }),
+);
+
 const finishPanels = computed(() => [
   { label: 'Coins', value: String(bank.value.coins) },
   { label: 'Today', value: `${progress.value.daily.done} / ${progress.value.daily.total}` },
@@ -138,8 +154,9 @@ usePauseKey({
           v-if="finish.isShown.value"
           title="Today's deck done"
           :panels="finishPanels"
-          note="Today's reviews and new words are done. Come back tomorrow for the next ones, or keep practising now."
+          note="Today's reviews and new words are done. Come back tomorrow for the next ones, or keep practising now: practice coins don't count toward your best."
           again-label="Keep practising"
+          :comparison="{ score: rankedCoins, previousBest }"
           @again="keepPractising"
           @leave="emit('leave')"
         />

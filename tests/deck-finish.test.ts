@@ -34,4 +34,27 @@ describe("word mode's finish line", () => {
     await nextTick();
     expect([finish.isShown.value, finishes]).toEqual([false, 0]);
   });
+
+  it('counts the run toward the best until the deck is cleared, the final bank included', async () => {
+    const isCleared = ref(false);
+    const finish = useDeckFinish(
+      () => isCleared.value,
+      () => undefined,
+    );
+    expect(finish.isRanked.value).toBe(true);
+    isCleared.value = true;
+    await nextTick();
+    // The finishing bank happens in this tick, and still counts.
+    expect(finish.isRanked.value).toBe(true);
+    await nextTick();
+    expect(finish.isRanked.value).toBe(false);
+  });
+
+  it('never counts a run that started with the deck already cleared', () => {
+    const finish = useDeckFinish(
+      () => true,
+      () => undefined,
+    );
+    expect(finish.isRanked.value).toBe(false);
+  });
 });
