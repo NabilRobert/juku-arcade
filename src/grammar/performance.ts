@@ -9,7 +9,7 @@
  * two, a polite chuckle; three or more, silence. Every TALES_PER_CHAPTER
  * tales, the chapter is shown together as a scroll.
  */
-import { rankFor } from '../components/ui/combo-ranks.ts';
+import { rankFor } from '../game/combo-ranks.ts';
 import type { StorytellerPose } from '../components/bunpou/stage-sprites.ts';
 import type { LineResult } from './bunpou-run.ts';
 
