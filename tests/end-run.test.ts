@@ -6,6 +6,7 @@ import { nextTick, ref } from 'vue';
 import EndRunButton from '../src/components/ui/EndRunButton.vue';
 import { useDeckFinish } from '../src/composables/useDeckFinish.ts';
 import { endedEarly, FRESH_DOJO } from '../src/dojo/dojo-run.ts';
+import { REST_QUOTES } from '../src/dojo/quotes.ts';
 import type { PlayedRound } from '../src/kanji/useKanjiRun.ts';
 import { useKanjiSheet } from '../src/kanji/useKanjiSheet.ts';
 
@@ -17,6 +18,10 @@ describe('the End run button', () => {
     const button = mount(EndRunButton, { attachTo: document.body });
     await button.find('[data-testid="end-run"]').trigger('click');
     expect(buttonIn('end-run-confirm')?.textContent).toContain('End this run?');
+    // A quote on resting, with who said it and where.
+    const shown = buttonIn('quote')?.textContent ?? '';
+    expect(REST_QUOTES.some((quote) => shown.includes(quote.text))).toBe(true);
+    expect(shown).toMatch(/― .+, .+/);
     expect(button.emitted('toggle')).toEqual([[true]]);
     expect(button.emitted('end')).toBeUndefined();
     button.unmount();

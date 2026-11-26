@@ -1,6 +1,8 @@
 /**
  * Quotes for the dojo's game-over screen (D62): a line on learning and
- * keeping at it, from a historic figure or a well-known character.
+ * keeping at it, from a historic figure or a well-known character. And
+ * quotes on resting, for End run's "End this run?" (REST_QUOTES): stopping
+ * for a while is fine (playtest decision, 2026-11-26).
  * Only quotes with a known source are here (a book, a letter, a film),
  * never the popular misattributions. Each is short, and the translations
  * are in plain English.
@@ -67,8 +69,38 @@ export const QUOTES: readonly Quote[] = [
   },
 ];
 
-export function pickQuote(random: RandomSource): Quote {
-  const quote = QUOTES[Math.floor(random() * QUOTES.length)] ?? QUOTES[0];
-  if (quote === undefined) throw new Error('quotes.ts has no quotes: add one to QUOTES.');
+export const REST_QUOTES: readonly Quote[] = [
+  {
+    text: "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day, listening to the murmur of the water, or watching the clouds float across the sky, is by no means a waste of time.",
+    by: 'John Lubbock',
+    source: 'The Use of Life (1894)',
+  },
+  {
+    text: 'Take rest; a field that has rested gives a bountiful crop.',
+    by: 'Ovid',
+    source: 'The Art of Love, book 2',
+  },
+  {
+    text: 'Almost everything will work again if you unplug it for a few minutes, including you.',
+    by: 'Anne Lamott',
+    source: '12 Truths I Learned from Life and Writing, TED (2017)',
+  },
+  {
+    text: 'Doing nothing often leads to the very best something.',
+    by: 'Winnie the Pooh',
+    source: 'Christopher Robin (2018)',
+  },
+  {
+    text: 'Fall seven times, stand up eight.',
+    by: 'Japanese proverb',
+    source: '七転び八起き',
+  },
+];
+
+/** One quote from the list (the game-over quotes unless another is given), picked at random. */
+export function pickQuote(random: RandomSource, from: readonly Quote[] = QUOTES): Quote {
+  const quote = from[Math.floor(random() * from.length)] ?? from[0];
+  if (quote === undefined)
+    throw new Error('This quote list is empty: add a quote to it in quotes.ts.');
   return quote;
 }
