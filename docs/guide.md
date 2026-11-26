@@ -696,6 +696,11 @@ fields. They stay in memory until slice 3 stores them.
 - **Change the stats page:** word numbers come from `memory/stats.ts`, grammar
   numbers from `memory/grammar-stats.ts` (its section is
   `components/GrammarStats.vue`); each list is a `ui/RankedList.vue`.
+- **Fold a start-screen panel:** the leaderboard and the streak each have a
+  `ui/FoldButton.vue`; whether each is folded is remembered in this browser
+  (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
+  length in sight, and on a wide screen the start screen drops to one
+  column, with the leaderboard as a bar across the top (`ModePicker.vue`).
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are

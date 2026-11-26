@@ -17,6 +17,7 @@ import { usePlayHistory } from '../composables/usePlayHistory.ts';
 import { boardBests, readBunpouBest } from '../leaderboard/leaderboard.ts';
 import { CURRICULUM } from '../grammar/curriculum.ts';
 import { kanjiPool } from '../kanji/kanji-round.ts';
+import { isLeaderboardFolded } from '../preferences/folded-panels.ts';
 import { grammarGoal, kanjiGoal, wordGoal, type LevelGoal } from '../memory/level-goals.ts';
 import LeaderboardPanel from './LeaderboardPanel.vue';
 import StreakPanel from './streak/StreakPanel.vue';
@@ -86,9 +87,14 @@ defineEmits<{ choose: [mode: GameMode] }>();
 </script>
 
 <template>
-  <!-- The leaderboard fills the left of the screen, the streak then the modes on the right; on a phone or a tablet they stack in that order, leaderboard on top. -->
+  <!-- The leaderboard fills the left of the screen, the streak then the modes on the right; on a phone or a tablet they stack in that order, leaderboard on top. Folded, the leaderboard is a bar across the top instead. -->
   <div
-    class="flex w-full flex-1 flex-col gap-6 lg:grid lg:grid-cols-[minmax(20rem,30%)_1fr] lg:gap-10"
+    class="flex w-full flex-1 flex-col gap-6 lg:grid lg:gap-10"
+    :class="
+      isLeaderboardFolded
+        ? 'lg:grid-cols-1 lg:content-start'
+        : 'lg:grid-cols-[minmax(20rem,30%)_1fr]'
+    "
   >
     <LeaderboardPanel :bests="bests" />
     <div class="flex flex-col justify-center gap-6">
