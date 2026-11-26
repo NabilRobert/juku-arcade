@@ -17,8 +17,9 @@ flowchart TD
     E --> H["public/decks/n5.json … n1.json"]
     H --> I["src/App.vue: loadDeck"]
     I --> M["ModePicker.vue: Words or Kanji"]
-    M -->|"Words"| J["GameScreen.vue → composables/useRun.ts"]
-    M -->|"Kanji"| N["KanjiScreen.vue → kanji/useKanjiRun.ts<br/>(the flow, part 2b)"]
+    M --> S["ModeScreen.vue: the chosen mode's screen"]
+    S -->|"Words"| J["GameScreen.vue → composables/useRun.ts"]
+    S -->|"Kanji"| N["KanjiScreen.vue → kanji/useKanjiRun.ts<br/>(the flow, part 2b)"]
     J --> K["src/game/run.ts: startRun → deal.ts: dealSet"]
     K --> L["GameHud.vue + GameBoard.vue → PlayCard.vue"]
 ```
@@ -39,8 +40,9 @@ flowchart TD
      `readings.ts: isIrregularReading`.
 5. **`scripts/build-decks.ts`** writes one JSON file per JLPT level to
    `public/decks/`. These files aren't committed.
-6. In the browser, **`src/App.vue: loadDeck`** fetches `decks/n5.json` and
-   mounts **`GameScreen.vue`**, which calls **`useRun`**.
+6. In the browser, **`src/App.vue: loadDeck`** fetches `decks/n5.json`.
+   Once a mode is picked, **`ModeScreen.vue`** mounts that mode's screen:
+   for Words, **`GameScreen.vue`**, which calls **`useRun`**.
 7. **`src/game/run.ts: startRun`** builds the first state. It calls
    **`deal.ts: dealSet`**, which picks 5 words that share no spelling and
    no valid reading, and one decoy of the error type shown least so far.
@@ -352,7 +354,7 @@ pinned OpenJLPT build.
 
 ## The flow, part 7b: Bunpou, the grammar mode on screen
 
-1. **`ModePicker.vue`** offers Bunpou as the third mode; **`App.vue`**
+1. **`ModePicker.vue`** offers Bunpou as the third mode; **`ModeScreen.vue`**
    shows **`components/bunpou/BunpouScreen.vue`**.
 2. **`src/grammar/useGrammarReviews.ts: useGrammarReviews`** rebuilds
    grammar memory from the grammar log (**`grammar-reviews.ts:
@@ -413,6 +415,41 @@ pinned OpenJLPT build.
 9. Pausing (the button or Esc) freezes the line's clock and turns the
    tiles face down where they lie, with the run's misses floating below. Play time counts toward the
    wellbeing nudges, as in kanji mode (`usePlayClock`).
+
+## The flow, part 8: every word on screen, in English or Indonesian
+
+```mermaid
+flowchart TD
+    A["main.ts: createApp(App).use(i18n)"] --> B["i18n/index.ts: createI18n<br/>locale = languages.ts: startingLanguage"]
+    B --> C["saved choice? else the browser's language? else English"]
+    D["SettingsPanel.vue: a language button"] --> E["i18n/index.ts: setLanguage"]
+    E --> F["locale changes, choice saved, html lang set"]
+    F --> G["every $t('area.key') re-renders<br/>from i18n/en/*.ts or i18n/id/*.ts"]
+```
+
+1. **`main.ts`** installs the translator, **`i18n/index.ts: i18n`**
+   (vue-i18n, D73). Its starting language comes from
+   **`i18n/languages.ts: startingLanguage`**: the choice saved in this
+   browser, else the browser's own language if it's one we have, else
+   English.
+2. A template asks for a word by key: `{{ $t('settings.title') }}`. The
+   key's first part is the area, which is a file: `settings` lives in
+   `i18n/en/settings.ts` and `i18n/id/settings.ts`. Numbers and names go
+   in as placeholders: `t('settings.classCode', { code })`.
+3. Plain modules don't translate when they load, because that would freeze
+   the language. They keep keys, or call **`translate`** when a component
+   renders: **`memory/play-log.ts: modeName`** is one.
+4. **`SettingsPanel.vue`** calls **`setLanguage`**. The locale changes,
+   the choice is saved (`PREFERENCE_KEYS.language`), and the page's `lang`
+   attribute follows, for screen readers. Every `$t` on screen re-renders
+   at once.
+5. Three checks keep it whole:
+   - `typecheck` fails if an Indonesian file misses a key, because
+     `id/*.ts` is typed as the English shape (`Messages`);
+   - `tests/i18n-messages.test.ts` fails on a key that doesn't exist, or a
+     translation that drops a `{placeholder}`;
+   - ESLint's `vue/no-bare-strings-in-template` fails on English typed
+     straight into a template.
 
 ## The look and wellbeing
 
@@ -544,6 +581,10 @@ fields. They stay in memory until slice 3 stores them.
 
 | Term | Meaning | Where |
 |---|---|---|
+| **Message file** | One part of the game's interface words, in one language: `en/game.ts` and its Indonesian twin `id/game.ts`. English is the source; the Indonesian file must have the same keys (D73) | `src/i18n/en/`, `src/i18n/id/` |
+| **Message key** | The name a template uses for a word or sentence: `game.pause` means the `pause` entry of the `game` file | `$t('…')`, `t('…')`, `translate('…')` |
+| **Placeholder** | A `{name}` in a message, filled in when it shows: `'{count} left'`. A translation must keep every one | `tests/i18n-messages.test.ts` |
+| **Interface language** | English or Indonesian, chosen in Settings, first guessed from the browser. The Japanese being learned never changes with it | `src/i18n/languages.ts`, `src/i18n/index.ts: setLanguage` |
 | **Reading** | How a word is pronounced, written in kana: 学校 → がっこう | `DeckWord.reading` |
 | **On-yomi / kun-yomi** | A kanji's Chinese-derived readings (ガク, shown in katakana) and native Japanese readings (まな.ぶ) | `KanjiReadings` in `readings.ts` |
 | **Okurigana** | Kana written after a kanji as part of the word: the ぶ in 学ぶ. KANJIDIC2 marks it with a dot: まな.ぶ | `kunyomiForms` |
@@ -837,5 +878,16 @@ fields. They stay in memory until slice 3 stores them.
   in `src/grammar/templates.ts`); whether it starts on is
   the `storedFlag` fallback in `src/preferences/hints.ts`. Furigana's
   switch is `src/preferences/furigana.ts`, read by `FuriganaText.vue`.
+- **Change a word on screen:** find its key in the template (`$t('game.pause')`)
+  and edit that entry in `src/i18n/en/game.ts` and `src/i18n/id/game.ts`.
+  Both files must change together.
+- **Add text to a screen:** add a key to the area's English file, the same
+  key to its Indonesian file (`typecheck` complains until you do), then use
+  `$t('area.key')` in the template. Typing the words straight into the
+  template fails the lint.
+- **Add a language:** add its code and name to `LANGUAGES` and
+  `LANGUAGE_NAMES` in `src/i18n/languages.ts`, copy `src/i18n/id/` to a new
+  folder and translate it, then register it in `messages` in
+  `src/i18n/index.ts`. The Settings switch lists it by itself.
 - **Change how cards look:** edit `src/components/PlayCard.vue`. Every card
   is one.
