@@ -31,6 +31,8 @@ import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
 import DailyBar from '../words/DailyBar.vue';
+import FloatingPause from '../ui/FloatingPause.vue';
+import SidePanel from '../ui/SidePanel.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
@@ -144,8 +146,8 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-3" aria-label="Bunpou run">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Bunpou run">
       <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
         :daily="reviews.progress.value.daily"
@@ -182,7 +184,14 @@ function dismiss(isStopping: boolean): void {
         Tap a tile to fill the next box, or drag it onto any box. Drag a placed tile to move it, or
         tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
-    </aside>
+    </SidePanel>
+    <FloatingPause
+      v-if="!isEnded"
+      :is-paused="isPaused()"
+      :is-disabled="run.phase !== 'building'"
+      @pause="game.pause"
+      @resume="game.resume"
+    />
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <CurtainCall
         v-if="runEnd.step.value === 'curtain' && runEnd.pick.value"

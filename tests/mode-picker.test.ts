@@ -33,8 +33,12 @@ describe('the start screen', () => {
     expect(goals[2]).toContain('0 / 20');
   });
 
-  it('puts the streak above the modes', () => {
+  it('puts the leaderboard first, then the streak, then the modes', () => {
     const html = mount(ModePicker, { props: { deck } }).html();
+    expect(html.indexOf('aria-label="Leaderboard"')).toBeLessThan(
+      html.indexOf('aria-label="Streak"'),
+    );
     expect(html.indexOf('aria-label="Streak"')).toBeLessThan(html.indexOf('Choose a mode'));
+    expect(html).not.toContain('order-last');
   });
 });

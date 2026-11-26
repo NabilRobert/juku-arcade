@@ -33,34 +33,10 @@ export type Shelf = 'S' | 'D' | 'T' | 'P';
 /** Each shelf as the part of the tale it is: 起承転結. */
 export const SHELF_NAMES: Readonly<Record<Shelf, string>> = { S: '起', D: '承', T: '転', P: '結' };
 
-/**
- * Every grammar point with templates, in the order they're taught: a new
- * player's first points are the first ones here (grammar-reviews.ts).
- * The ids are OpenJLPT's, as in the shelf map.
- */
-export const CURRICULUM = [
-  'wa',
-  'o',
-  'ni-time',
-  'de-place',
-  'mo',
-  'made',
-  'to-with',
-  'kara-from',
-  'ga-subject',
-  'ga-aru-ga-iru',
-  'ni-destination',
-  'te-iru',
-  'te',
-  'te-kara',
-  'ga-but',
-  'kara-reason',
-  'nani-mo-nai-dare-mo-nai',
-  'te-kudasai',
-  'masen-ka',
-  'yo',
-] as const;
-export type PointId = (typeof CURRICULUM)[number];
+// The curriculum lives in its own small module, so the start screen can count the
+// level's grammar without loading every template.
+export { CURRICULUM, type PointId } from './curriculum.ts';
+import type { PointId } from './curriculum.ts';
 
 /**
  * Points whose tested grammar is a pattern rather than a particle after

@@ -55,7 +55,7 @@ const crowdLayers = computed(() =>
 
 <template>
   <section
-    class="pixel-panel relative h-66 overflow-hidden border-9 border-cedar bg-wood/90"
+    class="pixel-panel relative h-44 overflow-hidden border-9 border-cedar bg-wood/90 sm:h-66"
     aria-label="The stage"
     data-testid="stage"
     :data-pose="pose"
@@ -65,15 +65,16 @@ const crowdLayers = computed(() =>
       aria-hidden="true"
     />
     <div
-      class="absolute bottom-22 left-1/2 h-10 w-80 -translate-x-1/2 rounded-[50%] bg-lamp/25"
+      class="absolute bottom-10 left-1/2 h-8 w-56 -translate-x-1/2 rounded-[50%] bg-lamp/25 sm:bottom-22 sm:h-10 sm:w-80"
       aria-hidden="true"
     />
-    <div class="absolute bottom-24 left-1/2 -translate-x-1/2">
+    <!-- On a phone the stage is shorter, so the storyteller sits lower and smaller, head in view. -->
+    <div class="absolute bottom-12 left-1/2 -translate-x-1/2 sm:bottom-24">
       <PixelSprite
         :grid="STORYTELLER[pose]"
         :palette="STAGE_PALETTE"
         :name="`storyteller-${pose}`"
-        class="h-32"
+        class="h-24 sm:h-32"
         :class="pose === 'trip' ? 'rotate-6 motion-safe:animate-shake' : ''"
       />
       <div

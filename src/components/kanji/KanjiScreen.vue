@@ -22,6 +22,7 @@ import type { Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
+import SidePanel from '../ui/SidePanel.vue';
 import RunResults from '../ui/RunResults.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
@@ -75,8 +76,8 @@ function dismiss(isStopping: boolean): void {
 </script>
 
 <template>
-  <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
-    <aside class="sticky top-6 flex flex-col gap-3" aria-label="Kanji run">
+  <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
+    <SidePanel label="Kanji run">
       <ModeHeader :title="`Kanji mode · ${deck.level}`">
         <p class="text-sm text-washi/70" data-testid="sheet-progress">
           Kanji {{ kanjiNumber }} / {{ KANJI_PER_SHEET }}
@@ -103,7 +104,7 @@ function dismiss(isStopping: boolean): void {
         Pick every reading of the kanji, then press Play. You can make 3 wrong picks per kanji.
         Practice only: it doesn't change your reviews.
       </p>
-    </aside>
+    </SidePanel>
     <div class="flex flex-col gap-5">
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
         <RunResults

@@ -23,7 +23,7 @@ import PlayCard from '../cards/PlayCard.vue';
 import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
 import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 
-/** Eight cards overlap more than word mode's six, to fit the same width. */
+/** Eight cards overlap more than word mode's six, to fit the same width (on a phone they're a grid instead). */
 const HAND_OVERLAP = '-4dvh';
 
 const props = withDefaults(
@@ -83,7 +83,10 @@ watch(
 
 <template>
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
-    <div class="flex flex-col items-center gap-2 [--card-height:34dvh]" data-testid="kanji-row">
+    <div
+      class="flex flex-col items-center gap-2 [--card-height:min(24dvh,45vw)] sm:[--card-height:min(20dvh,24vw)] lg:[--card-height:34dvh]"
+      data-testid="kanji-row"
+    >
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
         <div class="animate-float motion-reduce:animate-none" :style="floatStyle('word', 0)">
           <!-- Its own layer: the float's CSS animation would override a jolt on the same element. -->
@@ -132,8 +135,12 @@ watch(
         Play ▶
       </PixelButton>
     </div>
-    <div class="flex items-start gap-4 pt-4">
-      <div class="flex flex-1 justify-center [--card-height:20dvh]" data-testid="reading-row">
+    <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
+    <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
+      <div
+        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16dvh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        data-testid="reading-row"
+      >
         <div
           v-for="(card, index) in round.cards"
           :key="index"
@@ -165,7 +172,7 @@ watch(
       </div>
       <div
         :ref="table.registerDeck"
-        class="w-[calc(var(--card-height)*0.75)] [--card-height:20dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20dvh,8vw)] lg:block lg:[--card-height:20dvh]"
       >
         <CardDeck />
       </div>

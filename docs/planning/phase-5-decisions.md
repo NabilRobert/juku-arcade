@@ -1170,3 +1170,57 @@ From playtesting: "make another mode that has a game over".
   played); a speed-up with no floor (unfair to slow readers); new
   question screens of its own (the other modes' boards look and feel the
   same).
+
+### D63: The game fits a phone (2026-11-26)
+
+The game was laptop-only (D30). From playtesting, and since the school's
+students may play on phones, it now fits a phone-width screen too, with
+desktop unchanged.
+
+- **Below the lg breakpoint:** the start screen stacks (leaderboard,
+  streak, modes); each mode's board fills the screen and its side panel is
+  a drawer folded away to the left, slid open or closed by a tab on its
+  edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
+  tablets; word mode's set timer also shows above its cards, and the
+  pause button sits fixed at the top right (`ui/FloatingPause.vue`).
+- **Cards and tiles:** card rows cap their height by the window's width
+  as well as its height. On a phone the hand is a grid of cards side by
+  side, not an overlapping fan (kanji mode 4 by 2, word mode 3 by 2, on
+  tablets too, with bigger cards), so
+  each reading is big enough to read and tap (playtest: the fan was hard
+  to read and too small to tap). Bunpou's tiles shrink with their text. The calendar shows 12
+  weeks.
+- **One screen, no scrolling during play:** on phones and tablets each
+  board's cards are capped by the screen's height too, so the cards you
+  play fit on one screen (checked at 375×812, 375×667 and 768×1024);
+  Bunpou's stage is shorter on a phone. On phones and tablets the deck is
+  gone and each card slides up from under the screen; desktop keeps it. Card
+  text always stays on one line, shrinking to fit.
+- **Not yet checked on a real phone:** touch drags (throwing a card) work
+  in a phone emulator, but a playtest on a real device is still to come.
+- **Beat:** a separate phone app (more to keep in step); hiding modes on a
+  phone (every mode fits).
+
+### D64: A light first load, other screens on demand (2026-11-26)
+
+From playtesting: "since it's a game the components need to be light and
+load fast". Measured on the local build: the game's code was one 535 KB
+file (181 KB compressed), parsed before the start screen showed.
+
+- **Screens on demand** (`lazy-screens.ts`): kanji mode, Bunpou (with its
+  templates and stage), the dojo, and the stats, settings, research and
+  about pages are their own chunks. The first load is the start screen and
+  word mode: 385 KB of code (130 KB compressed) plus the shared animation
+  library (28 KB compressed).
+- **Prefetched when idle:** once the start screen is up, the other chunks
+  are fetched while the browser is free, so opening a mode stays instant:
+  measured at 13–83 ms from the tap to the first card, and 11–25 ms back
+  to the start screen.
+- **The curriculum stands alone** (`grammar/curriculum.ts`), so the start
+  screen counts the level's grammar without loading every template.
+- **Already light:** the music streams on the first tap; the Japanese font
+  comes in about 120 small pieces, of which a page loads only the ones its
+  characters need; built files are cached for a year (`public/_headers`).
+- **Beat:** splitting word mode too (the most played mode; it would only
+  add a fetch to its first tap); a service worker for offline play (more
+  to keep in step than the gain for now).

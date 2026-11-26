@@ -675,6 +675,15 @@ fields. They stay in memory until slice 3 stores them.
   the game-over quotes are `QUOTES` in `dojo/quotes.ts`.
 - **Change a leaderboard:** the sample players and how your bests are
   worked out are in `leaderboard/leaderboard.ts`.
+- **Change the phone layout:** below Tailwind's `lg` breakpoint each
+  mode's side panel is a drawer that slides in from the left
+  (`ui/SidePanel.vue`), the pause button floats at the top right
+  (`ui/FloatingPause.vue`), and cards deal up from under the screen
+  (`composables/useDeal.ts: belowScreen`); card sizes there are
+  the `min(…dvh, …vw)` values on each card row in `words/GameBoard.vue`
+  and `kanji/KanjiBoard.vue`.
+- **Add a screen:** if it isn't needed on the start screen, add it to
+  `lazy-screens.ts` so it loads on demand (and is prefetched when idle).
 - **Change the streak:** what counts as a day played is `playedDays` in
   `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
   the rest day is in `memory/streak.ts`; the reminders and milestones are

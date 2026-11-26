@@ -6,7 +6,7 @@
  */
 import { m } from 'motion-v';
 import { computed } from 'vue';
-import { secondsLeft, type RunState } from '../../game/run.ts';
+import { timeShareLeft, type RunState } from '../../game/run.ts';
 import { MAX_LEVEL } from '../../game/tuning.ts';
 import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
@@ -16,9 +16,7 @@ const props = defineProps<{ state: RunState; nowMs: number }>();
 defineEmits<{ pause: []; resume: [] }>();
 
 const isPaused = computed(() => props.state.pausedAtMs !== null);
-const timeShare = computed(
-  () => secondsLeft(props.state, props.nowMs) / (props.state.setDurationMs / 1000),
-);
+const timeShare = computed(() => timeShareLeft(props.state, props.nowMs));
 const isTimeLow = computed(() => timeShare.value < 0.25);
 </script>
 
@@ -63,7 +61,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
     </div>
     <PixelButton
       :colour="isPaused ? 'crimson' : 'steel'"
-      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50"
+      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50 max-lg:hidden"
       :disabled="state.phase !== 'playing'"
       :aria-pressed="isPaused"
       @click="isPaused ? $emit('resume') : $emit('pause')"
