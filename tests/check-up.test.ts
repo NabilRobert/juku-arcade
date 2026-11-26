@@ -10,7 +10,9 @@ import {
 } from '../src/memory/check-up.ts';
 import { poolForNextSet } from '../src/memory/daily-deck.ts';
 import { buildExport, exportFileName } from '../src/memory/export.ts';
-import { deriveMemory } from '../src/memory/word-memory.ts';
+import { deriveMemory, isWordKnown } from '../src/memory/word-memory.ts';
+import { wordGoal } from '../src/memory/level-goals.ts';
+import { createLocalEngine } from '../src/memory/review-engine.ts';
 import { answer } from './helpers/events.ts';
 import { sentence } from './helpers/grammar-events.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
@@ -76,6 +78,23 @@ describe('check-up history', () => {
       checked('w0', NEXT_DAY, 'after', false),
     ]);
     expect(memory.words.has('w0')).toBe(false);
+  });
+});
+
+describe('a head start from the check-up', () => {
+  it('counts a word right in its check-up before play as known, but not a wrong or later one', () => {
+    const memory = deriveMemory([
+      checked('w0', DAY, 'before'),
+      checked('w1', DAY, 'before', false),
+      checked('w2', NEXT_DAY, 'after'),
+    ]);
+    expect(['w0', 'w1', 'w2'].map((id) => isWordKnown(memory, id))).toEqual([true, false, false]);
+  });
+
+  it('adds those words to the level goal and to the words known in play', () => {
+    const events = [checked('w0', DAY, 'before'), checked('w1', DAY, 'before')];
+    expect(wordGoal(DECK, events).done).toBe(2);
+    expect(createLocalEngine(DECK, events).getProgress(NEXT_DAY).wordsKnown).toBe(2);
   });
 });
 

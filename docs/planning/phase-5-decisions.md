@@ -1242,3 +1242,22 @@ file (181 KB compressed), parsed before the start screen showed.
   stats page and the export already show grammar.
 - **Beat:** grammar in the check-up, before and after only; the full
   design with hold-backs.
+
+### D66: Results against the best, a head start, and a fair word board (2026-11-26)
+
+Three things the research page claimed, or the boards needed, that the
+game didn't yet do:
+
+- **How close a run came** (the near-miss effect, Clark et al. 2009): the
+  results card says "New best! Up from 20.", "That ties your best" or
+  "3 away from your best (20).", on practice mode, kanji mode's sheet and
+  word mode's deck (`memory/best-comparison.ts`,
+  `composables/usePreviousBest.ts`).
+- **A head start** (the endowed-progress effect, Nunes & Drèze 2006):
+  words answered right in their check-up before first play count as known,
+  on the start screen's goal and in word mode alike
+  (`word-memory.ts: isWordKnown`). Display only: the review schedule still
+  ignores check-ups (C4).
+- **A fair word board:** a word run counts toward the best and the board
+  only until today's deck is cleared, the pot banked at that moment
+  included (`useDeckFinish.isRanked`); practice after it doesn't count.

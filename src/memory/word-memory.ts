@@ -28,10 +28,27 @@ export interface Memory {
   checkUps: Map<string, CheckRecord>;
   /** Local days with at least one answer. */
   daysPlayed: Set<string>;
+  /**
+   * Words answered right in their check-up before they were ever played:
+   * the player knew them already, so they count as known from the start
+   * (the endowed-progress effect, Nunes & Drèze 2006). Display only: the
+   * review schedule still ignores check-ups (C4).
+   */
+  knownAtCheckUp: Set<string>;
 }
 
 export function emptyMemory(): Memory {
-  return { words: new Map(), checkUps: new Map(), daysPlayed: new Set() };
+  return {
+    words: new Map(),
+    checkUps: new Map(),
+    daysPlayed: new Set(),
+    knownAtCheckUp: new Set(),
+  };
+}
+
+/** Known through play (right on two separate days) or known before play, in the check-up. */
+export function isWordKnown(memory: Memory, wordId: string): boolean {
+  return memory.words.get(wordId)?.isKnown === true || memory.knownAtCheckUp.has(wordId);
 }
 
 /** The local date of an event: its `at` is local time with an offset, so the first 10 characters. */
@@ -78,6 +95,8 @@ export function recordAnswer(
 /** Applies one event to the memory, in place. Events must come in time order. */
 export function applyEvent(memory: Memory, event: GameEvent): void {
   applyCheckUp(memory.checkUps, event);
+  const isKnownBeforePlay = event.kind === 'check_up_right' && event.check_up_role === 'before';
+  if (isKnownBeforePlay && event.word_id !== null) memory.knownAtCheckUp.add(event.word_id);
   const isCorrect = answerOf(event);
   if (isCorrect === null || event.word_id === null) return;
   memory.words.set(
