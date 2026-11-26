@@ -8,4 +8,9 @@ interface ImportMetaEnv {
    * any public build.
    */
   readonly VITE_TABLE_IMAGE?: string;
+  /**
+   * '1' shows placeholder play in the streak and calendar (sample-play.ts),
+   * for a local copy only; unset in any public build.
+   */
+  readonly VITE_SAMPLE_PLAY?: string;
 }
