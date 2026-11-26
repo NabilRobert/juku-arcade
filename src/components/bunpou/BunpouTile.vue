@@ -49,13 +49,14 @@ onMounted(() => {
  * a longer phrase gets a smaller font to fit. The steps are by how many
  * characters the tile reads, without its furigana.
  */
+// A step smaller on a phone-width screen, where the tile is narrower.
 const TEXT_SIZES: readonly { upTo: number; size: string }[] = [
-  { upTo: 3, size: 'text-4xl' },
-  { upTo: 4, size: 'text-3xl' },
-  { upTo: 6, size: 'text-2xl' },
-  { upTo: 8, size: 'text-xl' },
+  { upTo: 3, size: 'text-3xl sm:text-4xl' },
+  { upTo: 4, size: 'text-2xl sm:text-3xl' },
+  { upTo: 6, size: 'text-xl sm:text-2xl' },
+  { upTo: 8, size: 'text-lg sm:text-xl' },
 ];
-const SMALLEST_TEXT = 'text-base';
+const SMALLEST_TEXT = 'text-sm sm:text-base';
 const textSize = computed(() => {
   const length = parseFurigana(props.marked).reduce((total, piece) => total + piece.text.length, 0);
   return TEXT_SIZES.find((step) => length <= step.upTo)?.size ?? SMALLEST_TEXT;
@@ -98,7 +99,7 @@ function onRelease(info: PanInfo): void {
   >
     <button
       type="button"
-      class="pixel-button flex h-24 w-48 items-center justify-center px-2 text-sumi"
+      class="pixel-button flex h-16 w-38 items-center justify-center px-2 text-sumi sm:h-24 sm:w-48"
       :class="[faceClass, textSize]"
       :data-wrong="isWrong === true ? '' : undefined"
       :disabled="isFaceDown"

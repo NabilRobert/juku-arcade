@@ -199,7 +199,7 @@ onMounted(async () => {
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
       <TableBackground />
-      <main class="flex min-h-dvh flex-col gap-4 px-8 py-4">
+      <main class="flex min-h-dvh flex-col gap-4 px-4 py-4 sm:px-8">
         <h1
           class="flex items-center justify-center gap-3 text-2xl font-bold tracking-wide text-aqua"
         >

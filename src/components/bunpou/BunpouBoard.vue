@@ -135,7 +135,7 @@ function dropAt(tile: string, point: Point): void {
 
     <div
       ref="strip"
-      class="pixel-panel flex min-h-32 flex-wrap items-center justify-center gap-2 bg-wood/80 p-4"
+      class="pixel-panel flex min-h-32 flex-wrap items-center justify-center gap-2 bg-wood/80 p-2 sm:p-4"
       data-testid="strip"
     >
       <SentenceFix v-if="judged && !judged.isRight" :result="judged" />
@@ -143,7 +143,7 @@ function dropAt(tile: string, point: Point): void {
         <div
           v-for="(tile, index) in run.boxes"
           :key="index"
-          class="flex h-24 w-48 items-center justify-center outline-2 -outline-offset-2"
+          class="flex h-16 w-38 items-center justify-center outline-2 -outline-offset-2 sm:h-24 sm:w-48"
           :class="tile === null ? 'outline-washi/30 outline-dashed' : 'outline-transparent'"
           data-box
         >
@@ -178,7 +178,7 @@ function dropAt(tile: string, point: Point): void {
         Paused. The tiles stay face down until you resume.
       </p>
     </div>
-    <div class="flex min-h-24 flex-wrap justify-center gap-4" data-testid="offered">
+    <div class="flex min-h-24 flex-wrap justify-center gap-2 sm:gap-4" data-testid="offered">
       <BunpouTile
         v-for="(tile, index) in unplaced"
         :key="`${run.lineIndex}-${tile}`"

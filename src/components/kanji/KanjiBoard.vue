@@ -23,8 +23,12 @@ import PlayCard from '../cards/PlayCard.vue';
 import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
 import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 
-/** Eight cards overlap more than word mode's six, to fit the same width. */
-const HAND_OVERLAP = '-4dvh';
+/**
+ * Eight cards overlap more than word mode's six, to fit the same width. On
+ * a phone-width screen they overlap less (5vw is the smaller), so each
+ * reading still shows.
+ */
+const HAND_OVERLAP = 'max(-4dvh, -5vw)';
 
 const props = withDefaults(
   defineProps<{
@@ -83,7 +87,10 @@ watch(
 
 <template>
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
-    <div class="flex flex-col items-center gap-2 [--card-height:34dvh]" data-testid="kanji-row">
+    <div
+      class="flex flex-col items-center gap-2 [--card-height:min(34dvh,45vw)] lg:[--card-height:34dvh]"
+      data-testid="kanji-row"
+    >
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
         <div class="animate-float motion-reduce:animate-none" :style="floatStyle('word', 0)">
           <!-- Its own layer: the float's CSS animation would override a jolt on the same element. -->
@@ -132,8 +139,11 @@ watch(
         Play ▶
       </PixelButton>
     </div>
-    <div class="flex items-start gap-4 pt-4">
-      <div class="flex flex-1 justify-center [--card-height:20dvh]" data-testid="reading-row">
+    <div class="flex items-start gap-2 pt-4 sm:gap-4">
+      <div
+        class="flex flex-1 justify-center [--card-height:min(20dvh,19vw)] lg:[--card-height:20dvh]"
+        data-testid="reading-row"
+      >
         <div
           v-for="(card, index) in round.cards"
           :key="index"
@@ -165,7 +175,7 @@ watch(
       </div>
       <div
         :ref="table.registerDeck"
-        class="w-[calc(var(--card-height)*0.75)] [--card-height:20dvh]"
+        class="w-[calc(var(--card-height)*0.75)] [--card-height:min(20dvh,8vw)] lg:[--card-height:20dvh]"
       >
         <CardDeck />
       </div>

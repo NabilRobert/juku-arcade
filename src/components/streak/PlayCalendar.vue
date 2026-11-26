@@ -21,6 +21,13 @@ defineEmits<{ select: [day: string] }>();
 // Lamp yellow, the flame's colour, reads better than aqua on the panel's blue.
 const SHADES = ['bg-lacquer', 'bg-lamp/30', 'bg-lamp/55', 'bg-lamp/80', 'bg-lamp'] as const;
 const WEEKDAYS = ['Mon', '', 'Wed', '', 'Fri', '', ''] as const;
+/** Weeks a phone-width screen shows (the latest); wider screens show them all. */
+const PHONE_WEEKS = 12;
+
+/** The oldest weeks hide on a phone-width screen, so the grid fits beside nothing. */
+function weekClass(index: number): string {
+  return index < props.weeks.length - PHONE_WEEKS ? 'hidden sm:flex' : 'flex';
+}
 const MONTH_FORMAT = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 
 /** A month's name above the week its first day falls in. */
@@ -53,7 +60,12 @@ function cellLabel(day: CalendarDay): string {
           weekday
         }}</span>
       </div>
-      <div v-for="(week, index) in weeks" :key="week[0]?.day" class="flex flex-col gap-1">
+      <div
+        v-for="(week, index) in weeks"
+        :key="week[0]?.day"
+        class="flex-col gap-1"
+        :class="weekClass(index)"
+      >
         <span class="h-4 w-5 overflow-visible whitespace-nowrap">{{ monthLabels[index] }}</span>
         <template v-for="day in week" :key="day.day">
           <span v-if="day.isFuture" class="size-5" />

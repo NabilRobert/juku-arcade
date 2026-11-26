@@ -19,7 +19,8 @@
  * card floats, bobbing and swaying out of step with its neighbours, so the
  * table never looks frozen. Each row
  * sets its cards' height as a share of the window's height
- * (--card-height), so the board fits the window.
+ * (--card-height), so the board fits the window; below the lg breakpoint
+ * it's also capped by the window's width, so a phone's cards fit across.
  *
  * Between the words and the hand sit the combo (ComboMeter) and the Play
  * button. Behind the cards a glow warms as the combo builds, and the table
@@ -130,12 +131,15 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
 <template>
   <section ref="tableElement" class="relative flex flex-col gap-y-3" aria-label="Board">
     <div
-      class="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem] bg-[radial-gradient(ellipse_at_50%_50%,rgb(168_218_220/0.3),rgb(155_27_48/0.2)_45%,transparent_72%)] transition-opacity duration-500 ease-[ease-out]"
+      class="pointer-events-none absolute -inset-2 -z-10 rounded-[3rem] lg:-inset-8 bg-[radial-gradient(ellipse_at_50%_50%,rgb(168_218_220/0.3),rgb(155_27_48/0.2)_45%,transparent_72%)] transition-opacity duration-500 ease-[ease-out]"
       :class="{ 'animate-glow motion-reduce:animate-none': heat >= 1 }"
       :style="{ opacity: heat }"
       aria-hidden="true"
     />
-    <div class="grid grid-cols-5 gap-x-10 [--card-height:32dvh]" data-testid="word-row">
+    <div
+      class="grid grid-cols-5 gap-x-2 [--card-height:min(32dvh,22vw)] lg:[--card-height:32dvh] sm:gap-x-10"
+      data-testid="word-row"
+    >
       <div
         v-for="(word, position) in state.set.words"
         :key="position"
@@ -188,7 +192,7 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
       </div>
       <p
         v-if="state.pausedAtMs !== null"
-        class="pixel-panel absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-wood/90 px-4 py-2 text-sm whitespace-nowrap text-aqua"
+        class="pixel-panel absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-wood/90 px-4 py-2 text-center text-sm text-aqua max-lg:w-[90vw] lg:whitespace-nowrap"
         role="status"
         data-testid="pause-hint"
       >
@@ -204,8 +208,11 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
         Play ▶
       </PixelButton>
     </div>
-    <div class="flex items-start gap-4 pt-4">
-      <div class="flex flex-1 justify-center [--card-height:24dvh]" data-testid="reading-row">
+    <div class="flex items-start gap-2 pt-4 sm:gap-4">
+      <div
+        class="flex flex-1 justify-center [--card-height:min(24dvh,24vw)] lg:[--card-height:24dvh]"
+        data-testid="reading-row"
+      >
         <div
           v-for="(card, index) in state.set.readings"
           :key="index"
@@ -238,7 +245,10 @@ function onRelease(readingIndex: number, point: Point, velocity: Point): void {
           </div>
         </div>
       </div>
-      <div :ref="registerDeck" class="w-[calc(var(--card-height)*0.75)] [--card-height:22dvh]">
+      <div
+        :ref="registerDeck"
+        class="w-[calc(var(--card-height)*0.75)] [--card-height:min(22dvh,14vw)] lg:[--card-height:22dvh]"
+      >
         <CardDeck />
       </div>
     </div>
