@@ -36,12 +36,17 @@ async function isPhoneLandscapeNow(): Promise<boolean> {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('a phone turned sideways', () => {
-  it('is a touch screen in landscape, at most 500 px tall', async () => {
+  it('is a landscape screen at most 500 px tall, touch-driven or phone-wide', async () => {
     const asked = stubMatchMedia(() => true);
     expect(await isPhoneLandscapeNow()).toBe(true);
-    expect(asked[0]).toContain('orientation: landscape');
-    expect(asked[0]).toContain('max-height: 500px');
-    expect(asked[0]).toContain('pointer: coarse');
+    const [touch, narrow] = (asked[0] ?? '').split(', ');
+    for (const branch of [touch, narrow]) {
+      expect(branch).toContain('orientation: landscape');
+      expect(branch).toContain('max-height: 500px');
+    }
+    expect(touch).toContain('pointer: coarse');
+    // A browser's phone preview reports a mouse, so a phone's width counts too.
+    expect(narrow).toContain('max-width: 1000px');
   });
 
   it("isn't a tablet or a desktop window, which don't match the query", async () => {

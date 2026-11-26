@@ -3,6 +3,11 @@
  * resized or turned (useIsWide.ts, usePhoneLandscape.ts). Plain matchMedia:
  * a library would be heavier than these few lines. Reads `fallback` until
  * the component is on the page.
+ *
+ * It listens for the query's own change event and also re-checks on every
+ * resize: a browser's device emulation can resize the page without firing
+ * the change event, which left the rotate notice up after the "phone" was
+ * turned back.
  */
 import { onMounted, onUnmounted, ref, type Ref } from 'vue';
 
@@ -16,7 +21,11 @@ export function useMediaQuery(query: string, fallback: boolean): Readonly<Ref<bo
     list = window.matchMedia(query);
     update();
     list.addEventListener('change', update);
+    window.addEventListener('resize', update);
   });
-  onUnmounted(() => list?.removeEventListener('change', update));
+  onUnmounted(() => {
+    list?.removeEventListener('change', update);
+    window.removeEventListener('resize', update);
+  });
   return matches;
 }
