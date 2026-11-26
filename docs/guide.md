@@ -713,7 +713,10 @@ fields. They stay in memory until slice 3 stores them.
 - **Change the review schedule:** edit `memory/leitner.ts`. Specs:
   `tests/memory.test.ts`.
 - **Add a source to the research page:** add it to `SOURCE_GROUPS` in
-  `research/sources.ts`, with what it found and where the game uses it.
+  `research/sources.ts` (its DOI and a free copy), then its claim, summary
+  paragraph, place in the paper and use in the game to
+  `i18n/en/pages/research.ts` and `i18n/id/pages/research.ts`. Keep it in
+  step with the client quote's section 2f, which cites the same 8.
 - **Change a finish line or a level goal:** the kanji sheet's size is
   `KANJI_PER_SHEET` in `kanji/useKanjiSheet.ts`; a Bunpou show's length is
   `TALES_PER_CHAPTER` in `grammar/performance.ts`; the goals, their stamps

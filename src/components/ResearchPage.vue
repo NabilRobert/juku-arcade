@@ -1,22 +1,19 @@
 <script setup lang="ts">
 /**
- * "The research": the papers and books the game's design rests on
- * (research/sources.ts), grouped by what they support, each with what it
- * found and where the game uses it. Opened from the footer, like "About
+ * "The research": the studies the game's design rests on
+ * (research/sources.ts), grouped by what they support, each with the
+ * claim, a paragraph on what the study did and found, where in the paper
+ * that is (with a free copy to check it), and where the game uses it. Opened from the footer, like "About
  * the data".
  */
 import { useI18n } from 'vue-i18n';
-import { SOURCE_GROUPS, type Source } from '../research/sources.ts';
+import { SOURCE_GROUPS } from '../research/sources.ts';
 import BackButton from './ui/BackButton.vue';
 
 defineEmits<{ close: [] }>();
 const { t } = useI18n();
 
 // Keys built from the ids are checked in tests/i18n-pages.test.ts, in both languages.
-function venueOf(source: Source): string {
-  if (source.venueNote === undefined) return source.venue;
-  return t(`pages.research.venueNotes.${source.venueNote}`, { venue: source.venue });
-}
 </script>
 
 <template>
@@ -34,18 +31,21 @@ function venueOf(source: Source): string {
         data-testid="source"
       >
         <p class="font-semibold">
-          <a
-            v-if="source.url"
-            class="underline"
-            :href="source.url"
-            target="_blank"
-            rel="noopener"
-            >{{ source.citation }}</a
-          >
-          <template v-else>{{ source.citation }}</template>
+          <a class="underline" :href="source.url" target="_blank" rel="noopener">{{
+            source.citation
+          }}</a>
         </p>
-        <p class="text-xs text-washi/60">{{ venueOf(source) }}</p>
+        <p class="text-xs text-washi/60">{{ source.venue }}</p>
         <p>{{ t(`pages.research.sources.${source.id}.finding`) }}</p>
+        <p class="text-sm text-washi/80" data-testid="source-summary">
+          {{ t(`pages.research.sources.${source.id}.summary`) }}
+        </p>
+        <p class="text-xs text-washi/60" data-testid="source-where">
+          {{ t('pages.research.where', { where: t(`pages.research.sources.${source.id}.where`) }) }}
+          <a class="underline" :href="source.freeCopyUrl" target="_blank" rel="noopener">{{
+            t('pages.research.freeCopy')
+          }}</a>
+        </p>
         <p class="text-sm text-lamp">
           {{ t('pages.research.inGame', { use: t(`pages.research.sources.${source.id}.inGame`) }) }}
         </p>
