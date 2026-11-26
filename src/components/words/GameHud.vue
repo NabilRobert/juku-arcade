@@ -61,7 +61,7 @@ const isTimeLow = computed(() => timeShare.value < 0.25);
     </div>
     <PixelButton
       :colour="isPaused ? 'crimson' : 'steel'"
-      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50"
+      class="min-h-11 px-4 text-sm font-semibold disabled:opacity-50 max-lg:hidden"
       :disabled="state.phase !== 'playing'"
       :aria-pressed="isPaused"
       @click="isPaused ? $emit('resume') : $emit('pause')"

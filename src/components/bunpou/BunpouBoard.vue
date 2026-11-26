@@ -123,7 +123,7 @@ function dropAt(tile: string, point: Point): void {
       <TimerBar class="flex-1" :time-left="timeLeft" />
       <PixelButton
         :colour="isPaused ? 'crimson' : 'steel'"
-        class="px-4 py-1 text-sm"
+        class="px-4 py-1 text-sm max-lg:hidden"
         :aria-pressed="isPaused"
         :disabled="run.phase !== 'building'"
         data-testid="pause"

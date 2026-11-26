@@ -31,6 +31,7 @@ import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import { areHintsShown, setHintsShown } from '../../preferences/hints.ts';
 import DailyBar from '../words/DailyBar.vue';
+import FloatingPause from '../ui/FloatingPause.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -184,6 +185,13 @@ function dismiss(isStopping: boolean): void {
         tap it or press Backspace to take it back. Keys 1–5 place a tile; Esc pauses.
       </p>
     </SidePanel>
+    <FloatingPause
+      v-if="!isEnded"
+      :is-paused="isPaused()"
+      :is-disabled="run.phase !== 'building'"
+      @pause="game.pause"
+      @resume="game.resume"
+    />
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <CurtainCall
         v-if="runEnd.step.value === 'curtain' && runEnd.pick.value"

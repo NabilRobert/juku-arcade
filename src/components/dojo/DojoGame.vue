@@ -17,6 +17,7 @@ import { usePauseKey } from '../../composables/usePauseKey.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
+import FloatingPause from '../ui/FloatingPause.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -85,7 +86,7 @@ function dismiss(isStopping: boolean): void {
       <PixelButton
         v-if="!state.isOver"
         :colour="isPaused ? 'crimson' : 'steel'"
-        class="min-h-9 px-4 text-sm"
+        class="min-h-9 px-4 text-sm max-lg:hidden"
         :aria-pressed="isPaused"
         @click="isPaused ? dojo.resume() : dojo.pause()"
       >
@@ -97,6 +98,12 @@ function dismiss(isStopping: boolean): void {
         answers. Esc pauses.
       </p>
     </SidePanel>
+    <FloatingPause
+      v-if="!state.isOver"
+      :is-paused="isPaused"
+      @pause="dojo.pause"
+      @resume="dojo.resume"
+    />
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <RunResults
         v-if="state.isOver"

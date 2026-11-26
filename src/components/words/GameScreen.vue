@@ -28,6 +28,7 @@ import MissedTray from './MissedTray.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BankPanel from '../bank-run/BankPanel.vue';
 import ShopOffer from '../bank-run/ShopOffer.vue';
+import FloatingPause from '../ui/FloatingPause.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import TimerBar from '../ui/TimerBar.vue';
 import RunResults from '../ui/RunResults.vue';
@@ -126,6 +127,12 @@ usePauseKey({
     <div class="flex flex-col gap-5">
       <!-- On a phone the panel with the set's timer is folded away, so the timer shows here too. -->
       <TimerBar class="lg:hidden" :time-left="timeShareLeft(state, nowMs)" />
+      <FloatingPause
+        :is-paused="state.pausedAtMs !== null"
+        :is-disabled="state.phase !== 'playing' || finish.isShown.value"
+        @pause="pause"
+        @resume="resume"
+      />
       <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismissNudge">
         <RunResults
           v-if="finish.isShown.value"
