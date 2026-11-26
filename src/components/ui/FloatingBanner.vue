@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * A short message that floats in over the top of the board and out again,
- * without stopping play: word mode's "today's deck done" (useDeckFinish.ts).
+ * A short message that floats in over the board and out again, without
+ * stopping play (fixed a fifth of the way down the screen, clear of the
+ * title and the Pause button on a phone): word mode's "today's deck done" (useDeckFinish.ts).
  * The parent decides when it shows; screen readers hear it as it appears.
  */
 defineProps<{ isShown: boolean }>();
@@ -16,7 +17,7 @@ defineProps<{ isShown: boolean }>();
   >
     <p
       v-if="isShown"
-      class="pixel-panel pointer-events-none absolute top-2 left-1/2 z-20 -translate-x-1/2 bg-lamp px-5 py-2 text-center font-bold whitespace-nowrap text-sumi"
+      class="pixel-panel pointer-events-none fixed top-[22%] left-1/2 z-40 -translate-x-1/2 bg-lamp px-5 py-2 text-center font-bold whitespace-nowrap text-sumi"
       role="status"
       data-testid="floating-banner"
     >
