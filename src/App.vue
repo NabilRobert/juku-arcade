@@ -179,9 +179,9 @@ async function exportData(): Promise<void> {
   downloadExport(buildExport(events, settings.value, new Date(), grammar));
 }
 
+/** A level change (or other settings) restarts the game on the start screen, with the new deck. */
 async function useSettings(updated: Settings): Promise<void> {
   await orFallback(() => saveSettings(updated), undefined);
-  page.value = 'game';
   await startGame(updated);
 }
 
@@ -265,6 +265,7 @@ onMounted(async () => {
           <ModePicker
             v-else-if="page === 'mode' || (page !== 'game' && returnPage === 'mode')"
             v-show="page === 'mode'"
+            :key="`menu-${runKey}`"
             :deck="deck"
             @choose="chooseMode"
           />

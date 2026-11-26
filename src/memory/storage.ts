@@ -110,6 +110,21 @@ export async function saveSettings(settings: Settings): Promise<void> {
 }
 
 /**
+ * Changes some fields of the saved settings, read and written in one
+ * transaction, leaving the rest as they are now. Does nothing once the
+ * settings are gone ("Delete my data"). For saves made from a copy taken
+ * earlier (the play clocks, the best combo): writing the whole copy back
+ * undid a level change made since, or brought deleted settings back.
+ */
+export async function updateSavedSettings(change: (saved: Settings) => Settings): Promise<void> {
+  await database.transaction('rw', database.settings, async () => {
+    const saved = await loadSettings();
+    if (saved === null) return;
+    await saveSettings(change(saved));
+  });
+}
+
+/**
  * "Delete my data" (N5): removes every event, word or grammar, every
  * setting, the play log, and the progress kept outside the database
  * (progress-keys.ts: the best scores and the haiku collection) from this
