@@ -11,6 +11,7 @@ import { areHintsShown, setHintsShown } from '../preferences/hints.ts';
 import OnOffButton from './ui/OnOffButton.vue';
 import PixelButton from './ui/PixelButton.vue';
 import SoundSliders from './ui/SoundSliders.vue';
+import BackButton from './ui/BackButton.vue';
 
 defineProps<{ settings: Settings }>();
 const emit = defineEmits<{
@@ -79,8 +80,6 @@ function confirmDelete(): void {
     <PixelButton colour="crimson" class="px-4 py-2" @click="confirmDelete">
       Delete my data
     </PixelButton>
-    <PixelButton colour="steel" class="block px-4 py-2" @click="emit('close')">
-      Back to the game
-    </PixelButton>
+    <BackButton class="block" @click="emit('close')" />
   </section>
 </template>

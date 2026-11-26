@@ -36,6 +36,7 @@ import { useLater } from '../../composables/useLater.ts';
 import { hoverPitch, playHoverSound, playSound } from '../../sound/sfx.ts';
 import type { CrestMark } from './crest-mark.ts';
 import CardFrame, { type FrameColour } from './CardFrame.vue';
+import PeekedMark from './PeekedMark.vue';
 import PixelSeal from '../ui/PixelSeal.vue';
 import { cardFontSize } from './card-text.ts';
 import { isDrag, type Offset, type Placement, type Point } from './throw-geometry.ts';
@@ -119,6 +120,14 @@ const isFaceDown = computed(() => props.status === 'hidden');
 
 /** Always one line, shrinking to fit (card-text.ts). */
 const textStyle = computed(() => ({ fontSize: cardFontSize(props.text, props.kind) }));
+
+/**
+ * A peeked card (L9) turns cedar brown, its border and its back, so it's
+ * plain that it won't score (playtest decision, 2026-11-26); this wins
+ * over a scouted crest's tint. A status colour still wins on the front.
+ */
+const PEEKED_TINT = 'var(--color-cedar)';
+const tint = computed(() => (props.isPeeked === true ? PEEKED_TINT : props.crestMark?.tint));
 
 const frame = computed<FrameColour>(() =>
   props.isTargeted === true ? 'lit' : (STATUS_FRAMES[props.status] ?? 'crimson'),
@@ -213,7 +222,7 @@ function onClick(event: MouseEvent): void {
   >
     <span ref="snapLayer" class="absolute inset-0 [transform-style:preserve-3d]" :style="tiltStyle">
       <span :class="SIDE_CLASS" :aria-hidden="isFaceDown">
-        <CardFrame :frame="frame" :is-face-down="false" :tint="crestMark?.tint" />
+        <CardFrame :frame="frame" :is-face-down="false" :tint="tint" />
         <span
           class="absolute top-[9cqw] left-[9cqw] text-[7cqw] leading-none"
           :class="suitClass"
@@ -239,6 +248,7 @@ function onClick(event: MouseEvent): void {
           >{{ text }}</span
         >
         <span v-if="hint" class="relative font-sans text-xs text-sumi/70">{{ hint }}</span>
+        <PeekedMark v-if="isPeeked" />
         <span
           v-if="(order ?? queuedAs) !== undefined"
           class="pixel-panel absolute -top-2.5 -right-2.5 flex size-8 items-center justify-center bg-aqua font-sans text-base text-sumi"
@@ -248,7 +258,7 @@ function onClick(event: MouseEvent): void {
         >
       </span>
       <span :class="[SIDE_CLASS, 'rotate-y-180 text-3xl text-aqua']" aria-hidden="true">
-        <CardFrame frame="crimson" :is-face-down="true" :tint="crestMark?.tint" />
+        <CardFrame frame="crimson" :is-face-down="true" :tint="tint" />
         <PixelSeal
           v-if="crestMark"
           class="w-[42cqw]"

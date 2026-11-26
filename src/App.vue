@@ -141,9 +141,19 @@ async function openStats(): Promise<void> {
 }
 
 /** A footer link: the stats page loads the latest first; the rest just open. */
+/** Where a page opened from the footer or the drawer goes back to: the game, or the start screen. */
+const returnPage = ref<Page>('game');
+
 function goTo(target: PageTarget): void {
+  if (target !== 'mode' && (page.value === 'game' || page.value === 'mode')) {
+    returnPage.value = page.value;
+  }
   if (target === 'stats') void openStats();
   else page.value = target;
+}
+
+function closePage(): void {
+  page.value = returnPage.value;
 }
 provideGoToPage(goTo);
 
@@ -220,15 +230,15 @@ onMounted(async () => {
         <p v-if="loadError" role="alert" class="text-center text-crimson">{{ loadError }}</p>
         <SetupScreen v-else-if="isLoaded && !settings" @start="finishSetup" />
         <template v-else-if="settings && deck">
-          <AboutData v-if="page === 'about'" @close="page = 'game'" />
-          <ResearchPage v-if="page === 'research'" @close="page = 'game'" />
+          <AboutData v-if="page === 'about'" @close="closePage" />
+          <ResearchPage v-if="page === 'research'" @close="closePage" />
           <StatsPage
             v-if="page === 'stats'"
             :deck="deck"
             :settings="settings"
             :events="pastEvents"
             :grammar-events="grammarEvents"
-            @close="page = 'game'"
+            @close="closePage"
           />
           <SettingsPanel
             v-if="page === 'settings'"
@@ -236,7 +246,7 @@ onMounted(async () => {
             @change-level="changeLevel"
             @delete-data="deleteData"
             @export-data="exportData"
-            @close="page = 'game'"
+            @close="closePage"
           />
           <CheckUpScreen
             v-if="page === 'checkUp'"
@@ -245,7 +255,13 @@ onMounted(async () => {
             @done="finishCheckUp"
             @skip="finishCheckUp([])"
           />
-          <ModePicker v-else-if="page === 'mode'" :deck="deck" @choose="chooseMode" />
+          <!-- A page opened from the start screen keeps it underneath, so no run starts behind the page. -->
+          <ModePicker
+            v-else-if="page === 'mode' || (isAway && returnPage === 'mode')"
+            v-show="page === 'mode'"
+            :deck="deck"
+            @choose="chooseMode"
+          />
           <KanjiScreen
             v-else-if="mode === 'kanji'"
             v-show="!isAway"
@@ -293,7 +309,11 @@ onMounted(async () => {
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
-        <AppFooter :is-in-game="settings !== null && page === 'game'" @go="goTo" />
+        <AppFooter
+          :is-in-game="settings !== null && page === 'game'"
+          :is-on-start-screen="settings !== null && page === 'mode'"
+          @go="goTo"
+        />
       </main>
     </MotionConfig>
   </LazyMotion>

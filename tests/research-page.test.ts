@@ -40,6 +40,15 @@ describe('the footer', () => {
     expect(footer.text()).toContain('@nabilrobert');
   });
 
+  it('offers Stats, Settings, About and Research on the start screen, on any screen, but not Change mode', async () => {
+    const footer = mount(AppFooter, { props: { isInGame: false, isOnStartScreen: true } });
+    const labels = footer.findAll('button').map((button) => button.text());
+    expect(labels).toEqual(['Stats', 'Settings', 'About the data', 'The research']);
+    expect(footer.classes()).not.toContain('max-lg:hidden');
+    await footer.findAll('button')[1]?.trigger('click');
+    expect(footer.emitted('go')?.[0]).toEqual(['settings']);
+  });
+
   it('hides during a game on a phone or a tablet, so the board fits with nothing to scroll', () => {
     const footer = mount(AppFooter, { props: { isInGame: true } });
     expect(footer.classes()).toContain('max-lg:hidden');

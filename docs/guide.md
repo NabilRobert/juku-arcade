@@ -694,7 +694,10 @@ fields. They stay in memory until slice 3 stores them.
   During a game the footer is hidden there, and its links (change mode,
   stats, settings, about, research) sit at the bottom of the drawer
   (`composables/usePageLinks.ts`, `ui/PageLinks.vue`), so the board fits
-  the screen with nothing to scroll.
+  the screen with nothing to scroll. The start screen's footer shows the
+  same links, without Change mode, so Settings and Stats are reachable
+  from the menu on any screen; a page opened from there closes back to it
+  (`App.vue: closePage`).
   Opening the drawer pauses a timed run, and closing it resumes the run if
   the drawer paused it (`composables/usePanelPause.ts`, wired to
   SidePanel's `toggle` event in each mode screen).
@@ -716,6 +719,9 @@ fields. They stay in memory until slice 3 stores them.
   (`useDeckFinish.endNow`), kanji mode ends the sheet (`useKanjiSheet.endNow`),
   practice mode ends as if the last lantern went out (`dojo-run.ts:
   endedEarly`), and Bunpou plays its curtain call.
+- **Change how a peeked card looks:** a word card flipped while paused
+  won't score (L9); `cards/PlayCard.vue` tints its border and back cedar
+  brown (`PEEKED_TINT`) and shows `cards/PeekedMark.vue`'s "no score" band.
 - **Change a card back:** a word's back is `words/CardBack.vue` and a
   kanji's is `words/KanjiCardBack.vue`; both are built from
   `words/CardBackPanel.vue` (the paper panel and Turn over) and

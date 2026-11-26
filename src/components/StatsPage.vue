@@ -12,7 +12,7 @@ import { localDay, type GameEvent } from '../game/events.ts';
 import { createLocalEngine } from '../memory/review-engine.ts';
 import { percentRight, playerStats } from '../memory/stats.ts';
 import type { Settings } from '../memory/storage.ts';
-import PixelButton from './ui/PixelButton.vue';
+import BackButton from './ui/BackButton.vue';
 import StatPanel from './ui/StatPanel.vue';
 import { readBestScore } from '../bank-run/useBankRun.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
@@ -92,8 +92,6 @@ const tiles = computed(() => [
     <p class="text-xs text-washi/60">
       From what you've played in this browser. Kanji mode and practice mode aren't counted.
     </p>
-    <PixelButton colour="steel" class="px-4 py-2" @click="$emit('close')">
-      Back to the game
-    </PixelButton>
+    <BackButton @click="$emit('close')" />
   </article>
 </template>
