@@ -5,7 +5,7 @@
  * pairs words with their readings and feeds the reviews; kanji mode,
  * which is practice at finding every reading of one kanji; or Bunpou
  * (D56), which puts grammar tiles in order. The leaderboard (D47) sits on
- * the left; the streak and the play calendar (StreakPanel.vue) sit under
+ * the left; the streak and the play calendar (StreakPanel.vue) sit above
  * the modes.
  */
 import type { Deck } from '../deck/types.ts';
@@ -21,10 +21,11 @@ defineEmits<{ choose: [mode: GameMode] }>();
 </script>
 
 <template>
-  <!-- The leaderboard fills the left of the screen; the modes and the streak sit on the right. -->
+  <!-- The leaderboard fills the left of the screen; the streak, then the modes, sit on the right. -->
   <div class="grid w-full flex-1 grid-cols-[minmax(20rem,30%)_1fr] gap-10">
     <LeaderboardPanel />
     <div class="flex flex-col justify-center gap-6">
+      <StreakPanel :deck="deck" />
       <section class="grid grid-cols-3 gap-6" aria-label="Choose a mode">
         <PixelButton
           colour="crimson"
@@ -63,7 +64,6 @@ defineEmits<{ choose: [mode: GameMode] }>();
           </span>
         </PixelButton>
       </section>
-      <StreakPanel :deck="deck" />
     </div>
   </div>
 </template>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 /**
- * The streak on the start screen: the flame and the streak's length, a
- * milestone banner on the day one is reached, this visit's reminder
- * (useStreak.ts), and the play calendar with the picked day's summary
- * beside it (today, at first). The streak and the calendar are read fresh
+ * The streak on the start screen: its headline (StreakHeader.vue) above
+ * the play calendar, with the picked day's summary beside it (today, at
+ * first). The streak and the calendar are read fresh
  * each time the start screen opens.
  */
 import { computed, ref } from 'vue';
@@ -12,9 +11,9 @@ import { IS_SAMPLE_PLAY, usePlayHistory } from '../../composables/usePlayHistory
 import { useStreak } from '../../composables/useStreak.ts';
 import { summariseDay } from '../../memory/day-summary.ts';
 import { calendarWeeks } from '../../memory/play-calendar.ts';
-import PixelIcon from '../ui/PixelIcon.vue';
 import DayDetail from './DayDetail.vue';
 import PlayCalendar from './PlayCalendar.vue';
+import StreakHeader from './StreakHeader.vue';
 
 const props = defineProps<{ deck: Deck }>();
 
@@ -27,19 +26,12 @@ const summary = computed(() => summariseDay(selected.value, history.value));
 
 <template>
   <section class="pixel-panel flex flex-col gap-3 bg-wood/80 p-4" aria-label="Streak">
-    <header class="flex items-center gap-3">
-      <PixelIcon name="flame" class="text-3xl" />
-      <p class="text-2xl font-bold" data-testid="streak-days">{{ streak.days }}-day streak</p>
-      <span v-if="IS_SAMPLE_PLAY" class="ml-auto text-xs text-washi/50">sample data</span>
-    </header>
-    <p
-      v-if="milestone"
-      class="bg-lamp px-3 py-1 text-center font-bold text-sumi"
-      data-testid="streak-milestone"
-    >
-      {{ milestone }}-day streak! Keep it up!
-    </p>
-    <p v-if="message" class="text-washi/80" data-testid="streak-message">{{ message.text }}</p>
+    <StreakHeader
+      :days="streak.days"
+      :milestone="milestone"
+      :message="message"
+      :is-sample="IS_SAMPLE_PLAY"
+    />
     <div class="flex flex-wrap gap-6">
       <PlayCalendar
         :weeks="weeks"
