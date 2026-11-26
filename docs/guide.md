@@ -592,6 +592,10 @@ fields. They stay in memory until slice 3 stores them.
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
 | **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.boxes` |
 | **Grammar log** | The browser table of judged Bunpou lines, one event each, kept apart from the word log | `grammar-events.ts`, `storage.ts: grammarEvents` |
+| **Play log** | One record per run in any mode (score, answers, day), saved from its first answer so a closed game still counts, plus one per kanji round. The streak and the play calendar read it; the reviews never do | `memory/play-log.ts`, `composables/useRunLog.ts`, `storage.ts: runs, kanjiRounds` |
+| **Streak** | Days in a row with a run played, in any mode. One missed day a week (Monday to Sunday) is forgiven as a **rest day**; a second breaks it. Today never breaks it | `memory/streak.ts` |
+| **Play calendar** | The start screen's grid of days, like a contribution graph: a column per week, each day brighter the more was answered. Clicking a day shows its summary | `memory/play-calendar.ts`, `memory/day-summary.ts`, `components/streak/` |
+| **Streak reminder** | The start screen's message about the streak, picked from templates that fit (after Duolingo's reminders); milestones (3, 7, 14, 30… days) are celebrated once | `memory/streak-messages.ts`, `composables/useStreak.ts` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
 | **Broken rule** | For a wrong order, the most basic rule it broke: verb not last, particle after the wrong word, or pieces out of order | `broken-rule.ts` |
 | **Stage / slip** | The storyteller above the table; each built line becomes a sealed slip in his sleeve until the tale is told | `StoryStage.vue`, `stage-sprites.ts` |
@@ -655,6 +659,16 @@ fields. They stay in memory until slice 3 stores them.
   `tests/pause.test.ts`.
 - **Change the review schedule:** edit `memory/leitner.ts`. Specs:
   `tests/memory.test.ts`.
+- **Add a source to the research page:** add it to `SOURCE_GROUPS` in
+  `research/sources.ts`, with what it found and where the game uses it.
+- **Change the streak:** what counts as a day played is `playedDays` in
+  `memory/play-calendar.ts` (with `withAnswer` in `memory/play-log.ts`);
+  the rest day is in `memory/streak.ts`; the reminders and milestones are
+  `TEMPLATES` and `MILESTONES` in `memory/streak-messages.ts`; the
+  calendar's weeks and shades are `CALENDAR_WEEKS` and `SHADE_THRESHOLDS`
+  in `memory/play-calendar.ts`. Placeholder play for a local copy is
+  `memory/sample-play.ts`, turned on by `VITE_SAMPLE_PLAY` (see
+  `.env.example`).
 - **Change the daily deck or endless mix:** edit `memory/daily-deck.ts`; its
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
@@ -711,6 +725,10 @@ fields. They stay in memory until slice 3 stores them.
   built for the `/juku-arcade/` folder); a class deploy is in
   `docs/playtest.md`.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
+- **Keep a new kind of progress in the browser** (a best score, a
+  collection): add its key to `src/memory/progress-keys.ts`, so "Delete
+  my data" clears it too. Preferences (sound, hints, furigana) don't go
+  there; a delete keeps them.
 - **Add an event field:** add it to `GameEvent` and `makeEvent` in
   `src/game/events.ts`, and to `R6_FIELDS` in `tests/run.test.ts`.
 - **Add a grammar template:** add it to its group's file in

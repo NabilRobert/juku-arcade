@@ -13,7 +13,8 @@ import { brokenRule } from './broken-rule.ts';
 import { answerText, makeGrammarEvent, type GrammarEvent } from './grammar-events.ts';
 import { createGrammarReviews } from './grammar-reviews.ts';
 
-function outcomeOf(result: LineResult): GrammarEvent['outcome'] {
+/** How a judged line ended: built right, built wrong, or timed out (also the play log's outcome). */
+export function outcomeOf(result: LineResult): GrammarEvent['outcome'] {
   if (result.isTimedOut) return 'timeout';
   return result.isRight ? 'right' : 'wrong';
 }

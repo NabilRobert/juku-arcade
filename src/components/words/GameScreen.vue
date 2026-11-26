@@ -7,12 +7,14 @@
  * or a flipped card's back while paused, then the missed tray. Also shows
  * the wellbeing nudge (W1) and, past the daily cap, a stop screen (W2).
  */
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import type { Deck, DeckWord } from '../../deck/types.ts';
 import type { GameEvent } from '../../game/events.ts';
 import { useRun } from '../../composables/useRun.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { useRunLog } from '../../composables/useRunLog.ts';
+import { tallyWordEvents } from '../../memory/play-log.ts';
 import type { Settings } from '../../memory/storage.ts';
 import CardBack from './CardBack.vue';
 import DailyBar from './DailyBar.vue';
@@ -50,6 +52,12 @@ const { run: bank, notice, shownCrests } = bankRun;
 /** The scouted crests, marked on the word cards until the set ends. */
 const crestMarks = computed(
   () => new Map([...shownCrests.value].map(([wordId, kind]) => [wordId, CRESTS[kind]])),
+);
+
+// Every answer or bank goes to the play log, for the streak and the calendar.
+const runLog = useRunLog('words');
+watch([() => state.value.events.length, () => bank.value.coins], () =>
+  runLog.record({ score: bank.value.coins, ...tallyWordEvents(state.value.events) }),
 );
 
 const { nudge, isCapped, dismissNudge } = useWellbeing({

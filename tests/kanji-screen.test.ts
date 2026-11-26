@@ -43,7 +43,9 @@ async function mountBoard() {
 
 describe('kanji mode on screen', () => {
   it('offers word mode, kanji mode and Bunpou on the start screen', async () => {
-    const picker = mount(ModePicker, { props: { level: 'N5' } });
+    const picker = mount(ModePicker, {
+      props: { deck: { level: 'N5', sourceCommit: 'test', words: [], kanji: {} } },
+    });
     // The leaderboard beside the modes has its own buttons; only the mode choice counts here.
     const buttons = picker.find('[aria-label="Choose a mode"]').findAll('button');
     expect(buttons.map((button) => button.text())).toEqual([

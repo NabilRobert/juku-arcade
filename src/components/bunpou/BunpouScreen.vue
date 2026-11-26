@@ -20,9 +20,11 @@ import { playSound } from '../../sound/sfx.ts';
 import type { GrammarEvent } from '../../grammar/grammar-events.ts';
 import { CURRICULUM } from '../../grammar/templates.ts';
 import { useBunpouRun } from '../../grammar/useBunpouRun.ts';
-import { useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
+import { outcomeOf, useGrammarReviews } from '../../grammar/useGrammarReviews.ts';
 import { useRunEnd } from '../../grammar/useRunEnd.ts';
 import { usePauseKey } from '../../composables/usePauseKey.ts';
+import { useRunLog } from '../../composables/useRunLog.ts';
+import { withAnswer, type Answers } from '../../memory/play-log.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
@@ -31,6 +33,7 @@ import DailyBar from '../words/DailyBar.vue';
 import OnOffButton from '../ui/OnOffButton.vue';
 import PixelButton from '../ui/PixelButton.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
+import ModeHeader from '../ui/ModeHeader.vue';
 import StatPanel from '../ui/StatPanel.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import BunpouBoard from './BunpouBoard.vue';
@@ -51,19 +54,31 @@ const props = defineProps<{
 const emit = defineEmits<{ leave: []; again: [] }>();
 
 const reviews = useGrammarReviews(CURRICULUM, props.settings, props.pastGrammarEvents);
+const runLog = useRunLog('bunpou');
+let lineTally: Answers = { answered: 0, right: 0 };
 const game = useBunpouRun({
   pointsByPriority: reviews.pointsByPriority,
-  onJudged: reviews.logJudged,
+  onJudged: (result, msTaken) => {
+    reviews.logJudged(result, msTaken);
+    logLine(result);
+  },
 });
 const { run, unplaced, timeLeft } = game;
 const isPaused = (): boolean => run.value.pausedAtMs !== null;
 const runEnd = useRunEnd();
 const isEnded = computed(() => runEnd.step.value !== 'playing');
 
+/** Each line goes to the play log, for the streak and the calendar (a timeout isn't counted). */
+function logLine(result: LineResult): void {
+  lineTally = withAnswer(lineTally, outcomeOf(result));
+  runLog.record({ score: game.run.value.score, ...lineTally });
+}
+
 /** Ends the run: the line's clock stops for good, the storyteller bows, then the haiku and results. */
 function endRun(): void {
   game.pause();
   runEnd.end(run.value);
+  if (runEnd.pick.value !== null) runLog.addHaiku(runEnd.pick.value.haiku.id);
 }
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -129,9 +144,7 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
     <aside class="sticky top-6 flex flex-col gap-3" aria-label="Bunpou run">
-      <section class="pixel-panel bg-wood/80 p-3 text-center">
-        <p class="text-xs tracking-widest text-aqua/80 uppercase">Bunpou · {{ level }}</p>
-      </section>
+      <ModeHeader :title="`Bunpou · ${level}`" />
       <DailyBar
         :daily="reviews.progress.value.daily"
         known-label="Grammar known"

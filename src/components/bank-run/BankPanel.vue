@@ -14,6 +14,7 @@ import { itemById } from '../../bank-run/items.ts';
 import { CRESTS } from '../../bank-run/crests.ts';
 import type { Notice } from '../../composables/useNotice.ts';
 import FloatingNotice from '../ui/FloatingNotice.vue';
+import PanelLabel from '../ui/PanelLabel.vue';
 
 const props = defineProps<{ run: BankRun; notice: Notice | null; canScout: boolean }>();
 defineEmits<{ bank: []; scout: []; openShop: [] }>();
@@ -29,7 +30,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
 <template>
   <section class="pixel-panel flex flex-col gap-2 bg-wood/80 p-3 text-center" aria-label="Bank run">
     <div class="relative py-1">
-      <p class="text-xs tracking-widest text-aqua/80 uppercase">Pot, not yet banked</p>
+      <PanelLabel>Pot, not yet banked</PanelLabel>
       <p class="text-2xl font-bold" data-testid="pot">
         <span class="text-xl"><PixelIcon name="coin" /></span> {{ run.pot }}
       </p>
@@ -71,7 +72,7 @@ const items = computed(() => props.run.items.flatMap((id) => itemById(id) ?? [])
       }}</span>
     </p>
     <div class="border-t-2 border-lacquer pt-2">
-      <p class="text-xs tracking-widest text-aqua/80 uppercase">Score</p>
+      <PanelLabel>Score</PanelLabel>
       <p class="text-3xl font-bold">
         <!-- A step smaller than the number, so the coin doesn't outweigh it. -->
         <span class="text-2xl"><PixelIcon name="coin" /></span>

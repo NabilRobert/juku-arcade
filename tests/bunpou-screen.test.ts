@@ -56,7 +56,9 @@ afterEach(() => {
 
 describe('Bunpou on screen', () => {
   it('is the third mode on the start screen', async () => {
-    const picker = mount(ModePicker, { props: { level: 'N5' } });
+    const picker = mount(ModePicker, {
+      props: { deck: { level: 'N5', sourceCommit: 'test', words: [], kanji: {} } },
+    });
     const buttons = picker.find('[aria-label="Choose a mode"]').findAll('button');
     await buttons[2]?.trigger('click');
     expect(picker.emitted('choose')?.[0]).toEqual(['bunpou']);

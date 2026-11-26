@@ -5,6 +5,7 @@
  * among its samples and splits the ranking into pages the panel flips
  * through with Back and Next.
  */
+import { BUNPOU_BEST_KEY } from '../memory/progress-keys.ts';
 
 export interface LeaderboardRow {
   rank: number;
@@ -58,8 +59,6 @@ export const BUNPOU_SAMPLE_PLAYERS: readonly { name: string; score: number }[] =
   { name: 'Kaeru', score: 800 },
   { name: 'Tako', score: 450 },
 ];
-
-export const BUNPOU_BEST_KEY = 'juku-arcade:best-bunpou-score';
 
 /** Your best Bunpou run in this browser, for its leaderboard. */
 export function readBunpouBest(): number {

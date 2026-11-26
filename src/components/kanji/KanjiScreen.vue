@@ -2,7 +2,8 @@
 /**
  * Kanji mode on screen (D37): a side panel (the mode, score, combo and
  * round, the last round's result, the sound switch) beside the kanji
- * board. It's practice: nothing is logged or reviewed. Its play time still
+ * board. It's practice: nothing is reviewed, and each round goes only to
+ * the play log, for the streak and the calendar (play-log.ts). Its play time still
  * counts toward the nudges and the school's daily cap (usePlayClock), and
  * the same wellbeing screens stand in front of the board (WellbeingGate);
  * "Stop for today" goes back to the start screen.
@@ -10,16 +11,20 @@
  * Crests (D42) hide on some cards: the scout panel flips the hand over to
  * show them (KanjiScoutPanel.vue).
  */
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import type { Deck } from '../../deck/types.ts';
 import { useKanjiRun } from '../../kanji/useKanjiRun.ts';
 import { usePlayClock } from '../../composables/usePlayClock.ts';
+import { useRunLog } from '../../composables/useRunLog.ts';
+import { withAnswer, type Answers } from '../../memory/play-log.ts';
+import { localDay } from '../../game/events.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
-import type { Settings } from '../../memory/storage.ts';
+import { appendKanjiRound, type Settings } from '../../memory/storage.ts';
 import KanjiBoard from './KanjiBoard.vue';
 import KanjiResult from './KanjiResult.vue';
 import KanjiScoutPanel from './KanjiScoutPanel.vue';
 import SoundToggle from '../ui/SoundToggle.vue';
+import ModeHeader from '../ui/ModeHeader.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import StatPanel from '../ui/StatPanel.vue';
 
@@ -35,6 +40,22 @@ const run = useKanjiRun(props.deck);
 const { round, roundNumber, thrown, score, combo, bestCombo, impacts, canPlay, lastResult } = run;
 const { wrongPicksLeft } = run;
 const { crestMarks, notice, scoutsLeft, isScouting, phase } = run;
+
+const runLog = useRunLog('kanji');
+let roundTally: Answers = { answered: 0, right: 0 };
+watch(lastResult, (result) => {
+  if (result === null) return;
+  roundTally = withAnswer(roundTally, result.isPerfect ? 'right' : 'wrong');
+  runLog.record({ score: score.value, ...roundTally });
+  const record = {
+    day: localDay(new Date()),
+    kanji: round.value.kanji,
+    isPerfect: result.isPerfect,
+  };
+  appendKanjiRound(record).catch((error: unknown) =>
+    console.warn('Could not save the round:', error),
+  );
+});
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
 const clock = usePlayClock(
@@ -63,10 +84,9 @@ function dismiss(isStopping: boolean): void {
 <template>
   <div class="grid grid-cols-[17rem_1fr] items-start gap-8">
     <aside class="sticky top-6 flex flex-col gap-3" aria-label="Kanji run">
-      <section class="pixel-panel bg-wood/80 p-3 text-center">
-        <p class="text-xs tracking-widest text-aqua/80 uppercase">Kanji mode · {{ deck.level }}</p>
+      <ModeHeader :title="`Kanji mode · ${deck.level}`">
         <p class="text-sm text-washi/70">Round {{ roundNumber }}</p>
-      </section>
+      </ModeHeader>
       <div class="grid grid-cols-2 gap-3">
         <StatPanel v-for="panel in panels" :key="panel.label" :label="panel.label">
           <span class="text-3xl font-bold" :data-testid="panel.label.toLowerCase()">{{

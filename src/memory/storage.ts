@@ -1,15 +1,16 @@
 /**
  * The browser's copy of everything (decisions D14, N5): the word event log,
  * the grammar event log (D57, kept apart so word memory never reads a
- * grammar answer) and a few settings, in IndexedDB through Dexie. Nothing leaves the browser until
+ * grammar answer), the play log (play-log.ts) and a few settings, in
+ * IndexedDB through Dexie. Nothing leaves the browser until
  * the player exports it (slice 5a).
  */
 import Dexie, { type Table } from 'dexie';
 import type { JlptLevel } from '../deck/types.ts';
 import type { GameEvent } from '../game/events.ts';
 import type { GrammarEvent } from '../grammar/grammar-events.ts';
-import { HAIKU_KEY } from '../grammar/haiku.ts';
-import { BUNPOU_BEST_KEY } from '../leaderboard/leaderboard.ts';
+import type { KanjiRoundRecord, PlayedRun } from './play-log.ts';
+import { PROGRESS_KEYS } from './progress-keys.ts';
 
 const DATABASE_NAME = 'juku-arcade';
 
@@ -37,12 +38,16 @@ class ArcadeDatabase extends Dexie {
   events!: Table<StoredEvent, number>;
   settings!: Table<SettingsRow, string>;
   grammarEvents!: Table<GrammarEvent & { seq?: number }, number>;
+  runs!: Table<PlayedRun, string>;
+  kanjiRounds!: Table<KanjiRoundRecord & { seq?: number }, number>;
 
   constructor() {
     super(DATABASE_NAME);
     this.version(1).stores({ events: '++seq, &event_id', settings: 'key' });
     // Version 2 adds the grammar log; the word log and settings carry over untouched.
     this.version(2).stores({ grammarEvents: '++seq, &event_id' });
+    // Version 3 adds the play log (play-log.ts), for the streak and the calendar.
+    this.version(3).stores({ runs: 'id, day', kanjiRounds: '++seq, day' });
   }
 }
 
@@ -71,6 +76,23 @@ export async function appendGrammarEvents(events: readonly GrammarEvent[]): Prom
   if (events.length > 0) await database.grammarEvents.bulkAdd([...events]);
 }
 
+/** Saves a run as it stands, replacing its earlier copy. */
+export async function saveRun(run: PlayedRun): Promise<void> {
+  await database.runs.put(run);
+}
+
+export async function loadRuns(): Promise<PlayedRun[]> {
+  return database.runs.toArray();
+}
+
+export async function appendKanjiRound(round: KanjiRoundRecord): Promise<void> {
+  await database.kanjiRounds.add({ ...round });
+}
+
+export async function loadKanjiRounds(): Promise<KanjiRoundRecord[]> {
+  return (await database.kanjiRounds.orderBy('seq').toArray()).map(withoutSeq);
+}
+
 export async function loadSettings(): Promise<Settings | null> {
   const saved = (await database.settings.get('settings'))?.value;
   if (saved === undefined) return null;
@@ -87,15 +109,20 @@ export async function saveSettings(settings: Settings): Promise<void> {
   await database.settings.put({ key: 'settings', value: settings });
 }
 
-/** Progress kept outside the database: Bunpou's haiku collection and best run (D59). */
-const PROGRESS_KEYS = [HAIKU_KEY, BUNPOU_BEST_KEY];
-
 /**
  * "Delete my data" (N5): removes every event, word or grammar, every
- * setting, and Bunpou's haiku collection and best run from this browser.
+ * setting, the play log, and the progress kept outside the database
+ * (progress-keys.ts: the best scores and the haiku collection) from this
+ * browser.
  */
 export async function deleteAllData(): Promise<void> {
-  const tables = [database.events, database.grammarEvents, database.settings];
+  const tables = [
+    database.events,
+    database.grammarEvents,
+    database.settings,
+    database.runs,
+    database.kanjiRounds,
+  ];
   await database.transaction('rw', tables, async () => {
     await Promise.all(tables.map((table) => table.clear()));
   });

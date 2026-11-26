@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'happy-dom',
+    // A local copy's .env.local may turn on placeholder play; the tests must not see it.
+    env: { VITE_SAMPLE_PLAY: '' },
   },
 });
