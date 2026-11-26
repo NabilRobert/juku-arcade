@@ -242,6 +242,7 @@ onMounted(async () => {
             :settings="settings"
             :is-away="isAway"
             @leave="page = 'mode'"
+            @again="chooseMode('kanji')"
           />
           <BunpouScreen
             v-else-if="mode === 'bunpou'"
