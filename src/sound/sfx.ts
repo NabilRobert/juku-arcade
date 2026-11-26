@@ -13,6 +13,7 @@
  * sound, which always follows a tap or a drag. Muting is remembered in
  * this browser only (localStorage): a classroom may need it off.
  */
+import { PREFERENCE_KEYS } from '../preferences/preference-keys.ts';
 import { pickOne } from '../game/random.ts';
 import { storedFlag } from '../preferences/stored-flag.ts';
 import { storedVolume } from './volume.ts';
@@ -102,7 +103,7 @@ export const SYNTH_VOLUME = 0.6;
 export const RECORDING_VOLUME = 0.9;
 
 /** The effects slider (0 is off), on top of those levels; it starts at full. */
-const effects = storedVolume('juku-arcade:effects-volume', 1);
+const effects = storedVolume(PREFERENCE_KEYS.effectsVolume, 1);
 export const effectsVolume = effects.volume;
 export const setEffectsVolume = effects.set;
 /**
@@ -156,7 +157,7 @@ const RECORDING_FADES_S: Partial<Record<SoundName, number>> = { applause: 1, app
  */
 const COMBO_STEPS = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
 const SEMITONES_PER_OCTAVE = 12;
-const MUTED_KEY = 'juku-arcade:muted';
+const MUTED_KEY = PREFERENCE_KEYS.muted;
 
 /** The playback speed that raises a sound by the note for this combo. */
 export function comboPitch(combo: number): number {

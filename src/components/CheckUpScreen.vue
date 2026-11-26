@@ -4,6 +4,7 @@
  * question shows a word and 4 readings, with 8 seconds to answer; running
  * out of time counts as wrong. Emits the answers as events when done.
  */
+import { CLOCK_TICK_MS } from '../game/tuning.ts';
 import TimerBar from './ui/TimerBar.vue';
 import { computed, onUnmounted, ref } from 'vue';
 import type { GameEvent, SessionIdentity } from '../game/events.ts';
@@ -13,7 +14,6 @@ import PixelButton from './ui/PixelButton.vue';
 const props = defineProps<{ questions: readonly Question[]; identity: SessionIdentity }>();
 const emit = defineEmits<{ done: [events: GameEvent[]]; skip: [] }>();
 
-const TICK_MS = 100;
 const QUESTION_MS = SECONDS_PER_QUESTION * 1000;
 
 const index = ref(-1);
@@ -50,7 +50,7 @@ function start(): void {
   timer = setInterval(() => {
     nowMs.value = Date.now();
     if (nowMs.value - shownAtMs.value >= QUESTION_MS) answer(null);
-  }, TICK_MS);
+  }, CLOCK_TICK_MS);
 }
 
 onUnmounted(() => clearInterval(timer));

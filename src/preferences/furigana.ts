@@ -4,8 +4,9 @@
  * for players who want to read without them. Kanji mode never shows
  * furigana, as reading the kanji is its exercise.
  */
+import { PREFERENCE_KEYS } from './preference-keys.ts';
 import { storedFlag } from './stored-flag.ts';
 
-const furigana = storedFlag('juku-arcade:furigana', true);
+const furigana = storedFlag(PREFERENCE_KEYS.furigana, true);
 export const isFuriganaShown = furigana.isOn;
 export const setFuriganaShown = furigana.set;

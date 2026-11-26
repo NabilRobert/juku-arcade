@@ -4,7 +4,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import PlayCard from '../src/components/cards/PlayCard.vue';
-import { THROW_S } from '../src/components/cards/card-motion.ts';
+import { THROW_S } from '../src/game/tuning.ts';
 import CardQuestionView from '../src/components/dojo/CardQuestionView.vue';
 import DojoGame from '../src/components/dojo/DojoGame.vue';
 import DojoScreen from '../src/components/dojo/DojoScreen.vue';

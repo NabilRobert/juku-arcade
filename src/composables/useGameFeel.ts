@@ -9,7 +9,7 @@
  * go, so the slap, the chime and the shake wait for the throw (THROW_S).
  */
 import { ref, watch } from 'vue';
-import { THROW_S } from '../components/cards/card-motion.ts';
+import { THROW_MS } from '../game/tuning.ts';
 import type { RunState } from '../game/run.ts';
 import { comboPitch, playSound } from '../sound/sfx.ts';
 import { useLater } from './useLater.ts';
@@ -17,7 +17,6 @@ import { useLater } from './useLater.ts';
 /** A combo this long is a streak worth losing: breaking it shows on the table. */
 export const STREAK_COMBO = 3;
 
-const THROW_MS = THROW_S * 1000;
 /** A cleared set's applause starts as its chime rings out. */
 const APPLAUSE_AFTER_CHIME_MS = 300;
 

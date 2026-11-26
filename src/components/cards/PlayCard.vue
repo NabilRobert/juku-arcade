@@ -28,7 +28,8 @@
 import { m, type PanInfo } from 'motion-v';
 import { computed, onMounted, ref } from 'vue';
 import type { CardStatus } from '../../game/card-status.ts';
-import { cardPose, cardTransition, dealDelayMs, dealtFrom, THROW_S } from './card-motion.ts';
+import { cardPose, cardTransition, dealDelayMs, dealtFrom } from './card-motion.ts';
+import { THROW_MS } from '../../game/tuning.ts';
 import type { JlptLevel } from '../../deck/types.ts';
 import { useCardTilt } from '../../composables/useCardTilt.ts';
 import { usePixelSnap } from '../../composables/usePixelSnap.ts';
@@ -83,7 +84,7 @@ const emit = defineEmits<{
 const HELD_POSE = { scale: 1.12, rotate: 6 } as const;
 
 const { tiltStyle, follow, settle } = useCardTilt();
-usePixelSnap('snapLayer', () => props.status === 'matched', THROW_S * 1000);
+usePixelSnap('snapLayer', () => props.status === 'matched', THROW_MS);
 
 const SUITS = { word: '言', reading: '音' } as const;
 

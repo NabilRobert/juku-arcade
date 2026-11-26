@@ -8,12 +8,13 @@
  * started there. Its volume is its own setting (volume.ts; 0 is
  * off), and the mute switch (sfx.ts) silences the music too. It pauses while the tab is hidden.
  */
+import { PREFERENCE_KEYS } from '../preferences/preference-keys.ts';
 import { watch } from 'vue';
 import { isMuted } from './sfx.ts';
 import { storedVolume } from './volume.ts';
 
 const MUSIC_FILE = 'music/france-instrumental.m4a';
-const VOLUME_KEY = 'juku-arcade:music-volume';
+const VOLUME_KEY = PREFERENCE_KEYS.musicVolume;
 /** Quiet enough to sit under the card sounds. */
 export const DEFAULT_MUSIC_VOLUME = 0.3;
 
