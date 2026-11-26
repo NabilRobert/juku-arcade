@@ -17,9 +17,13 @@ export interface DealFrom {
   readings: (Placement | undefined)[];
 }
 
-/** Just under the bottom of the screen, straight below the slot, the same size. */
+/**
+ * Just under the bottom of the screen, straight below the slot, the same
+ * size. Built field by field: a measured box is a DOMRect, whose fields are
+ * getters a spread wouldn't copy.
+ */
 export function belowScreen(slot: Box, screenHeight: number): Box {
-  return { ...slot, top: screenHeight };
+  return { left: slot.left, top: screenHeight, width: slot.width, height: slot.height };
 }
 
 /** A hidden deck (display: none, on a phone or a tablet) measures nothing. */

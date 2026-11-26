@@ -9,4 +9,9 @@ describe('dealing on a phone or a tablet, with no deck', () => {
     expect(from).toEqual({ left: 40, top: 812, width: 90, height: 120 });
     expect(placementBetween(slot, from)).toEqual({ x: 0, y: 512, scale: 1 });
   });
+
+  it('copies a measured box (a DOMRect, whose fields are getters)', () => {
+    const measured = new DOMRect(40, 300, 90, 120);
+    expect(belowScreen(measured, 812)).toEqual({ left: 40, top: 812, width: 90, height: 120 });
+  });
 });
