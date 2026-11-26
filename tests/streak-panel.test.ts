@@ -74,6 +74,23 @@ describe("a day's summary on screen", () => {
   });
 });
 
+describe("a day's kanji and scores on screen", () => {
+  it("shows the day's most recognised and most missed kanji, and each mode's best", () => {
+    const summary: DaySummary = {
+      ...quietDay,
+      runs: 1,
+      scores: [{ mode: 'kanji', dayBest: 90, monthBest: 120, everBest: 300 }],
+      kanji: { mostRecognised: { kanji: '学', count: 3 }, mostMissed: { kanji: '先', count: 2 } },
+    };
+    const detail = mount(DayDetail, {
+      props: { day: TODAY, today: TODAY, summary, isRestDay: false },
+    });
+    expect(detail.find('[data-testid="most-recognised"]').text()).toContain('学 ×3');
+    expect(detail.find('[data-testid="most-missed"]').text()).toContain('先 ×2');
+    expect(detail.find('[data-mode="kanji"]').text()).toBe('Kanji90120300');
+  });
+});
+
 describe('the streak panel', () => {
   beforeEach(async () => {
     await deleteAllData();

@@ -7,9 +7,10 @@
  */
 import { computed } from 'vue';
 import type { DaySummary } from '../../memory/day-summary.ts';
-import type { PlayMode } from '../../memory/play-log.ts';
 import { dayLabel } from '../../memory/play-calendar.ts';
 import DayHaiku from './DayHaiku.vue';
+import DayScores from './DayScores.vue';
+import KanjiHighlight from './KanjiHighlight.vue';
 
 const props = defineProps<{
   day: string;
@@ -17,8 +18,6 @@ const props = defineProps<{
   summary: DaySummary;
   isRestDay: boolean;
 }>();
-
-const MODE_NAMES: Record<PlayMode, string> = { words: 'Words', kanji: 'Kanji', bunpou: 'Bunpou' };
 
 const percent = (right: number, answered: number): number =>
   answered === 0 ? 0 : Math.round((right / answered) * 100);
@@ -58,42 +57,22 @@ const answerLines = computed(() => {
         {{ summary.runs }} {{ summary.runs === 1 ? 'session' : 'sessions' }} played ·
         {{ summary.minutes }} min
       </p>
-      <table class="w-full text-left">
-        <thead class="text-xs text-washi/60">
-          <tr>
-            <th class="font-normal">Highest score</th>
-            <th class="font-normal">That day</th>
-            <th class="font-normal">This month</th>
-            <th class="font-normal">Ever</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in summary.scores" :key="row.mode" :data-mode="row.mode">
-            <td>{{ MODE_NAMES[row.mode] }}</td>
-            <td class="font-bold text-lamp">{{ row.dayBest }}</td>
-            <td>{{ row.monthBest }}</td>
-            <td>{{ row.everBest }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <DayScores :scores="summary.scores" />
       <p v-for="line in answerLines" :key="line" class="text-washi/80">{{ line }}</p>
-      <div
-        v-if="summary.kanji.mostRecognised || summary.kanji.mostMissed"
-        class="flex gap-6"
-        lang="ja"
-      >
-        <p v-if="summary.kanji.mostRecognised" data-testid="most-recognised">
-          <span class="block text-xs text-washi/60" lang="en">Most recognised kanji</span>
-          <span class="text-3xl text-aqua">{{ summary.kanji.mostRecognised.kanji }}</span>
-          <span class="text-washi/60"> ×{{ summary.kanji.mostRecognised.count }}</span>
-        </p>
-        <p v-if="summary.kanji.mostMissed" data-testid="most-missed">
-          <span class="block text-xs text-washi/60" lang="en">Most missed kanji</span>
-          <span class="bg-crimson px-1 text-3xl text-washi">{{
-            summary.kanji.mostMissed.kanji
-          }}</span>
-          <span class="text-washi/60"> ×{{ summary.kanji.mostMissed.count }}</span>
-        </p>
+      <div class="flex gap-6">
+        <KanjiHighlight
+          v-if="summary.kanji.mostRecognised"
+          label="Most recognised kanji"
+          :count="summary.kanji.mostRecognised"
+          data-testid="most-recognised"
+        />
+        <KanjiHighlight
+          v-if="summary.kanji.mostMissed"
+          label="Most missed kanji"
+          :count="summary.kanji.mostMissed"
+          is-missed
+          data-testid="most-missed"
+        />
       </div>
       <DayHaiku :haiku-ids="summary.haikuIds" :is-today="day === today" />
     </template>
