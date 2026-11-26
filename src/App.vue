@@ -153,11 +153,12 @@ async function chooseMode(next: GameMode): Promise<void> {
   runKey.value += 1;
 }
 
-/** A1: downloads this browser's events as an anonymous file. */
+/** A1: downloads this browser's word and grammar events as an anonymous file. */
 async function exportData(): Promise<void> {
   if (settings.value === null) return;
   const events = await orFallback(loadEvents, pastEvents.value);
-  downloadExport(buildExport(events, settings.value, new Date()));
+  const grammar = await orFallback(loadGrammarEvents, grammarEvents.value);
+  downloadExport(buildExport(events, settings.value, new Date(), grammar));
 }
 
 async function useSettings(updated: Settings): Promise<void> {

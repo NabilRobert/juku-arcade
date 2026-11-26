@@ -12,6 +12,7 @@ import { poolForNextSet } from '../src/memory/daily-deck.ts';
 import { buildExport, exportFileName } from '../src/memory/export.ts';
 import { deriveMemory } from '../src/memory/word-memory.ts';
 import { answer } from './helpers/events.ts';
+import { sentence } from './helpers/grammar-events.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
 
 const PLAYER = 'player-1';
@@ -152,13 +153,17 @@ describe('the export', () => {
       playMsToday: 0,
       checkUpOfferedDay: null,
     };
+    const grammar = [sentence('wa', DAY, 'right')];
     const file = buildExport(
       [answer('w0', DAY, 'clean')],
       settings,
       new Date('2026-11-21T12:00:00Z'),
+      grammar,
     );
     expect(file).toMatchObject({
-      format_version: 1,
+      format_version: 2,
+      grammar_event_count: 1,
+      grammar_events: grammar,
       player_id: 'abcdef12-3456',
       class_code: 'N5-SAT',
       event_count: 1,
