@@ -1261,3 +1261,44 @@ game didn't yet do:
 - **A fair word board:** a word run counts toward the best and the board
   only until today's deck is cleared, the pot banked at that moment
   included (`useDeckFinish.isRanked`); practice after it doesn't count.
+
+### D67: A reachable kanji goal, and sheets that balance learning with review (2026-11-26)
+
+- **The goal counts the level's official kanji list.** It counted every
+  kanji the level's words use, 405 for N5, most of them from harder
+  levels' lists (欲 in ほしい). It now counts the kanji OpenJLPT tags as on
+  the level's own list (Jonathan Waller's lists, not "supplementary"):
+  78 for N5, the 79th being in no N5 word. The deck builder carries the tag
+  (`KanjiNote.listLevel`); the other kanji are still played.
+- **Each sheet balances learning with review** (`kanji/sheet-mix.ts`):
+  every third kanji (3 of a sheet's 10) is one the player has mastered, so
+  it stays fresh; the rest are still being learned, from the official list
+  3 times in 4, so the goal fills, and from the level's other kanji
+  otherwise. A kind with nothing left falls back to the next (review →
+  list → other), so a new player only learns.
+- Considered: drawing only from the list until it's mastered (it hides most
+  of the kanji the level's words use for weeks), and plain weights (a
+  sheet's mix would vary too much to explain). Playtest decision:
+  "a balance of that would be nice".
+
+### D68: An accessibility pass: contrast and keyboard focus (2026-11-26)
+
+Checked against WCAG 2.1 AA in the built game, at desktop and phone sizes:
+contrast measured from the colours on screen, every button checked for a
+name, then keyboard focus by hand.
+
+- **Steel is a shade darker** (`#457b9d` → `#3c7090`, `--color-steel`):
+  white on steel was 4.3:1, under AA's 4.5:1, on every steel button, the
+  leaderboard and the Kanji card; it's 5.0:1 now. Faded white text on
+  steel (80%, 70%) can't pass on any steel this light, so it's full white
+  there; "sample data" on the wood goes from 50% to 60% white.
+- **Keyboard focus shows.** The pixel buttons' stepped corners are a
+  clip-path, which cut off the browser's focus outline, so nothing showed
+  where focus was. A ring is drawn inside each pixel button in its text
+  colour, and the cards get a lamp-yellow ring.
+- Already fine: every control has a name, Japanese text is marked `lang`,
+  motion follows the reduce-motion setting, and the timed modes pause (the
+  timers are part of the game, which WCAG allows when they can be paused).
+- Not covered: a screen reader run with VoiceOver, and playing a whole run
+  by keyboard alone; both are worth a session on a real device.
+

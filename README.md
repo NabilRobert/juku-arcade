@@ -51,8 +51,9 @@ Pages (`.github/workflows/deploy.yml`).
 Word data comes from [OpenJLPT](https://github.com/evanclan/OpenJLPT)
 (CC BY-SA 4.0), which uses JMdict and KANJIDIC2 (EDRDG), Jonathan Waller's
 JLPT lists, and Tatoeba; the generated decks are CC BY-SA 4.0 too. The
-fonts are balatro and Kuronuri (both OFL), and the card sounds are from
-Kenney's Casino Audio pack (CC0). The music is "France Instrumental" by
+fonts are balatro and Kuronuri (both OFL), the card sounds are from
+Kenney's Casino Audio pack (CC0), and the applause is "Applause from 40
+People #5" by Joseph Sardin, from [BigSoundBank](https://bigsoundbank.com/applause-from-40-people-5-s3521.html) (CC0). The music is "France Instrumental" by
 Sub_Clair, from [Pixabay](https://pixabay.com/music/france-france-instrumental-633138/)
 (Pixabay Content License). The classic haiku in Bunpou (Bashō, Buson,
 Issa) are in the public domain; the others were written for the game. No licence yet for the code.

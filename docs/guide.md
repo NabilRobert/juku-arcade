@@ -486,7 +486,12 @@ pinned OpenJLPT build.
   cards), and the deck's JLPT level (N5 to N1) in the bottom-left. The text sizes itself to the card with container
   units, and a reading longer than 6 kana goes in two columns.
 - **Sound and the combo (feeling involved):** every move gets an answer.
-  `sound/sfx.ts` plays them. The card sounds are recordings from Kenney's
+  `sound/sfx.ts` plays them. Applause (a CC0 recording from BigSoundBank,
+  in `public/sounds/` with its licence note; a slice of it, `RECORDING_STARTS_S`
+  and `RECORDING_MAX_S`) plays when a word set is cleared, when a kanji's
+  readings are all found, after a Bunpou tale the crowd enjoyed, and at the
+  curtain call; practice mode's right answers get a short burst of it
+  (`applauseShort`), as they come every second or so. The card sounds are recordings from Kenney's
   Casino Audio pack (CC0, in `public/sounds/` with its licence): a
   soft tap of a card landing as each card comes off the deck, one card
   every 150 ms, left to right and the top row first, rising along each
@@ -597,7 +602,9 @@ fields. They stay in memory until slice 3 stores them.
 | **Play calendar** | The start screen's grid of days, like a contribution graph: a column per week, each day brighter the more was answered. Clicking a day shows its summary | `memory/play-calendar.ts`, `memory/day-summary.ts`, `components/streak/` |
 | **Streak reminder** | The start screen's message about the streak, picked from templates that fit (after Duolingo's reminders); milestones (3, 7, 14, 30… days) are celebrated once | `memory/streak-messages.ts`, `composables/useStreak.ts` |
 | **Finish line** | Where a run ends (D61): word mode when today's deck is cleared, kanji mode after a sheet of 10, Bunpou after one chapter; each ends on the same results card | `composables/useDeckFinish.ts`, `kanji/useKanjiSheet.ts`, `ui/RunResults.vue` |
-| **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
+| **Level goal** | A goal for the whole level on each mode's card: words known, kanji mastered (perfect on two separate days, counting only the level's official kanji list), or Bunpou's rakugo rank (前座, 二ツ目, 真打) | `memory/level-goals.ts`, `ui/GoalBar.vue` |
+| **Official kanji list** | The kanji a JLPT level's list names (79 for N5), as OpenJLPT tags them. A level's words also use harder kanji (欲 in ほしい); those are played but not counted by the goal (D67) | `deck/types.ts: KanjiNote.listLevel`, `kanji/kanji-round.ts: kanjiPool` |
+| **Sheet mix** | Which kind of kanji each round of kanji mode draws: every third a mastered one, for review; the rest still being learned, from the official list 3 times in 4 (D67) | `kanji/sheet-mix.ts` |
 | **Practice mode** (the dojo in the code) | The game-over mode: questions on words, kanji and grammar the player has met, on the other modes' boards, until three lanterns are out; the timer tightens by stage to a floor | `dojo/`, `components/dojo/` |
 | **Total board** | The leaderboard that adds up your best run in each mode | `leaderboard/leaderboard.ts: boardBests` |
 | **Grammar reviews** | Each grammar point's spaced reviews, on the words' Leitner schedule; today's grammar is the points due plus up to 3 new | `grammar-reviews.ts`, `useGrammarReviews.ts` |
@@ -702,6 +709,13 @@ fields. They stay in memory until slice 3 stores them.
   (`preferences/folded-panels.ts`). Folded, the streak keeps its flame and
   length in sight, and on a wide screen the start screen drops to one
   column, with the leaderboard as a bar across the top (`ModePicker.vue`).
+- **Change End run:** every mode's side panel has `ui/EndRunButton.vue`,
+  which asks "End this run?" (in `ui/CardOverlay.vue`) before it ends the
+  run, and pauses the clock while it asks (`usePanelPause`). What ending
+  does is each mode's own: word mode banks the pot and shows its results
+  (`useDeckFinish.endNow`), kanji mode ends the sheet (`useKanjiSheet.endNow`),
+  practice mode ends as if the last lantern went out (`dojo-run.ts:
+  endedEarly`), and Bunpou plays its curtain call.
 - **Change a card back:** a word's back is `words/CardBack.vue` and a
   kanji's is `words/KanjiCardBack.vue`; both are built from
   `words/CardBackPanel.vue` (the paper panel and Turn over) and

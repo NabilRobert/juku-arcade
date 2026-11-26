@@ -17,7 +17,7 @@ import { readingsUsedByKanji, toKanjiReading } from '../src/kanji/readings.ts';
 import { deckWord, seededRandom } from './helpers/fixtures.ts';
 
 function note(onyomi: string[], kunyomi: string[]): KanjiNote {
-  return { onyomi, kunyomi, meanings: [], words: [] };
+  return { onyomi, kunyomi, meanings: [], words: [], listLevel: 'N5' };
 }
 
 function used(id: string, word: string, readings: Record<string, string[]>) {

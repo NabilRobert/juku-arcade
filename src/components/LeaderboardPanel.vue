@@ -98,7 +98,7 @@ function turn(by: number): void {
         <ArcadeButton :disabled="page === 0" data-testid="leaderboard-back" @click="turn(-1)">
           Back
         </ArcadeButton>
-        <span class="text-sm text-washi/80" data-testid="leaderboard-page"
+        <span class="text-sm text-washi" data-testid="leaderboard-page"
           >{{ page + 1 }} / {{ pages }}</span
         >
         <ArcadeButton
@@ -109,7 +109,7 @@ function turn(by: number): void {
           Next
         </ArcadeButton>
       </div>
-      <p class="text-center text-xs text-washi/70 normal-case">Sample players for now.</p>
+      <p class="text-center text-xs text-washi normal-case">Sample players for now.</p>
     </template>
   </section>
 </template>

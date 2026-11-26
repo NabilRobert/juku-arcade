@@ -22,9 +22,9 @@ const props = defineProps<{
   note?: string;
 }>();
 
-/** The pale buttons (aqua, paper) take dark text; the rest light. */
+/** The pale buttons (aqua, paper) take dark text; the rest full white, as faded white fails contrast on steel. */
 const textClass = computed(() =>
-  props.colour === 'aqua' || props.colour === 'paper' ? 'text-sumi/80' : 'text-washi/80',
+  props.colour === 'aqua' || props.colour === 'paper' ? 'text-sumi/80' : 'text-washi',
 );
 </script>
 

@@ -40,10 +40,17 @@ export function useKanjiSheet(source: SheetSource) {
     saveRound(source.round.value.kanji, result.isPerfect);
   });
 
+  /** True once the player ended the sheet early (End run): its results show at once. */
+  const isEndedEarly = ref(false);
+
   return {
     tally,
     /** The kanji on the table, counting from 1, never past the sheet's last. */
     kanjiNumber: computed(() => Math.min(source.roundNumber.value, KANJI_PER_SHEET)),
-    isDone: computed(() => source.roundNumber.value > KANJI_PER_SHEET),
+    isDone: computed(() => isEndedEarly.value || source.roundNumber.value > KANJI_PER_SHEET),
+    isEndedEarly,
+    endNow: () => {
+      isEndedEarly.value = true;
+    },
   };
 }

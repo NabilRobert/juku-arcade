@@ -100,9 +100,14 @@ describe('ending a run', () => {
     localStorage.clear();
     const screen = mount(BunpouScreen, {
       props: { level: 'N5', settings: SETTINGS, pastGrammarEvents: [], isAway: false },
+      attachTo: document.body,
     });
     expect(screen.find('[data-testid="strip"]').exists()).toBe(true);
     await screen.find('[data-testid="end-run"]').trigger('click');
+    // It asks first, so a misclick can't end the run.
+    expect(screen.find('[data-testid="strip"]').exists()).toBe(true);
+    document.querySelector<HTMLElement>('[data-testid="end-run-yes"]')?.click();
+    await nextTick();
     expect(screen.find('[data-testid="strip"]').exists()).toBe(false);
     expect(screen.find('[data-testid="stage"]').attributes('data-pose')).toBe('bow');
     expect(screen.find('[data-testid="curtain-left"]').attributes('data-closed')).toBeUndefined();

@@ -22,14 +22,12 @@ const CLOSING_LINE = 'おあとがよろしいようで';
 const BOW_MS = 1800;
 /** How long the curtains take to meet (StoryStage's transition), before the haiku card comes. */
 const CURTAIN_MS = 800;
-/** The applause: the crowd's roar, a little lower. */
-const APPLAUSE_PITCH = 0.85;
 
 const later = useLater();
 const isCurtainClosed = ref(false);
 const isHaikuShown = ref(false);
 onMounted(() => {
-  playSound('laughBig', APPLAUSE_PITCH);
+  playSound('applause');
   later(() => {
     isCurtainClosed.value = true;
     playSound('whoosh');

@@ -7,7 +7,7 @@
  * modes, its play time counts toward the nudges and the daily cap, and the
  * wellbeing screens stand in front of the question.
  */
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import type { JlptLevel } from '../../deck/types.ts';
 import type { DojoPools } from '../../dojo/dojo-questions.ts';
 import { LANTERNS } from '../../dojo/dojo-run.ts';
@@ -20,6 +20,7 @@ import { usePlayClock } from '../../composables/usePlayClock.ts';
 import { useWellbeing } from '../../composables/useWellbeing.ts';
 import type { Settings } from '../../memory/storage.ts';
 import FloatingPause from '../ui/FloatingPause.vue';
+import EndRunButton from '../ui/EndRunButton.vue';
 import SidePanel from '../ui/SidePanel.vue';
 import ModeHeader from '../ui/ModeHeader.vue';
 import PixelButton from '../ui/PixelButton.vue';
@@ -30,7 +31,7 @@ import TimerBar from '../ui/TimerBar.vue';
 import WellbeingGate from '../WellbeingGate.vue';
 import DojoQuestionView from './DojoQuestionView.vue';
 import LanternRow from './LanternRow.vue';
-import QuoteCard from './QuoteCard.vue';
+import QuoteCard from '../ui/QuoteCard.vue';
 
 const props = defineProps<{
   pools: DojoPools;
@@ -40,7 +41,11 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ leave: []; again: [] }>();
 
-const dojo = useDojoRun(props.pools);
+const questionView = useTemplateRef<InstanceType<typeof DojoQuestionView>>('questionView');
+// Cards picked or in the air when time runs out are judged, not lost.
+const dojo = useDojoRun(props.pools, {
+  settleOnTimeUp: () => questionView.value?.judgeNow() ?? null,
+});
 const { state, question, isLocked, stage, isPaused, timeLeft } = dojo;
 
 // The clock first reads this a tick after setup, once the wellbeing state below exists.
@@ -63,6 +68,8 @@ const pauseControls: PauseKeyInput = {
 usePauseKey(pauseControls);
 /** Opening the drawer on a phone or a tablet pauses the run, as it covers the board. */
 const onPanelToggle = usePanelPause(pauseControls);
+/** Asking "End this run?" pauses the question's clock too, on its own count, like the drawer. */
+const onEndRunToggle = usePanelPause(pauseControls);
 
 const resultPanels = computed(() => [
   { label: 'Your score was', value: String(state.value.right) },
@@ -99,6 +106,7 @@ function dismiss(isStopping: boolean): void {
         {{ isPaused ? 'Resume' : 'Pause' }}
       </PixelButton>
       <SoundToggle />
+      <EndRunButton v-if="!state.isOver" @end="dojo.endNow" @toggle="onEndRunToggle" />
       <p class="text-center text-xs text-washi/60">
         Words, kanji and grammar you've met, until three misses. The timer tightens every 10 right
         answers. Esc pauses.
@@ -113,7 +121,7 @@ function dismiss(isStopping: boolean): void {
     <WellbeingGate :is-capped="isCapped" :nudge="nudge" @dismiss="dismiss">
       <RunResults
         v-if="state.isOver"
-        title="Game over"
+        :title="state.lanterns > 0 ? 'Run ended' : 'Game over'"
         :panels="resultPanels"
         again-label="Restart"
         leave-label="Quit to main menu"
@@ -134,6 +142,7 @@ function dismiss(isStopping: boolean): void {
         <TimerBar v-if="question.kind !== 'grammar'" :time-left="timeLeft" />
         <DojoQuestionView
           :key="state.answered"
+          ref="questionView"
           :question="question"
           :level="level"
           :combo="state.combo"

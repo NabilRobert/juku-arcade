@@ -5,7 +5,7 @@ import type { DeckWord } from '../../src/deck/types.ts';
 export { seededRandom } from '../../src/game/random.ts';
 
 function kanji(onyomi: string[], kunyomi: string[], frequencyRank: number | null): KanjiRow {
-  return { onyomi, kunyomi, frequencyRank, meanings: [], words: [] };
+  return { onyomi, kunyomi, frequencyRank, meanings: [], words: [], listLevel: 'N5' };
 }
 
 /** Readings as KANJIDIC2 gives them (on-yomi in katakana, kun-yomi with okurigana dots). */

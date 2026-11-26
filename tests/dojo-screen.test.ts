@@ -11,11 +11,18 @@ import DojoScreen from '../src/components/dojo/DojoScreen.vue';
 import LanternRow from '../src/components/dojo/LanternRow.vue';
 import type { Deck } from '../src/deck/types.ts';
 import { dojoPools } from '../src/dojo/dojo-questions.ts';
-import { QUOTES } from '../src/dojo/quotes.ts';
+import { STAGE_SECONDS } from '../src/dojo/dojo-run.ts';
+import { QUOTES, REST_QUOTES } from '../src/dojo/quotes.ts';
 import { kanjiPool } from '../src/kanji/kanji-round.ts';
 import { deleteAllData, type Settings } from '../src/memory/storage.ts';
+import { playSound } from '../src/sound/sfx.ts';
 import { answer } from './helpers/events.ts';
 import { deckWord } from './helpers/fixtures.ts';
+
+vi.mock('../src/sound/sfx.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/sound/sfx.ts')>()),
+  playSound: vi.fn(),
+}));
 
 const DECK: Deck = {
   level: 'N5',
@@ -75,6 +82,32 @@ describe('the dojo on screen', () => {
     vi.useFakeTimers();
     const game = mountGame();
     await choose(game, true);
+    expect(game.find('[data-testid="score"]').text()).toBe('1');
+    expect(game.findComponent(LanternRow).props('lit')).toBe(3);
+  });
+
+  it('applauds each right answer with a short burst, and a miss with none', async () => {
+    vi.useFakeTimers();
+    vi.mocked(playSound).mockClear();
+    const game = mountGame();
+    await choose(game, false);
+    expect(playSound).not.toHaveBeenCalledWith('applauseShort');
+    await vi.advanceTimersByTimeAsync(2500);
+    await choose(game, true);
+    expect(playSound).toHaveBeenCalledWith('applauseShort');
+  });
+
+  it('judges the cards picked when time runs out, rather than counting a miss', async () => {
+    vi.useFakeTimers();
+    const game = mountGame();
+    await nextTick();
+    const board = game.findComponent(CardQuestionView);
+    const index = board.props('round').cards.findIndex((card) => card.isRight);
+    const readings = board
+      .findAllComponents(PlayCard)
+      .filter((card) => card.props('kind') === 'reading');
+    readings[index]?.vm.$emit('tap');
+    await vi.advanceTimersByTimeAsync((STAGE_SECONDS.word[0] ?? 0) * 1000 + 200);
     expect(game.find('[data-testid="score"]').text()).toBe('1');
     expect(game.findComponent(LanternRow).props('lit')).toBe(3);
   });
@@ -140,9 +173,9 @@ describe('the lanterns', () => {
   });
 });
 
-describe('the game-over quotes', () => {
+describe('the game-over and resting quotes', () => {
   it('each name who said it and where, so it can be checked', () => {
-    for (const quote of QUOTES) {
+    for (const quote of [...QUOTES, ...REST_QUOTES]) {
       expect(quote.text.length).toBeGreaterThan(0);
       expect(quote.by.length).toBeGreaterThan(0);
       expect(quote.source.length).toBeGreaterThan(0);

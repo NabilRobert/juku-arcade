@@ -142,6 +142,7 @@ describe("a day's kanji and scores on screen", () => {
       kunyomi: [],
       meanings: ['spirit', 'mind'],
       words: [{ word: '天気', reading: 'てんき' }],
+      listLevel: 'N5' as const,
     };
     const detail = mount(DayDetail, {
       props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: { 気: note } },
@@ -167,7 +168,13 @@ describe("a day's kanji and scores on screen", () => {
       runs: 1,
       kanji: { mostRecognised: { kanji: '学', count: 1 }, mostMissed: null },
     };
-    const note = { onyomi: ['ガク'], kunyomi: ['まな.ぶ'], meanings: ['study'], words: [] };
+    const note = {
+      onyomi: ['ガク'],
+      kunyomi: ['まな.ぶ'],
+      meanings: ['study'],
+      words: [],
+      listLevel: 'N5' as const,
+    };
     const detail = mount(DayDetail, {
       props: { day: TODAY, today: TODAY, summary, isRestDay: false, kanjiNotes: { 学: note } },
       attachTo: document.body,

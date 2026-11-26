@@ -33,7 +33,8 @@
   --color-sumi: #13283d;
   --color-crimson: #9b1b30;
   --color-aqua: #a8dadc;
-  --color-steel: #457b9d;
+  /* Steel is a shade darker than the palette's #457b9d, so white text on it passes WCAG AA (5:1, not 4.3:1). */
+  --color-steel: #3c7090;
   /* Cedar wood, for Bunpou's chapter scroll rods (D58). */
   --color-cedar: #7a5230;
   /* Warm stage light, for the spotlight on Bunpou's storyteller (D58). */
@@ -254,5 +255,15 @@
   /* A transform, not translate: some buttons already use translate to sit in place. */
   .pixel-button:active:not(:disabled) {
     transform: translateY(2px);
+  }
+
+  /*
+   * Keyboard focus: the stepped corners are a clip-path, which cuts off the
+   * browser's own outline, so the ring is drawn inside the button, in its
+   * text colour (which already contrasts with its background).
+   */
+  .pixel-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: calc(var(--pixel) * -2);
   }
 }

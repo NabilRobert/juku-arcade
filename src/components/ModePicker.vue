@@ -39,7 +39,8 @@ interface Card {
 
 const level = props.deck.level;
 const { history, today } = usePlayHistory(props.deck);
-const levelKanji = [...kanjiPool(props.deck).readings.keys()];
+/** The kanji goal counts the level's official kanji list only (D67), not every kanji its words use. */
+const levelKanji = [...kanjiPool(props.deck).levelList];
 const goals = computed<Partial<Record<GameMode, LevelGoal>>>(() => ({
   words: wordGoal(props.deck.words, history.value.wordEvents),
   kanji: kanjiGoal(levelKanji, history.value.kanjiRounds),
