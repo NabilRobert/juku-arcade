@@ -138,4 +138,13 @@ describe('the chapter scroll', () => {
     expect(scroll.findAll('article')).toHaveLength(3);
     expect(scroll.find('article h3').text()).toContain('◯ 3 / 4');
   });
+
+  it('leads to the curtain call, since a show is one chapter', async () => {
+    const tale = taleResults(['right']);
+    const scroll = mount(ChapterScroll, { props: { chapter: 1, tales: [tale, tale, tale] } });
+    const button = scroll.find('[data-testid="chapter-next"]');
+    expect(button.text()).toContain('Curtain call');
+    await button.trigger('click');
+    expect(scroll.emitted('next')).toHaveLength(1);
+  });
 });

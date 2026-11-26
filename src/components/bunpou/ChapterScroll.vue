@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
- * Every third tale, the chapter shown together as a scroll (D58): its
+ * After the third tale, the chapter shown together as a scroll (D58): its
  * number (第1章), then each tale (其の一, 其の二, 其の三) with its lines as
  * told and how many were right. Wooden rods top and bottom make the
- * scroll; the body scrolls if the chapter is long.
+ * scroll; the body scrolls if the chapter is long. A show is one chapter
+ * (D61), so its button leads to the curtain call.
  */
 import type { LineResult } from '../../grammar/bunpou-run.ts';
 import PixelButton from '../ui/PixelButton.vue';
@@ -37,7 +38,7 @@ const rightCount = (results: readonly LineResult[]): number =>
         data-testid="chapter-next"
         @click="$emit('next')"
       >
-        Next tale ▶
+        Curtain call ▶
       </PixelButton>
     </div>
     <div class="pixel-corners mx-[-0.75rem] h-4 bg-cedar" aria-hidden="true" />

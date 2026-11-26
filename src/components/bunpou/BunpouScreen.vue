@@ -4,8 +4,9 @@
  * reviews, score, level and best combo, the hint and sound switches, End
  * run) beside the stage and the table (D58: the storyteller keeps each
  * built line as a sealed slip, and forgets a line that times out), the
- * tale's performance after its last line, the chapter's scroll after every
- * third tale, or the results once the player ends the run. Every judged line goes to the
+ * tale's performance after its last line, the chapter's scroll after the
+ * third tale, then the curtain call and results: a show is one chapter
+ * (D61), though the player can end it sooner. Every judged line goes to the
  * grammar log and reviews (useGrammarReviews, D57), which also pick each
  * tale's points. Like kanji mode, its play time counts toward the nudges
  * and the school's daily cap (usePlayClock), the wellbeing screens stand
@@ -118,9 +119,10 @@ function afterTale(): void {
   game.nextTale();
 }
 
+/** A show is one chapter (D61): after its scroll comes the curtain call. */
 function afterChapter(): void {
   chapterShown.value = null;
-  game.nextTale();
+  endRun();
 }
 
 /** The line just judged, while its result shows. */
