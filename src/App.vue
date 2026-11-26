@@ -24,7 +24,8 @@ import {
   saveSettings,
   type Settings,
 } from './memory/storage.ts';
-import AppFooter, { type FooterTarget } from './components/AppFooter.vue';
+import { provideGoToPage, type PageTarget } from './composables/usePageLinks.ts';
+import AppFooter from './components/AppFooter.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
 import ModePicker, { type GameMode } from './components/ModePicker.vue';
@@ -140,10 +141,11 @@ async function openStats(): Promise<void> {
 }
 
 /** A footer link: the stats page loads the latest first; the rest just open. */
-function goTo(target: FooterTarget): void {
+function goTo(target: PageTarget): void {
   if (target === 'stats') void openStats();
   else page.value = target;
 }
+provideGoToPage(goTo);
 
 async function chooseMode(next: GameMode): Promise<void> {
   const latest = await orFallback(loadSettings, null);
@@ -206,7 +208,9 @@ onMounted(async () => {
   <LazyMotion :features="domMax">
     <MotionConfig reduced-motion="user">
       <TableBackground />
-      <main class="flex min-h-dvh flex-col gap-4 px-4 py-4 sm:px-8">
+      <!-- Clipped, so cards dealt up from under the screen never make the page scrollable mid-deal;
+           clip, unlike hidden, makes no scroll box, so the side panel stays sticky. -->
+      <main class="flex min-h-svh flex-col gap-4 overflow-clip px-4 py-4 sm:px-8">
         <h1
           class="flex items-center justify-center gap-3 text-2xl font-bold tracking-wide text-aqua"
         >
@@ -289,7 +293,7 @@ onMounted(async () => {
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
-        <AppFooter :is-nav-shown="settings !== null && page === 'game'" @go="goTo" />
+        <AppFooter :is-in-game="settings !== null && page === 'game'" @go="goTo" />
       </main>
     </MotionConfig>
   </LazyMotion>

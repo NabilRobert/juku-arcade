@@ -680,8 +680,14 @@ fields. They stay in memory until slice 3 stores them.
   (`ui/SidePanel.vue`), the pause button floats at the top right
   (`ui/FloatingPause.vue`), and cards deal up from under the screen
   (`composables/useDeal.ts: belowScreen`); card sizes there are
-  the `min(…dvh, …vw)` values on each card row in `words/GameBoard.vue`
-  and `kanji/KanjiBoard.vue`.
+  the `min(…svh, …vw)` values on each card row in `words/GameBoard.vue`
+  and `kanji/KanjiBoard.vue`. Sizes use `svh` (the screen's height with
+  the browser's address bar showing), not `dvh`: `dvh` changes as the bar
+  slides away, which resized the cards mid-scroll and made the page jump.
+  During a game the footer is hidden there, and its links (change mode,
+  stats, settings, about, research) sit at the bottom of the drawer
+  (`composables/usePageLinks.ts`, `ui/PageLinks.vue`), so the board fits
+  the screen with nothing to scroll.
 - **Add a screen:** if it isn't needed on the start screen, add it to
   `lazy-screens.ts` so it loads on demand (and is prefetched when idle).
 - **Change the stats page:** word numbers come from `memory/stats.ts`, grammar

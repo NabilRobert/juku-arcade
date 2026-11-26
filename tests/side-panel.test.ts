@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
+import { GO_TO_PAGE_KEY, type PageTarget } from '../src/composables/usePageLinks.ts';
 import PixelButton from '../src/components/ui/PixelButton.vue';
 import SidePanel from '../src/components/ui/SidePanel.vue';
 
@@ -13,11 +14,13 @@ function asPhone(): void {
   }));
 }
 
-const mountPanel = () =>
+/** With goToPage, the panel sits in the app shell, which provides what the links open. */
+const mountPanel = (goToPage?: (target: PageTarget) => void) =>
   mount(SidePanel, {
     props: { label: 'Run' },
     slots: { default: '<p data-testid="inside">Score</p>' },
     attachTo: document.body,
+    global: goToPage ? { provide: { [GO_TO_PAGE_KEY]: goToPage } } : {},
   });
 
 afterEach(() => {
@@ -54,6 +57,26 @@ describe('a mode’s side panel', () => {
     await panel.find('[data-testid="side-panel-toggle"]').trigger('click');
     expect(panel.findComponent(PixelButton).exists()).toBe(true);
     expect(panel.find('[data-testid="wipe"]').exists()).toBe(true);
+  });
+
+  it('holds the links out of the game on a phone, closing before it leaves', async () => {
+    asPhone();
+    const opened: PageTarget[] = [];
+    const panel = mountPanel((target) => opened.push(target));
+    await nextTick();
+    await panel.find('[data-testid="side-panel-toggle"]').trigger('click');
+    const stats = panel
+      .findAll('[data-testid="side-panel-links"] button')
+      .find((button) => button.text() === 'Stats');
+    await stats?.trigger('click');
+    expect(opened).toEqual(['stats']);
+    expect(panel.find('[data-testid="side-panel"]').classes()).toContain('-translate-x-full');
+  });
+
+  it('leaves the links to the footer on a wide screen', async () => {
+    const panel = mountPanel(() => undefined);
+    await nextTick();
+    expect(panel.find('[data-testid="side-panel-links"]').exists()).toBe(false);
   });
 
   it('stays open beside the board on a wide screen, with no tab', () => {

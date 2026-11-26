@@ -24,7 +24,7 @@ import { floatStyle, handStyle, SLOT_SIZE } from '../cards/hand-layout.ts';
 import { centreOffset, type Offset } from '../cards/throw-geometry.ts';
 
 /** Eight cards overlap more than word mode's six, to fit the same width (on a phone they're a grid instead). */
-const HAND_OVERLAP = '-4dvh';
+const HAND_OVERLAP = '-4svh';
 
 const props = withDefaults(
   defineProps<{
@@ -84,7 +84,7 @@ watch(
 <template>
   <section class="flex flex-col gap-y-3" aria-label="Kanji board">
     <div
-      class="flex flex-col items-center gap-2 [--card-height:min(24dvh,45vw)] sm:[--card-height:min(20dvh,24vw)] lg:[--card-height:34dvh]"
+      class="flex flex-col items-center gap-2 [--card-height:min(24svh,45vw)] sm:[--card-height:min(20svh,24vw)] lg:[--card-height:34svh]"
       data-testid="kanji-row"
     >
       <div :ref="table.registerWord(KANJI_SLOT)" :class="SLOT_SIZE">
@@ -138,7 +138,7 @@ watch(
     <!-- No deck on a phone or tablet (cards slide up from under the screen); beside the hand on desktop. -->
     <div class="flex flex-col items-center gap-3 pt-4 lg:flex-row lg:items-start lg:gap-4">
       <div
-        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16dvh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20dvh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20dvh] lg:[--hand-overlap:1]"
+        class="flex w-full flex-wrap justify-center gap-2 [--card-height:min(16svh,38vw)] sm:grid sm:grid-cols-4 sm:justify-items-center sm:[--card-height:min(20svh,24vw)] lg:w-auto lg:flex-1 [--hand-overlap:0] lg:flex lg:justify-center lg:gap-0 lg:[--card-height:20svh] lg:[--hand-overlap:1]"
         data-testid="reading-row"
       >
         <div
@@ -172,7 +172,7 @@ watch(
       </div>
       <div
         :ref="table.registerDeck"
-        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20dvh,8vw)] lg:block lg:[--card-height:20dvh]"
+        class="hidden w-[calc(var(--card-height)*0.75)] [--card-height:min(20svh,8vw)] lg:block lg:[--card-height:20svh]"
       >
         <CardDeck />
       </div>

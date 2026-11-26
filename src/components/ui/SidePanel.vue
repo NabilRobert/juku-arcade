@@ -9,6 +9,8 @@
  */
 import { computed, ref } from 'vue';
 import { useIsWide } from '../../composables/useIsWide.ts';
+import { injectGoToPage, type PageTarget } from '../../composables/usePageLinks.ts';
+import PageLinks from './PageLinks.vue';
 import PixelButton from './PixelButton.vue';
 
 defineProps<{ label: string }>();
@@ -16,6 +18,13 @@ defineProps<{ label: string }>();
 const isOpen = ref(false);
 const isWide = useIsWide();
 const isHidden = computed(() => !isWide.value && !isOpen.value);
+const goToPage = injectGoToPage();
+
+/** The game stays mounted behind the page it opens, so the drawer closes first. */
+function leaveFor(target: PageTarget): void {
+  isOpen.value = false;
+  goToPage?.(target);
+}
 </script>
 
 <template>
@@ -37,6 +46,13 @@ const isHidden = computed(() => !isWide.value && !isOpen.value);
       :inert="isHidden"
     >
       <slot />
+      <!-- The footer hides during a game on a phone or a tablet, so its links live here. -->
+      <PageLinks
+        v-if="goToPage !== null && !isWide"
+        class="mt-auto pt-4"
+        data-testid="side-panel-links"
+        @go="leaveFor"
+      />
     </div>
     <!-- The tab rides on the drawer's edge, so it shows whether the drawer is open or not. -->
     <PixelButton

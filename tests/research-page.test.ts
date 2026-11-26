@@ -28,15 +28,20 @@ describe('the research page', () => {
 
 describe('the footer', () => {
   it('opens the research page from its link during a game', async () => {
-    const footer = mount(AppFooter, { props: { isNavShown: true } });
+    const footer = mount(AppFooter, { props: { isInGame: true } });
     const link = footer.findAll('button').find((button) => button.text() === 'The research');
     await link?.trigger('click');
     expect(footer.emitted('go')?.[0]).toEqual(['research']);
   });
 
   it('shows only who made the game when there is no game', () => {
-    const footer = mount(AppFooter, { props: { isNavShown: false } });
+    const footer = mount(AppFooter, { props: { isInGame: false } });
     expect(footer.findAll('button')).toHaveLength(0);
     expect(footer.text()).toContain('@nabilrobert');
+  });
+
+  it('hides during a game on a phone or a tablet, so the board fits with nothing to scroll', () => {
+    const footer = mount(AppFooter, { props: { isInGame: true } });
+    expect(footer.classes()).toContain('max-lg:hidden');
   });
 });
