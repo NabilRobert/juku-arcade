@@ -13,8 +13,8 @@ describe('the pause button on a phone or a tablet', () => {
     expect(paused.emitted('resume')).toHaveLength(1);
   });
 
-  it('sits at the top right of the screen, and hides on a wide screen', () => {
+  it('sits at the top right of the page, and hides on a wide screen', () => {
     const classes = mount(FloatingPause, { props: { isPaused: false } }).classes();
-    expect(classes).toEqual(expect.arrayContaining(['fixed', 'top-3', 'right-3', 'lg:hidden']));
+    expect(classes).toEqual(expect.arrayContaining(['absolute', 'top-3', 'right-3', 'lg:hidden']));
   });
 });

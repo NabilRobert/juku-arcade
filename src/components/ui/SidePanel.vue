@@ -39,7 +39,7 @@ const isHidden = computed(() => !isWide.value && !isOpen.value);
     <!-- The tab rides on the drawer's edge, so it shows whether the drawer is open or not. -->
     <button
       type="button"
-      class="pixel-button absolute top-20 left-full bg-steel px-2 py-4 text-washi lg:hidden"
+      class="pixel-button absolute top-3 left-full bg-steel px-3 py-2 text-washi lg:hidden"
       :aria-expanded="isOpen"
       :aria-label="isOpen ? 'Close the panel' : 'Open the panel'"
       data-testid="side-panel-toggle"
