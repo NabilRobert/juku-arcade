@@ -24,6 +24,7 @@ import {
   type Settings,
 } from './memory/storage.ts';
 import AboutData from './components/AboutData.vue';
+import AppFooter, { type FooterTarget } from './components/AppFooter.vue';
 import CheckUpScreen from './components/CheckUpScreen.vue';
 import GameScreen from './components/words/GameScreen.vue';
 import KanjiScreen from './components/kanji/KanjiScreen.vue';
@@ -130,6 +131,12 @@ async function openStats(): Promise<void> {
   const latest = await orFallback(loadSettings, null);
   if (latest) settings.value = latest;
   page.value = 'stats';
+}
+
+/** A footer link: the stats page loads the latest first; the rest just open. */
+function goTo(target: FooterTarget): void {
+  if (target === 'stats') void openStats();
+  else page.value = target;
 }
 
 async function chooseMode(next: GameMode): Promise<void> {
@@ -260,26 +267,7 @@ onMounted(async () => {
           />
         </template>
         <p v-else class="text-center text-washi/60">Loading…</p>
-        <footer class="mt-auto flex flex-col items-center gap-2 text-washi/60">
-          <nav v-if="settings && page === 'game'" class="flex justify-center gap-6 text-sm">
-            <button type="button" class="underline" @click="page = 'mode'">Change mode</button>
-            <button type="button" class="underline" @click="openStats">Stats</button>
-            <button type="button" class="underline" @click="page = 'settings'">Settings</button>
-            <button type="button" class="underline" @click="page = 'about'">About the data</button>
-            <button type="button" class="underline" @click="page = 'research'">The research</button>
-          </nav>
-          <p class="text-xs text-washi/80">
-            made by
-            <a
-              class="underline"
-              href="https://github.com/NabilRobert"
-              target="_blank"
-              rel="noopener"
-              >@nabilrobert</a
-            >
-            · 2026
-          </p>
-        </footer>
+        <AppFooter :is-nav-shown="settings !== null && page === 'game'" @go="goTo" />
       </main>
     </MotionConfig>
   </LazyMotion>

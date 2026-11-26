@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import AppFooter from '../src/components/AppFooter.vue';
 import ResearchPage from '../src/components/ResearchPage.vue';
 import { SOURCE_GROUPS } from '../src/research/sources.ts';
 
@@ -22,5 +23,20 @@ describe('the research page', () => {
 
   it('says the sources back the ideas, not this game', () => {
     expect(mount(ResearchPage).text()).toContain('none of them studied this game');
+  });
+});
+
+describe('the footer', () => {
+  it('opens the research page from its link during a game', async () => {
+    const footer = mount(AppFooter, { props: { isNavShown: true } });
+    const link = footer.findAll('button').find((button) => button.text() === 'The research');
+    await link?.trigger('click');
+    expect(footer.emitted('go')?.[0]).toEqual(['research']);
+  });
+
+  it('shows only who made the game when there is no game', () => {
+    const footer = mount(AppFooter, { props: { isNavShown: false } });
+    expect(footer.findAll('button')).toHaveLength(0);
+    expect(footer.text()).toContain('@nabilrobert');
   });
 });
