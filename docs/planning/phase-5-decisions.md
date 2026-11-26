@@ -1415,6 +1415,7 @@ and is no guarantee of learning results or exam scores.
   - the weekly rest day is like Silverman & Barasch's repair, but not what
     they tested;
   - Moreno & Mayer used narrated lessons.
-- **Ryan et al. (2006):** the DOI registry gives pages 344–360, and the page
-  uses those. Its place in the paper is named by section, without page
-  numbers, until the quote's p. 347/p. 361 is checked against them.
+- **Ryan et al. (2006):** the printed issue is pages 344–360 (the DOI
+  registry). The free copy is Springer's early online version, numbered
+  347–363, so the card gives both, as it does for Silverman & Barasch's
+  manuscript. The quote was corrected to match.

@@ -57,7 +57,8 @@ export const research = {
       finding: 'Games appeal because they make players feel capable and free to choose.',
       summary:
         'Four studies. In the first three, university students played one, two or four games in a lab and said how capable and how free to choose they felt; those feelings predicted how much they enjoyed a game, whether they wanted to play it again, and how their mood changed. The fourth surveyed an online community of multiplayer gamers, where feeling capable, free to choose and connected to others each predicted enjoyment and future play.',
-      where: 'The abstract, and "General discussion", 2nd paragraph.',
+      where:
+        'p. 344, abstract; p. 358, "General discussion", 2nd paragraph. The free copy is the early online version, so its pages differ: the abstract is on p. 347 and the discussion on p. 361.',
       inGame: 'You pick your own mode, and the difficulty follows your skill.',
     },
     kivetz2006: {

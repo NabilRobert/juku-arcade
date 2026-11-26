@@ -52,7 +52,8 @@ export const research: Messages['pages']['research'] = {
       finding: 'Game memikat karena membuat pemain merasa mampu dan bebas memilih.',
       summary:
         'Empat penelitian. Di tiga penelitian pertama, mahasiswa memainkan satu, dua, atau empat game di laboratorium lalu menilai seberapa mampu dan seberapa bebas memilih yang mereka rasakan; perasaan itu memprediksi seberapa senang mereka dengan game itu, apakah mereka ingin memainkannya lagi, dan bagaimana suasana hati mereka berubah. Penelitian keempat menyurvei komunitas daring pemain game multipemain: merasa mampu, bebas memilih, dan terhubung dengan orang lain masing-masing memprediksi rasa senang dan keinginan bermain lagi.',
-      where: 'Abstrak, dan "General discussion", paragraf ke-2.',
+      where:
+        'hlm. 344, abstrak; hlm. 358, "General discussion", paragraf ke-2. Salinan gratisnya adalah versi daring awal, jadi halamannya berbeda: abstrak di hlm. 347 dan pembahasan di hlm. 361.',
       inGame: 'Kamu memilih mode sendiri, dan tingkat kesulitannya mengikuti kemampuanmu.',
     },
     kivetz2006: {
