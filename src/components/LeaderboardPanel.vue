@@ -54,12 +54,12 @@ function turn(by: number): void {
     >
       Leaderboard
     </h2>
-    <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Which board">
+    <div class="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Which board">
       <PixelButton
         v-for="choice in BOARDS"
         :key="choice.board"
         :colour="board === choice.board ? 'aqua' : 'steel'"
-        class="min-h-9 px-3 text-sm font-bold uppercase"
+        class="min-h-9 px-2 text-xs font-bold uppercase"
         :aria-pressed="board === choice.board"
         :data-testid="`board-${choice.board}`"
         @click="show(choice.board)"

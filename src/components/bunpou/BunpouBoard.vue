@@ -120,7 +120,7 @@ function dropAt(tile: string, point: Point): void {
         data-testid="hint"
         ><FuriganaText :marked="hint" is-reading-below
       /></span>
-      <TimerBar :time-left="timeLeft" />
+      <TimerBar class="flex-1" :time-left="timeLeft" />
       <PixelButton
         :colour="isPaused ? 'crimson' : 'steel'"
         class="px-4 py-1 text-sm"
