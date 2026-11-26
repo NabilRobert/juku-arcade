@@ -1178,9 +1178,10 @@ students may play on phones, it now fits a phone-width screen too, with
 desktop unchanged.
 
 - **Below the lg breakpoint:** the start screen stacks (streak, modes,
-  leaderboard); each mode puts its board first and folds its side panel
-  away under a Show panel button (`ui/SidePanel.vue`), asked for in
-  playtesting; word mode's set timer also shows above its cards.
+  leaderboard); each mode's board fills the screen and its side panel is
+  a drawer folded away to the left, slid open or closed by a tab on its
+  edge (`ui/SidePanel.vue`), asked for in playtesting for phones and
+  tablets; word mode's set timer also shows above its cards.
 - **Cards and tiles:** card rows cap their height by the window's width
   as well as its height, so a hand fits across; the kanji hand overlaps
   less; Bunpou's tiles shrink with their text. The calendar shows 12

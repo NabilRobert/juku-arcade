@@ -676,7 +676,8 @@ fields. They stay in memory until slice 3 stores them.
 - **Change a leaderboard:** the sample players and how your bests are
   worked out are in `leaderboard/leaderboard.ts`.
 - **Change the phone layout:** below Tailwind's `lg` breakpoint each
-  mode's side panel folds away (`ui/SidePanel.vue`); card sizes there are
+  mode's side panel is a drawer that slides in from the left
+  (`ui/SidePanel.vue`); card sizes there are
   the `min(…dvh, …vw)` values on each card row in `words/GameBoard.vue`
   and `kanji/KanjiBoard.vue`.
 - **Change the streak:** what counts as a day played is `playedDays` in
