@@ -1,5 +1,5 @@
 /**
- * Placeholder play for a local copy and the GitHub Pages demo
+ * Placeholder play for a local copy and the hosted demo
  * (VITE_SAMPLE_PLAY, see .env.example),
  * so the streak and the play calendar have something to show before
  * there's real play: a week's streak ending yesterday, with a different

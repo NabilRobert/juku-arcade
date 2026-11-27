@@ -240,6 +240,9 @@ rule, and there's no preview per branch. It also shares browser storage
 with any other site under `nabilrobert.github.io`. Cloudflare Pages stays
 the choice for a class playtest (docs/playtest.md).
 
+**D20 update (2026-11-27):** the demo has left GitHub Pages for the
+owner's server, behind a password (D76).
+
 ### D21: Licences (open: the code licence)
 
 The data is CC BY-SA 4.0, as OpenJLPT requires, with attribution. The
@@ -840,7 +843,8 @@ is a small, general option in `TableBackground.vue`: with the setting,
 it shows the picture (a still image or an animated GIF, which plays on
 its own) pixel-sharp, darkened by a 40% navy wash so the
 cards stand out, and skips the swirl's shader; without it, as in every
-public build (GitHub Pages has neither file), nothing changes.
+public build (neither file is committed, and the demo bundle leaves
+`public/local/` out), nothing changes.
 
 - **Beat:** committing the picture (not ours to publish); keeping the
   change as uncommitted edits (in the way of every later commit).
@@ -1448,3 +1452,40 @@ stored, and no migration is needed.
     undo D67's balance, and a backlog could crowd out new kanji;
   - counting kanji answers toward the words that use them. Rejected: it
     mixes the two and changes what the school measures.
+
+### D76: The demo sits behind a password, on the owner's server (2026-11-27)
+
+The demo was open to anyone with the link. The owner wants the online
+demo behind a password that only the portfolio shows: a visitor who finds
+the portfolio can play, and nobody gets in without the password. The code
+stays public (the owner's choice), so the lock covers the hosted demo, not
+the source.
+
+- **Where:** the owner's server, behind the Caddy that serves the other
+  sites. GitHub Pages only serves files, so it can't check a password, and
+  its deploy workflow is gone.
+- **How:** Caddy's built-in `basic_auth` (`ops/demo.Caddyfile`). Every
+  request, including the JS, the decks and the sounds, needs the
+  username `demo` and the password, or Caddy answers 401.
+- **The password:** only a bcrypt hash is kept, in a root-only file on the
+  server. The owner sets or changes it with one command,
+  `sudo juku-demo-password` (`ops/set-demo-password.sh`). It checks the
+  config and reloads Caddy, and puts the old password back if either step
+  fails.
+- **A trap avoided:** every response says `Cache-Control: private`.
+  Cloudflare caches a response marked `public` even when the request
+  carried a password, and would hand that copy to anyone.
+- **The bundle:** `npm run demo:bundle`, with the sample week on (as on
+  Pages), and without the private `public/local/` or its table picture, so
+  the table shows the moving swirl.
+- Owner's request (2026-11-27); the owner chose the server over Cloudflare.
+- **Considered:**
+  - a Cloudflare Worker with a styled lock page. Rejected: the owner
+    prefers his server;
+  - a small lock service behind Caddy's `forward_auth`, for a styled page.
+    Rejected: another app to run and maintain on a small server;
+  - the caddy-security plugin. Rejected: it needs a custom Caddy build;
+  - StatiCrypt on GitHub Pages. Rejected: the page is decrypted in the
+    browser and the decks stay downloadable, so it can be bypassed;
+  - Cloudflare Access. Rejected: it asks visitors for an email address, not
+    a shared password.

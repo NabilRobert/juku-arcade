@@ -40,3 +40,6 @@ src/fonts/
 
 # Reports written by npm run report
 report-output/
+
+# The demo bundle for the VPS, written by npm run demo:bundle
+juku-arcade-demo.tar.gz

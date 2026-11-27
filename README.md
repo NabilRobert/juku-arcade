@@ -10,8 +10,9 @@ met, with no timer, until your lanterns run out.
 It's a static web app with no server: progress stays in the browser. The
 interface is in English or Indonesian, switched in Settings.
 
-**Play it:** <https://nabilrobert.github.io/juku-arcade/> (on a laptop, a
-tablet, or a phone held upright).
+**Play it:** the online demo asks for a username and password, which are on
+the owner's portfolio (<https://nabilrobert.my.id/>). It plays on a laptop, a
+tablet, or a phone held upright. To run it yourself, see below.
 
 An optional daily check-up is designed to measure whether playing improves
 recall. No learners have been measured yet, so there's no result to report.
@@ -26,8 +27,8 @@ The first run downloads the pinned OpenJLPT file (about 6 MB) and builds
 the word decks.
 
 Checks, as CI runs them: `npm run lint`, `npm run typecheck`, `npm test`,
-`npm run build`. Every push to `main` that passes them deploys to GitHub
-Pages (`.github/workflows/deploy.yml`).
+`npm run build`. The online demo runs on the owner's server behind a
+password: [`ops/caddy-demo.md`](ops/caddy-demo.md) (D76).
 
 ## Layout
 
@@ -37,6 +38,7 @@ Pages (`.github/workflows/deploy.yml`).
 | `scripts/` | The deck and font builds, and the reports made from exported play data                                                                                                                           |
 | `public/`  | Fonts, card sounds, music and hosting headers                                                                                                                                                    |
 | `tests/`   | Vitest specs, one behaviour each                                                                                                                                                                 |
+| `ops/`     | Hosting the online demo behind a password: the Caddy block and the password command                                                                                                              |
 | `docs/`    | The guides and planning documents below                                                                                                                                                          |
 
 ## Read more
