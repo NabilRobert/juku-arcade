@@ -87,7 +87,8 @@ sudo juku-demo-password
 1. On the Mac: `npm run demo:bundle`.
    - It builds with the sample week of play on (`VITE_SAMPLE_PLAY=1`), so a
      visitor sees a filled-in streak calendar, labelled "sample data".
-   - It leaves out `public/local/`, which is private.
+   - It leaves out `public/local/` and its table picture (`VITE_TABLE_IMAGE`),
+     which are private, so the table shows the moving swirl.
 2. Copy `juku-arcade-demo.tar.gz` to the server.
 3. Extract it into a fresh folder, then swap that in for the web root, the
    same way as the portfolio site. Caddy needs no reload.

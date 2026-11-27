@@ -1476,7 +1476,8 @@ the source.
   Cloudflare caches a response marked `public` even when the request
   carried a password, and would hand that copy to anyone.
 - **The bundle:** `npm run demo:bundle`, with the sample week on (as on
-  Pages), and without the private `public/local/`.
+  Pages), and without the private `public/local/` or its table picture, so
+  the table shows the moving swirl.
 - Owner's request (2026-11-27); the owner chose the server over Cloudflare.
 - **Considered:**
   - a Cloudflare Worker with a styled lock page. Rejected: the owner
