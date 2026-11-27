@@ -1461,17 +1461,21 @@ the portfolio can play, and nobody gets in without the password. The code
 stays public (the owner's choice), so the lock covers the hosted demo, not
 the source.
 
-- **Where:** the owner's server, behind the Caddy that serves the other
-  sites. GitHub Pages only serves files, so it can't check a password, and
-  its deploy workflow is gone.
+- **Where:** the owner's server, in its own small Caddy container
+  (`ops/compose.yaml`), hardened like the portfolio's. The server's front
+  Caddy only forwards the demo's address to it, so setting it up or
+  changing the password never touches another site. GitHub Pages only
+  serves files, so it can't check a password, and its deploy workflow is
+  gone.
 - **How:** Caddy's built-in `basic_auth` (`ops/demo.Caddyfile`). Every
   request, including the JS, the decks and the sounds, needs the
   username `demo` and the password, or Caddy answers 401.
 - **The password:** only a bcrypt hash is kept, in a root-only file on the
   server. The owner sets or changes it with one command,
   `sudo juku-demo-password` (`ops/set-demo-password.sh`). It checks the
-  config and reloads Caddy, and puts the old password back if either step
-  fails.
+  config and reloads the demo's Caddy, and puts the old password back if
+  either step fails. Before the first password is set, the lock has no
+  accounts and refuses everyone.
 - **A trap avoided:** every response says `Cache-Control: private`.
   Cloudflare caches a response marked `public` even when the request
   carried a password, and would hand that copy to anyone.
@@ -1480,6 +1484,9 @@ the source.
   the table shows the moving swirl.
 - Owner's request (2026-11-27); the owner chose the server over Cloudflare.
 - **Considered:**
+  - the lock inside the front Caddy. Rejected: adding the folders means
+    recreating it, which takes every site down for a moment, and each
+    password change would reload it;
   - a Cloudflare Worker with a styled lock page. Rejected: the owner
     prefers his server;
   - a small lock service behind Caddy's `forward_auth`, for a styled page.

@@ -465,7 +465,9 @@ flowchart LR
     C -- right --> E["file_server sends the game<br/>(Cache-Control: private)"]
 ```
 
-1. **`ops/demo.Caddyfile`** is the server's Caddy block. `basic_auth` runs
+1. **`ops/demo.Caddyfile`** is the config of the demo's own Caddy container
+   (`ops/compose.yaml`). The server's front Caddy forwards the demo's address
+   to it. `basic_auth` runs
    before `file_server`, so no file goes out without the password.
 2. **`ops/set-demo-password.sh`**, run as `sudo juku-demo-password`, is how
    the owner sets the password. It writes only a bcrypt hash, to a
@@ -868,7 +870,7 @@ fields. They stay in memory until slice 3 stores them.
   30%):** the constants at the top of `scripts/report/render-play.ts`.
   Specs: `tests/play-report.test.ts`, on hand-built events.
 - **Change how the demo is hosted or locked:** `ops/demo.Caddyfile` (the
-  Caddy block) and `ops/caddy-demo.md` (setting it up, updating it); a
+  demo's Caddy config), `ops/compose.yaml` (its container) and `ops/caddy-demo.md` (setting it up, updating it); a
   class deploy is in `docs/playtest.md`.
 - **Change the demo password:** on the server, `sudo juku-demo-password`
   (`ops/set-demo-password.sh`). Only the owner does this.

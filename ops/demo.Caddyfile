@@ -1,16 +1,26 @@
 # The hosted juku-arcade demo, behind a password (D76).
 #
-# Paste this block into the server's Caddyfile after replacing the three
-# placeholders (see ops/caddy-demo.md). Every request, including the JS, the
-# decks and the sounds, needs the password, so nothing is served without it.
-# Only a bcrypt hash is kept, in the secret file, which
-# ops/set-demo-password.sh writes.
-<demo-domain> {
+# The whole config of the demo's own Caddy container (ops/compose.yaml); the
+# server's front Caddy only forwards the demo's address here (see
+# ops/caddy-demo.md). Every request, including the JS, the decks and the
+# sounds, needs the password, so nothing is served without it. Only a bcrypt
+# hash is kept, in the secrets folder, which ops/set-demo-password.sh writes.
+{
+	# The front Caddy and Cloudflare handle HTTPS. The admin API stays on
+	# (inside the container only): the password command reloads through it.
+	auto_https off
+}
+
+:8080 {
 	basic_auth bcrypt "Juku Arcade demo" {
-		import <secret-file>
+		# A pattern, not a file name, so Caddy still starts before the first
+		# password is set. With no hash, basic_auth has no accounts and
+		# refuses everyone. The command's temporary files don't end in .caddy.
+		import /secrets/*.caddy
 	}
 
-	root * <web-root>
+	# `current` is a link to the release being served; see ops/caddy-demo.md.
+	root * /srv/arcade/current
 	encode zstd gzip
 	file_server
 
