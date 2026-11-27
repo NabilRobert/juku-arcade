@@ -1,4 +1,5 @@
-# Cloudflare Pages response headers (D20); GitHub Pages ignores this file.
+# Cloudflare Pages response headers (D20). The hosted demo's Caddy block
+# (ops/demo.Caddyfile, D76) repeats this policy: change both together.
 # Everything the game loads comes from this site and it sends nothing
 # anywhere, so the policy allows only 'self'. Styles allow inline because
 # Vue and Motion set style attributes.
