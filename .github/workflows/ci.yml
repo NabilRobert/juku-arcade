@@ -26,6 +26,8 @@ jobs:
       - run: npm run build
       # The grammar content against that file; only the two shelf-map rules need the local CSV, so they're skipped here.
       - run: npm run grammar:check
+      # The demo's password command (ops/caddy-demo.md); shellcheck ships with the runner.
+      - run: shellcheck ops/set-demo-password.sh
       # Scans every commit for secrets. Same step as the other repos: installed
       # from the release and checked against the published checksum.
       - name: Install gitleaks, checked against its published checksum

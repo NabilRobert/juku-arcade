@@ -1,0 +1,36 @@
+# The hosted juku-arcade demo, behind a password (D76).
+#
+# Paste this block into the server's Caddyfile after replacing the three
+# placeholders (see ops/caddy-demo.md). Every request, including the JS, the
+# decks and the sounds, needs the password, so nothing is served without it.
+# Only a bcrypt hash is kept, in the secret file, which
+# ops/set-demo-password.sh writes.
+<demo-domain> {
+	basic_auth bcrypt "Juku Arcade demo" {
+		import <secret-file>
+	}
+
+	root * <web-root>
+	encode zstd gzip
+	file_server
+
+	# The same policy as public/_headers, which only Cloudflare Pages reads.
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+		Strict-Transport-Security "max-age=31536000"
+	}
+
+	# Every Cache-Control here says "private". Cloudflare stores a response
+	# marked "public" even when the request carried the password, and then
+	# hands that copy to anyone, password or not. "private" keeps each copy
+	# in the visitor's own browser.
+	@hashed path /assets/*
+	header @hashed Cache-Control "private, max-age=31536000, immutable"
+	@decks path /decks/*
+	header @decks Cache-Control "private, max-age=3600"
+	@everything_else not path /assets/* /decks/*
+	header @everything_else Cache-Control "private, no-cache"
+}
