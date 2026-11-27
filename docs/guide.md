@@ -452,6 +452,28 @@ flowchart TD
    - ESLint's `vue/no-bare-strings-in-template` fails on English typed
      straight into a template.
 
+## Where it runs: the demo behind a password
+
+The game is a static site, but the online demo isn't open: the owner's
+server asks for a password first (D76).
+
+```mermaid
+flowchart LR
+    A["Visitor finds the password<br/>on the portfolio"] --> B["Browser asks for<br/>username and password"]
+    B --> C["Caddy: basic_auth<br/>checks the bcrypt hash"]
+    C -- wrong or none --> D["401, nothing sent"]
+    C -- right --> E["file_server sends the game<br/>(Cache-Control: private)"]
+```
+
+1. **`ops/demo.Caddyfile`** is the server's Caddy block. `basic_auth` runs
+   before `file_server`, so no file goes out without the password.
+2. **`ops/set-demo-password.sh`**, run as `sudo juku-demo-password`, is how
+   the owner sets the password. It writes only a bcrypt hash, to a
+   root-only file the block imports.
+3. **`npm run demo:bundle`** builds what the server serves.
+
+How to set it up and update it: `ops/caddy-demo.md`.
+
 ## The look and wellbeing
 
 - **The styles** are Tailwind classes in the components. `src/style.css`
@@ -667,6 +689,8 @@ fields. They stay in memory until slice 3 stores them.
 | **Polite form / て-form** | ます, ました, ません, ませんでした, and the て-form (食べて) that ている, てから and てください build on: the verb forms templates ask for | `grammar/conjugate.ts` |
 | **Particle point / pattern point** | A particle point tests a particle after its noun (two loose noun+particle pairs); a pattern point tests a pattern like ている or ませんか, with only its pieces loose | `templates.ts: PATTERN_POINTS`, `template-check.ts: kindProblems` |
 | **Pinned OpenJLPT** | One exact OpenJLPT build, fixed by commit and SHA-256, the same one Juku uses | `scripts/openjlpt.ts` |
+| **Demo lock** | Caddy asking for a username and password before it sends any of the online demo's files (D76) | `ops/demo.Caddyfile` |
+| **bcrypt hash** | A one-way scramble of the password. Caddy keeps it to check the password against, and the password can't be recovered from it | `ops/set-demo-password.sh: hash_password` |
 
 ## Where to change things
 
@@ -790,7 +814,7 @@ fields. They stay in memory until slice 3 stores them.
   in `memory/play-calendar.ts`. The sample week of play is
   `memory/sample-play.ts`, shown while Settings' "Sample data" switch is on
   (`preferences/sample-play.ts`); `VITE_SAMPLE_PLAY` sets where the switch
-  starts (see `.env.example`; the GitHub Pages deploy starts it on).
+  starts (see `.env.example`; the demo bundle starts it on).
 - **Change the daily deck or endless mix:** edit `memory/daily-deck.ts`; its
   numbers (10 new words a day, the endless pool) are in `game/tuning.ts`.
 - **Change what's saved in the browser:** edit `memory/storage.ts`. Bump the
@@ -843,9 +867,11 @@ fields. They stay in memory until slice 3 stores them.
 - **Change a play report threshold (S3's 5%, S4's 40% and 30%, S6's
   30%):** the constants at the top of `scripts/report/render-play.ts`.
   Specs: `tests/play-report.test.ts`, on hand-built events.
-- **Change how it deploys:** `.github/workflows/deploy.yml` (GitHub Pages,
-  built for the `/juku-arcade/` folder); a class deploy is in
-  `docs/playtest.md`.
+- **Change how the demo is hosted or locked:** `ops/demo.Caddyfile` (the
+  Caddy block) and `ops/caddy-demo.md` (setting it up, updating it); a
+  class deploy is in `docs/playtest.md`.
+- **Change the demo password:** on the server, `sudo juku-demo-password`
+  (`ops/set-demo-password.sh`). Only the owner does this.
 - **Deploy or tune for the playtest:** `docs/playtest.md`.
 - **Keep a new kind of progress in the browser** (a best score, a
   collection): add its key to `src/memory/progress-keys.ts`, so "Delete

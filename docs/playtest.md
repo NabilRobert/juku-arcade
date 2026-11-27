@@ -16,24 +16,21 @@ tune it, and read what the data says. The plan is in
 
 ## 2. Deploy (D20)
 
-### The public build: GitHub Pages
+### The public demo: the owner's server, behind a password
 
-Every push to `main` that passes the checks deploys to
-<https://nabilrobert.github.io/juku-arcade/> (`.github/workflows/deploy.yml`;
-the repo's Pages source is set to GitHub Actions). To re-run it by hand:
-**Actions → Deploy → Run workflow**.
+The online demo runs on the owner's server behind Caddy, which asks for a
+username and password before it sends any file (D76). The portfolio shows
+both. Setting it up, updating it and changing the password:
+[`ops/caddy-demo.md`](../ops/caddy-demo.md).
 
-For a daily play limit there, add it to the workflow's build step:
+To update it, run `npm run demo:bundle` and swap the new bundle in on the
+server. For a daily play limit, add it to that build:
 
-```yaml
-      - run: npm run build -- --base=/juku-arcade/
-        env:
-          VITE_DAILY_CAP_MINUTES: 60
+```bash
+VITE_DAILY_CAP_MINUTES=60 npm run demo:bundle
 ```
 
-GitHub Pages ignores `public/_headers`, so this build has no content
-security policy, and branches get no preview. For a class, use Cloudflare
-Pages below.
+For a class, use Cloudflare Pages below: it gives every branch a preview.
 
 ### For a class: Cloudflare Pages
 
