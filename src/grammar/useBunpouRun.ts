@@ -93,7 +93,8 @@ export function useBunpouRun(options: BunpouRunOptions = {}) {
   };
   const { random } = settled;
   const newTale = () => makeTaleFromRanking(settled.pointsByPriority(), TEMPLATES, random);
-  const run = shallowRef(rules.startBunpouRun(newTale(), Date.now(), random));
+  // The game gives some lines' particles (D77); the dojo's untimed check doesn't.
+  const run = shallowRef(rules.startBunpouRun(newTale(), Date.now(), random, true));
   const timeLeft = useLineClock(run);
   useJudgedLines(run, settled);
 

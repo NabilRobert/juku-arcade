@@ -51,9 +51,21 @@ describe('the grammar log', () => {
       outcome: 'wrong',
       broken_rule: 'particle_after_wrong_word',
       answer: result.answer.join('|'),
+      given_tiles: result.answer.map(() => '_').join('|'),
       ms_taken: 5200,
       box_before: null,
     });
+  });
+
+  it('logs the particles a line started with (D77)', async () => {
+    await deleteAllData();
+    const reviews = useGrammarReviews(CURRICULUM, SETTINGS, []);
+    const result = { ...judgedLine(true), givenBoxes: [1] };
+    reviews.logJudged(result, 3000);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const [event] = await loadGrammarEvents();
+    const tiles = result.sentence.tiles.map((tile, index) => (index === 1 ? tile.text : '_'));
+    expect(event?.given_tiles).toBe(tiles.join('|'));
   });
 
   it('updates today’s grammar and the run’s lines as soon as a line is judged', () => {

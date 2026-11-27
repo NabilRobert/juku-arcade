@@ -15,6 +15,7 @@ export function sentence(pointId: string, day: string, outcome: SentenceOutcome)
       outcome,
       broken_rule: outcome === 'wrong' ? 'verb_not_last' : null,
       answer: 'a|b|c',
+      given_tiles: '_|_|_',
       ms_taken: 4000,
       level: 1,
       combo_before: 0,
