@@ -6,7 +6,8 @@
  * offered tile to put it in the first empty box, or drag it onto the box
  * it belongs in; drag a placed tile to another box to move it (a tile
  * already there swaps places), or off the strip, or tap it, to take it
- * back. A missed line shows its fix for a moment.
+ * back. A missed line shows its fix for a moment. A given particle (D77)
+ * starts in its box and stays there.
  *
  * Pausing turns the tiles face down where they lie, as word mode turns
  * its cards (D8), so a pause gives no free thinking time; the run's
@@ -159,7 +160,8 @@ function dropAt(tile: string, point: Point): void {
             :key="tile"
             :marked="markedOf(tile)"
             :is-face-down="isPaused"
-            :is-draggable="canMove"
+            :is-given="run.givenBoxes.includes(index)"
+            :is-draggable="canMove && !run.givenBoxes.includes(index)"
             data-placed
             @tap="emit('takeBack', tile)"
             @release="(point: Point) => dropAt(tile, point)"

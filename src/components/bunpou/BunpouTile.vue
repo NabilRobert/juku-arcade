@@ -8,7 +8,9 @@
  * Every tile is the same size (TEXT_SIZES). While paused it turns face down, showing the card back, at the same
  * size so nothing on the table moves (D8). A line's tiles are dealt in
  * like word mode's cards (D58): one after another from above, each with
- * the card-landing tap, a little higher than the one before.
+ * the card-landing tap, a little higher than the one before. A given
+ * particle (D77) sits fixed in its box, on plain shaded paper, so it reads
+ * as already placed and can't be tapped or dragged.
  * On a wide screen (lg) a tile is at most a fifth of the board's width, less
  * the gaps and the boxes' padding (cqw: the board is a size container), so a
  * sentence of five tiles always fits on one row, even on a 4:3 tablet in
@@ -17,6 +19,7 @@
 import { m, type PanInfo } from 'motion-v';
 import { parseFurigana } from '../../deck/furigana.ts';
 import { computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useLater } from '../../composables/useLater.ts';
 import { hoverPitch, playSound } from '../../sound/sfx.ts';
 import {
@@ -35,12 +38,15 @@ const props = defineProps<{
   isWrong?: boolean;
   isDraggable?: boolean;
   isFaceDown?: boolean;
+  /** A particle the line started with in its box (D77): fixed there. */
+  isGiven?: boolean;
   /** Its place in a fresh deal, so it's dealt in; left out, it just appears (a tile taken back). */
   dealIndex?: number;
 }>();
 const emit = defineEmits<{ tap: []; release: [point: Point] }>();
 
 const HELD_POSE = { scale: 1.1, rotate: 4 } as const;
+const { t } = useI18n();
 
 const later = useLater();
 onMounted(() => {
@@ -68,7 +74,17 @@ const textSize = computed(() => {
 
 const faceClass = computed(() => {
   if (props.isFaceDown) return 'card-back';
+  if (props.isGiven) return 'bg-washi-shade';
   return props.isWrong ? 'bg-crimson text-washi' : 'washi';
+});
+const plainText = computed(() =>
+  parseFurigana(props.marked)
+    .map((piece) => piece.text)
+    .join(''),
+);
+const ariaLabel = computed(() => {
+  if (props.isFaceDown) return t('bunpou.faceDownTile');
+  return props.isGiven ? t('bunpou.givenTile', { tile: plainText.value }) : undefined;
 });
 let pressedAt: Point | null = null;
 
@@ -106,8 +122,9 @@ function onRelease(info: PanInfo): void {
       class="pixel-button flex h-16 w-38 items-center justify-center px-2 text-sumi sm:h-24 sm:w-48 lg:w-[min(12rem,calc((100cqw-4rem)/5))]"
       :class="[faceClass, textSize]"
       :data-wrong="isWrong === true ? '' : undefined"
-      :disabled="isFaceDown"
-      :aria-label="isFaceDown ? $t('bunpou.faceDownTile') : undefined"
+      :disabled="isFaceDown || isGiven"
+      :aria-label="ariaLabel"
+      :data-given="isGiven === true ? '' : undefined"
       @pointerdown="onPress"
       @click="onClick"
     >

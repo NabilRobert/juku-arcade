@@ -9,13 +9,17 @@
  * combo and scores; a wrong one or a timeout resets the combo, as in word
  * mode, and is kept for the pause list. The levels are word mode's
  * (levels.ts), and the time per sentence depends on the level and the
- * number of tiles. After a tale's last line, the tale is revealed.
+ * number of tiles to place. After a tale's last line, the tale is revealed.
+ *
+ * In the game (not the dojo's untimed check), a line can start with some of
+ * its particles already in their boxes, fixed there (D77, given-particles.ts).
  */
 import { shuffled, type RandomSource } from '../game/deal.ts';
 import { FIRST_LEVEL, levelAfterMatch, levelAfterMiss } from '../game/levels.ts';
 import { MISSED_TRAY_SIZE } from '../game/tuning.ts';
 import { rankFor, type RankLetter } from '../game/combo-ranks.ts';
 import type { Sentence } from './fill.ts';
+import { chooseGivenBoxes } from './given-particles.ts';
 import { closestFix, isRightOrder, type Fix } from './order-check.ts';
 import type { Tale } from './tale.ts';
 
@@ -43,6 +47,8 @@ export interface LineResult {
   sentence: Sentence;
   /** The boxes as the player left them; a timeout can leave some empty (null). */
   answer: (string | null)[];
+  /** The boxes that started filled with a particle (D77), for the log. */
+  givenBoxes: number[];
   isRight: boolean;
   isTimedOut: boolean;
   fix: Fix;
@@ -54,10 +60,14 @@ export interface LineResult {
 export interface BunpouRun {
   tale: Tale;
   lineIndex: number;
-  /** This line's tiles in the order they're offered (shuffled). */
+  /** This line's loose tiles in the order they're offered (shuffled); given ones aren't offered. */
   offered: string[];
   /** One box per tile, left to right: the tile put there, or null while empty. */
   boxes: (string | null)[];
+  /** Boxes that started with their particle in them (D77): fixed, so nothing moves in or out. */
+  givenBoxes: number[];
+  /** Whether lines may start with particles given: on in the game, off in the dojo's check (D77). */
+  givesParticles: boolean;
   phase: BunpouPhase;
   /** This tale's judged lines, in order. */
   results: LineResult[];
@@ -100,12 +110,15 @@ function offerLine(
 ): BunpouRun {
   const line = run.tale.lines[lineIndex];
   const tiles = line?.tiles.map((tile) => tile.text) ?? [];
-  const lineDurationMs = sentenceDurationMs(run.level, tiles.length);
+  const givenBoxes = run.givesParticles && line ? chooseGivenBoxes(line, random) : [];
+  const looseTiles = tiles.filter((_, index) => !givenBoxes.includes(index));
+  const lineDurationMs = sentenceDurationMs(run.level, looseTiles.length);
   return {
     ...run,
     lineIndex,
-    offered: shuffled(tiles, random),
-    boxes: tiles.map(() => null),
+    offered: shuffled(looseTiles, random),
+    boxes: tiles.map((tile, index) => (givenBoxes.includes(index) ? tile : null)),
+    givenBoxes,
     phase: 'building',
     deadlineMs: nowMs + lineDurationMs,
     lineDurationMs,
@@ -115,12 +128,19 @@ function offerLine(
   };
 }
 
-export function startBunpouRun(tale: Tale, nowMs: number, random: RandomSource): BunpouRun {
+export function startBunpouRun(
+  tale: Tale,
+  nowMs: number,
+  random: RandomSource,
+  givesParticles = false,
+): BunpouRun {
   const empty: BunpouRun = {
     tale,
     lineIndex: 0,
     offered: [],
     boxes: [],
+    givenBoxes: [],
+    givesParticles,
     phase: 'building',
     results: [],
     missed: [],
@@ -144,6 +164,7 @@ function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
   const result = {
     sentence,
     answer,
+    givenBoxes: run.givenBoxes,
     isRight,
     isTimedOut,
     fix,
@@ -167,9 +188,17 @@ function judge(run: BunpouRun, isTimedOut: boolean): BunpouRun {
 
 const canPlace = (run: BunpouRun): boolean => run.phase === 'building' && run.pausedAtMs === null;
 
-/** The tiles in the boxes, in box order, without the empty ones. */
+/** The tiles the player has put in boxes, in box order: not the empty or the given ones. */
 export function placedTiles(run: BunpouRun): string[] {
-  return run.boxes.filter((tile) => tile !== null);
+  return run.boxes.filter(
+    (tile, index): tile is string => tile !== null && !run.givenBoxes.includes(index),
+  );
+}
+
+/** Whether a box can take the tile: it exists, isn't given (D77), and doesn't hold the tile already. */
+function canTake(run: BunpouRun, box: number, tile: string): boolean {
+  if (box < 0 || box >= run.boxes.length) return false;
+  return !run.givenBoxes.includes(box) && run.boxes[box] !== tile;
 }
 
 /**
@@ -181,7 +210,7 @@ export function placedTiles(run: BunpouRun): string[] {
 export function placeTile(run: BunpouRun, tile: string, at?: number): BunpouRun {
   if (!canPlace(run) || !run.offered.includes(tile)) return run;
   const target = at ?? run.boxes.indexOf(null);
-  if (target < 0 || target >= run.boxes.length || run.boxes[target] === tile) return run;
+  if (!canTake(run, target, tile)) return run;
   const boxes = [...run.boxes];
   const from = boxes.indexOf(tile);
   if (from >= 0) boxes[from] = boxes[target] ?? null;
@@ -192,7 +221,7 @@ export function placeTile(run: BunpouRun, tile: string, at?: number): BunpouRun 
 
 /** Takes a tile out of its box; with no tile named, the rightmost one placed. */
 export function takeBack(run: BunpouRun, tile = placedTiles(run).at(-1)): BunpouRun {
-  if (!canPlace(run) || tile === undefined) return run;
+  if (!canPlace(run) || tile === undefined || !run.offered.includes(tile)) return run;
   return { ...run, boxes: run.boxes.map((placed) => (placed === tile ? null : placed)) };
 }
 

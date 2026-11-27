@@ -27,6 +27,13 @@ function brokenRuleOf(result: LineResult): GrammarEvent['broken_rule'] {
   );
 }
 
+/** The boxes as the line started: its given particles, empty elsewhere (D77). */
+function givenTiles(result: LineResult): (string | null)[] {
+  return result.sentence.tiles.map((tile, index) =>
+    result.givenBoxes.includes(index) ? tile.text : null,
+  );
+}
+
 /** The grammar log event for a judged line. */
 function eventFor(
   identity: SessionIdentity,
@@ -40,6 +47,7 @@ function eventFor(
     outcome: outcomeOf(result),
     broken_rule: brokenRuleOf(result),
     answer: answerText(result.answer),
+    given_tiles: answerText(givenTiles(result)),
     ms_taken: Math.max(0, Math.round(msTaken)),
     level: result.level,
     combo_before: result.comboBefore,

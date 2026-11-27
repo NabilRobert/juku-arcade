@@ -1489,3 +1489,38 @@ the source.
     browser and the decks stay downloadable, so it can be bypassed;
   - Cloudflare Access. Rejected: it asks visitors for an email address, not
     a shared password.
+
+### D77: Some Bunpou lines start with their particles placed (2026-11-27)
+
+Playtest feedback: ordering four or five loose tiles blind was too hard.
+Now each line in the game gets one of three helps, as likely as each
+other (`grammar/given-particles.ts: chooseGivenBoxes`):
+
+- **every particle given:** the player orders only the words around them;
+- **all but one given:** the player places the words and one particle;
+- **none given:** every tile loose, as before.
+
+A line with one particle has two choices (it, or none), and a pattern
+line without loose particles gets none. Given particles sit where the
+template's own order puts them, which is always a right order, on shaded
+paper, and can't be moved or taken back (`run.givenBoxes`). The time
+counts only the tiles left to place.
+
+- **Particles only:** は, を, に, へ, で, が, も, と, から, まで and には
+  (`PARTICLES`). A pattern's pieces (から、, が、, います, ください) are what
+  a pattern line tests (D60), so they're never given.
+- **Not in the dojo:** the dojo's untimed check (D69) measures what the
+  player knows, so its lines give nothing.
+- **Logged:** each grammar event now records `given_tiles`, the boxes as
+  the line started (schema version 2). The reviews still count a right
+  line as right, given particles or not. Grammar memory is rebuilt from
+  the log, so if helped lines should count for less, that can change later
+  and apply to past answers too.
+- Owner's request (2026-11-27), from playtest feedback.
+- **Considered:**
+  - more help at lower levels, less at higher. Rejected for now: the
+    feedback asked for a mix on every line, and the level already sets
+    the time;
+  - giving the line's first tile or a whole unit instead. Rejected:
+    particles are what the mode teaches (D55), and a placed particle shows
+    the sentence's shape without giving away the words' order.

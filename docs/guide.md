@@ -365,7 +365,11 @@ pinned OpenJLPT build.
    **`src/grammar/useBunpouRun.ts: useBunpouRun`** makes a tale from the
    top of that ranking (`tale.ts: makeTaleFromRanking`) and starts the run (**`bunpou-run.ts: startBunpouRun`**),
    which offers the first line's tiles shuffled, with a time set by the
-   level and the tile count (`sentenceDurationMs`).
+   level and the number of tiles to place (`sentenceDurationMs`). Some
+   lines start with particles already in their boxes (D77):
+   **`given-particles.ts: chooseGivenBoxes`** picks all of them, all but
+   one, or none, and those boxes stay fixed (`run.givenBoxes`). The dojo's
+   untimed check never gives any.
 3. **`BunpouBoard.vue`** shows the part (起承転結), the timer bar, the
    strip of boxes (one per tile, `run.boxes`) and the offered tiles
    (**`BunpouTile.vue`**). A tap puts a tile in the first empty box; a
@@ -661,6 +665,7 @@ fields. They stay in memory until slice 3 stores them.
 | **Deal event** | Logged for every set, with the error type its decoy tests, so error rates can be per time shown | `run.ts: dealEvent` |
 | **Bunpou** | The grammar mode: put a sentence's tiles in order, line by line, then see the tale (D56) | `src/grammar/`, `components/bunpou/` |
 | **Tile / strip / box** | A word or particle the player places; the strip has one box per tile, filled in any order | `BunpouTile.vue`, `BunpouBoard.vue`, `run.boxes` |
+| **Given particle** | A particle a Bunpou line starts with already in its box, on shaded paper, fixed there. A line gives all its particles, all but one, or none (D77) | `grammar/given-particles.ts`, `run.givenBoxes`, `BunpouTile.vue: isGiven` |
 | **Grammar log** | The browser table of judged Bunpou lines, one event each, kept apart from the word log | `grammar-events.ts`, `storage.ts: grammarEvents` |
 | **Play log** | One record per run in any mode (score, answers, day), saved from its first answer so a closed game still counts, plus one per kanji round. The streak and the play calendar read it; the reviews never do | `memory/play-log.ts`, `composables/useRunLog.ts`, `storage.ts: runs, kanjiRounds` |
 | **Streak** | Days in a row with a run played, in any mode. One missed day a week (Monday to Sunday) is forgiven as a **rest day**; a second breaks it. Today never breaks it | `memory/streak.ts` |
@@ -890,6 +895,10 @@ fields. They stay in memory until slice 3 stores them.
   `POINTS_PER_SENTENCE` and `RANK_MULTIPLIERS` in
   `src/grammar/bunpou-run.ts`; how long a line's result shows is at the top
   of `src/grammar/useBunpouRun.ts`.
+- **Change how much help a line gets:** which tiles count as particles is
+  `PARTICLES`, and the all / all-but-one / none choice is `givenCount`,
+  both in `src/grammar/given-particles.ts`. The game turns it on with the
+  last argument of `startBunpouRun` in `useBunpouRun.ts`.
 - **Add a haiku:** add it to `HAIKU_BANK` in
   `src/grammar/haiku-bank.ts`, tagged with the lexicon words it fits; the
   collection's total follows. Bunpou's leaderboard samples are

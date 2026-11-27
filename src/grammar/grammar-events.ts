@@ -10,7 +10,8 @@
 import { localTimeWithOffset, type SessionIdentity } from '../game/events.ts';
 import type { BrokenRule } from './broken-rule.ts';
 
-export const GRAMMAR_EVENT_SCHEMA_VERSION = 1;
+/** 2 added given_tiles (D77); a version-1 event had every tile loose. */
+export const GRAMMAR_EVENT_SCHEMA_VERSION = 2;
 
 /** right: built in a right order; wrong: built in a wrong order; timeout: time ran out first. */
 export type SentenceOutcome = 'right' | 'wrong' | 'timeout';
@@ -31,6 +32,8 @@ export interface GrammarEvent {
   broken_rule: BrokenRule | null;
   /** The boxes as left, tile texts joined by '|', with '_' for an empty box. */
   answer: string;
+  /** The boxes as the line started, the same way: its given particles (D77), '_' for the rest. */
+  given_tiles: string;
   /** How long the player took, from the line shown to the judgement. */
   ms_taken: number;
   level: number;
